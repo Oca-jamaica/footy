@@ -339,6 +339,18 @@ function drawBall(x=B.x,y=B.y,z=B.z){
   ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=Math.max(.5,.5*q.s);ctx.beginPath();ctx.arc(q.x,q.y,r,0,7);ctx.stroke();
 }
 function groundRing(x,y,r,a0=0,a1=6.2832){wpath(wcircle(x,y,r,a0,a1,32))}
+// a fading streak behind a fast-moving ball
+let btrail=[],passFx=null;
+// a quick fading guide on the grass from passer to where the ball is headed
+function drawPassFx(){if(!passFx||state!=='play')return;const k=(t-passFx.t0)/26;if(k>=1){passFx=null;return}
+  const a=P(passFx.x0,passFx.y0),b=P(passFx.x1,passFx.y1);ctx.save();ctx.globalAlpha=(1-k)*.55;ctx.strokeStyle=C.mint;ctx.lineCap='round';ctx.lineWidth=Math.max(1.5,2.4*b.s);
+  ctx.setLineDash([2,7]);ctx.lineDashOffset=-k*30;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();ctx.ellipse(b.x,b.y,9*b.s*(1+k*.6),3.4*b.s*(1+k*.6),0,0,7);ctx.stroke();ctx.restore()}
+function drawTrail(){const n=btrail.length;if(n<2)return;const ch=ballCharge(),col=B.rocket?'255,111,89':ch>=2?'255,209,102':'255,255,255';
+  ctx.save();ctx.lineCap='round';
+  for(let i=1;i<n;i++){const a=P(btrail[i-1][0],btrail[i-1][1],btrail[i-1][2]+5),b=P(btrail[i][0],btrail[i][1],btrail[i][2]+5),k=i/n;
+    ctx.strokeStyle=`rgba(${col},${(.32*k*k).toFixed(3)})`;ctx.lineWidth=Math.max(1,9*b.s*k*(hr('giant')?2:1));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+  ctx.restore()}
 
 /* ---------- audio ---------- */
 let ac=null,master=null,muted=false,nbuf=null;
@@ -347,7 +359,25 @@ function initAudio(){
   master=ac.createGain();master.gain.value=muted?0:.55;master.connect(ac.destination);
   nbuf=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);const d=nbuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
   const n=ac.createBufferSource();n.buffer=nbuf;n.loop=true;const f=ac.createBiquadFilter();f.type='lowpass';f.frequency.value=420;const g=ac.createGain();g.gain.value=.05;n.connect(f).connect(g).connect(master);n.start();
+  crowdG=g;crowdF=f;
 }
+// The crowd murmur swells and brightens as the ball nears either goal, peaks on shots and goals, and settles down in midfield.
+let crowdG=null,crowdF=null,moodT=0;
+function crowdMood(dt){if(!crowdG||!ac)return;moodT-=dt;if(moodT>0)return;moodT=8;
+  let ex=0;
+  if(state==='play'){const dg=Math.min(Math.abs(B.x-FX0),Math.abs(B.x-FX1));ex=clamp(1-(dg-80)/420,0,1)*(Math.abs(B.y-MY)<260?.85:.45);
+    if(!B.owner&&B.shot)ex=Math.max(ex,.85);if(B.owner&&B.owner.breakaway)ex=Math.max(ex,.7)}
+  else if(state==='goal')ex=1;else if(state==='concede')ex=.3;
+  else if(state==='pens'&&pen)ex=pen.phase==='runup'||pen.phase==='fly'?.75:.3;
+  const tt=ac.currentTime;crowdG.gain.setTargetAtTime(.04+ex*.1,tt,.45);crowdF.frequency.setTargetAtTime(380+ex*560,tt,.45)}
+// Ticks over the last ten seconds, and a heads-up banner with half a minute left.
+let lastSec=null,banner=null;
+function clockCues(){if(state!=='play'||(SG&&SG.k==='slalom')){lastSec=null;return}const s=Math.ceil(clock);
+  if(lastSec!=null&&s!==lastSec){if(s===30&&lastSec>30&&!SG)banner={txt:'30 SECONDS LEFT',t0:t};if(s<=10&&s>0)tone(s<=3?1320:990,.06,'square',s<=3?.05:.03)}
+  lastSec=s}
+function trailStep(){const sp=Math.hypot(B.vx,B.vy);
+  if(!B.owner&&sp>7&&(state==='play'||state==='goal'||state==='concede')){btrail.push([B.x,B.y,B.z]);if(btrail.length>9)btrail.shift()}else if(btrail.length)btrail.shift();
+  if(parts.length>1200)parts.splice(0,parts.length-1200)}
 function tone(fr,dur,type='triangle',vol=.18,delay=0,slide=0){
   if(!ac)return;const t0=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(fr,t0);
   if(slide)o.frequency.exponentialRampToValueAtTime(fr*slide,t0+dur);
@@ -379,7 +409,10 @@ function setMute(m){muted=m;try{if(m&&window.speechSynthesis)speechSynthesis.can
 muteBtn.onclick=()=>{initAudio();setMute(!muted)};
 
 /* ---------- helpers ---------- */
-function pop(text,x,y,col=C.cream,size=20,z=52){pops.push({text,x,y:y+30,z,col,size,life:70})}
+function pop(text,x,y,col=C.cream,size=20,z=52){
+  // if another fresh pop is already right here, stack this one above it so both stay readable
+  for(let k=0;k<4&&pops.some(q=>q.life>38&&Math.abs(q.x-x)<85&&Math.abs(q.y-(y+30))<45&&Math.abs(q.z-z)<15);k++)z+=17;
+  pops.push({text,x,y:y+30,z,col,size,life:70})}
 function burst(x,y,n,cols,spd=6,grav=.12,size=[4,8]){const q=P(x,y,14);burstS(q.x,q.y,n,cols,spd,grav,size)}
 function burstS(x,y,n,cols,spd=6,grav=.12,size=[4,8]){for(let i=0;i<n;i++){const a=rnd(0,6.283),s=rnd(1,spd);parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-rnd(0,3),g:grav,life:rnd(60,120),max:120,c:pick(cols),w:rnd(size[0],size[1]),h:rnd(3,6),r:rnd(0,6),vr:rnd(-.3,.3)})}}
 function grass(wx,wy,n){const q=P(wx,wy);const x=q.x,y=q.y;for(let i=0;i<n;i++)parts.push({x,y,vx:rnd(-2,2),vy:rnd(-2,1),g:.08,life:rnd(15,30),max:30,c:'#3f8a4a',w:2,h:2,r:0,vr:0})}
@@ -529,6 +562,7 @@ function pass(p,to,through=false,assist=1){
   let a=Math.atan2(ty-p.y,tx-p.x);if(assist<1)a=p.dir+angDiff(a,p.dir)*assist;a+=rnd(-1,1)*(through?.02*(1.3-ps):.09*(1.25-ps));
   const spd=clamp(d*.046+6.2,6.8,14.5)*(.82+ps*.28);
   kick(p,a,spd,d>260?2.2:.4);B.pass={from:p,to,through};p.dir=a;S.pass();
+  if(p.team===0&&!p.keeper)passFx={x0:p.x,y0:p.y,x1:p.x+Math.cos(a)*d,y1:p.y+Math.sin(a)*d,t0:t};
   if(through)to.turbo=90;
   if(p.team===0&&!to.keeper)ctrl=to;else if(p.team===1&&NET.host&&!to.keeper)ctrl2=to;
 }
@@ -545,7 +579,8 @@ function passTarget(p){
 function humanPass(p){
   const m=passTarget(p);
   if(m)pass(p,m,false,.96);
-  else{kick(p,p.dir+rnd(-1,1)*.04*(1.2-p.st.pass),9.5,.4);B.pass={from:p,to:null,through:false};S.pass()}
+  else{const a=p.dir+rnd(-1,1)*.04*(1.2-p.st.pass);kick(p,a,9.5,.4);B.pass={from:p,to:null,through:false};S.pass();
+    if(p.team===0)passFx={x0:p.x,y0:p.y,x1:p.x+Math.cos(a)*220,y1:p.y+Math.sin(a)*220,t0:t}}
 }
 function bestMate(p){
   const att=p.team===0?1:-1;let bm=null,bs=-1e9;
@@ -585,6 +620,7 @@ function shoot(p,type,ch,aim=null){
   const k=keeperOf(1-p.team);k.track=true;k.err=p.team===0||pvp()?rnd(-1,1)*spd*1.6*(1.25-DF.gk):0;k.react=(p.team===1&&!pvp()?4:DF.react)+(type==='curler'?4:type==='knuckle'?6:type==='bicycle'?20:0)+rnd(0,3);
   if(p.team===0){stats.shots++;addHype(3)}
   S.kick(ch);grass(B.x,B.y,6+ch*10|0);
+  if(ch>.6||type!=='normal'){ring(B.x,B.y,'rgba(255,255,255,.85)');burst(B.x,B.y,5+ch*6|0,['#ffffff',C.sun],3.5,.06,[2,4])}
   if(rocket){S.boom();shake=Math.max(shake,RM?0:9);ring(p.x,p.y,C.coral)}
   if(type==='normal'&&ch>.92){shake=Math.max(shake,RM?0:5);pop('LACES',p.x,p.y-30,C.sun,18)}
 }
@@ -827,7 +863,7 @@ function humanUpdate(p,dt){
   else{
     // gentle acceleration, firmer braking, and a sharp plant when you cut back the other way
     const cutting=(ax||ay)&&cur>.5&&(p.vx*ax+p.vy*ay)/cur<.15;
-    if(cutting&&B.owner===p&&t-(p.cutT||-99)>18){p.cutT=t;p.pvx=p.vx;p.pvy=p.vy}
+    if(cutting&&B.owner===p&&t-(p.cutT||-99)>18){p.cutT=t;p.pvx=p.vx;p.pvy=p.vy;if(cur>2.4){grass(p.x,p.y,6);S.tap()}}
     let k=!(ax||ay)?.17:cutting?.24:.1;if(hr('ice'))k*=.32;
     p.vx+=(ax*sp-p.vx)*Math.min(1,k*dt);p.vy+=(ay*sp-p.vy)*Math.min(1,k*dt)}
   if(charging){charge=Math.min(1,charge+.024*dt);
@@ -1012,7 +1048,7 @@ function ballUpdate(dt,live){
   B.x+=B.vx*dt;B.y+=B.vy*dt;B.spin+=sp*.06*dt;
   const fr=B.z>0?.996:B.curl?.992:hr('ice')?.994:.984;B.vx*=Math.pow(fr,dt);B.vy*=Math.pow(fr,dt);
   const wasAir=B.z>0;
-  if(B.z>0||B.vz>0){B.vz-=(B.knuckle?.34:.25)*dt;B.z+=B.vz*dt;if(B.z<0){B.z=0;B.vz=Math.abs(B.vz)>1.2?-B.vz*.45:0;if(B.vz>0){B.curl*=.4;B.knuckle=0}}}
+  if(B.z>0||B.vz>0){B.vz-=(B.knuckle?.34:.25)*dt;B.z+=B.vz*dt;if(B.z<0){B.z=0;if(B.vz<-1.8){tone(110,.07,'sine',Math.min(.16,-B.vz*.03),0,.6);grass(B.x,B.y,3)}B.vz=Math.abs(B.vz)>1.2?-B.vz*.45:0;if(B.vz>0){B.curl*=.4;B.knuckle=0}}}
   if(B.lobTo&&wasAir&&B.z<=0){const m=B.lobTo;B.lobTo=null;m.lobRun=null;
     if(dist(m,B)<(B.lobThrough?72:58)&&m.stun<=0){give(m);if(m.team===0)ctrl=m;else if(NET.host)ctrl2=m}else{const th=B.lobThrough;B.vx*=th?0:.15;B.vy*=th?0:.15;B.vz=0;B.graceTo=m;B.graceT=th?75:40;m.lobRun={x:B.x,y:B.y}}}
   if(B.graceT>0){B.graceT-=dt;if(B.graceT<=0||B.owner){if(B.graceTo)B.graceTo.lobRun=null;B.graceTo=null}}
@@ -1101,7 +1137,7 @@ function goalFor(team){
     if(comp==='chal'&&chalCur&&!chalWon){if(chalCur.flag&&labels.some(l=>chalCur.flag.includes(l[0]))||(chalCur.hat&&hat&&hat.team===0)){chalWon=true;clock=Math.min(clock,.01);labels.unshift(['CHALLENGE DONE',100])}}
     phrase=labels.length&&ANN[labels[0][0]]?pick(ANN[labels[0][0]]):pick(PHRASES);speak(phrase);celebType=scorer.st.celeb??((Math.random()*6)|0);
     shake=RM?0:16;flash=RM?0:1;addHype(30);
-    burst(FX1+10,B.y,170,CONF,9,.13);burst(FX1-200,MY,100,CONF,12,.15);if(hat&&hat.team===0&&hat.t0===t){burst(FX1-300,FY0+80,140,CONF,12,.15);burst(FX1-300,FY1-80,140,CONF,12,.15)}
+    {const K=[...CONF,KIT(),KIT(),'#fff6e4'];burst(FX1+10,B.y,170,K,9,.13);burst(FX1-200,MY,100,K,12,.15)}if(hat&&hat.team===0&&hat.t0===t){burst(FX1-300,FY0+80,140,CONF,12,.15);burst(FX1-300,FY1-80,140,CONF,12,.15)}
     S.goal();
     scorer.cx=FX1-55;scorer.cy=scorer.y<MY?FY0+55:FY1-55;
   }else{
@@ -1151,7 +1187,7 @@ function kickoff(team){koT=t;
   const taker=pickTaker(team);taker.x=team===0?MIDX-12:MIDX+12;taker.y=MY;
   B.x=MIDX;B.y=MY;B.vx=B.vy=B.z=B.vz=0;B.shot=null;B.pass=null;B.curl=0;B.knuckle=0;B.rocket=false;
   give(taker);ctrl=team===0?taker:pickTaker(0);if(NET.host){ctrl2=team===1?taker:pickTaker(1);if(RS)RS.charging=false}lastPoss=team;
-  kickT=50;state='play';stT=0;rec=[];charging=false;passChain=0;S.whistle(1);
+  kickT=50;state='play';stT=0;rec=[];btrail=[];charging=false;passChain=0;S.whistle(1);
 }
 
 /* ---------- penalty shoot-out ---------- */
@@ -1401,6 +1437,7 @@ function update(dt){
   else if(state==='fulltime'){stT+=dt;if(cupEvent==='champion'&&stT%18<dt){firework(rnd(80,920),rnd(30,200));if(stT<200)burstS(rnd(100,900),-10,40,CONF,5,.1,[3,7])}if(stT>50&&shownEarned<earned){const before=shownEarned;shownEarned=Math.min(earned,shownEarned+Math.max(1,earned/70)*dt);if(Math.floor(before/25)!==Math.floor(shownEarned/25))tone(1200+shownEarned%400,.05,'triangle',.06)}if(score[0]>score[1]&&stT%30<dt)firework(rnd(100,900),rnd(25,120))}
   else if(state==='menu'){players.forEach((p,i)=>{p.dir+=Math.sin(t*.01+i)*.004})}
   for(const c of clouds){c.x+=.12*dt;if(c.x-c.r>W)c.x=-c.r}
+  trailStep();clockCues();crowdMood(dt);
   if(state!=='replay'&&state!=='menu')for(const p of players){const d=Math.hypot(p.x-(p.lx??p.x),p.y-(p.ly??p.y));p.runPh=(p.runPh||0)+d*.17;p.spdNow=(p.spdNow||0)+(d/Math.max(.2,dt)-(p.spdNow||0))*Math.min(1,.3*dt);p.lx=p.x;p.ly=p.y}
   updateCam(dt);
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];if(p.ring){p.r+=2.2*dt}else{p.vy+=p.g*dt;p.vx*=.99;p.x+=p.vx*dt;p.y+=p.vy*dt;p.r+=p.vr*dt}p.life-=dt;if(p.life<=0)parts.splice(i,1)}

@@ -26,7 +26,7 @@ function drawModeWorld(){
   if(SG&&state==='play'){const lab=SG.k==='target'?`TARGET PRACTICE  ·  ${SG.pts} pts  ·  ${Math.ceil(clock)}s`:SG.k==='slalom'?`SLALOM  ·  ${SG.time.toFixed(1)}s  ·  gate ${Math.min(SG.gi+1,SG.gates.length)}/${SG.gates.length}${SG.gi>=SG.gates.length?'  ·  now finish it!':''}`:'';
     if(lab){ctx.fillStyle='rgba(20,48,63,.9)';rr(W/2-210,76,420,30,15);ctx.fill();txt(lab,W/2,91,15,C.sun,'center',false)}}
   if(windX&&state==='play'){const d=Math.sign(windX);ctx.fillStyle='rgba(20,48,63,.85)';rr(W-150,76,120,26,13);ctx.fill();txt((d>0?'WIND →→':'←← WIND'),W-90,89,13,C.cream,'center',false)}}
-function drawSwipes(){if(state!=='play'&&state!=='goal'&&state!=='concede')return;for(const w of swipes)drawSwipe(w,w.pts.length,w.end==null?-1:t-w.end)}
+function drawSwipes(){drawPassFx();if(state!=='play'&&state!=='goal'&&state!=='concede')return;for(const w of swipes)drawSwipe(w,w.pts.length,w.end==null?-1:t-w.end)}
 function dizzyAt(p,x,y){const hf=lookOf(p.st)[3]||1,h=P(x,y,48*hf),r=14*h.s;for(let i=0;i<3;i++){const a=t*.18+i*2.094,sx=h.x+Math.cos(a)*r,sy=h.y+Math.sin(a)*r*.4;ctx.fillStyle=i===1?C.cream:C.sun;star(sx,sy,5.2*h.s)}}
 function drawCtrlMarker(){
   if(!ctrl||state!=='play')return;const p=ctrl,hf=lookOf(p.st)[3]||1,g=P(p.x,p.y);
@@ -39,7 +39,8 @@ function drawCtrlMarker(){
   {const o=B.owner;if(o&&o.team===1&&!o.keeper&&p.tackleCd<=0&&p.stun<=0&&p.lunge<=0){const d=dist(p,o);if(d<95){const inR=d<62,pl=.5+.5*Math.sin(t*.25);
     ctx.strokeStyle=inR?`rgba(127,224,180,${.55+.45*pl})`:'rgba(127,224,180,.28)';ctx.lineWidth=Math.max(2,(inR?3.4:2)*g.s);groundRing(p.x,p.y,inR?26+pl*3:24);ctx.stroke();
     if(inR){const h2=P(p.x,p.y,0);txt('STEAL',h2.x,h2.y+22,11,C.mint,'center',false)}}}}
-  if(B.owner!==p&&p.tackleCd>0){ctx.strokeStyle='rgba(255,111,89,.75)';ctx.lineWidth=Math.max(2,3*g.s);groundRing(p.x,p.y,19,-1.571,-1.571+(1-p.tackleCd/48)*6.283);ctx.stroke()}
+  if(p.tackleCd>(p.tcLast||0))p.tcMax=p.tackleCd;p.tcLast=p.tackleCd;
+  if(B.owner!==p&&p.tackleCd>0){ctx.strokeStyle='rgba(255,111,89,.75)';ctx.lineWidth=Math.max(2,3*g.s);groundRing(p.x,p.y,19,-1.571,-1.571+(1-p.tackleCd/(p.tcMax||48))*6.283);ctx.stroke()}
   if(B.owner===p&&!charging){const m=passTarget(p);if(m){ctx.save();ctx.strokeStyle='rgba(255,246,228,.6)';ctx.lineWidth=2;ctx.setLineDash([4,4]);groundRing(m.x,m.y,17);ctx.stroke();ctx.restore()}}
   if(p.stam<99){ctx.fillStyle='rgba(20,48,63,.6)';ctx.fillRect(g.x-14,g.y+6,28,4);ctx.fillStyle=p.stam<25?C.coral:C.mint;ctx.fillRect(g.x-14,g.y+6,28*p.stam/100,4)}
   if(charging){
@@ -94,11 +95,15 @@ function drawHUD(){
   // home | score | away | clock
   ctx.fillStyle=KIT();ctx.fillRect(x0,y0,5,hgt);ctx.fillStyle=OPP.kit;ctx.fillRect(x0+186,y0,5,hgt);
   txt(ab(home),x0+14,y0+hgt/2+1,19,'#ffffff','left',false);
+  {const sk=score.join('-');if(sk!==hudKey){if(hudKey!=null)hudBumpT=t;hudKey=sk}}
+  const bump=Math.max(0,1-(t-hudBumpT)/36);
+  if(bump>0){ctx.save();ctx.globalAlpha=bump;ctx.shadowColor=C.sun;ctx.shadowBlur=22*bump;ctx.fillStyle=C.sun;rr(x0+62,y0,70,hgt,6);ctx.fill();ctx.restore()}
   {const g=ctx.createLinearGradient(0,y0,0,y0+hgt);g.addColorStop(0,'#f5f5f5');g.addColorStop(1,'#cfd3d8');ctx.fillStyle=g;rr(x0+66,y0+4,62,hgt-8,4);ctx.fill()}
-  txt(score[0]+' - '+score[1],x0+97,y0+hgt/2+1,21,'#0d1117','center',false);
+  {const e=1+.45*bump*Math.abs(Math.sin(bump*Math.PI*1.5));ctx.save();ctx.translate(x0+97,y0+hgt/2+1);ctx.scale(e,e);txt(score[0]+' - '+score[1],0,0,21,'#0d1117','center',false);ctx.restore()}
   txt(ab(away),x0+137,y0+hgt/2+1,19,'#ffffff','left',false);
   ctx.fillStyle='#1d242e';rr(x0+196,y0+4,84,hgt-8,4);ctx.fill();
-  const m=Math.floor(clock/60),sec=Math.floor(clock%60);txt(m+':'+String(sec).padStart(2,'0'),x0+238,y0+hgt/2+1,20,clock<20?'#ff5a4a':'#ffffff','center',false);}
+  const m=Math.floor(clock/60),sec=Math.floor(clock%60),beat=state==='play'&&clock>0&&clock<=10?Math.pow(clock%1,3):0;
+  ctx.save();ctx.translate(x0+238,y0+hgt/2+1);ctx.scale(1+beat*.2,1+beat*.2);txt(m+':'+String(sec).padStart(2,'0'),0,0,20,clock<20?'#ff5a4a':'#ffffff','center',false);ctx.restore();}
   // hype and style, slim along the top right
   const rx=W-214;ctx.fillStyle='rgba(13,17,23,.82)';rr(rx,y0,196,hgt,6);ctx.fill();
   txt(fire>0?'ON FIRE':'HYPE',rx+12,y0+hgt/2+1,14,fire>0?'#ff5a4a':'#9fb0c0','left',false);
@@ -111,6 +116,16 @@ function drawHUD(){
   if(state==='play'&&kickT>0&&stT<50){ctx.globalAlpha=Math.min(1,kickT/20);txt('KICK OFF',W/2,140,40,'#ffffff');ctx.globalAlpha=1}
   drawAbilities();
 }
+let hudKey=null,hudBumpT=-999;
+function drawBanner(){if(!banner||state!=='play')return;const k=t-banner.t0;if(k>150){banner=null;return}
+  const e=elastic(k/26),a=Math.min(1,(150-k)/25);ctx.save();ctx.globalAlpha=a;ctx.translate(W/2,31);ctx.scale(e,e);
+  ctx.fillStyle='rgba(226,72,61,.94)';rr(-120,-16,240,32,6);ctx.fill();txt(banner.txt,0,1,20,'#fff','center',false);ctx.restore()}
+// warm pulsing glow round the edges of the screen while you're on fire
+function drawFireGlow(){if(fire<=0||state!=='play'||RM)return;const a=Math.min(1,fire/60)*(.55+.25*Math.sin(t*.12));
+  if(!fireCv){fireCv=document.createElement('canvas');fireCv.width=W/2;fireCv.height=H/2;const g=fireCv.getContext('2d'),rg=g.createRadialGradient(W/4,H/4,H*.2,W/4,H/4,W*.29);
+    rg.addColorStop(0,'rgba(255,111,89,0)');rg.addColorStop(.6,'rgba(255,111,89,.12)');rg.addColorStop(1,'rgba(255,120,60,.5)');g.fillStyle=rg;g.fillRect(0,0,W/2,H/2)}
+  ctx.save();ctx.globalAlpha=a;ctx.drawImage(fireCv,0,0,W,H);ctx.restore()}
+let fireCv=null;
 function drawPops(){for(const p of pops){ctx.globalAlpha=Math.min(1,p.life/25);const q=P(p.x,p.y,p.z),sz=p.size*(1+Math.max(0,(p.life-60)/10)*.4)*clamp(q.s,.8,1.6);txt(p.text,q.x,q.y,Math.round(sz),p.col);ctx.globalAlpha=1}}
 function drawGoalBanner(){
   const k=stT,word='GOAL!',sp=82,x0=W/2-sp*2;
@@ -171,12 +186,15 @@ function draw(){
     const near=1-Math.min(1,(replay.length-1-replayIdx)/60),zoom=1+near*.22,fz=BROAD.f*zoom,D=BROAD.dist+(BROAD.y-rf.b[1]);
     rcx+=(clamp(rf.b[0],FX0+260,FX1-230)-rcx)*.07;const th=H*.56-BROAD.h*fz/D;rhor+=(th-rhor)*.07;
     cam={...BROAD,x:rcx,f:fz,hor:rhor};drawReplay();ctx.restore();return}
-  ctx.save();if(shake>0)ctx.translate(rnd(-shake,shake)*.6,rnd(-shake,shake)*.6);
-  const ents=players.map(p=>({y:p.y,f:()=>drawPlayer(p)}));ents.push({y:B.y+.1,f:()=>drawBall()});
+  ctx.save();if(shake>0){
+    // a smooth rumble with a touch of roll, instead of jumping to a new random spot every frame
+    const sx=(Math.sin(t*1.7)+Math.sin(t*2.9+1.3)*.6)*.38*shake,sy=(Math.sin(t*2.3+.7)+Math.sin(t*3.7)*.5)*.38*shake;
+    ctx.translate(W/2+sx,H/2+sy);ctx.rotate(Math.sin(t*1.3)*shake*.0012);ctx.translate(-W/2,-H/2)}
+  const ents=players.map(p=>({y:p.y,f:()=>drawPlayer(p)}));ents.push({y:B.y+.1,f:()=>{drawTrail();drawBall()}});
   drawWorld(ents);
   if(hr('night')&&state!=='menu'){ctx.fillStyle='rgba(6,10,40,.42)';ctx.fillRect(0,0,W,H);for(const fx of [W*.15,W*.85]){const gr=ctx.createRadialGradient(fx,40,10,fx,40,420);gr.addColorStop(0,'rgba(255,250,220,.18)');gr.addColorStop(1,'rgba(255,250,220,0)');ctx.fillStyle=gr;ctx.fillRect(0,0,W,H)}}
   drawModeWorld();
-  drawSwipes();drawParts();drawDizzy();drawCtrlMarker();drawPops();
+  drawSwipes();drawParts();drawDizzy();drawCtrlMarker();drawPops();drawBanner();drawFireGlow();
   {const v=state!=='menu';if(vigOn!==v){vigOn=v;const e=$('vig');if(e)e.hidden=!v}}
   if(state==='goal'&&camK>0){ctx.fillStyle=`rgba(0,0,0,${.35*camK})`;ctx.fillRect(0,0,W,30*camK);ctx.fillRect(0,H-30*camK,W,30*camK);
     if(camK>.6){ctx.fillStyle=C.coral;ctx.beginPath();ctx.arc(W-90,H-15,4,0,7);ctx.fill();txt('STADIUM CAM',W-14,H-15,11,C.cream,'right',false)}}
@@ -434,6 +452,7 @@ function guestUpdate(dt){t+=dt;const h=netPeer('host');
       if(c){c.x+=lead.x;c.y+=lead.y;if(B.owner===c){B.x+=lead.x;B.y+=lead.y}}}
     if(state==='goal'&&stT%22<dt&&stT<220)burstS(rnd(100,900),rnd(-20,60),40,CONF,5,.1,[3,7])}
   for(const c of clouds){c.x+=.12*dt;if(c.x-c.r>W)c.x=-c.r}
+  trailStep();clockCues();crowdMood(dt);
   for(const p of players){const d=Math.hypot(p.x-(p.lx??p.x),p.y-(p.ly??p.y));p.runPh=(p.runPh||0)+d*.17;p.spdNow=(p.spdNow||0)+(d/Math.max(.2,dt)-(p.spdNow||0))*Math.min(1,.3*dt);p.lx=p.x;p.ly=p.y}
   updateCam(dt);
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];if(p.ring){p.r+=2.2*dt}else{p.vy+=p.g*dt;p.vx*=.99;p.x+=p.vx*dt;p.y+=p.vy*dt;p.r+=p.vr*dt}p.life-=dt;if(p.life<=0)parts.splice(i,1)}
@@ -503,6 +522,6 @@ function fixScreen(){pitchCv=null;skyCv=null;vigCv=null;grainPat=null;cv.width=W
 cv.addEventListener('contextrestored',()=>{cleanCtx()});
 if(document.fonts&&document.fonts.load)document.fonts.load('40px "Lilita One"').catch(()=>{});
 $('fixscr').onclick=fixScreen;$('fixscr2').onclick=()=>{setPause(false);fixScreen()};
-window.__kick={errs:()=>loopErrs,net:()=>({RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+window.__kick={errs:()=>loopErrs,setFire:v=>{fire=v},net:()=>({RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 requestAnimationFrame(loop);
 })();

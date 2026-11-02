@@ -333,7 +333,7 @@ function renderMenu(){
   else{$('diff-note').textContent=`${LV().name}: ${LV().note} Coins ×${+(DIFFS[diffKey].coin*LV().coin).toFixed(2)}.`;const c=club.cup,tro=(club.trophies||{})[c.tier]||0;
    $('cup').innerHTML=`<div class="cup-head"><b>${CUPS[c.tier]}</b><span>${tro?'\u{1F3C6} ×'+tro+' won':'Win three in a row to lift the trophy'}</span></div><div class="rounds">`+ROUNDS.map((r,i)=>{const o=OPPS[c.opps[i]],st=i<c.res.length?(c.res[i]?'won':'lost'):i===c.round&&c.alive?'now':'';
      return `<div class="rnd ${st}" style="--k:${o[1]}"><i>${r.toUpperCase()}</i><em>${esc(o[0])}</em>${st==='won'?'<b>WON</b>':st==='lost'?'<b>KNOCKED OUT</b>':st==='now'?'<b style="color:var(--sun)">NEXT</b>':''}</div>`}).join('')+`</div>`}
-  $('club-name').value=club.name;$('coins').textContent=club.coins.toLocaleString();
+  $('club-name').value=club.name;{const el=$('coins');el.textContent=club.coins.toLocaleString();if(shownCoins!=null&&club.coins!==shownCoins){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}shownCoins=club.coins}
   $('club-kit').innerHTML=KITS.map(c=>`<button type="button" style="background:${c}" aria-label="Kit colour" aria-pressed="${club.kit===c}" data-c="${c}"></button>`).join('');
   const q=sq();q.s=q.s.map(id=>id&&club.owned.includes(id)?id:null);
   // pitch
@@ -368,7 +368,7 @@ function renderMenu(){
   const filled=q.s.filter(Boolean).length,canFill=ownedPlayers().length>=4;
   goBtn.disabled=!canFill;goBtn.textContent=comp==='friendly'?'Play a friendly':comp==='chal'?`Try: ${CHALS.find(c=>c.id===chalId()).name}`:comp==='skill'?`Play ${SGAMES[sgId()].name}`:comp==='tour'?(tourOver()?'Enter a new tournament':`Play ${TROUNDS[club.tour.round].replace(/s$/,'').toLowerCase()} vs ${clubName(myMatch().a===ME?myMatch().b:myMatch().a)}`):cupOver()?(club.cup.alive?'Defend the trophy':'Enter the cup again'):`Play ${ROUNDS[club.cup.round].toLowerCase()} vs ${OPPS[club.cup.opps[club.cup.round]][0]}`;
 }
-const renderRoster=renderMenu;
+const renderRoster=renderMenu;let shownCoins=null;
 function toast(m){$('toast').textContent=m}
 /* ---------- Friendly + House Rules ---------- */
 const HRULES=[['golden','Golden goal','First goal wins it.'],['first3','First to 3','Match ends as soon as someone scores three.'],['nokeep','No keepers','Empty nets at both ends.'],
