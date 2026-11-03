@@ -6,7 +6,7 @@ const {chromium}=require('playwright');const path=require('path');
   const errs=[];pg.on('pageerror',e=>errs.push(String(e)));pg.on('console',m=>{if(m.type()==='error'&&!/fonts|ERR_|net::|Failed to load/.test(m.text()))errs.push(m.text())});
   await pg.goto('file://'+path.resolve('sunday-kickabout.html'));await pg.waitForTimeout(800);
   await pg.screenshot({path:out+'/menu.png'});
-  await pg.click('#go');await pg.waitForTimeout(1500);
+  await pg.click('#go');await pg.waitForTimeout(900);await pg.screenshot({path:out+'/intro.png'});await pg.keyboard.press('Space');await pg.waitForTimeout(600);
   await pg.keyboard.down('KeyD');await pg.waitForTimeout(1500);await pg.keyboard.down('Space');await pg.waitForTimeout(500);await pg.keyboard.up('Space');
   await pg.waitForTimeout(400);await pg.screenshot({path:out+'/play1.png'});await pg.keyboard.up('KeyD');
   for(let i=0;i<6;i++){await pg.keyboard.press(['ShiftLeft','KeyE','KeyR','Space'][i%4]);await pg.waitForTimeout(600)}
