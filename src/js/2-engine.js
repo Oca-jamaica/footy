@@ -338,6 +338,7 @@ function drawBall(x=B.x,y=B.y,z=B.z){
   ctx.restore();
   ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=Math.max(.5,.5*q.s);ctx.beginPath();ctx.arc(q.x,q.y,r,0,7);ctx.stroke();
 }
+const gaussN=()=>(Math.random()+Math.random()+Math.random()+Math.random()-2)*1.73;
 function groundRing(x,y,r,a0=0,a1=6.2832){wpath(wcircle(x,y,r,a0,a1,32))}
 // a fading streak behind a fast-moving ball
 let btrail=[],passFx=null;
@@ -470,7 +471,7 @@ function playKey(p,c){
     if(c==='KeyE'||c==='ArrowUp')doSkill(p);
     if(c==='KeyX'||c==='ArrowDown')doSpecial(p);
 }
-function playRelease(p){charging=false;if(state==='play'&&p&&canStrike(p)){if(p.aimY!=null)p.dir=Math.atan2(p.aimY-B.y,goalX(p.team)-B.x);p.quickShot=charge<.4;shoot(p,'normal',Math.max(charge,.5),p.aimY);p.quickShot=false}if(p)p.aimY=null}
+function playRelease(p){charging=false;if(state==='play'&&p&&canStrike(p)){if(p.aimY!=null)p.dir=Math.atan2(p.aimY-B.y,goalX(p.team)-B.x);p.quickShot=charge<.4;const w=sweetW(p);p.perfectShot=Math.abs(charge-SWEET)<=w/2;p.overShot=Math.max(0,charge-1);shoot(p,'normal',Math.max(Math.min(charge,1),.5),p.aimY);p.quickShot=false;p.perfectShot=false;p.overShot=0}if(p)p.aimY=null}
 addEventListener('keyup',e=>{keys[e.code]=false;if(NET.guest){if(e.code==='Space')guestKey('SpaceUp');return}
   if(state==='pens'&&pen){penKeyUp(e.code);return}
   if(e.code==='Space'&&charging)playRelease(ctrl)});// a quick tap still gets a decent strike
@@ -598,7 +599,9 @@ function shoot(p,type,ch,aim=null){
   const d=Math.hypot(gx-B.x,(ty??MY)-B.y);
   let spd,vz,curl=0,spread,knuckle=0,rocket=false;
   if(type==='normal'){spd=(7.5+ch*(3+pow*12))*fz;vz=.4+ch*1.4;spread=.015+ch*.08*(1.55-fin*1.15);if(p.quickShot)spread*=.6;if(p.team===0&&passChain>=3){spread*=.55;spd*=1.07}if((p.team===0||pvp())&&p.recvPass&&t-p.recvT<30){spread*=.6;pop('ONE-TOUCH',p.x,p.y-40,C.mint,15,40)}
-    else if((p.team===0||pvp())&&(B.owner!==p||t-p.recvT<26)){spread*=2.1;spd*=.88;pop('rushed it',p.x,p.y-40,C.muted,13,40)}}
+    else if((p.team===0||pvp())&&(B.owner!==p||t-p.recvT<26)){spread*=2.1;spd*=.88;pop('rushed it',p.x,p.y-40,C.muted,13,40)}
+    if(p.perfectShot){spread*=.5;spd*=1.045;pop('PERFECT STRIKE',p.x,p.y-52,C.mint,17,50);tone(1568,.1,'triangle',.08)}
+    if(p.overShot){spread*=1+p.overShot*4;vz+=p.overShot*12;pop('leaned back',p.x,p.y-52,C.coral,14,40)}}
   else if(type==='curler'){spd=(9.5+fin*3+clamp((d-240)*.011,0,4.5))*fz;vz=1;spread=.05*(1.55-fin*1.15)*Math.min(1,260/d+.35);
     const side=((ty??MY)>B.y?1:-1)*att,th=.14+fin*.13;a-=side*th;curl=side*Math.pow(spd*.8,2)*2*Math.sin(th)/Math.max(140,d)*1.3;
     // solve the launch angle with the real ball physics so long-range curlers still bend into the corner
@@ -610,8 +613,9 @@ function shoot(p,type,ch,aim=null){
   a+=rnd(-spread,spread);
   kick(p,a,spd,vz);B.curl=curl;B.knuckle=knuckle;B.rocket=rocket;
   if(p.breakaway)p.breakaway=false;
-  B.shot={one:!!p.wasClear,beat:p.beatRun||0,team:p.team,by:p,type,fx:p.x,first:t-p.recvT<22,skill:p.team===0&&t-lastSkillT<150,ch};
-  const k=keeperOf(1-p.team);k.track=true;k.err=p.team===0||pvp()?rnd(-1,1)*spd*1.6*(1.25-DF.gk):0;k.react=(p.team===1&&!pvp()?4:DF.react)+(type==='curler'?4:type==='knuckle'?6:type==='bicycle'?20:0)+rnd(0,3);
+  B.shot={perfect:!!p.perfectShot,one:!!p.wasClear,beat:p.beatRun||0,team:p.team,by:p,type,fx:p.x,first:t-p.recvT<22,skill:p.team===0&&t-lastSkillT<150,ch};
+  {const k=keeperOf(1-p.team),ai=!(k.team===0||pvp());
+   keeperRead(k,(ai?Math.round(DF.react*.55):6)+(type==='curler'?3:type==='knuckle'?5:type==='bicycle'?14:0)+rnd(0,2),type)}
   if(p.team===0){stats.shots++;addHype(3)}
   S.kick(ch);grass(B.x,B.y,6+ch*10|0);
   if(ch>.6||type!=='normal'){ring(B.x,B.y,'rgba(255,255,255,.85)');burst(B.x,B.y,5+ch*6|0,['#ffffff',C.sun],3.5,.06,[2,4])}
@@ -860,7 +864,7 @@ function humanUpdate(p,dt){
     if(cutting&&B.owner===p&&t-(p.cutT||-99)>18){p.cutT=t;p.pvx=p.vx;p.pvy=p.vy;if(cur>2.4){grass(p.x,p.y,6);S.tap()}}
     let k=!(ax||ay)?.17:cutting?.24:.1;if(hr('ice'))k*=.32;
     p.vx+=(ax*sp-p.vx)*Math.min(1,k*dt);p.vy+=(ay*sp-p.vy)*Math.min(1,k*dt)}
-  if(charging){charge=Math.min(1,charge+.024*dt);
+  if(charging){charge=Math.min(1.15,charge+.024*dt);
     if(p.aimY!=null){const c=openCorner(p.aimY,p.team);p.aimY+=(c-p.aimY)*Math.min(1,Math.max(.01,p.st.fin*.06)*dt);p.aimY=clamp(p.aimY+inY()*(7.5-charge*1.5)*dt,GY0-12,GY1+12);p.vx*=Math.pow(.9,dt);p.vy*=Math.pow(.9,dt);
       p.dir+=angDiff(Math.atan2(p.aimY-B.y,goalX(p.team)-B.x),p.dir)*Math.min(1,.3*dt)}}
 }
@@ -993,32 +997,47 @@ function aiShoot(p,dG){
   const ty=(k.y>MY?GY0+12:GY1-12)+rnd(-1,1)*DF.err*.75*(dG/200);
   const kOut=Math.abs(k.x-gx);
   let type='normal';const ch=rnd(.55,1);
-  const r=Math.random();if(dG<190&&kOut>36&&r<.3)type='chip';else if(r<.35)type='curler';
+  const r=Math.random();if(dG<190&&kOut>36&&r<.3)type='chip';else if(dG<260&&r<.22)type='curler';
   p.dir=Math.atan2(ty-B.y,gx-B.x);shoot(p,type,ch,ty);
 }
 
 const noKeep=()=>hr('nokeep')||(comp==='skill'&&SG&&SG.k==='slalom');
+// The keeper reads a shot the moment it's struck: he predicts where it will cross his line (curl included), with an
+// error that grows with pace, swerve and knuckle and shrinks with his quality. Then he has to get there: a short
+// reaction, then a dive that accelerates. Placement and pace beat him; a shot straight at him doesn't.
+const kgk=k=>(k.team===0||pvp())?1.02:DF.gk;
+function keeperRead(k,react,type='normal'){
+  const gk=kgk(k),spd=Math.hypot(B.vx,B.vy),a=Math.atan2(B.vy,B.vx);
+  let py=curlCross(B.x,B.y,a,spd,B.curl||0,B.vz||0,k.x);if(py==null){const tt=(k.x-B.x)/(B.vx||1e-3);py=B.y+B.vy*Math.max(0,tt)}
+  const far=Math.abs(k.x-B.x),clean=B.shot&&B.shot.perfect;
+  const sig=(3+spd*.45*(1.3-gk*.55)+far*.05)*(type==='curler'?(gk===1.02?1.25:1.7):type==='knuckle'?2.4:type==='rocket'?1.3:1)*(clean?1.4:1);
+  k.planErr=gaussN()*sig;k.planD0=Math.max(40,far);k.planY=py+k.planErr;k.react=Math.max(2,react);k.track=true;k.dv=0;k.diving=false}
 function keeperUpdate(k,dt){
   if(noKeep()){const gx=k.team===0?FX0:FX1;k.x=gx+(k.team===0?-8:8);k.y=GY1+30;k.vx=k.vy=0;if(B.owner===k){B.owner=null;const m=outfield(k.team)[0];if(m)give(m)}return}
-  const gx=k.team===0?FX0:FX1,s=k.team===0?1:-1;
+  const gx=k.team===0?FX0:FX1,s=k.team===0?1:-1,mine=k.team===0||pvp(),gk=kgk(k);
   if(k.stun>0)k.stun-=dt;
-  if(B.owner===k){k.hold-=dt;steer(k,gx+s*22,MY,1.5,dt);
+  if(B.owner===k){k.hold-=dt;k.diving=false;steer(k,gx+s*22,MY,1.5,dt);
     if(k.hold<=0){const m=bestMate(k)||pick(outfield(k.team));if(m)pass(k,m)}return}
   let shotIn=false;
   if(!B.owner&&B.vx*s<-2&&Math.abs(B.x-gx)<620&&!(B.lockBy===k&&B.lockT>0)){const tt=(gx-B.x)/B.vx,py=B.y+B.vy*tt;shotIn=py>GY0-34&&py<GY1+34}
-  if(shotIn&&!k.track){k.track=true;k.err=0;if(k.react<=0)k.react=(k.team===0||pvp())?11:DF.react}
-  if(!shotIn)k.track=false;
+  if(shotIn&&!k.track)keeperRead(k,mine?9:Math.round(DF.react*.6));// deflections and loose balls heading in
+  if(!shotIn){k.track=false;k.planY=null}
   if(shotIn){
-    if(k.react>0){k.react-=dt;k.vx*=.8;k.vy*=.8}
-    else{const tt=(k.x-B.x)/(B.vx||1e-3);let py=(tt>0?B.y+B.vy*tt:B.y)+(k.err||0);py=clamp(py,GY0-22,GY1+22);
-      const dy=py-k.y,dv=(k.team===0||pvp())?3.2:DF.dive*DF.gk;k.vy=clamp(dy,-dv,dv);k.vx=0;k.diving=Math.abs(dy)>8}
+    if(k.react>0){k.react-=dt;k.vx*=.7;k.vy*=.7}
+    else{// he keeps reading it as it comes: his early misjudgement shrinks the closer the ball gets
+      {const spd=Math.hypot(B.vx,B.vy),py=curlCross(B.x,B.y,Math.atan2(B.vy,B.vx),spd,B.curl||0,B.vz||0,k.x);
+       if(py!=null)k.planY=py+(k.planErr||0)*Math.pow(clamp(Math.abs(k.x-B.x)/(k.planD0||200),0,1),.6)}
+      const ty=clamp(k.planY??B.y,GY0-24,GY1+24),dy=ty-k.y,max=(mine?3.5:DF.dive*1.15)*gk;
+      k.dv=Math.min(max,(k.dv||0)+.45*gk*dt);k.vy=clamp(dy,-k.dv,k.dv);k.vx=0;if(Math.abs(dy)>7)k.diving=true}
   }else{
     k.diving=false;
     const threat=B.owner&&B.owner.team!==k.team?Math.hypot(B.x-gx,B.y-MY):999;
-    const out=14+(threat<220?(220-threat)/220*40*((k.team===0||pvp())?1:DF.gk):0);
-    const ty=clamp(MY+(B.y-MY)*.55,GY0+6,GY1-6);
+    const out=14+(threat<220?(220-threat)/220*40*(mine?1:gk):0);
+    let ty=clamp(MY+(B.y-MY)*.55,GY0+6,GY1-6);
+    // their keeper watches your shooting stance and shades towards where you're aiming: switch corners late to beat him
+    const sh=B.owner;if(!mine&&sh&&sh.team!==k.team&&sh.aimY!=null&&(sh===ctrl?charging:sh===ctrl2&&RS&&RS.charging))ty=clamp(ty+(sh.aimY-ty)*.3*gk,GY0+4,GY1-4);
     steer(k,gx+s*out,ty,2.3,dt);
-    if(!B.owner&&!B.lobTo&&!(B.graceT>0)&&B.lockBy!==k&&Math.abs(B.x-gx)<BOX&&Math.abs(B.y-MY)<130&&B.z<24&&Math.hypot(B.vx,B.vy)<((k.team===0||pvp())?6:4)&&dist(k,B)<((k.team===0||pvp())?150:120))steer(k,B.x,B.y,(k.team===0||pvp())?3.4:2.8,dt);
+    if(!B.owner&&!B.lobTo&&!(B.graceT>0)&&B.lockBy!==k&&Math.abs(B.x-gx)<BOX&&Math.abs(B.y-MY)<130&&B.z<24&&Math.hypot(B.vx,B.vy)<(mine?6:4)&&dist(k,B)<(mine?150:120))steer(k,B.x,B.y,mine?3.4:2.8,dt);
   }
 }
 
@@ -1059,7 +1078,7 @@ function ballUpdate(dt,live){
     const crossed=(B.px-k.x)*(B.x-k.x)<=0||Math.abs(B.x-k.x)<11;
     if(!crossed||B.z>27)continue;
     const f=B.x===B.px?1:clamp((k.x-B.px)/(B.x-B.px),0,1),yc=B.y-B.vy*dt*(1-f);
-    const reach=(k.team===0?13.5:12*DF.gk)+(k.diving?(k.team===0?10:10):0);
+    const reach=12.5*kgk(k)+(k.diving?11:0);
     if(Math.abs(yc-k.y)<reach&&Math.abs(B.x-(k.team===0?FX0:FX1))<BOX){
       const s=k.team===0?1:-1;
       if(B.rocket&&Math.random()<.5){B.rocket=false;B.vx*=.8;B.vy+=rnd(-1,1);B.lockBy=k;B.lockT=30;pop('THROUGH HIS HANDS!',k.x-s*60,k.y-30,C.coral,20);S.boom();continue}

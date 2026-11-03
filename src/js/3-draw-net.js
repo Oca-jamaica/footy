@@ -44,8 +44,13 @@ function drawCtrlMarker(){
   if(B.owner===p&&!charging){const m=passTarget(p);if(m){ctx.save();ctx.strokeStyle='rgba(255,246,228,.6)';ctx.lineWidth=2;ctx.setLineDash([4,4]);groundRing(m.x,m.y,17);ctx.stroke();ctx.restore()}}
   if(p.stam<99){ctx.fillStyle='rgba(20,48,63,.6)';ctx.fillRect(g.x-14,g.y+6,28,4);ctx.fillStyle=p.stam<25?C.coral:C.mint;ctx.fillRect(g.x-14,g.y+6,28*p.stam/100,4)}
   if(charging){
-    ctx.lineCap='round';ctx.lineWidth=Math.max(3,4.5*g.s);ctx.strokeStyle='rgba(20,48,63,.35)';groundRing(p.x,p.y,24);ctx.stroke();
-    ctx.strokeStyle=charge>.8?C.coral:charge>.45?C.sun:C.mint;groundRing(p.x,p.y,24,-1.571,-1.571+charge*6.283);ctx.stroke();ctx.lineCap='butt';
+    // the ring is the power meter: gold = perfect strike, red = too much (it'll balloon)
+    const A=v=>-1.571+v/1.15*6.283,w=sweetW(p),perf=Math.abs(charge-SWEET)<=w/2;
+    ctx.lineCap='butt';ctx.lineWidth=Math.max(4,6*g.s);ctx.strokeStyle='rgba(13,17,23,.55)';groundRing(p.x,p.y,24);ctx.stroke();
+    ctx.strokeStyle='rgba(255,209,102,.55)';groundRing(p.x,p.y,24,A(SWEET-w/2),A(SWEET+w/2));ctx.stroke();
+    ctx.strokeStyle='rgba(255,111,89,.45)';groundRing(p.x,p.y,24,A(1),A(1.15));ctx.stroke();
+    ctx.lineCap='round';ctx.lineWidth=Math.max(3,4.2*g.s);ctx.strokeStyle=charge>1?C.coral:perf?'#fff':C.mint;groundRing(p.x,p.y,24,-1.571,A(charge));ctx.stroke();ctx.lineCap='butt';
+    if(perf){ctx.strokeStyle='rgba(255,209,102,.9)';ctx.lineWidth=Math.max(2,2.5*g.s);groundRing(p.x,p.y,30+Math.sin(t*.6));ctx.stroke()}
     drawAimLine(p);
   }
 }
@@ -523,6 +528,6 @@ function fixScreen(){pitchCv=null;skyCv=null;vigCv=null;grainPat=null;cv.width=W
 cv.addEventListener('contextrestored',()=>{cleanCtx()});
 if(document.fonts&&document.fonts.load)document.fonts.load('40px "Lilita One"').catch(()=>{});
 $('fixscr').onclick=fixScreen;$('fixscr2').onclick=()=>{setPause(false);fixScreen()};
-window.__kick={errs:()=>loopErrs,penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+window.__kick={errs:()=>loopErrs,dbg:{shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 requestAnimationFrame(loop);
 })();
