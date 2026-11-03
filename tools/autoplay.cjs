@@ -26,7 +26,7 @@ const {chromium}=require('playwright');const path=require('path');
           set('KeyD',tx>c.x+8);set('KeyA',tx<c.x-8);set('KeyS',ty>c.y+8);set('KeyW',ty<c.y-8)}
         K.update(1)}
       const s=K.stats(),sc=K.score();out.push({score:sc.join('-'),shots:s.shots,onT:s.on,shotsThem:tel.shotsThem,tackles:s.tackles,passes:s.passes,skills:s.skills,possUs:Math.round(tel.poss[0]/(tel.poss[0]+tel.poss[1])*100)+'%',
-        goals:tel.goals,zone:tel.ballZone.map(v=>Math.round(v/(tel.ballZone[0]+tel.ballZone[1]+tel.ballZone[2])*100)).join('/'),frames});
+        goals:tel.goals,zone:tel.ballZone.map(v=>Math.round(v/(tel.ballZone[0]+tel.ballZone[1]+tel.ballZone[2])*100)).join('/'),frames,air:JSON.stringify(K.sim().air)});
       for(let i=0;i<200;i++)K.update(1);key('Space',true);key('Space',false);await new Promise(r=>setTimeout(r,50));
       if(K.state()==='fulltime'){key('Space',true);key('Space',false)}document.querySelector('#menu').hidden=false;while(K.state()!=='menu'){key('Space',true);key('Space',false);K.update(1);await new Promise(r=>setTimeout(r,5))}}
     return out},[1,LV]));await pg.close()}
