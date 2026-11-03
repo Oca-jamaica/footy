@@ -176,7 +176,8 @@ function drawGoalBanner(){
 function drawWorld(ents){
   if(!(broadCam()&&!(state==='goal'||(state==='fulltime'&&score[0]>score[1]))))drawSky();else{ctx.fillStyle='#05080f';ctx.fillRect(0,0,W,H)}drawBackground();goalBack(0);goalBack(1);
   ents.push({y:GY1,f:()=>nearPost(0)},{y:GY1,f:()=>nearPost(1)});
-  ents.sort((a,b)=>a.y-b.y).forEach(e=>e.f());
+  // each player/ball draws on its own: if one ever fails, the rest of the pitch still gets drawn
+  ents.sort((a,b)=>(a.y||0)-(b.y||0)).forEach(e=>{const m=ctx.getTransform();try{e.f()}catch(err){loopErrs++;window.__lastErr=String(err&&err.stack||err);ctx.setTransform(m);ctx.globalAlpha=1;ctx.shadowBlur=0}});
 }
 function drawReplay(){
   const i=Math.min(replay.length-1,Math.floor(replayIdx)),f=replay[i];
@@ -413,9 +414,9 @@ function netRemoteKey(c){
   else if(state==='concede'){if(/^Digit[1-6]$/.test(c)&&stT<220&&scorer){celebType=+c.slice(5)-1;scorer.rot=0;scorer.jump=0}if(c==='Space'&&stT>60)kickoff(0)}}
 function netSnapOf(){
   const ix=p=>p?players.indexOf(p):-1;
-  const p=players.map(q=>{const v={};for(const k of VISK){const x=q[k];if(x)v[k]=typeof x==='number'?r1(x):x===true?1:x}return[Math.round(q.x),Math.round(q.y),Math.round(q.dir*100)/100,v]});
+  const p=players.map(q=>{const v={};for(const k of VISK){const x=q[k];if(x)v[k]=typeof x==='number'?r1(x):x===true?1:x}return[Math.round(q.x),Math.round(q.y),Math.round(q.dir*100)/100,v,r1(q.vx||0),r1(q.vy||0)]});
   const c=ctrl2;const a=c?[r1(c.skillCd),r1(c.spCd),r1(c.slideCd),r1(c.blungeCd||0),r1(c.tackleCd),Math.round(c.stam),c.aimY==null?null:Math.round(c.aimY),RS.charging?1:0,Math.round(RS.charge*100)/100]:null;
-  const s={n:++netSnapN,ack:netSeenEv,w:netWaiting?1:0,s:state,st:Math.round(stT),c:Math.round(clock*10),sc:score.slice(),b:[Math.round(B.x),Math.round(B.y),r1(B.z),ballCharge(),Math.round((B.spin||0)*100)/100],o:ix(B.owner),c1:ix(ctrl),c2:ix(ctrl2),p,a,kt:Math.round(kickT),
+  const s={n:++netSnapN,ack:netSeenEv,w:netWaiting?1:0,s:state,st:Math.round(stT),c:Math.round(clock*10),sc:score.slice(),b:[Math.round(B.x),Math.round(B.y),r1(B.z),ballCharge(),Math.round((B.spin||0)*100)/100,r1(B.vx||0),r1(B.vy||0),r1(B.vz||0)],o:ix(B.owner),c1:ix(ctrl),c2:ix(ctrl2),p,a,kt:Math.round(kickT),
     pp:netPopsOut.slice(-8),fx:netSfxOut.slice(-10),sh:r1(shake),fl:r1(flash),ns:netShake.map(Math.round),sco:ix(scorer),cel:celebType,ph:state==='goal'||state==='concede'?String(phrase||'').slice(0,60):''};
   if(hat)s.hat=[hat.n,hat.team,String(hat.name).slice(0,16),hat.txt,Math.round(t-hat.t0)];
   return s}
@@ -448,10 +449,10 @@ function guestBegin(h){if(!guestBuild(h))return;NET.on=true;NET.guest=true;NET.h
   menuEl.hidden=true;edEl.hidden=true;$('pack').hidden=true;cv.focus();state='play';stT=0;S.whistle(1);netLastSnapAt=performance.now();netGuestWait=false;lead={x:0,y:0};leadP=null;netEvSent={};netApply(h.presence.g,true)}
 function netApply(g,snap){if(!g||!Array.isArray(g.p))return;
   g.p.forEach((r,j)=>{const p=players[j];if(!p||!Array.isArray(r))return;const tx=MX(+r[0]||0),ty=+r[1]||0,td=MA(+r[2]||0);
-    if(snap||Math.hypot(tx-p.x,ty-p.y)>90){p.x=tx;p.y=ty}else{p.tx=tx;p.ty=ty}p.td=td;if(snap)p.dir=td;
+    if(snap||Math.hypot(tx-p.x,ty-p.y)>90){p.x=tx;p.y=ty}p.tx=tx;p.ty=ty;p.svx=-(+r[4]||0);p.svy=+r[5]||0;p.td=td;if(snap)p.dir=td;
     const v=r[3]||{};for(const k of VISK){let x=v[k];if(x===undefined)x=k==='anim'?null:k==='flip'?1:0;p[k]=x}
     if(p.lean)p.lean=-p.lean;if(p.fallDir)p.fallDir=MA(p.fallDir)});
-  const b=g.b||[];B.tx=MX(+b[0]||MIDX);B.ty=+b[1]||MY;B.tz=+b[2]||0;if(snap){B.x=B.tx;B.y=B.ty;B.z=B.tz}B.spin=-(+b[4]||0);guestCh=+b[3]||0;
+  const b=g.b||[];B.tx=MX(+b[0]||MIDX);B.ty=+b[1]||MY;B.tz=+b[2]||0;B.svx=-(+b[5]||0);B.svy=+b[6]||0;B.svz=+b[7]||0;if(snap){B.x=B.tx;B.y=B.ty;B.z=B.tz}B.spin=-(+b[4]||0);guestCh=+b[3]||0;
   B.owner=g.o>=0?players[g.o]||null:null;
   const c2=players[g.c2];if(c2&&c2!==ctrl){ctrl=c2;charging=false}
   if(ctrl&&Array.isArray(g.a)){const a=g.a;[ctrl.skillCd,ctrl.spCd,ctrl.slideCd,ctrl.blungeCd,ctrl.tackleCd,ctrl.stam]=a.slice(0,6).map(x=>+x||0);ctrl.aimY=a[6]==null?null:+a[6];if(!a[7])charging=false;else{charging=true;charge=+a[8]||0}}
@@ -486,8 +487,15 @@ function guestUpdate(dt){t+=dt;const h=netPeer('host');
   else{if(charging)charge=Math.min(1,charge+.024*dt);
     // undo last frame's lead before smoothing towards the host's positions
     if(leadP){leadP.x-=lead.x;leadP.y-=lead.y;if(B.owner===leadP){B.x-=lead.x;B.y-=lead.y}}
-    for(const p of players){if(p.tx!=null){const k=Math.min(1,.5*dt);p.x+=(p.tx-p.x)*k;p.y+=(p.ty-p.y)*k}if(p.td!=null)p.dir+=angDiff(p.td,p.dir)*Math.min(1,.4*dt)}
-    if(B.tx!=null){const k=Math.min(1,.55*dt),ox=B.x,oy=B.y;B.x+=(B.tx-B.x)*k;B.y+=(B.ty-B.y)*k;B.z+=(B.tz-B.z)*k;B.vx=(B.x-ox)/Math.max(.2,dt);B.vy=(B.y-oy)/Math.max(.2,dt)}
+    // dead reckoning: run each snapshot forward by its age, plus half the round trip so you see where things are on the host
+    // right now rather than where they were when the snapshot left. Then ease towards that, so corrections don't jerk.
+    const age=clamp((performance.now()-netLastSnapAt)/16.667,0,8),lc=state==='play'?clamp(netRtt/33.3,0,5):0,ex=f=>Math.min(f,10);
+    for(const p of players){if(p.tx!=null){const f=ex(age+(p===ctrl?0:lc)),gx=p.tx+(p.svx||0)*f,gy=p.ty+(p.svy||0)*f,k=Math.min(1,.45*dt);
+      p.x+=(clamp(gx,FX0-40,FX1+40)-p.x)*k;p.y+=(clamp(gy,FY0-40,FY1+40)-p.y)*k}if(p.td!=null)p.dir+=angDiff(p.td,p.dir)*Math.min(1,.4*dt)}
+    if(B.tx!=null){const k=Math.min(1,.55*dt),ox=B.x,oy=B.y,o=B.owner;let gx,gy,gz;
+      if(o&&o.tx!=null){gx=o.x+(B.tx-o.tx);gy=o.y+(B.ty-o.ty);gz=B.tz}
+      else{const f=ex(age+lc),dk=(1-Math.pow(.986,f))/.014;gx=B.tx+(B.svx||0)*dk;gy=B.ty+(B.svy||0)*dk;gz=B.tz>0||B.svz>0?Math.max(0,B.tz+(B.svz||0)*f-.125*f*f):0}
+      B.x+=(gx-B.x)*k;B.y+=(gy-B.y)*k;B.z+=(gz-B.z)*k;B.vx=(B.x-ox)/Math.max(.2,dt);B.vy=(B.y-oy)/Math.max(.2,dt)}
     // your own player answers your keys straight away: draw him a little ahead, where the host is about to put him
     {const c=ctrl;if(c!==leadP){lead.x=lead.y=0;leadP=c}
       let ix=(K('KeyD')?1:0)-(K('ArrowLeft')||K('KeyA')?1:0),iy=(K('KeyS')?1:0)-(K('KeyW')?1:0);const l=Math.hypot(ix,iy);if(l){ix/=l;iy/=l}
@@ -556,17 +564,22 @@ let lastFrame=performance.now(),loopErrs=0;
 function cleanCtx(){ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.setLineDash([]);ctx.shadowBlur=0}
 function safeDraw(){cleanCtx();try{draw()}catch(e){loopErrs++;window.__lastErr=String(e&&e.stack||e);cleanCtx()}}
 const PERF={u:0,d:0,n:0,max:0};window.__perf=PERF;
-function loop(now){lastFrame=performance.now();const dt=Math.min(2.5,(now-last)/16.667);last=now;const p0=performance.now();
-  try{if(hitT>0){hitT-=dt;safeDraw();requestAnimationFrame(loop);return}let ds=dt;if(slowT>0){slowT-=dt;ds=dt*timeScale}if(hr('turbo')&&state==='play')ds*=1.3;update(ds)}catch(e){loopErrs++;window.__lastErr=String(e&&e.stack||e);hitT=0;slowT=0;timeScale=1}
-  const p1=performance.now();safeDraw();const p2=performance.now();PERF.u+=p1-p0;PERF.d+=p2-p1;PERF.n++;PERF.max=Math.max(PERF.max,p2-p0);requestAnimationFrame(loop)}
-setInterval(()=>{if(!document.hidden&&performance.now()-lastFrame>1500){last=performance.now();requestAnimationFrame(loop)}},1000);
+// only one loop may ever run: restarting it (watchdog, Fix screen) retires the old one instead of running two at once
+let loopGen=0;const startLoop=()=>{const g=++loopGen;requestAnimationFrame(n=>loop(n,g))};
+function loop(now,g){if(g!==loopGen)return;lastFrame=performance.now();const dt=Math.min(2.5,(now-last)/16.667);last=now;const p0=performance.now();
+  try{if(hitT>0){hitT-=dt;safeDraw();requestAnimationFrame(n=>loop(n,g));return}let ds=dt;if(slowT>0){slowT-=dt;ds=dt*timeScale}if(hr('turbo')&&state==='play')ds*=1.3;update(ds)}catch(e){loopErrs++;window.__lastErr=String(e&&e.stack||e);hitT=0;slowT=0;timeScale=1}
+  const p1=performance.now();safeDraw();const p2=performance.now();PERF.u+=p1-p0;PERF.d+=p2-p1;PERF.n++;PERF.max=Math.max(PERF.max,p2-p0);requestAnimationFrame(n=>loop(n,g))}
+setInterval(()=>{if(!document.hidden&&performance.now()-lastFrame>1500){last=performance.now();startLoop()}},1000);
 function fixScreen(){pitchCv=null;skyCv=null;vigCv=null;grainPat=null;cv.width=W*DPR;cv.height=H*DPR;cleanCtx();hitT=0;slowT=0;timeScale=1;shake=0;flash=0;camK=0;celebCut=false;
   cam={...BROAD,x:camFollow=camTX=clamp(B.x,FX0+330,FX1-330),hor:camHor};parts=[];
   if(state==='replay'||state==='goal'||state==='concede')kickoff(state==='concede'?0:1);
-  if(state!=='menu'&&!players.length)showMenu(true);last=performance.now();requestAnimationFrame(loop);toast('Screen reset');cv.focus()}
-cv.addEventListener('contextrestored',()=>{cleanCtx()});
+  if(state!=='menu'&&!players.length)showMenu(true);last=performance.now();startLoop();toast('Screen reset');cv.focus()}
+// the browser can throw away canvas memory (GPU reset, a hidden tab): rebuild the cached pictures when that happens
+const dropCaches=()=>{pitchCv=null;skyCv=null;vigCv=null;grainPat=null;penA=null;penB=null};
+cv.addEventListener('contextrestored',()=>{dropCaches();cleanCtx()});cv.addEventListener('contextlost',e=>{e.preventDefault()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){dropCaches();last=performance.now()}});
 if(document.fonts&&document.fonts.load)document.fonts.load('40px "Lilita One"').catch(()=>{});
 $('fixscr').onclick=fixScreen;$('fixscr2').onclick=()=>{setPause(false);fixScreen()};
-window.__kick={errs:()=>loopErrs,dbg:{shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
-requestAnimationFrame(loop);
+window.__kick={errs:()=>loopErrs,dbg:{draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+startLoop();
 })();

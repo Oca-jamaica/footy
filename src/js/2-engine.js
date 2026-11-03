@@ -291,9 +291,17 @@ function hairDraw0(lk,hc,fx,face,hy){
     case 'dreads':cap(.3);ctx.strokeStyle=hc;ctx.lineWidth=1.5;for(const x of (face<0?[-5,-2.5,0,2.5,5]:[-fx*5,-fx*3,fx*4.6])){ctx.beginPath();ctx.moveTo(x*.9,hy-3);ctx.lineTo(x,hy+5.5);ctx.stroke()}break;
   }
 }
+// A safety net: if anything ever leaves a player or the ball at a non-number position (which makes them vanish),
+// put them back somewhere sensible instead of losing them for the rest of the match.
+const NUMK=['x','y','vx','vy','dir','jump','runPh','spdNow','rot','lean','lx','ly'];
+function sanePitch(){
+  for(const p of players){let bad=false;for(const k of NUMK)if(p[k]!=null&&!Number.isFinite(p[k])){bad=true;p[k]=0}
+    if(bad){const sl=p.slot,att=p.team===0?1:-1;if(p.keeper){p.x=p.team?FX1-16:FX0+16;p.y=MY}else if(sl){p.x=MIDX-att*(1-sl.x)*(FX1-FX0)*.42;p.y=FY0+sl.y*(FY1-FY0)}else{p.x=MIDX;p.y=MY}
+      p.vx=p.vy=0;p.lx=p.x;p.ly=p.y;p.dir=p.team?Math.PI:0;p.anim=null;window.__fixes=(window.__fixes||0)+1}}
+  if(![B.x,B.y,B.z,B.vx,B.vy,B.vz].every(Number.isFinite)){Object.assign(B,{x:MIDX,y:MY,z:0,vx:0,vy:0,vz:0,curl:0,knuckle:0});B.owner=null;window.__fixes=(window.__fixes||0)+1}}
 function kitFor(p){
   if(p.keeper)return{kit:p.kit,shorts:'#1b2530',socks:p.kit,gloves:'#f4f4f4',band:'#1b2530',trim:'#1b2530'};
-  const k=p.kit,n=parseInt(k.slice(1),16),lum=((n>>16)*.3+(n>>8&255)*.59+(n&255)*.11),light=lum>170;
+  const k=typeof p.kit==='string'&&/^#[0-9a-f]{6}$/i.test(p.kit)?p.kit:'#8e8ff0',n=parseInt(k.slice(1),16),lum=((n>>16)*.3+(n>>8&255)*.59+(n&255)*.11),light=lum>170;
   if(p.team===0)return{kit:k,shorts:light?'#2a2d36':'#f4f4f4',socks:k,band:light?'#2a2d36':'#f4f4f4',trim:light?'#2a2d36':'#f4f4f4',numCol:light?'#1d2028':'#fff',boot:'#15161b',bootMark:'#ffd23f'};
   return{kit:k,shorts:light?'#1d2440':'#20253a',socks:light?k:'#20253a',band:light?'#1d2440':k,trim:light?'#1d2440':'#f4f4f4',numCol:light?'#1d2440':'#fff',boot:'#f2f2f2',bootMark:'#e2483d'};
 }
@@ -308,7 +316,7 @@ function drawPlayer(p,x=p.x,y=p.y,dir=p.dir,rot=p.rot,ph=p.runPh||0,run=p.spdNow
    for(const [dx,dy] of [[1,.32],[-1,.32],[1,-.22],[-1,-.22]]){ctx.beginPath();ctx.ellipse(q.x+dx*10*k,q.y+dy*6*k,13*k*wd,2.4*k,dx*dy>0?.32:-.32,0,7);ctx.fill()}
    ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(q.x,q.y,8.5*k*wd,2.7*k,0,0,7);ctx.fill()}
   const jz=P(x,y,p.jump||0);
-  ctx.save();ctx.translate(q.x,jz.y);if(p.ghost>0)ctx.globalAlpha=.42+.18*Math.sin(t*.4);
+  ctx.save();try{ctx.translate(q.x,jz.y);if(p.ghost>0)ctx.globalAlpha=.42+.18*Math.sin(t*.4);
   if(p.anim==='bike'){const pr=1-p.animT/p.animMax;ctx.translate(0,-14*k);ctx.rotate(-fx*pr*Math.PI*2);ctx.translate(0,14*k)}
   if(sliding){ctx.rotate(fx*1.25);ctx.translate(0,4*k)}
   else if(p.whiff>0&&!fallen&&(state==='play'||state==='replay')){const w=Math.min(1,(p.whiffMax-p.whiff)/5);ctx.translate(0,-2*k);ctx.rotate(fx*(.95+Math.sin(t*.45)*.12)*w);ctx.translate(0,7*k*w)}
@@ -320,7 +328,7 @@ function drawPlayer(p,x=p.x,y=p.y,dir=p.dir,rot=p.rot,ph=p.runPh||0,run=p.spdNow
   const kc=kitFor(p);
   figure({fx,face:spin?0:face,ph,run,kit:kc.kit,shorts:kc.shorts,socks:kc.socks,gloves:kc.gloves,band:kc.band,trim:kc.trim,numCol:kc.numCol,boot:kc.boot,bootMark:kc.bootMark,skin:p.st.skin,hair:p.st.hair,look:lk,arms:p.arms||(p.keeper&&(p.diveK||0)>.35?1:0),dive:p.keeper&&p.diving,
     kneel:p.kneel,glow:p.anim==='shield'?C.sun:p.turbo>0||p.knockT>0?C.mint:null,num:p.st.num,k});
-  ctx.restore();
+  }finally{ctx.restore()}
   const head=P(x,y,(p.jump||0)+56*hf);
   if(state==='play'&&p.stun>0){ctx.fillStyle=C.sun;for(let i=0;i<3;i++){const a=t*.15+i*2.1;ctx.beginPath();ctx.arc(head.x+Math.cos(a)*10*q.s,head.y+Math.sin(a)*3*q.s,2.2*q.s,0,7);ctx.fill()}}
   if(p.team===0&&!p.keeper&&p!==ctrl&&state==='play')txt(String(p.st.num)+(p.role==='cap'?' C':p.role==='att'?' ⚡':''),head.x,head.y-2,Math.round(10*Math.max(.8,q.s)),'rgba(255,246,228,.8)','center',false);
@@ -744,7 +752,7 @@ function doThrough(p){if(B.owner!==p)return false;const sp=attackSpot(p.team);le
   lobTo(p,m,sp.x,sp.y,60,true);pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
 function doLob(p){if(B.owner!==p)return false;const att=p.team===0?1:-1;let m=bestMate(p);
   if(!m){for(const q of outfield(p.team))if(q!==p&&(!m||(q.x-m.x)*att>0))m=q}if(!m)return false;
-  const T=clamp(dist(p,m)/6.5,34,62);lobTo(p,m,m.x+m.vx*T*.6+att*30,m.y+m.vy*T*.6,T,false);pop('CHIP PASS',p.x,p.y-34,p.team===0?C.sun:C.coral,18,70);return true}
+  const T=clamp(dist(p,m)/6.5,34,62),err=(1.25-(p.st.pass??.65))*55*(dist(p,m)/400+.5);lobTo(p,m,m.x+m.vx*T*.6+att*30+rnd(-err,err),m.y+m.vy*T*.6+rnd(-err,err),T,false);B.pass.chip=true;m.turbo=Math.min(m.turbo,T*.35);pop('CHIP PASS',p.x,p.y-34,p.team===0?C.sun:C.coral,18,70);return true}
 function doOneTwo(p){if(B.owner!==p)return false;let m=null;for(const q of outfield(p.team))if(q!==p&&dist(q,p)<320&&(!m||dist(q,p)<dist(m,p)))m=q;if(!m)return false;
   pass(p,m,false,1);m.wallTo=p;m.wallT=7;p.turbo=Math.max(p.turbo||0,120);if(p.team===0)ctrl=p;pop('ONE-TWO',p.x,p.y-34,p.team===0?C.mint:C.coral,18,70);return true}
 function doGhost(p){if(B.owner!==p)return false;p.ghost=150;ring(p.x,p.y,C.lilac);pop('GHOST',p.x,p.y-34,C.lilac,22,80);return true}
@@ -914,9 +922,10 @@ function teamAI(team,dt){
   const ai=own.filter(p=>!(team===0&&p===ctrl)&&p!==ctrl2);
   const hasBall=owner?owner.team===team:lastPoss===team&&B.pass&&B.pass.from.team===team;
   const theyHave=owner&&owner.team===opp;
+  const chipIn=!owner&&B.lobTo&&B.lobTo.team!==team&&B.pass&&B.pass.chip;// they've chipped it: someone go and attack where it drops
   let chaser=null,cover=null;
   if(!owner||(theyHave&&!owner.keeper)){
-    const target=owner||{x:B.x+B.vx*8,y:B.y+B.vy*8};
+    const target=owner||(chipIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*8,y:B.y+B.vy*8});
     const cands=ai.filter(p=>p.stun<=0);
     if(B.pass&&!owner){const r=cands.find(p=>p===B.pass.to);if(r)chaser=r}
     if(!chaser&&cands.length){chaser=cands.reduce((a,b)=>dist(a,target)<dist(b,target)?a:b);
@@ -954,7 +963,7 @@ function teamAI(team,dt){
     if(p===chaser&&team===1&&owner&&owner.team===0&&owner.x<MIDX-20-(DF.press-.5)*260){
       const a=Math.atan2(MY-owner.y,FX1-owner.x);steer(p,owner.x+Math.cos(a)*60,owner.y+Math.sin(a)*60,topSpeed(p)*.8,dt);continue}
     if(p===chaser){
-      const tgt=owner?{x:B.x+Math.cos(owner.dir)*10,y:B.y+Math.sin(owner.dir)*10}:{x:B.x+B.vx*6,y:B.y+B.vy*6};
+      const tgt=owner?{x:B.x+Math.cos(owner.dir)*10,y:B.y+Math.sin(owner.dir)*10}:chipIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*6,y:B.y+B.vy*6};
       if(team===1&&p.st.sp==='stomp'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<95&&Math.random()<.02*dt&&doStomp(p)){p.spCd=SPECIALS.stomp.cd*1.7;continue}
       if(team===1&&p.st.sp==='slide'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<110&&dist(p,owner)>25&&notBehind(p,owner)&&Math.random()<.015*dt){
         p.spCd=SPECIALS.slide.cd*1.15;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
@@ -1094,8 +1103,16 @@ function ballUpdate(dt,live){
   if(B.z>0||B.vz>0){B.vz-=(B.knuckle?.34:.25)*dt;B.z+=B.vz*dt;if(B.z<0){B.z=0;if(B.vz<-1.8){tone(110,.07,'sine',Math.min(.16,-B.vz*.03),0,.6);grass(B.x,B.y,3)}B.vz=Math.abs(B.vz)>1.2?-B.vz*.45:0;if(B.vz>0){B.curl*=.4;B.knuckle=0}}}
   if(B.lobTo&&B.claimBy&&B.z<44&&dist(B.claimBy,B)<30&&B.claimBy.stun<=0){const k=B.claimBy;B.claimBy=null;airN.claim++;give(k);k.hold=40;pop('CLAIMED',k.x,k.y-34,C.cream,17,60);S.save()}
   else if(B.lobTo&&B.lobTo.volley&&B.vz<0&&B.z<54&&B.z>2&&dist(B.lobTo,B)<44&&B.lobTo.stun<=0)airStrike(B.lobTo);
-  if(B.lobTo&&wasAir&&B.z<=0&&B.pass&&B.pass.cross){const m=B.lobTo;let d=null;for(const q of outfield(1-m.team))if(q.stun<=0&&dist(q,B)<30&&dist(q,B)<dist(m,B)&&(!d||dist(q,B)<dist(d,B)))d=q;
-    if(d&&Math.random()<.55){B.lobTo=null;m.lobRun=null;m.volley=false;const a=Math.atan2(MY-B.y,MIDX-B.x)+rnd(-.6,.6);d.hjump=18;airN.clear++;kick(d,a,9,3.4);pop('CLEARED',d.x,d.y-40,d.team===0?C.mint:C.muted,16,50);S.tap()}}
+  // a chip pass is contested as it drops into reach: a defender who's got there can win it
+  if(B.lobTo&&B.pass&&B.pass.chip&&!B.pass.contested&&B.vz<0&&B.z<20){B.pass.contested=true;const m=B.lobTo;let d=null;
+    for(const q of outfield(1-m.team))if(q.stun<=0&&q.fall<=0&&dist(q,B)<40&&(!d||dist(q,B)<dist(d,B)))d=q;
+    if(d&&Math.random()<clamp(.52+(dist(m,B)-dist(d,B))/60+((d.st.tackle??.6)-.6)*.5,.2,.8)){B.lobTo=null;m.lobRun=null;m.volley=false;d.hjump=14;airN.clear++;give(d);
+      if(d.team===0){ctrl=d;stats.tackles++;pop('WON IT IN THE AIR',d.x,d.y-40,C.mint,16,60)}else pop('READ IT',d.x,d.y-40,C.muted,16,50);S.tap()}}
+  if(B.lobTo&&wasAir&&B.z<=0&&B.pass&&(B.pass.cross||B.pass.chip)){const m=B.lobTo,chip=B.pass.chip;let d=null;
+    // a chip can be attacked by anyone who's got there too: the closer he is compared with the receiver, the better his chance
+    for(const q of outfield(1-m.team))if(q.stun<=0&&dist(q,B)<(chip?36:30)&&(chip||dist(q,B)<dist(m,B))&&(!d||dist(q,B)<dist(d,B)))d=q;
+    const win=!d?0:chip?clamp(.42+(dist(m,B)-dist(d,B))/60+((d.st.tackle??.6)-.6)*.5,.2,.8):.55;
+    if(d&&Math.random()<win){B.lobTo=null;m.lobRun=null;m.volley=false;const a=Math.atan2(MY-B.y,MIDX-B.x)+rnd(-.6,.6);d.hjump=18;airN.clear++;kick(d,a,9,3.4);pop('CLEARED',d.x,d.y-40,d.team===0?C.mint:C.muted,16,50);S.tap()}}
   if(B.lobTo&&wasAir&&B.z<=0){const m=B.lobTo;B.lobTo=null;m.lobRun=null;m.volley=false;
     if(dist(m,B)<(B.lobThrough?72:58)&&m.stun<=0){give(m);if(m.team===0)ctrl=m;else if(NET.host)ctrl2=m}else{const th=B.lobThrough;B.vx*=th?0:.15;B.vy*=th?0:.15;B.vz=0;B.graceTo=m;B.graceT=th?75:40;m.lobRun={x:B.x,y:B.y}}}
   if(B.graceT>0){B.graceT-=dt;if(B.graceT<=0||B.owner){if(B.graceTo)B.graceTo.lobRun=null;B.graceTo=null}}
@@ -1126,7 +1143,7 @@ function ballUpdate(dt,live){
   }
   if(B.z<12){
     for(const p of players){
-      if(p.keeper||p.stun>0||(B.lockBy===p&&B.lockT>0)||(B.lobTo&&p!==B.lobTo)||(B.graceTo&&B.graceT>0&&p!==B.graceTo))continue;
+      if(p.keeper||p.stun>0||(B.lockBy===p&&B.lockT>0)||(B.lobTo&&p!==B.lobTo&&!(B.pass&&B.pass.chip&&p.team!==B.lobTo.team&&B.vz<0))||(B.graceTo&&B.graceT>0&&p!==B.graceTo))continue;
       {const x0=B.x-B.vx*dt,y0=B.y-B.vy*dt,dx=B.x-x0,dy=B.y-y0,L2=dx*dx+dy*dy||1,u=clamp(((p.x-x0)*dx+(p.y-y0)*dy)/L2,0,1);if(Math.hypot(x0+dx*u-p.x,y0+dy*u-p.y)>(B.shot&&B.shot.team===0&&p.team===1?12:18)*(hr('giant')?1.4:1))continue}
       if(B.shot&&B.shot.team===0&&p.team===1&&sp>6.5){
         // your shots: a defender in the way only stops it some of the time; otherwise it takes a nick and carries on
@@ -1330,7 +1347,7 @@ function update(dt){
     for(const p of players){if(B.owner!==p){p.blocked=0;continue}if((p.blocked||0)>18){p.blocked=0;const d=players.filter(q=>q.team!==p.team&&!q.keeper&&q.stun<=0).sort((a,b)=>dist(a,p)-dist(b,p))[0];if(d&&dist(d,p)<30){give(d);p.stun=20;S.tackle();if(d.team===0){stats.tackles++;addStyle(10,d.x,d.y,'STOOD FIRM');ctrl=d}else pop('ran into him',p.x,p.y-30,C.muted,15)}}
       if(B.owner===p&&!players.some(q=>q.team!==p.team&&dist(q,p)<26))p.blocked=Math.max(0,(p.blocked||0)-dt)}
     if(B.owner&&dist(B.owner,B)>48)B.owner=null;
-    ballUpdate(dt,true);
+    ballUpdate(dt,true);sanePitch();
     {const o=B.owner;if(o&&!o.keeper&&state==='play'){const gx=goalX(o.team),dir=Math.sign(gx-o.x);
       const clear=!outfield(1-o.team).some(q=>q.fall<=0&&(q.x-o.x)*dir>-6&&Math.abs(q.y-o.y)<Math.abs(q.x-o.x)*.9+40);
       if(clear&&Math.abs(gx-o.x)<700&&!o.breakaway){o.breakaway=true;if(o.team===0){pop('BREAKAWAY!',o.x,o.y-30,C.mint,28,96);addStyle(15,o.x,o.y);addHype(8);noise(1.6,700,.18,.5,.6);S.skill(1)}else pop('they’re through!',o.x,o.y-30,C.muted,16)}

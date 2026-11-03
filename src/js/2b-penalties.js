@@ -7,7 +7,7 @@ const PSTART={x:-1.7,y:13.8},PSTRIKE={x:-.42,y:11.32},SWEET=.86;
 function PP(X,Y,Z=0){const s=PC.f/Math.max(.5,PC.D-Y);return{x:W/2+X*s,y:PC.hor+(PC.H-Z)*s,s}}
 const gauss=()=>(Math.random()+Math.random()+Math.random()+Math.random()-2)*1.73;
 function segDist(px,pz,ax,az,bx,bz){const dx=bx-ax,dz=bz-az,L=dx*dx+dz*dz||1,u=clamp(((px-ax)*dx+(pz-az)*dz)/L,0,1);return Math.hypot(ax+dx*u-px,az+dz*u-pz)}
-const sweetW=p=>.05+p.st.shot*.07;// better strikers get a wider "perfect contact" window
+const sweetW=p=>.045+p.st.shot*.06;// better strikers get a wider "perfect contact" window
 
 function startPens(){
   state='pens';stT=0;charging=false;parts=[];
@@ -51,7 +51,7 @@ function penSetup(){
     else{ax=rnd(-.5,.5);az=rnd(.5,1.8)}
     // honest takers open their hips towards where they're going; the rest sell you a dummy
     pen.ai={style,ax,az,power:style==='pan'?.2:rnd(.62,1),stut:style!=='pan'&&Math.random()<.2,stutAt:.45+rnd(0,.12),stutDone:false,
-      honest:Math.random()<clamp(1.35-DF.gk*.55,.6,.9),runT:70+rnd(-8,8)}}
+      honest:Math.random()<clamp(1.28-DF.gk*.55,.55,.85),runT:70+rnd(-8,8)}}
 }
 
 /* ----- input ----- */
@@ -99,7 +99,7 @@ function penAim(dt){const f=pen.taker.st.fin,ix=inX(),iy=inY(),moving=ix||iy;
   pen.aim.x=clamp(pen.aim.x+ix*.075*dt,-4.6,4.6);pen.aim.z=clamp(pen.aim.z-iy*.045*dt,0,3.2);
   // nerves: the reticle sways, more under pressure and less for good finishers. Keep still and it settles.
   pen.calm=clamp(pen.calm+(moving?-.06:.018)*dt,0,1);
-  const amp=(.1+pen.st.press*.32)*(1.35-f)*(1-.5*pen.calm);
+  const amp=(.13+pen.st.press*.36)*(1.35-f)*(1-.45*pen.calm);
   pen.wob.x=amp*(Math.sin(t*.061)*.7+Math.sin(t*.137+1.7)*.45);pen.wob.z=amp*.55*(Math.sin(t*.083+.4)*.7+Math.sin(t*.171)*.4);
   if(charging)charge=Math.min(1.25,charge+.02*dt)}
 function moveTaker(k){const R=pen.run,nx=PSTART.x+(PSTRIKE.x-PSTART.x)*k,ny=PSTART.y+(PSTRIKE.y-PSTART.y)*k,d=Math.hypot(nx-R.x,ny-R.y);
@@ -132,13 +132,13 @@ function penStrikeMine(){const st=pen.taker.st,p=pen.power;let tx=pen.aim.x,tz=p
 // Their keeper decides at the strike. He reads some kicks (better keepers more often), guesses the rest,
 // and a stutter that made him flinch commits him early. Then his hands have to actually get there.
 function aiKeeperPlan(ix,iz){const K=pen.K,lv=pen.ladder?pen.lvl:0;
-  const read=clamp(.06+DF.gk*.15+lv*.05-(pen.perfect?.06:0),.05,.62);
-  K.spd=.125+DF.gk*.02+Math.min(.04,lv*.004);
+  const read=clamp(.1+DF.gk*.17+lv*.05-(pen.perfect?.03:0),.06,.64);
+  K.spd=.133+DF.gk*.022+Math.min(.04,lv*.004);
   let tx=0,tz=1.2,at=clamp(Math.round(13-DF.gk*5-lv*.6),4,12),stay=false;
   if(pen.commit){tx=pen.commit*rnd(1.6,2.9);tz=rnd(.3,1.7);at=1}
   else{const rd=pen.commit===0?read+.2:read;
     if(Math.random()<rd){if(Math.abs(ix)<.8)stay=true;else{tx=ix+rnd(-.45,.45);tz=iz+rnd(-.35,.35)}}// read it down the middle: he just stands there
-    else if(Math.random()<.16)stay=true;
+    else if(Math.random()<.18)stay=true;
     else{const sd=K.bias&&Math.random()<.7?K.bias:pick([-1,1]);tx=sd*rnd(1.1,3.1);tz=rnd(.25,2)}}
   K.plan={tx,tz,at,stay}}
 function penStrikeAi(){const a=pen.ai,st=pen.taker.st;let ax=a.ax,az=a.az,v,arc=0,curl=0,tx,tz;
@@ -146,7 +146,7 @@ function penStrikeAi(){const a=pen.ai,st=pen.taker.st;let ax=a.ax,az=a.az,v,arc=
   if(pen.early&&a.style!=='pan'&&Math.random()<.75){ax=-(Math.sign(pen.K.tx)||pick([-1,1]))*rnd(1.7,3);az=rnd(.3,1.8);pen.switched=true;penFlash('HE WAITED FOR YOU',C.coral)}
   if(a.style==='pan'){tx=ax;tz=1.2;v=.2;arc=1.5;pen.pan=true}
   else{const sig=(1.3-st.fin)*.28;tx=ax+gauss()*sig;tz=az+gauss()*sig*.7;
-    if(Math.random()<(PMISS[diffKey]||.1)*.6){if(Math.random()<.5)tx=(Math.sign(tx)||1)*rnd(3.85,4.4);else tz=rnd(2.65,3.3)}
+    if(Math.random()<(PMISS[diffKey]||.1)*.45){if(Math.random()<.5)tx=(Math.sign(tx)||1)*rnd(3.85,4.4);else tz=rnd(2.65,3.3)}
     v=.15+a.power*.27+st.shot*.05;curl=gauss()*.1*(1.1-st.fin)}
   penLaunch(tx,Math.max(PG.br,tz),v,arc,curl,a.power)}
 function penLaunch(tx,tz,v,arc,curl,p){const b=pen.ball;

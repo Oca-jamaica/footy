@@ -29,7 +29,7 @@ const SPECIALS={
   chip:{name:'CHIP',cd:960,d:'Lob over a keeper who has come off his line.'},
   through:{name:'THROUGH BALL',cd:900,d:'Floats it over everyone onto the penalty spot after one second. Your best runner bursts onto it.'},
   bicycle:{name:'BICYCLE KICK',cd:900,d:'Only straight off a teammate’s pass: flip and volley it first time. Very likely to go in.'},
-  lob:{name:'CHIP PASS',cd:720,d:'Lofted pass over everyone that always reaches your best-placed teammate.'},
+  lob:{name:'CHIP PASS',cd:960,d:'Lofted pass over the defence to your best-placed teammate. Defenders can still attack it as it drops.'},
 
   slide:{name:'INTERCEPTOR',cd:960,d:'Lightning lunge that always wins the ball if you reach the carrier.'},
   turbo:{name:'TURBO',cd:1080,d:'Three seconds of top speed without using stamina.'}};
