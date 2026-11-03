@@ -368,7 +368,7 @@ function crowdMood(dt){if(!crowdG||!ac)return;moodT-=dt;if(moodT>0)return;moodT=
   if(state==='play'){const dg=Math.min(Math.abs(B.x-FX0),Math.abs(B.x-FX1));ex=clamp(1-(dg-80)/420,0,1)*(Math.abs(B.y-MY)<260?.85:.45);
     if(!B.owner&&B.shot)ex=Math.max(ex,.85);if(B.owner&&B.owner.breakaway)ex=Math.max(ex,.7)}
   else if(state==='goal')ex=1;else if(state==='concede')ex=.3;
-  else if(state==='pens'&&pen)ex=pen.phase==='runup'||pen.phase==='fly'?.75:.3;
+  else if(state==='pens'&&pen)ex=pen.phase==='aim'||pen.phase==='kwait'?.05:pen.phase==='runup'?.45:pen.phase==='fly'?.85:pen.phase==='result'?(pen.good?.95:.4):.45;
   const tt=ac.currentTime;crowdG.gain.setTargetAtTime(.04+ex*.1,tt,.45);crowdF.frequency.setTargetAtTime(380+ex*560,tt,.45)}
 // Ticks over the last ten seconds, and a heads-up banner with half a minute left.
 let lastSec=null,banner=null;
@@ -456,13 +456,7 @@ addEventListener('keydown',e=>{
     if(c==='Space'&&stT>70){if(NET.on)kickoff(1);else startReplay()}
   }else if(state==='replay'){if(c==='Space')kickoff(1)}
   else if(state==='concede'){if(c==='Space'&&stT>60)kickoff(0)}
-  else if(state==='pens'&&pen){
-    if(c==='Space'&&pen.phase==='aim'&&!charging){charging=true;charge=0}
-    if(pen.phase==='wait'){if(c==='KeyW'||c==='ArrowUp')pen.dive=-1;if(c==='KeyS'||c==='ArrowDown')pen.dive=1}
-    if(pen.phase==='runup'&&(c==='KeyE'||c==='ArrowUp')&&!pen.stut&&pen.t<14){pen.stut=true;pen.stutT=28;S.swoosh();
-      // the stutter makes their keeper twitch first: most commit to a side (watch the lean and re-aim), some hold their nerve
-      pen.commit=Math.random()<.7?pick([-1,1]):0;pop('STUTTER…',pen.taker.x,pen.taker.y-40,C.sun,18)}
-    if(c==='Space'&&pen.phase==='intro'&&pen.t>40)penSetup()}
+  else if(state==='pens'&&pen)penKey(c);
   else if(state==='fulltime'){if(c==='Space'&&stT>60){netLeave();showMenu()}}
 });
 // one button press for whoever is in control. The host runs this for the guest's player too.
@@ -478,7 +472,7 @@ function playKey(p,c){
 }
 function playRelease(p){charging=false;if(state==='play'&&p&&canStrike(p)){if(p.aimY!=null)p.dir=Math.atan2(p.aimY-B.y,goalX(p.team)-B.x);p.quickShot=charge<.4;shoot(p,'normal',Math.max(charge,.5),p.aimY);p.quickShot=false}if(p)p.aimY=null}
 addEventListener('keyup',e=>{keys[e.code]=false;if(NET.guest){if(e.code==='Space')guestKey('SpaceUp');return}
-  if(e.code==='Space'&&charging&&state==='pens'&&pen&&pen.phase==='aim'){charging=false;pen.power=charge;pen.phase='runup';pen.t=0;return}
+  if(state==='pens'&&pen){penKeyUp(e.code);return}
   if(e.code==='Space'&&charging)playRelease(ctrl)});// a quick tap still gets a decent strike
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;charging=false});
 // Aim point on the goal line. Starts where you're facing, then W/S (or up/down) slide it smoothly while you hold Space.
@@ -1195,152 +1189,7 @@ const VISK=['aiLunge','aiSlide','anim','animMax','animT','arms','diving','fall',
 let rcx=MIDX,rhor=0,replayCh=0;
 let pen=null,mercy=false,hat=null,swipes=[],hitT=0,reboundT=-999,counterT=-999,counterX=0,wasBehind=false;
 const PMISS={beginner:.2,easy:.14,normal:.1,hard:.07,legend:.04};
-function startPens(){
-  state='pens';stT=0;charging=false;
-  pen={kicks:[[],[]],turn:0,phase:'intro',t:0,order:[outfield(0).slice().sort((a,b)=>b.st.fin-a.st.fin),outfield(1)],n:[0,0],winner:null};
-  S.whistle(2);
-}
-function penSetup(){
-  const team=pen.turn,taker=pen.order[team][pen.n[team]%pen.order[team].length],gk=keeperOf(1-team),wait=keeperOf(team);
-  pen.taker=taker;pen.gk=gk;
-  let i0=0,i1=0;
-  for(const p of players){p.vx=p.vy=0;p.jump=0;p.arms=0;p.lean=0;p.kneel=false;p.spinRot=false;p.diving=false;p.rot=0;p.anim=null;p.slide=false;p.lunge=0;p.aimY=null;p.stun=0;
-    if(p===taker||p===gk)continue;
-    if(p===wait){p.x=FX1-235;p.y=MY+175;p.dir=-Math.PI/2;continue}
-    const k=p.team===0?i0++:i1++;p.x=FX1-330-k*26-(p.team?13:0);p.y=MY-175+(p.team?22:0);p.dir=Math.PI/2}
-  taker.x=FX1-SPOT-34;taker.y=MY+6;taker.dir=0;
-  gk.x=FX1-5;gk.y=MY;gk.dir=Math.PI;
-  Object.assign(B,{owner:null,x:FX1-SPOT,y:MY,z:0,vx:0,vy:0,vz:0,shot:null,pass:null,curl:0,knuckle:0,rocket:false,lockT:0});
-  pen.aimY=MY;pen.dive=0;pen.kdive=0;charge=0;charging=false;pen.t=0;pen.res=null;pen.stut=false;pen.stutT=0;pen.commit=null;pen.pan=false;
-  // the AI taker picks a style: mostly normal, sometimes a stutter, very rarely a Panenka
-  {const r=Math.random();pen.ai={stut:r<.25,pan:r>.95,power:rnd(.45,.95),stutAt:50+rnd(0,8)}}
-  pen.phase=team===0?'aim':'wait';
-  ctrl=team===0?taker:null;
-}
-// Power is ball speed. Soft = keeper has time to react, rocket = he barely moves, but wilder.
-const penSpeed=(power,shot)=>5+Math.pow(power,1.4)*13+shot*1.5;
-function penResolve(ty,spd,over,shooterTeam,kd,panenka){
-  const off=Math.abs(ty-MY),side=off<20?0:Math.sign(ty-MY);
-  if(over)return'over';
-  if(off>66)return'wide';
-  if(off>58)return'post';
-  if(panenka)return kd===0?'saved':'goal';// chip it down the middle: genius if he dives, embarrassing if he stands
-  const fast=clamp((spd-6)/12,0,1);let saveP;
-  if(side!==0&&kd===side)saveP=off<44?.95-fast*.6:.85-fast*.75;// right way: only real pace or the very corner beats him
-  else if(kd===0)saveP=side===0?.95-fast*.45:off<40?.7-fast*.65:.4-fast*.4;// stood up: slow ones within reach get stopped
-  else saveP=side===0?(fast<.35?.55-fast:0):off<40?Math.max(0,.3-fast*.8):0;// wrong way: only a slow one gets a trailing leg
-  if(shooterTeam===1&&side!==0&&kd===side)saveP+=.05;// your keeper gets a tiny edge
-  return Math.random()<clamp(saveP,0,.97)?'saved':'goal';
-}
-function penShoot(power){
-  const tk=pen.taker,fin=tk.st.fin;
-  let ty,over=false,res,kd,panenka=false;
-  if(pen.turn===0){
-    if(pen.stut)power*=.92;
-    panenka=power<.3&&Math.abs(pen.aimY-MY)<24;
-    ty=panenka?MY+rnd(-6,6):pen.aimY+rnd(-1,1)*(3+power*24*(1.3-fin*.6))*(pen.stut?1.3:1);
-    over=power>.88&&Math.random()<(power-.88)*2.5;
-    const real=Math.abs(ty-MY)<20?0:Math.sign(ty-MY),read=Math.min(.75,.16+DF.gk*.16+(pen.ladder?pen.lvl*.06:0));
-    kd=pen.commit!=null?pen.commit:Math.random()<read?real:pick([-1,-1,-1,0,1,1,1]);
-  }else{
-    const r=Math.random(),sd=Math.random()<.5?-1:1;power=pen.ai.power;
-    if(pen.ai.pan){panenka=true;power=.2;ty=MY+rnd(-6,6)}
-    else if(pen.ai.stut&&pen.dive!==0&&Math.random()<.65)ty=MY-pen.dive*rnd(30,54);// he waited for you to go, then went the other way
-    else if(r<PMISS[diffKey]*(1+power-.6)){ty=MY+sd*rnd(67,90);if(Math.random()<.4){over=true;ty=MY+sd*rnd(10,50)}}
-    else ty=MY+(r<.5?sd*rnd(46,58):r<.8?sd*rnd(22,42):rnd(-12,12));
-    kd=pen.dive;
-  }
-  const spd=panenka?5.2:penSpeed(power,tk.st.shot);
-  res=penResolve(ty,spd,over,pen.turn,kd,panenka);
-  if(panenka&&pen.turn===0&&res==='goal')addStyle(60,tk.x,tk.y,'PANENKA');
-  if(pen.stut&&pen.turn===0&&res==='goal')addStyle(20,tk.x,tk.y,'STUTTER');
-  Object.assign(pen,{ty,over,res,kdive:kd,spd,phase:'fly',t:0,T:SPOT/spd,power,pan:panenka});
-  tk.dir=Math.atan2(ty-B.y,FX1-B.x);S.kick(power);grass(B.x,B.y,10);stats.shots+=pen.turn===0?1:0;
-}
-function penOver(){
-  const g=t=>pen.kicks[t].filter(Boolean).length,a=g(0),b=g(1),na=pen.kicks[0].length,nb=pen.kicks[1].length;
-  if(na<=5&&nb<=5){if(a+(5-na)<b)return 1;if(b+(5-nb)<a)return 0;if(na===5&&nb===5&&a!==b)return a>b?0:1;return null}
-  if(na===nb&&a!==b)return a>b?0:1;return null;
-}
-function updatePens(dt){
-  pen.t+=dt;stT+=dt;
-  const tk=pen.taker,gk=pen.gk;
-  if(pen.phase==='intro'){if(pen.t>110)penSetup();return}
-  if(pen.phase==='aim'){
-    pen.aimY=clamp(pen.aimY+inY()*(4.4-charge*.9)*dt,GY0-14,GY1+14);tk.aimY=pen.aimY;
-    tk.dir=Math.atan2(pen.aimY-B.y,FX1-B.x);
-    if(charging)charge=Math.min(1,charge+.024*dt);
-    gk.y=MY+Math.sin(t*.06)*6;// keeper bounces on his line
-    return}
-  if(pen.phase==='runup'){
-    pen.aimY=clamp(pen.aimY+inY()*3.4*dt,GY0-14,GY1+14);tk.aimY=pen.aimY;tk.dir=Math.atan2(pen.aimY-B.y,FX1-B.x);
-    if(pen.stutT>0){pen.stutT-=dt;tk.vx=0;// frozen mid-run-up; the keeper shows his hand
-      gk.y+=((MY+(pen.commit||0)*16)-gk.y)*.15*dt;gk.lean=(pen.commit||0)*.25;return}
-    tk.x=Math.min(FX1-SPOT-12,tk.x+(pen.stut?1.1:1.6)*dt);
-    if(pen.commit==null)gk.y=MY+Math.sin(t*.06)*6;
-    if(tk.x>=FX1-SPOT-12){gk.lean=0;penShoot(pen.power)}
-    return}
-  if(pen.phase==='wait'){
-    const a=pen.ai,pauseEnd=a.stutAt+28,go=pen.t>30&&!(a.stut&&pen.t>a.stutAt&&pen.t<pauseEnd);
-    if(a.stut&&pen.t>a.stutAt&&pen.t-dt<=a.stutAt)pop('STUTTER…',tk.x,tk.y-40,C.coral,16);
-    tk.x=Math.min(FX1-SPOT-12,tk.x+(go?1.1:0)*dt);// run-up
-    gk.y=MY+Math.sin(t*.08)*4+pen.dive*3;
-    if(tk.x>=FX1-SPOT-12&&pen.t>40)penShoot(0);return}
-  if(pen.phase==='fly'){
-    const k=Math.min(1,pen.t/pen.T),saved=pen.res==='saved';
-    // keeper dives
-    const dk=Math.min(1,pen.t/12);gk.diving=pen.kdive!==0;gk.vy=pen.kdive;gk.y=saved&&!pen.pan?MY+(clamp(pen.ty,GY0,GY1)-MY)*Math.min(1,pen.t/pen.T):MY+pen.kdive*50*dk;gk.jump=pen.kdive?Math.sin(dk*Math.PI)*14:0;
-    if(pen.kdive===0){gk.arms=dk>.5?1:0}
-    if(!pen.hit){
-      const ex=FX1+(pen.res==='goal'?26:pen.res==='wide'?30:0);
-      B.x=FX1-SPOT+(ex-(FX1-SPOT))*k;B.y=MY+(pen.ty-MY)*k;B.z=pen.over?k*60:pen.pan?Math.sin(k*Math.PI)*34+(pen.res==='goal'?k*6:0):Math.sin(k*Math.PI)*(3+pen.power*8)*(1-k*.3)+(pen.res==='goal'?k*8:0);B.spin+=.5*dt;
-      if(k>=1){pen.hit=true;
-        if(pen.res==='saved'){B.vx=-rnd(3,5);B.vy=rnd(-3,3);netShake[1]=0;S.save();shake=RM?0:5}
-        else if(pen.res==='post'){B.vx=-rnd(2,4);B.vy=Math.sign(pen.ty-MY)*2;S.post();shake=RM?0:4}
-        else if(pen.res==='goal'){netShake[1]=40;B.vx=0;B.vy=0;S.goal()}
-        else{B.vx=3;B.vy=0;S.aww()}}
-    }else{B.x+=B.vx*dt;B.y+=B.vy*dt;B.vx*=.95;B.vy*=.95;if(B.z>0)B.z=Math.max(0,B.z-1.5*dt)}
-    if(pen.t>pen.T+28){
-      const scored=pen.res==='goal';pen.kicks[pen.turn].push(scored);pen.n[pen.turn]++;pen.phase='result';pen.t=0;
-      const ours=pen.turn===0;
-      if((scored&&ours)||(!scored&&!ours)){burst(FX1-40,MY,90,CONF,8,.12);addHype(15)}
-      if(scored&&ours)stats.on++;
-      if(!scored&&!ours&&pen.res==='saved'){addStyle(40,gk.x,gk.y,'PEN SAVE')}
-    }
-    return}
-  if(pen.phase==='result'){
-    gk.jump=0;
-    if(pen.t>75&&pen.ladder){pen.hit=false;const sc=pen.kicks[0][pen.kicks[0].length-1];if(sc){pen.lvl++;penSetup();return}
-      state='fulltime';stT=0;SG.pts=pen.lvl;awardCoins();S.whistle(3,true);return}
-    if(pen.t>75){pen.hit=false;const w=penOver();
-      if(w!==null){pen.winner=w;state='fulltime';stT=0;awardCoins();S.whistle(3,true);if(w===0){S.goal();burstS(W/2,H/2,200,CONF,12,.12)}else S.aww();return}
-      pen.turn=1-pen.turn;penSetup()}
-  }
-}
-function drawPenHUD(){
-  if(pen.ladder){ctx.fillStyle='rgba(20,48,63,.92)';rr(W/2-200,72,400,40,20);ctx.fill();txt(`PENALTY LADDER  ·  ${pen.lvl} in a row  ·  best ${(club.sgBest||{}).pens||0}`,W/2,92,17,C.sun,'center',false)}
-  else{
-  // scoreboard of kicks
-  ctx.fillStyle='rgba(20,48,63,.9)';rr(W/2-220,8,440,64,18);ctx.fill();
-  const rows=[[TEAMNAME().slice(0,12),0,KIT()==='#2f2f3a'?C.cream:KIT()],[OPP.name.slice(0,14),1,lighten(OPP.kit,.2)]];
-  rows.forEach(([nm,tm,col],r)=>{const y=27+r*26;txt(nm,W/2-206,y,14,col,'left',false);
-    const ks=pen.kicks[tm],n=Math.max(5,ks.length+(pen.turn===tm&&pen.phase!=='result'?1:0));
-    for(let i=0;i<n;i++){const x=W/2-60+i*26;ctx.lineWidth=2;
-      if(i<ks.length){ctx.fillStyle=ks[i]?C.mint:C.coral;ctx.beginPath();ctx.arc(x,y,8,0,7);ctx.fill();ctx.strokeStyle=C.ink;ctx.lineWidth=2.4;ctx.beginPath();
-        if(ks[i]){ctx.moveTo(x-4,y);ctx.lineTo(x-1,y+3);ctx.lineTo(x+4,y-3)}else{ctx.moveTo(x-3.5,y-3.5);ctx.lineTo(x+3.5,y+3.5);ctx.moveTo(x+3.5,y-3.5);ctx.lineTo(x-3.5,y+3.5)}ctx.stroke()}
-      else{ctx.strokeStyle='rgba(255,246,228,.35)';ctx.beginPath();ctx.arc(x,y,7,0,7);ctx.stroke()}}
-    txt(String(ks.filter(Boolean).length),W/2+200,y,20,C.cream,'right',false)})}
-  const msg=pen.phase==='intro'?null:pen.phase==='aim'?'W / S aim  ·  hold SPACE: tap = soft, full = rocket  ·  soft down the middle = Panenka  ·  E in run-up = stutter':pen.phase==='runup'?(pen.stutT>0?'STUTTER  ·  watch which way he leans and re-aim with W / S':pen.stut?'':'E now to stutter'):pen.phase==='wait'?(pen.dive?`DIVING ${pen.dive<0?'UP':'DOWN'}  ·  change with W / S`:'YOU’RE IN GOAL  ·  press W or S to dive, or stand still'):null;
-  if(msg){ctx.fillStyle='rgba(20,48,63,.88)';const w=ctx.measureText?Math.min(W-40,msg.length*8.4):600;rr(W/2-w/2,H-50,w,32,16);ctx.fill();txt(msg,W/2,H-34,14,C.cream,'center',false)}
-  if(pen.phase==='aim'&&pen.taker){txt(`#${pen.taker.st.num} ${pen.taker.st.short} steps up`,W/2,100,18,C.cream);
-    if(charging){const pan=charge<.3&&Math.abs(pen.aimY-MY)<24,lab=pan?'PANENKA':charge<.3?'SOFT':charge<.65?'PLACED':charge<.86?'DRIVEN':'ROCKET (risky)';
-      const col=pan?C.sun:charge<.86?C.mint:C.coral;ctx.fillStyle='rgba(20,48,63,.9)';rr(W/2-130,H-104,260,44,16);ctx.fill();
-      ctx.fillStyle=col;rr(W/2-118,H-80,236*Math.max(.04,charge),12,6);ctx.fill();txt(lab,W/2,H-92,14,col,'center',false)}}
-  if(pen.phase==='intro'){const e=elastic(pen.t/34);ctx.save();ctx.translate(W/2,H/2-30);ctx.scale(e,e);txt('PENALTIES!',0,0,84,C.sun);ctx.restore();if(pen.t>30)txt('Level after full time. Five kicks each, then sudden death.',W/2,H/2+30,18,C.cream)}
-  if(pen.phase==='result'){const ours=pen.turn===0,sc=pen.kicks[pen.turn][pen.kicks[pen.turn].length-1];
-    const word=sc?(pen.pan?(ours?'PANENKA!':'CHEEKY PANENKA'):ours?'GOAL!':'THEY SCORE'):pen.res==='saved'?(pen.pan?(ours?'CHIP CAUGHT…':'YOU READ THE PANENKA!'):ours?'SAVED':'YOU SAVED IT!'):pen.res==='post'?'OFF THE POST':pen.res==='over'?'OVER THE BAR':'WIDE';
-    const good=(sc&&ours)||(!sc&&!ours);const e=elastic(pen.t/26);ctx.save();ctx.translate(W/2,170);ctx.scale(e,e);txt(word,0,0,good?72:54,good?C.sun:C.muted);ctx.restore()}
-}
+// the penalty shoot-out lives in 2b-penalties.js
 
 let earned=0,shownEarned=0;
 function awardCoins(){earned=0;shownEarned=0;

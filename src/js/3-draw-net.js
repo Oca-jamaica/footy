@@ -182,6 +182,7 @@ function drawFulltime(){
   if(stT>60){ctx.globalAlpha=.6+Math.sin(t*.1)*.3;txt('space to continue',W/2,H-30,16,C.cream,'center',false);ctx.globalAlpha=1}
 }
 function draw(){
+  if(state==='pens'&&pen){drawPens();return}
   if(state==='replay'){ctx.save();const rf=replay[Math.min(replay.length-1,Math.floor(replayIdx))];
     const near=1-Math.min(1,(replay.length-1-replayIdx)/60),zoom=1+near*.22,fz=BROAD.f*zoom,D=BROAD.dist+(BROAD.y-rf.b[1]);
     rcx+=(clamp(rf.b[0],FX0+260,FX1-230)-rcx)*.07;const th=H*.56-BROAD.h*fz/D;rhor+=(th-rhor)*.07;
@@ -522,6 +523,6 @@ function fixScreen(){pitchCv=null;skyCv=null;vigCv=null;grainPat=null;cv.width=W
 cv.addEventListener('contextrestored',()=>{cleanCtx()});
 if(document.fonts&&document.fonts.load)document.fonts.load('40px "Lilita One"').catch(()=>{});
 $('fixscr').onclick=fixScreen;$('fixscr2').onclick=()=>{setPause(false);fixScreen()};
-window.__kick={errs:()=>loopErrs,setFire:v=>{fire=v},net:()=>({RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+window.__kick={errs:()=>loopErrs,penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 requestAnimationFrame(loop);
 })();

@@ -1,0 +1,20 @@
+// Walks through a penalty shoot-out in a headless browser and screenshots each stage.
+const {chromium}=require('playwright');const path=require('path');
+(async()=>{const out=process.argv[2]||'.';const b=await chromium.launch();const pg=await b.newPage({viewport:{width:1200,height:900}});
+  const errs=[];pg.on('pageerror',e=>errs.push(String(e)));
+  await pg.goto('file://'+path.resolve('sunday-kickabout.html'));await pg.waitForTimeout(500);await pg.click('#go');await pg.waitForTimeout(800);
+  await pg.evaluate(()=>window.__kick.startPens());await pg.waitForTimeout(700);await pg.screenshot({path:out+'/1-intro.png'});
+  await pg.keyboard.press('Space');await pg.waitForTimeout(400);
+  await pg.keyboard.down('KeyD');await pg.keyboard.down('KeyW');await pg.waitForTimeout(650);await pg.keyboard.up('KeyD');await pg.keyboard.up('KeyW');
+  await pg.waitForTimeout(300);await pg.keyboard.down('Space');await pg.waitForTimeout(500);await pg.screenshot({path:out+'/2-aim.png'});
+  await pg.waitForTimeout(220);await pg.keyboard.up('Space');await pg.waitForTimeout(500);await pg.screenshot({path:out+'/3-runup.png'});
+  await pg.waitForTimeout(450);await pg.screenshot({path:out+'/4-fly.png'});
+  await pg.waitForTimeout(900);await pg.screenshot({path:out+'/5-result.png'});
+  console.log('after kick 1',await pg.evaluate(()=>{const p=window.__kick.pen();return{res:p.res,power:p.power,perfect:p.perfect,kicks:p.kicks}}));
+  await pg.waitForTimeout(2200);await pg.screenshot({path:out+'/6-keeper.png'});
+  await pg.keyboard.down('KeyA');await pg.waitForTimeout(400);await pg.keyboard.up('KeyA');
+  await pg.waitForFunction(()=>window.__kick.pen().phase==='fly',null,{timeout:6000}).catch(()=>{});
+  await pg.waitForTimeout(80);await pg.keyboard.press('Space');await pg.waitForTimeout(200);await pg.screenshot({path:out+'/7-dive.png'});
+  await pg.waitForTimeout(900);await pg.screenshot({path:out+'/8-result2.png'});
+  console.log('after kick 2',await pg.evaluate(()=>{const p=window.__kick.pen();return{res:p.res,kicks:p.kicks,sub:p.sub}}));
+  console.log(JSON.stringify({errs,loop:await pg.evaluate(()=>[window.__kick.errs(),window.__lastErr||null])}));await b.close()})();
