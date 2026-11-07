@@ -1332,6 +1332,7 @@ function update(dt){
       if(p.keeper){const gx=p.team===0?FX0:FX1;p.x=clamp(p.x,p.team?gx-BOX:gx-6,p.team?gx+6:gx+BOX);p.y=clamp(p.y,MY-170,MY+170)}
       else{p.x=clamp(p.x,FX0+10,FX1-10);p.y=clamp(p.y,FY0+10,FY1-10)}
       if(p!==ctrl&&p!==ctrl2)faceVel(p,dt)}
+    if(NET.host&&ctrl2)netGuestAuthority(dt);
     for(let i=0;i<players.length;i++)for(let j=i+1;j<players.length;j++){const a=players[i],b=players[j],d=dist(a,b);if(a.fall>0||b.fall>0||((a.ghost>0||b.ghost>0)&&a.team!==b.team))continue;
       const carry=(B.owner===a||B.owner===b)&&a.team!==b.team&&!(B.owner&&B.owner.keeper),R0=carry?24:20;
       if(d<R0&&d>0){const nx=(b.x-a.x)/d,ny=(b.y-a.y)/d,gap=R0-d;

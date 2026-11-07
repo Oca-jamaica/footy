@@ -2280,6 +2280,7 @@ function update(dt){
       if(p.keeper){const gx=p.team===0?FX0:FX1;p.x=clamp(p.x,p.team?gx-BOX:gx-6,p.team?gx+6:gx+BOX);p.y=clamp(p.y,MY-170,MY+170)}
       else{p.x=clamp(p.x,FX0+10,FX1-10);p.y=clamp(p.y,FY0+10,FY1-10)}
       if(p!==ctrl&&p!==ctrl2)faceVel(p,dt)}
+    if(NET.host&&ctrl2)netGuestAuthority(dt);
     for(let i=0;i<players.length;i++)for(let j=i+1;j<players.length;j++){const a=players[i],b=players[j],d=dist(a,b);if(a.fall>0||b.fall>0||((a.ghost>0||b.ghost>0)&&a.team!==b.team))continue;
       const carry=(B.owner===a||B.owner===b)&&a.team!==b.team&&!(B.owner&&B.owner.keeper),R0=carry?24:20;
       if(d<R0&&d>0){const nx=(b.x-a.x)/d,ny=(b.y-a.y)/d,gap=R0-d;
@@ -2991,7 +2992,7 @@ function loadPeer(){if(window.Peer)return Promise.resolve(window.Peer);if(peerLi
     next();setTimeout(()=>res(window.Peer||null),9000)});return peerLib}
 // what actually goes down the wire: the whole presence object now and then (and whenever the lobby info changes),
 // otherwise only the fields that changed. Each side rebuilds the other's presence from these.
-const FASTK=new Set(['g','k','ev','hb']);
+const FASTK=new Set(['g','k','ev','hb','me']);
 function wireOut(st,p,now){const slow=Object.keys(p).some(k=>!FASTK.has(k));if(slow||now-st.full>1000){st.full=now;return{f:st.mine}}return{p}}
 function wireIn(prev,d){if(!d||typeof d!=='object'||Array.isArray(d))return null;if(d.f&&typeof d.f==='object')return d.f;if(d.p&&typeof d.p==='object')return{...(prev||{}),...d.p};if(!('f' in d)&&!('p' in d))return d;return null}
 function peerRoom(code,role){return new Promise(async res=>{const PJ=await loadPeer();if(!PJ){res('nolib');return}
@@ -3096,7 +3097,7 @@ function netStart(){const g=netPeer('guest');if(!g){netStatus('Your friend isnâ€
   OPP={name:netGuest.club.toUpperCase(),kit,off:0};cupEvent=null;eventText=null;comp='online';
   NET.on=true;NET.host=true;NET.guest=false;netMatch=(Date.now()%100000)+1;
   initAudio();if(ac&&ac.state==='suspended')ac.resume();DF=levelDF('normal');setup();hat=null;score=[0,0];mercy=false;clock=150;style=0;shownStyle=0;hype=0;fire=0;streak=0;
-  stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];RS={x:0,y:0,charging:false,charge:0};netSeenEv=netSeenEvOf(g);netGuestAt=performance.now();netWaiting=false;
+  stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];RS={x:0,y:0,charging:false,charge:0};netSeenEv=netSeenEvOf(g);RME=null;netGuestAt=performance.now();netWaiting=false;
   menuEl.hidden=true;edEl.hidden=true;cv.focus();kickoff(0);ctrl2=outfield(1).reduce((a,b)=>b.slot.x>a.slot.x?b:a);
   const roster=players.map(p=>{const s=p.st;return[p.team,p.keeper?1:0,p.kit,String(s.id||'').replace(/_opp$/,'').replace(/^custom$/,'hcustom'),String(s.name||'').slice(0,16),String(s.short||'').slice(0,10),s.num||0,s.skin||'',s.hair||'',s.look||null,s.sk||'',s.sp||'',s.celeb||0]});
   nroom.presence({m:netMatch,r:roster,g:netSnapOf()}).catch(()=>{})}
@@ -3112,7 +3113,17 @@ let netGuestP=null,netGuestAt=0,netWaiting=false,netGuestWait=false,netLastSnapA
 function netHostInput(){const g=netPeer('guest');if(!g)return;
   if(g.presence!==netGuestP){netGuestP=g.presence;netGuestAt=performance.now()}
   const P=g.presence,k=Array.isArray(P.k)?P.k:[0,0];RS.x=-clamp(+k[0]||0,-1,1);RS.y=clamp(+k[1]||0,-1,1);
-  const ev=Array.isArray(P.ev)?P.ev:[];for(const e of ev){const id=+e[0]||0;if(id<=netSeenEv)continue;netSeenEv=id;netRemoteKey(String(e[1]||''))}}
+  const ev=Array.isArray(P.ev)?P.ev:[];for(const e of ev){const id=+e[0]||0;if(id<=netSeenEv)continue;netSeenEv=id;netRemoteKey(String(e[1]||''))}
+  const m=P.me;if(Array.isArray(m)&&m.length>=9&&(!RME||+m[7]!==RME.stamp)){const v=m.map(x=>+x||0);
+    RME={x:clamp(v[0],FX0,FX1),y:clamp(v[1],FY0,FY1),vx:clamp(v[2],-9,9),vy:clamp(v[3],-9,9),dir:v[4],idx:v[5]|0,on:!!v[6],stamp:v[7],half:clamp(v[8],0,400),at:performance.now()}}}
+// The guest moves their own player on their own laptop, so it answers their keys instantly. The host takes that position
+// as the truth (run forward by the time it spent travelling) whenever nothing the host decides has hold of the player.
+let RME=null;
+const netFree=c=>!(c.stun>0)&&!(c.fall>0)&&!(c.whiff>0)&&!c.anim&&!(c.lunge>0)&&!(c.locked>0);
+function netGuestAuthority(dt){const r=RME,c=ctrl2;if(!r||!c||!r.on||state!=='play'||players[r.idx]!==c)return;
+  const age=performance.now()-r.at;if(age>350||!netFree(c)||(c.push&&c.push.T>0)||B.lobTo===c||B.graceTo===c)return;
+  const f=Math.min(12,(age+r.half)/16.667),tx=clamp(r.x+r.vx*f,FX0+10,FX1-10),ty=clamp(r.y+r.vy*f,FY0+10,FY1-10);
+  if(Math.hypot(tx-c.x,ty-c.y)>170)return;const k=Math.min(1,.6*dt);c.x+=(tx-c.x)*k;c.y+=(ty-c.y)*k;c.vx=r.vx;c.vy=r.vy;c.dir=r.dir}
 function withP2(fn){if(!ctrl2)return;const c0=ctrl,ch=charging,cg=charge,me=ctrl2;RIN=RS;ctrl=me;charging=RS.charging;charge=RS.charge;
   try{fn()}finally{RS.charging=charging;RS.charge=charge;const after=ctrl;ctrl=c0;charging=ch;charge=cg;RIN=null;if(after&&after!==me&&after.team===1)ctrl2=after}}
 function netRemoteKey(c){
@@ -3122,7 +3133,7 @@ function netSnapOf(){
   const ix=p=>p?players.indexOf(p):-1;
   const p=players.map(q=>{const v={};for(const k of VISK){const x=q[k];if(x)v[k]=typeof x==='number'?r1(x):x===true?1:x}return[Math.round(q.x),Math.round(q.y),Math.round(q.dir*100)/100,v,r1(q.vx||0),r1(q.vy||0)]});
   const c=ctrl2;const a=c?[r1(c.skillCd),r1(c.spCd),r1(c.slideCd),r1(c.blungeCd||0),r1(c.tackleCd),Math.round(c.stam),c.aimY==null?null:Math.round(c.aimY),RS.charging?1:0,Math.round(RS.charge*100)/100]:null;
-  const s={n:++netSnapN,ack:netSeenEv,w:netWaiting?1:0,s:state,st:Math.round(stT),c:Math.round(clock*10),sc:score.slice(),b:[Math.round(B.x),Math.round(B.y),r1(B.z),ballCharge(),Math.round((B.spin||0)*100)/100,r1(B.vx||0),r1(B.vy||0),r1(B.vz||0)],o:ix(B.owner),c1:ix(ctrl),c2:ix(ctrl2),p,a,kt:Math.round(kickT),
+  const s={n:++netSnapN,ack:netSeenEv,me2:RME?RME.stamp:0,mh:RME?Math.round(performance.now()-RME.at):0,w:netWaiting?1:0,s:state,st:Math.round(stT),c:Math.round(clock*10),sc:score.slice(),b:[Math.round(B.x),Math.round(B.y),r1(B.z),ballCharge(),Math.round((B.spin||0)*100)/100,r1(B.vx||0),r1(B.vy||0),r1(B.vz||0)],o:ix(B.owner),c1:ix(ctrl),c2:ix(ctrl2),p,a,kt:Math.round(kickT),
     pp:netPopsOut.slice(-8),fx:netSfxOut.slice(-10),sh:r1(shake),fl:r1(flash),ns:netShake.map(Math.round),sco:ix(scorer),cel:celebType,ph:state==='goal'||state==='concede'?String(phrase||'').slice(0,60):''};
   if(hat)s.hat=[hat.n,hat.team,String(hat.name).slice(0,16),hat.txt,Math.round(t-hat.t0)];
   return s}
@@ -3139,10 +3150,15 @@ function guestKey(c){
   if(/^Digit[1-6]$/.test(c)&&state==='goal'){celebType=+c.slice(5)-1;S.skill(1)}}
 let netGPushAt=0,netGK='';
 let netHb=0,netHbAt=0,netEvSent={},netRtt=150,lead={x:0,y:0},leadP=null;
+let netMeAt=0;
+function netMeOut(){const c=ctrl;if(!c)return null;return[Math.round(MX(c.x)),Math.round(c.y),r1(-(gMe.vx||0)),r1(gMe.vy||0),Math.round(MA(c.dir)*100)/100,players.indexOf(c),gMe.on?1:0,Math.round(performance.now()),Math.round(netRtt/2)]}
 function netGuestPush(force){if(!nroom)return;const k=[(K('KeyD')?1:0)-(K('ArrowLeft')||K('KeyA')?1:0),(K('KeyS')?1:0)-(K('KeyW')?1:0)],kk=k.join(),now=performance.now();
-  const hbDue=now-netHbAt>350;if(!force&&kk===netGK&&!hbDue)return;netGK=kk;if(hbDue){netHbAt=now;netHb++}
+  const meDue=state==='play'&&now-netMeAt>=30;
+  const hbDue=now-netHbAt>350;if(!force&&kk===netGK&&!hbDue&&!meDue)return;
+  if(!force&&kk===netGK&&!hbDue){netMeAt=now;const me=netMeOut();if(me)nroom.presence({me}).catch(()=>{});return}
+  netGK=kk;if(hbDue){netHbAt=now;netHb++}netMeAt=now;
   if(force&&guestEv.length)netEvSent[guestEv[guestEv.length-1][0]]=now;
-  nroom.presence({k,ev:guestEv.slice(),hb:netHb}).catch(()=>{})}
+  const o={k,ev:guestEv.slice(),hb:netHb},me=netMeOut();if(me)o.me=me;nroom.presence(o).catch(()=>{})}
 function guestBuild(h){const R=h.presence.r;if(!Array.isArray(R)||R.length<4)return false;
   players=R.map((r,j)=>{const base=byId(String(r[3]||''))||{};const st={...base,id:String(r[3]||''),name:String(r[4]||''),short:String(r[5]||''),num:+r[6]||0,skin:String(r[7]||base.skin||'#e8b88c'),hair:String(r[8]||base.hair||'#111'),sk:SKILLS[r[10]]?r[10]:'roulette',sp:SPECIALS[r[11]]?r[11]:'curler',celeb:+r[12]||0};
     if(Array.isArray(r[9]))st.look=r[9];if(st.id==='hcustom')st.id='x';
@@ -3152,7 +3168,7 @@ function guestBuild(h){const R=h.presence.r;if(!Array.isArray(R)||R.length<4)ret
 function guestBegin(h){if(!guestBuild(h))return;NET.on=true;NET.guest=true;NET.host=false;comp='online';netLock=false;netGotMatch=h.presence.m;netGState='';
   netSeenPop=Infinity;netSeenSfx=Infinity;score=[0,0];clock=150;style=0;shownStyle=0;hype=0;fire=0;streak=0;hat=null;mercy=false;pen=null;cupEvent=null;eventText=null;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];charging=false;
-  menuEl.hidden=true;edEl.hidden=true;$('pack').hidden=true;cv.focus();state='play';stT=0;S.whistle(1);netLastSnapAt=performance.now();netGuestWait=false;lead={x:0,y:0};leadP=null;netEvSent={};netApply(h.presence.g,true)}
+  menuEl.hidden=true;edEl.hidden=true;$('pack').hidden=true;cv.focus();state='play';stT=0;S.whistle(1);netLastSnapAt=performance.now();netGuestWait=false;gMe.p=null;gMe.on=false;gMe.hx=null;netLastEcho=0;netEvSent={};netApply(h.presence.g,true)}
 function netApply(g,snap){if(!g||!Array.isArray(g.p))return;
   g.p.forEach((r,j)=>{const p=players[j];if(!p||!Array.isArray(r))return;const tx=MX(+r[0]||0),ty=+r[1]||0,td=MA(+r[2]||0);
     if(snap||Math.hypot(tx-p.x,ty-p.y)>90){p.x=tx;p.y=ty}p.tx=tx;p.ty=ty;p.svx=-(+r[4]||0);p.svy=+r[5]||0;p.td=td;if(snap)p.dir=td;
@@ -3180,35 +3196,53 @@ function netApply(g,snap){if(!g||!Array.isArray(g.p))return;
     state=gsN}
   if(gsN==='goal'||gsN==='concede'){scorer=players[g.sco]||scorer;if(gsN==='goal')celebType=+g.cel||0}
   stT=+g.st||0}
-let guestCh=0;
+let guestCh=0,netLastEcho=0;
+// Your own player, moved on your laptop with the same running rules as the host. Whenever the host has taken him over
+// (a tackle, a fall, a skill move) he follows the host instead, then hands back to your keys.
+const gMe={p:null,on:false,vx:0,vy:0,hx:null,hy:null};
+function guestMove(dt){const c=ctrl;if(c!==gMe.p){gMe.p=c;gMe.on=false;gMe.vx=gMe.vy=0}if(!c)return;
+  const free=state==='play'&&!netGuestWait&&netFree(c)&&!(introT>0);
+  if(!free){if(gMe.on){gMe.on=false}gMe.vx=c.svx||0;gMe.vy=c.svy||0;return}
+  if(!gMe.on){gMe.on=true;gMe.vx=c.svx||0;gMe.vy=c.svy||0}
+  let ax=(K('KeyD')?1:0)-(K('ArrowLeft')||K('KeyA')?1:0),ay=(K('KeyS')?1:0)-(K('KeyW')?1:0);const l=Math.hypot(ax,ay);if(l){ax/=l;ay/=l}
+  const cur=Math.hypot(gMe.vx,gMe.vy),own=B.owner===c;
+  if(ax||ay){const a=Math.atan2(ay,ax),turn=(own?.17:.24)+(cur<1.5?.12:0);c.dir+=angDiff(a,c.dir)*Math.min(1,turn*dt)}
+  let sp=1.85+(c.st.pace??.7)*1.85;try{const v=topSpeed(c);if(Number.isFinite(v)&&v>0)sp=v}catch(e){}
+  const cutting=(ax||ay)&&cur>.5&&(gMe.vx*ax+gMe.vy*ay)/cur<.15;let k=!(ax||ay)?.17:cutting?.24:.1;
+  gMe.vx+=(ax*sp-gMe.vx)*Math.min(1,k*dt);gMe.vy+=(ay*sp-gMe.vy)*Math.min(1,k*dt);
+  if(charging){gMe.vx*=Math.pow(.9,dt);gMe.vy*=Math.pow(.9,dt)}
+  if(!Number.isFinite(gMe.vx)||!Number.isFinite(gMe.vy)){gMe.vx=gMe.vy=0}
+  c.x=clamp(c.x+gMe.vx*dt,FX0+10,FX1-10);c.y=clamp(c.y+gMe.vy*dt,FY0+10,FY1-10);
+  // if the two laptops ever disagree a lot (bumped by someone on the host), drift back to the host's picture
+  if(gMe.hx!=null){const d=Math.hypot(gMe.hx-c.x,gMe.hy-c.y);if(d>220){c.x=gMe.hx;c.y=gMe.hy}else if(d>70){const kk=Math.min(1,.08*dt);c.x+=(gMe.hx-c.x)*kk;c.y+=(gMe.hy-c.y)*kk}}}
 function guestUpdate(dt){t+=dt;const h=netPeer('host');
   if(!netLock){const now=performance.now();
     if(h&&h.presence.m===netGotMatch&&h.presence.g!==netLastG){netLastG=h.presence.g;netLastSnapAt=now;netApply(netLastG,false);
-      const a=netLastG&&+netLastG.ack;if(a&&netEvSent[a]){netRtt=netRtt*.7+(now-netEvSent[a])*.3;for(const id in netEvSent)if(+id<=a)delete netEvSent[id]}}
+      const a=netLastG&&+netLastG.ack;if(a&&netEvSent[a]){for(const id in netEvSent)if(+id<=a)delete netEvSent[id]}
+      const e2=netLastG&&+netLastG.me2;if(e2&&e2!==netLastEcho){netLastEcho=e2;const rt=now-e2-(+netLastG.mh||0);if(rt>0&&rt<3000)netRtt=netRtt*.8+rt*.2}}
     if(h&&h.presence.m!==netGotMatch&&h.presence.m){netLastSnapAt=now-1e9}
     const quiet=now-(netLastSnapAt||now);netGuestWait=quiet>1800||!!(netLastG&&netLastG.w);
     if(quiet>30000){netLeave();showMenu(true);resultEl.textContent='Lost the connection to the host, so the online match ended.';return}}
   netGuestPush(false);
   if(state==='fulltime'){stT+=dt;if(stT>50&&shownEarned<earned){shownEarned=Math.min(earned,shownEarned+Math.max(1,earned/70)*dt)}if(score[0]>score[1]&&stT%30<dt)firework(rnd(100,900),rnd(25,120))}
   else{if(charging)charge=Math.min(1,charge+.024*dt);
-    // undo last frame's lead before smoothing towards the host's positions
-    if(leadP){leadP.x-=lead.x;leadP.y-=lead.y;if(B.owner===leadP){B.x-=lead.x;B.y-=lead.y}}
     // dead reckoning: run each snapshot forward by its age, plus half the round trip so you see where things are on the host
     // right now rather than where they were when the snapshot left. Then ease towards that, so corrections don't jerk.
     const age=clamp((performance.now()-netLastSnapAt)/16.667,0,8),lc=state==='play'?clamp(netRtt/33.3,0,5):0,ex=f=>Math.min(f,10);
-    for(const p of players){if(p.tx!=null){const f=ex(age+(p===ctrl?0:lc)),gx=p.tx+(p.svx||0)*f,gy=p.ty+(p.svy||0)*f,k=Math.min(1,.45*dt);
-      p.x+=(clamp(gx,FX0-40,FX1+40)-p.x)*k;p.y+=(clamp(gy,FY0-40,FY1+40)-p.y)*k}if(p.td!=null)p.dir+=angDiff(p.td,p.dir)*Math.min(1,.4*dt)}
-    if(B.tx!=null){const k=Math.min(1,.55*dt),ox=B.x,oy=B.y,o=B.owner;let gx,gy,gz;
-      if(o&&o.tx!=null){gx=o.x+(B.tx-o.tx);gy=o.y+(B.ty-o.ty);gz=B.tz}
+    for(const p of players){const mine=p===ctrl&&gMe.on;
+      if(p.tx!=null){const f=ex(age+lc),gx=clamp(p.tx+(p.svx||0)*f,FX0-40,FX1+40),gy=clamp(p.ty+(p.svy||0)*f,FY0-40,FY1+40);
+        if(p===ctrl){gMe.hx=gx;gMe.hy=gy}if(!mine){const k=Math.min(1,.45*dt);p.x+=(gx-p.x)*k;p.y+=(gy-p.y)*k}}
+      if(p.td!=null&&!mine)p.dir+=angDiff(p.td,p.dir)*Math.min(1,.4*dt)}
+    guestMove(dt);
+    // running onto a loose ball: show it at your feet straight away; the host's answer follows a moment later
+    {const c=ctrl,now=performance.now();if(!B.owner&&c&&gMe.on&&B.z<10&&Math.hypot(B.x-c.x,B.y-c.y)<18&&Math.hypot(B.svx||0,B.svy||0)<9)gMe.pick=now;
+      if(B.owner)gMe.pick=0}
+    if(B.tx!=null){const k=Math.min(1,.55*dt),ox=B.x,oy=B.y,o=B.owner||(gMe.pick&&performance.now()-gMe.pick<300?ctrl:null);let gx,gy,gz;
+      if(o===ctrl&&gMe.on){gx=o.x+Math.cos(o.dir)*12;gy=o.y+Math.sin(o.dir)*12;gz=0}
+      else if(o&&o.tx!=null){gx=o.x+(B.tx-o.tx);gy=o.y+(B.ty-o.ty);gz=B.tz}
       else{const f=ex(age+lc),dk=(1-Math.pow(.986,f))/.014;gx=B.tx+(B.svx||0)*dk;gy=B.ty+(B.svy||0)*dk;gz=B.tz>0||B.svz>0?Math.max(0,B.tz+(B.svz||0)*f-.125*f*f):0}
       B.x+=(gx-B.x)*k;B.y+=(gy-B.y)*k;B.z+=(gz-B.z)*k;B.vx=(B.x-ox)/Math.max(.2,dt);B.vy=(B.y-oy)/Math.max(.2,dt)}
-    // your own player answers your keys straight away: draw him a little ahead, where the host is about to put him
-    {const c=ctrl;if(c!==leadP){lead.x=lead.y=0;leadP=c}
-      let ix=(K('KeyD')?1:0)-(K('ArrowLeft')||K('KeyA')?1:0),iy=(K('KeyS')?1:0)-(K('KeyW')?1:0);const l=Math.hypot(ix,iy);if(l){ix/=l;iy/=l}
-      const free=c&&state==='play'&&!netGuestWait&&!(c.stun>0)&&!(c.fall>0)&&!(c.whiff>0)&&!c.anim&&!(c.lunge>0);
-      const sp=c?2.6+(c.st.pace||.7)*1.6:0,fr=clamp(netRtt/16.7,0,24)*.6,tx=free?ix*sp*fr:0,ty=free?iy*sp*fr:0;
-      lead.x+=(tx-lead.x)*Math.min(1,.25*dt);lead.y+=(ty-lead.y)*Math.min(1,.25*dt);
-      if(c){c.x+=lead.x;c.y+=lead.y;if(B.owner===c){B.x+=lead.x;B.y+=lead.y}}}
+
     if(state==='goal'&&stT%22<dt&&stT<220)burstS(rnd(100,900),rnd(-20,60),40,CONF,5,.1,[3,7])}
   for(const c of clouds){c.x+=.12*dt;if(c.x-c.r>W)c.x=-c.r}
   trailStep();clockCues();crowdMood(dt);
@@ -3286,7 +3320,7 @@ cv.addEventListener('contextrestored',()=>{dropCaches();cleanCtx()});cv.addEvent
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){dropCaches();last=performance.now()}});
 if(document.fonts&&document.fonts.load)document.fonts.load('40px "Lilita One"').catch(()=>{});
 $('fixscr').onclick=fixScreen;$('fixscr2').onclick=()=>{setPause(false);fixScreen()};
-window.__kick={errs:()=>loopErrs,dbg:{draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+window.__kick={errs:()=>loopErrs,dbg:{draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({gm:{on:gMe.on,vx:gMe.vx,hx:gMe.hx,wait:netGuestWait,rtt:netRtt},RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 startLoop();
 })();
 </script>
