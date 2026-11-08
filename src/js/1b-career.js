@@ -57,7 +57,7 @@ function genPlayers(){
   const BASE={bronze:[0,340],silver:[340,240],gold:[580,230],special:[810,100],icon:[910,45]},D=realPlayers();
   for(const rar of ['bronze','silver','gold','special','icon']){let k=0;
     for(const line of D[rar].split('\n')){const [real,cc,sc,rt]=line.split('|');if(!real||seen.has(real))continue;seen.add(real);
-      const shape=SH[sc]||'b2b',pos=POS[shape],rating=clamp(+rt||60,45,98),v=statsFor(rating,shape),reg=P(REG);
+      const shape=SH[sc]||'b2b',pos=POS[shape],rating=clamp((+rt||60)-BASE_DROP-legDrop(+rt,rar==='icon'),43,98),v=statsFor(rating,shape),reg=P(REG);
       let name,g=0;do{name=P(reg[0])+' '+P(reg[1]);g++}while(used.has(name)&&g<40);if(used.has(name))name+=' Jr';used.add(name);
       const last=name.split(' ').slice(1).join(' '),id=k<BASE[rar][1]?'g'+(BASE[rar][0]+k):'gx'+rar[0]+k;k++;
       const p={id,name,short:last.toUpperCase().slice(0,10),num:pos==='DEF'?P([2,3,4,5,6,12,15,22]):pos==='MID'?P([6,8,10,14,16,18,20,23]):P([7,9,10,11,17,19,21,29]),
@@ -79,15 +79,15 @@ for(const p of PLAYERS)if(!p.ab&&(tier(p)==='icon'||tier(p)==='special')){const 
 
 /* ===== upgrades, XP and evolutions ===== */
 const RAR=['bronze','silver','gold','special','icon'];
-const UPCAP={bronze:12,silver:15,gold:18,special:20,icon:24},UPBASE={bronze:80,silver:150,gold:300,special:600,icon:1000},STATMAX=8;
+const UPCAP={bronze:8,silver:10,gold:12,special:12,icon:14},UPBASE={bronze:100,silver:200,gold:400,special:800,icon:1300},STATMAX=5;
 const OVRCAP={bronze:80,silver:86,gold:93,special:96,icon:99};
 const upOf=id=>(club.up||{})[id]||{};
 const upSpent=id=>Object.values(upOf(id)).reduce((a,b)=>a+b,0);
-const upRoom=p=>Math.min(UPCAP[tier(p)],3+3*lvlOf(p.id));// levelling up through XP unlocks more room
-const upCost=p=>Math.round(UPBASE[tier(p)]*(1+.25*upSpent(p.id))/10)*10;
+const upRoom=p=>Math.min(UPCAP[tier(p)],2+2*lvlOf(p.id));// levelling up through XP unlocks more room
+const upCost=p=>Math.round(UPBASE[tier(p)]*(1+.35*upSpent(p.id))/10)*10;
 // Evolutions: multi-stage boosts for a favourite player, each stage needs an on-pitch objective plus coins and Training Tokens
-const EVO={bronze:{boost:[4,4,4],coins:[400,800,1500],tt:[2,3,4]},silver:{boost:[3,3,3],coins:[800,1600,3000],tt:[2,4,6]},
-  gold:{boost:[3,3,2],coins:[2000,4000,8000],tt:[3,5,8]},special:{boost:[2,2],coins:[6000,12000],tt:[5,10]},icon:{boost:[2],coins:[25000],tt:[15]}};
+const EVO={bronze:{boost:[3,2,2],coins:[400,800,1500],tt:[2,3,4]},silver:{boost:[2,2,2],coins:[800,1600,3000],tt:[2,4,6]},
+  gold:{boost:[2,2,1],coins:[2000,4000,8000],tt:[3,5,8]},special:{boost:[1,1],coins:[6000,12000],tt:[5,10]},icon:{boost:[1],coins:[25000],tt:[15]}};
 const EVOGOAL={ATT:{k:'g',n:[2,4,6],w:'goals'},MID:{k:'p',n:[12,25,40],w:'passes'},DEF:{k:'t',n:[5,10,16],w:'tackles won'}};
 const evoOf=id=>(club.evo||{})[id]||{st:0,m:0,g:0,p:0,t:0};
 function evoNeed(p){const e=evoOf(p.id),E=EVO[tier(p)];if(e.st>=E.boost.length)return null;const G=EVOGOAL[natPos(p)];
@@ -95,7 +95,7 @@ function evoNeed(p){const e=evoOf(p.id),E=EVO[tier(p)];if(e.st>=E.boost.length)r
 const evoBoost=p=>{const e=evoOf(p.id),E=EVO[tier(p)];let b=0;for(let i=0;i<e.st;i++)b+=E.boost[i];return b};
 // the stats a player actually takes onto the pitch: card stats plus everything you've invested in him
 function playStats(p){if(!p||!p.id)return p;const b={...p};
-  const L=Math.min(5,lvlOf(p.id));if(L)STATK.map(k=>k[0]).sort((x,y)=>p[y]-p[x]).slice(0,5).forEach(k=>b[k]+=.01*L);
+  const L=Math.min(3,Math.floor(lvlOf(p.id)/2));if(L)STATK.map(k=>k[0]).sort((x,y)=>p[y]-p[x]).slice(0,5).forEach(k=>b[k]+=.01*L);
   const u=upOf(p.id);for(const k in u)if(k in b)b[k]+=u[k]*.01;
   let ev=evoBoost(p);if(ev){const room=OVRCAP[tier(p)]-ovr({...b,isCustom:p.isCustom});ev=Math.max(0,Math.min(ev,room));for(const [k] of STATK)b[k]+=ev*.01}
   const ab=ABIL[p.ab];if(ab)for(const k in ab.fx)b[k]+=ab.fx[k];
@@ -103,7 +103,7 @@ function playStats(p){if(!p||!p.id)return p;const b={...p};
 const effOvr=p=>p?ovr(playStats(p)):0;
 // how good he could become with every upgrade and evolution done
 function potOvr(p){const b={...p},room=UPCAP[tier(p)];const ks=STATK.map(k=>k[0]).sort((x,y)=>p[y]-p[x]);let left=room;
-  for(const k of ks){const a=Math.min(STATMAX,left);b[k]=Math.min(.99,b[k]+a*.01+.05);left-=a;if(left<=0)break}
+  for(const k of ks){const a=Math.min(STATMAX,left);b[k]=Math.min(.99,b[k]+a*.01+.03);left-=a;if(left<=0)break}
   const E=EVO[tier(p)],ev=E.boost.reduce((a,c)=>a+c,0);for(const [k] of STATK)b[k]=Math.min(.99,b[k]+ev*.01);return Math.min(OVRCAP[tier(p)]+3,ovr(b))}
 // the club keeper: one shared goalkeeper whose Goalkeeping you can train up
 const GKMAX=8,gkCost=lv=>Math.round(600*Math.pow(1.6,lv)/50)*50;
@@ -327,8 +327,8 @@ function evoDo(id){const p=byId(id),N=p&&evoNeed(p);if(!N)return;if(N.have.m<N.m
   if(club.coins<N.coins||res().tt<N.tt){toast('Not enough coins or Training Tokens.');return}
   const before=effOvr(p);club.coins-=N.coins;club.tt-=N.tt;club.evo[id]={st:N.stage+1,m:0,g:0,p:0,t:0};stat('evos');if(!evoNeed(p))stat('evomax');
   toast(`${p.name} evolved! ${before} → ${effOvr(p)} OVR`);S.goal();confetti(tier(p));achCheck();saveClub();renderMenu()}
-function trainDo(id){const p=byId(id);if(!p||res().tt<2)return;club.tt-=2;club.xp=club.xp||{};const b=lvlOf(id);club.xp[id]=(club.xp[id]||0)+150;
-  toast(`Training session: ${p.short} +150 XP`+(lvlOf(id)>b?` · now Lv ${lvlOf(id)}`:''));S.skill(1);saveClub();renderMenu()}
+function trainDo(id){const p=byId(id);if(!p||res().tt<2)return;club.tt-=2;club.xp=club.xp||{};const b=lvlOf(id);club.xp[id]=(club.xp[id]||0)+100;
+  toast(`Training session: ${p.short} +100 XP`+(lvlOf(id)>b?` · now Lv ${lvlOf(id)}`:''));S.skill(1);saveClub();renderMenu()}
 function gkTrain(){const lv=club.gkLv||0;if(lv>=GKMAX)return;const c=gkCost(lv);if(club.coins<c){toast(`Needs ${c.toLocaleString()} coins.`);return}club.coins-=c;club.gkLv=lv+1;toast(`Keeper training: Goalkeeping now ${gkRating()}`);S.skill(1);saveClub();renderMenu()}
 const gkRating=()=>70+(club.gkLv||0)*3;
 
@@ -351,7 +351,7 @@ function renderModes(){const lv=m=>{const L=(club.lg||{})[m];return L?DIVS[L.div
    <button class="modecard cl" data-gm="classical" aria-pressed="${GM==='classical'}"><div class="mh"><b>CLASSICAL</b><i>9v9</i></div><span>Full-pitch tactical football</span><em>1.5× coins on everything</em><small>${lv('classical')}${w('classical')}</small></button>`}
 const kd=k=>`<span class="kitdot" style="background:${k}"></span>`;
 function renderLeague(){let L=lgOf();if(!L)L=newSeason(GM,0,1);const D=DIVS[L.div],T=lgTable(L);
-  $('diff-note').textContent=`${GM==='classical'?'Classical 9v9':'Volta 5v5'} · Season ${L.season} · ${D.n}. Top 3 go up${L.div===4?' (you’re at the top)':''}, bottom 3 go down${L.div===0?' (not from here)':''}. A top-3 finish also earns a World Club Championship place.`;
+  $('diff-note').textContent=`${LV().name}: ${LV().note} ${GM==='classical'?'Classical 9v9':'Volta 5v5'} · Season ${L.season} · ${D.n}. Top 3 go up${L.div===4?' (you’re at the top)':''}, bottom 3 go down${L.div===0?' (not from here)':''}. A top-3 finish also earns a World Club Championship place.`;
   const tabs=`<div class="subtabs">${[['table','League table'],['fix','Fixtures & results'],['rew','Season rewards']].map(([k,n])=>`<button data-lgv="${k}" aria-pressed="${lgView===k}">${n}</button>`).join('')}</div>`;
   let body='';
   if(L.done&&L.summary){const S0=L.summary;body+=`<div class="panel welcome"><h4>Season ${L.season} complete: ${ordinal(S0.pos)} in the ${D.n}</h4><p>${S0.lines.join(' · ')||'Mid-table finish.'}</p><p>Rewards: ${S0.got}</p><button class="go" data-lgnext="1" style="font-size:18px">Start season ${L.season+1} in the ${DIVS[S0.next].n}</button></div>`}
@@ -389,7 +389,7 @@ function renderSquadExtras(){
   $('sqhead').innerHTML=`<span class="hint" style="margin:0">Editing your</span>`+['volta','classical'].map(m=>`<button class="ghost" data-sqgm="${m}" aria-pressed="${GM===m}" style="${GM===m?'color:var(--sun);border-color:var(--sun)':''}">${m==='volta'?'Volta 5v5':'Classical 9v9'} line-up</button>`).join('');
   $('team-chemistry').textContent=chemOf();
   const T=tacSet();$('tactics').innerHTML=TAC.map(x=>`<div class="panel"><div class="lab">${x.l.toUpperCase()}</div><div class="forms">${x.o.map((o,i)=>`<button data-tac="${x.k}" data-v="${i}" aria-pressed="${T[x.k]===i}">${o}</button>`).join('')}</div></div>`).join('')+
-    `<div class="panel"><div class="lab">CHEMISTRY ${chemOf()}/100</div><p class="hint" style="margin:0">Players in their own position, a settled line-up that keeps playing together, and a mix of defenders, creators and finishers. At 100 every player gets +3 on every stat.</p></div>`}
+    `<div class="panel"><div class="lab">CHEMISTRY ${chemOf()}/100</div><p class="hint" style="margin:0">Players in their own position, a settled line-up that keeps playing together, and a mix of defenders, creators and finishers. At 100 every player gets +2 on every stat.</p></div>`}
 $('sqhead').addEventListener('click',e=>{const b=e.target.closest('[data-sqgm]');if(b)setGM(b.dataset.sqgm)});
 $('tactics').addEventListener('click',e=>{const b=e.target.closest('[data-tac]');if(!b)return;tacSet()[b.dataset.tac]=+b.dataset.v;saveClub();renderMenu()});
 $('legpill').onclick=()=>{tab='club';ctab='legacy';renderMenu()};
@@ -442,7 +442,7 @@ function devHTML(){const mine=ownedPlayers().filter(p=>!p.isCustom);if(!upId||!c
     <div class="panel t-${tier(p)}"><h4>Upgrades · ${spent}/${cap} points used</h4><p><span class="ovrbig">${effOvr(p)}</span> now · potential <b>${potOvr(p)}</b> · base card ${ovr(p)}</p>
     ${upFlash&&upFlash.id===p.id?`<p class="flash">Upgraded: ${upFlash.o0} → ${upFlash.o1} OVR</p>`:''}
     <p class="hint">Level ${L} unlocks ${room} of ${cap} upgrade points${room<cap?' · play him or train him to level up for more':''}. Each stat can go up by ${STATMAX}. Each point costs a little more than the last.</p>${rows}</div>
-    <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +150 XP.</p><button class="btn" data-train2="1" ${club.tt<2?'disabled':''}>Train · 2 Training Tokens</button></div>
+    <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +100 XP. Every two levels adds +1 to his five best stats (up to +3).</p><button class="btn" data-train2="1" ${club.tt<2?'disabled':''}>Train · 2 Training Tokens</button></div>
     ${evo}${p.ab?`<div class="panel"><h4>Signature ability · ${ABIL[p.ab].name}</h4><p>${ABIL[p.ab].d}. Always on when he plays.</p></div>`:''}${gk}</div></div>`}
 $('club-body').addEventListener('change',e=>{if(e.target.id==='dev-pick'){upId=e.target.value;upFlash=null;renderMenu()}});
 $('club-body').addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;

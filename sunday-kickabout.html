@@ -42,6 +42,10 @@ body{background:var(--ground);color:var(--cream);font-family:var(--body);padding
 #vig[hidden]{display:none}
 .stage{position:relative;flex:none;width:100%;max-width:min(1100px,calc((100vh - 110px) * 1.613));min-width:min(100%,560px);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
 canvas{display:block;width:100%;height:auto;aspect-ratio:1000/620;outline:none;background:var(--ground-2)}
+.stage:fullscreen{max-width:none;width:100vw;height:100vh;border-radius:0;background:#0d1d27;display:flex;align-items:center;justify-content:center}
+.stage:fullscreen canvas{width:min(100vw,calc(100vh * 1000 / 620));height:auto}
+.stage:-webkit-full-screen{max-width:none;width:100vw;height:100vh;border-radius:0;background:#0d1d27;display:flex;align-items:center;justify-content:center}
+.stage:-webkit-full-screen canvas{width:min(100vw,calc(100vh * 1000 / 620))}
 canvas:focus-visible{box-shadow:inset 0 0 0 3px var(--sun)}
 .menu{position:absolute;inset:0;overflow:auto;background:radial-gradient(ellipse at center,rgba(20,48,63,.8),rgba(20,48,63,.96));display:flex;padding:14px}
 .menu-inner{margin:auto;display:flex;flex-direction:column;align-items:center;gap:10px;width:min(100%,900px);text-align:center}
@@ -354,6 +358,7 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
           <button data-lv="chill" aria-pressed="false">Chill</button>
           <button data-lv="normal" aria-pressed="false">Normal</button>
           <button data-lv="hard" aria-pressed="false">Hard</button>
+          <button data-lv="extreme" aria-pressed="false" title="An extreme challenge">Extreme 🔥</button>
         </div>
         <div class="diff" id="comps" role="group" aria-label="Competition"></div>
         <button class="go" id="go">Kick off</button>
@@ -445,7 +450,7 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
   <div class="menu" id="pause" hidden><div class="menu-inner">
     <h1>Paused</h1>
     <p class="hint">Take a breather. Leaving ends the match with no coins. Forfeiting counts as a 0–3 defeat in your cup or tournament run.</p>
-    <div class="row"><button class="go" id="resume">Resume</button><button class="ghost" id="leave">Leave match</button><button class="ghost" id="forfeit">Forfeit</button><button class="ghost" id="fixscr2">Fix screen</button></div>
+    <div class="row"><button class="go" id="resume">Resume</button><button class="ghost" id="leave">Leave match</button><button class="ghost" id="forfeit">Forfeit</button><button class="ghost" id="fixscr2">Fix screen</button><button class="ghost" id="fullscr2">Full screen</button></div>
   </div></div>
   <div class="editor" id="editor" hidden><div class="ed-inner">
     <h2>Create your player</h2>
@@ -478,6 +483,7 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
   <span><kbd>1</kbd>–<kbd>6</kbd> celebration</span>
   <span><button class="mute" id="mute">Sound on (M)</button></span>
   <span><button class="mute" id="fixscr" title="Use this if the screen ever goes black or freezes">Fix screen (G)</button></span>
+  <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span>
 </div>
 
 <script>(()=>{
@@ -584,7 +590,10 @@ const ROWS=[
 const ORATE={rafa:99,marco:98,kai:94,lucien:93,tiago:92,sverre:93,yusuf:91,diego:88,han:85,tyrese:81,callum:83,gary:79,dario:81,anderson:78,nico:90,dimi:96,kees:89,ilya:88,jordan:91,
   pau:94,marc:94,davi:93,rui:87,omar:85,dylan:88,cal:88,jake:81,rory:80,femi:72,tomas:78,alessio:95,ade:90,rodrigo:91,joao:92,marcos:92,edinho:90,moussa:88,jack:83,shaun:89,toby:81,hamish:79,evan:76,pete:68,jens:84};
 const OICON=new Set(['rafa','marco','tiago','diego','lucien','dimi','pau','marc','davi','alessio','rodrigo','joao','marcos','edinho','shaun']);
-const PLAYERS0=ROWS.map(r=>{const rt=ORATE[r[0]]??r[6],v=statsFor(rt,r[7]);return{id:r[0],name:r[1],short:r[2],num:r[3],tag:r[4],pos:r[5],pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],
+// every card starts a little lower, so training and upgrades have room to matter; retired greats outside the
+// very top drop a little more, so today's stars mix into the top 50
+const BASE_DROP=2,legDrop=(rt,legend)=>!legend||rt>=97?0:rt>=95?1:4;
+const PLAYERS0=ROWS.map(r=>{const rt=ORATE[r[0]]??r[6],v=statsFor(rt-BASE_DROP-legDrop(rt,OICON.has(r[0])&&!['rafa','marco'].includes(r[0])),r[7]);return{id:r[0],name:r[1],short:r[2],num:r[3],tag:r[4],pos:r[5],pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],
   sk:SKMAP[r[8]],sp:SPMAP[r[9]],celeb:r[10],skin:r[11],hair:r[12],look:r[13],plays:r[14],...(OICON.has(r[0])?{rar:'icon'}:rt>=86?{rar:'special'}:{})}});
 // saves from older versions: carry over players whose inspiration survived, refund the rest
 const OLDMAP={lena:'marc',andre:'sverre',finn:'nico',baz:'alessio',ze:'lucien',bruno:'moussa',sami:'jordan',nia:'shaun',luca:'jake',theo:'diego',yuki:'han',kofi:'edinho',ama:'rui',jonny:'callum',pablo:'anderson',ivo:'hamish',max:'rory',ray:'evan',tom:'femi',sid:'toby',joe:'gary'};
@@ -711,13 +720,15 @@ let DF=DIFFS[diffKey];
 // defenders bite on your cuts (overcommit), and scale the coins.
 const LEVELS={chill:{shift:-1,ai:.9,bite:.62,coin:.8,name:'Chill',note:'Opponents bite on your cuts a lot and press gently, but fewer coins.'},
   normal:{shift:0,half:.8,ai:1.22,bite:.3,coin:1,name:'Normal',note:'A fair game. Defenders sometimes bite on a sharp cut.'},
-  hard:{shift:2.6,ai:1.75,bite:.04,coin:1.8,boost:.07,name:'Hard',note:'A genuine challenge: opponents beyond Legend level, stronger players, sharp keepers and they almost never bite. 1.8× coins.'}};
+  hard:{shift:2.6,ai:1.75,bite:.04,coin:1.8,boost:.07,name:'Hard',note:'A genuine challenge: opponents beyond Legend level, stronger players, sharp keepers and they almost never bite. 1.8× coins.'},
+  extreme:{shift:4.2,ai:2.1,bite:0,coin:2.5,boost:.12,extreme:true,name:'Extreme',note:'For true gamer ballers only: +12 on every opponent, near-instant reactions, elite keepers, relentless pressing and slide tackles, and they never bite. 2.5× coins.'}};
 const LV=()=>NET.on?{shift:0,ai:1,bite:.3,coin:1,name:'Online'}:LEVELS[club.level]||LEVELS.normal;
 const DKEYS=['beginner','easy','normal','hard','legend'];
 // Hard can push an opponent past Legend: the numbers carry on from Normal → Hard → Legend, within sensible limits
 const DFCAP={spd:[1.5,3.15],tackle:[0,.8],react:[5,40],dive:[1,3.7],shoot:[0,1.1],err:[3,40],press:[0,1.35],range:[100,345],read:[0,.34],gk:[.7,1.42]};
-const levelDF=k=>{const x=clamp(DKEYS.indexOf(k)+LV().shift+(LV().half||0),0,6);
-  if(x>4){const L=DIFFS.legend,Hd=DIFFS.hard,o={...L};for(const key in L)if(typeof L[key]==='number'&&key!=='coin'){const v=L[key]+(L[key]-Hd[key])*(x-4)*1.15,c=DFCAP[key];o[key]=c?clamp(v,c[0],c[1]):v}return o}
+const DFCAPX={spd:[1.5,3.35],tackle:[0,.92],react:[3,40],dive:[1,4],shoot:[0,1.25],err:[2,40],press:[0,1.5],range:[100,370],read:[0,.42],gk:[.7,1.55]};
+const levelDF=k=>{const X=LV().extreme,x=clamp(DKEYS.indexOf(k)+LV().shift+(LV().half||0),0,X?8:6);
+  if(x>4){const L=DIFFS.legend,Hd=DIFFS.hard,o={...L};for(const key in L)if(typeof L[key]==='number'&&key!=='coin'){const v=L[key]+(L[key]-Hd[key])*(x-4)*1.15,c=(X?DFCAPX:DFCAP)[key];o[key]=c?clamp(v,c[0],c[1]):v}if(X)o.slide=true;return o}
   const lo=DIFFS[DKEYS[Math.floor(x)]],hi=DIFFS[DKEYS[Math.ceil(x)]],f=x-Math.floor(x);
   if(!f)return lo;const o={...lo};for(const key in lo)if(typeof lo[key]==='number')o[key]=lo[key]+(hi[key]-lo[key])*f;else o[key]=f>=.5?hi[key]:lo[key];return o};
 const CELEBS=['KNEE SLIDE','SIUUU','ROBOT','AIRPLANE','BACKFLIP','CALM DOWN'];
@@ -895,7 +906,7 @@ function renderMenu(){
   $('benchctl').innerHTML=`<span class="hint" style="margin:0">${benchList.length} players · best for the selected ${slots[selSlot]?slots[selSlot].r:''} spot first</span>`+(benchList.length>36?`<button class="ghost" data-benchall="1">${benchAll?'Show fewer':'Show all '+benchList.length}</button>`:'');
   $('bench').innerHTML=(benchAll?benchList:benchList.slice(0,36)).map(p=>{const at=q.s.indexOf(p.id);return cardHTML(p,{pickable:true,inteam:at>=0,badge:at>=0?slots[at].r[0]:'',
     extra:!p.isCustom?renameUI(p,'bench'):
-      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<300||(custom.budget||BUDGET)>=650?'disabled':''}>Train +15 pts · 300</button>`:''})}).join('');
+      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<400||(custom.budget||BUDGET)>=650?'disabled':''}>Train +8 pts · 400</button>`:''})}).join('');
   renderSquadExtras();
   // packs
   $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const od=Object.entries(k.odds).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ');
@@ -944,7 +955,7 @@ const XPL=[0,100,250,450,700,1000,1400,1900,2500];
 const xpOf=id=>(club.xp||{})[id]||0;
 const lvlOf=id=>{const x=xpOf(id);let l=0;while(l<XPL.length-1&&x>=XPL[l+1])l++;return l};
 function lvlHTML(p){if(!club.owned.includes(p.id))return'';const L=lvlOf(p.id),x=xpOf(p.id),M=XPL.length-1,a=XPL[L],b=XPL[Math.min(M,L+1)],pc=L>=M?100:Math.round((x-a)/(b-a)*100);
-  return `<span class="lv">Lv ${L}${L?' · +'+Math.min(5,L):''}</span><div class="xpbar" title="${x} XP"><i style="width:${pc}%"></i></div>`}
+  return `<span class="lv">Lv ${L}${L>=2?' · +'+Math.min(3,Math.floor(L/2)):''}</span><div class="xpbar" title="${x} XP"><i style="width:${pc}%"></i></div>`}
 // the stats a player actually takes onto the pitch: card stats plus everything you've invested in him
 let levelUps=[];
 function grantXP(won){levelUps=[];club.xp=club.xp||{};
@@ -987,7 +998,7 @@ $('market').addEventListener('keydown',renameKey);
 $('bench').addEventListener('click',e=>{
   if(renameClick(e,'bench'))return;
   if(e.target.closest('[data-edit]')){openEditor();return}
-  const tr=e.target.closest('[data-train]');if(tr){if(club.coins>=300){const was=ovr(custom),gain=Math.min(15,650-(custom.budget||BUDGET));club.coins-=300;custom.budget=(custom.budget||BUDGET)+gain;autoSpend(custom,gain);const now=ovr(custom);try{localStorage.setItem('kickabout-custom',JSON.stringify(custom))}catch(e){}saveClub();S.skill(2);renderMenu();showUpgrade(was,now);openEditor()}return}
+  const tr=e.target.closest('[data-train]');if(tr){if(club.coins>=400){const was=ovr(custom),gain=Math.min(8,650-(custom.budget||BUDGET));club.coins-=400;custom.budget=(custom.budget||BUDGET)+gain;autoSpend(custom,gain);const now=ovr(custom);try{localStorage.setItem('kickabout-custom',JSON.stringify(custom))}catch(e){}saveClub();S.skill(2);renderMenu();showUpgrade(was,now);openEditor()}return}
   const c=e.target.closest('.card[data-id]');if(c){lastSlotClick=-1;placePlayer(c.dataset.id)}});
 $('bench').addEventListener('keydown',e=>{if(renameKey(e))return;
   const c=e.target.closest('.card[data-id]');if(c&&e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();placePlayer(c.dataset.id)}});
@@ -1150,7 +1161,7 @@ function genPlayers(){
   const BASE={bronze:[0,340],silver:[340,240],gold:[580,230],special:[810,100],icon:[910,45]},D=realPlayers();
   for(const rar of ['bronze','silver','gold','special','icon']){let k=0;
     for(const line of D[rar].split('\n')){const [real,cc,sc,rt]=line.split('|');if(!real||seen.has(real))continue;seen.add(real);
-      const shape=SH[sc]||'b2b',pos=POS[shape],rating=clamp(+rt||60,45,98),v=statsFor(rating,shape),reg=P(REG);
+      const shape=SH[sc]||'b2b',pos=POS[shape],rating=clamp((+rt||60)-BASE_DROP-legDrop(+rt,rar==='icon'),43,98),v=statsFor(rating,shape),reg=P(REG);
       let name,g=0;do{name=P(reg[0])+' '+P(reg[1]);g++}while(used.has(name)&&g<40);if(used.has(name))name+=' Jr';used.add(name);
       const last=name.split(' ').slice(1).join(' '),id=k<BASE[rar][1]?'g'+(BASE[rar][0]+k):'gx'+rar[0]+k;k++;
       const p={id,name,short:last.toUpperCase().slice(0,10),num:pos==='DEF'?P([2,3,4,5,6,12,15,22]):pos==='MID'?P([6,8,10,14,16,18,20,23]):P([7,9,10,11,17,19,21,29]),
@@ -1172,15 +1183,15 @@ for(const p of PLAYERS)if(!p.ab&&(tier(p)==='icon'||tier(p)==='special')){const 
 
 /* ===== upgrades, XP and evolutions ===== */
 const RAR=['bronze','silver','gold','special','icon'];
-const UPCAP={bronze:12,silver:15,gold:18,special:20,icon:24},UPBASE={bronze:80,silver:150,gold:300,special:600,icon:1000},STATMAX=8;
+const UPCAP={bronze:8,silver:10,gold:12,special:12,icon:14},UPBASE={bronze:100,silver:200,gold:400,special:800,icon:1300},STATMAX=5;
 const OVRCAP={bronze:80,silver:86,gold:93,special:96,icon:99};
 const upOf=id=>(club.up||{})[id]||{};
 const upSpent=id=>Object.values(upOf(id)).reduce((a,b)=>a+b,0);
-const upRoom=p=>Math.min(UPCAP[tier(p)],3+3*lvlOf(p.id));// levelling up through XP unlocks more room
-const upCost=p=>Math.round(UPBASE[tier(p)]*(1+.25*upSpent(p.id))/10)*10;
+const upRoom=p=>Math.min(UPCAP[tier(p)],2+2*lvlOf(p.id));// levelling up through XP unlocks more room
+const upCost=p=>Math.round(UPBASE[tier(p)]*(1+.35*upSpent(p.id))/10)*10;
 // Evolutions: multi-stage boosts for a favourite player, each stage needs an on-pitch objective plus coins and Training Tokens
-const EVO={bronze:{boost:[4,4,4],coins:[400,800,1500],tt:[2,3,4]},silver:{boost:[3,3,3],coins:[800,1600,3000],tt:[2,4,6]},
-  gold:{boost:[3,3,2],coins:[2000,4000,8000],tt:[3,5,8]},special:{boost:[2,2],coins:[6000,12000],tt:[5,10]},icon:{boost:[2],coins:[25000],tt:[15]}};
+const EVO={bronze:{boost:[3,2,2],coins:[400,800,1500],tt:[2,3,4]},silver:{boost:[2,2,2],coins:[800,1600,3000],tt:[2,4,6]},
+  gold:{boost:[2,2,1],coins:[2000,4000,8000],tt:[3,5,8]},special:{boost:[1,1],coins:[6000,12000],tt:[5,10]},icon:{boost:[1],coins:[25000],tt:[15]}};
 const EVOGOAL={ATT:{k:'g',n:[2,4,6],w:'goals'},MID:{k:'p',n:[12,25,40],w:'passes'},DEF:{k:'t',n:[5,10,16],w:'tackles won'}};
 const evoOf=id=>(club.evo||{})[id]||{st:0,m:0,g:0,p:0,t:0};
 function evoNeed(p){const e=evoOf(p.id),E=EVO[tier(p)];if(e.st>=E.boost.length)return null;const G=EVOGOAL[natPos(p)];
@@ -1188,7 +1199,7 @@ function evoNeed(p){const e=evoOf(p.id),E=EVO[tier(p)];if(e.st>=E.boost.length)r
 const evoBoost=p=>{const e=evoOf(p.id),E=EVO[tier(p)];let b=0;for(let i=0;i<e.st;i++)b+=E.boost[i];return b};
 // the stats a player actually takes onto the pitch: card stats plus everything you've invested in him
 function playStats(p){if(!p||!p.id)return p;const b={...p};
-  const L=Math.min(5,lvlOf(p.id));if(L)STATK.map(k=>k[0]).sort((x,y)=>p[y]-p[x]).slice(0,5).forEach(k=>b[k]+=.01*L);
+  const L=Math.min(3,Math.floor(lvlOf(p.id)/2));if(L)STATK.map(k=>k[0]).sort((x,y)=>p[y]-p[x]).slice(0,5).forEach(k=>b[k]+=.01*L);
   const u=upOf(p.id);for(const k in u)if(k in b)b[k]+=u[k]*.01;
   let ev=evoBoost(p);if(ev){const room=OVRCAP[tier(p)]-ovr({...b,isCustom:p.isCustom});ev=Math.max(0,Math.min(ev,room));for(const [k] of STATK)b[k]+=ev*.01}
   const ab=ABIL[p.ab];if(ab)for(const k in ab.fx)b[k]+=ab.fx[k];
@@ -1196,7 +1207,7 @@ function playStats(p){if(!p||!p.id)return p;const b={...p};
 const effOvr=p=>p?ovr(playStats(p)):0;
 // how good he could become with every upgrade and evolution done
 function potOvr(p){const b={...p},room=UPCAP[tier(p)];const ks=STATK.map(k=>k[0]).sort((x,y)=>p[y]-p[x]);let left=room;
-  for(const k of ks){const a=Math.min(STATMAX,left);b[k]=Math.min(.99,b[k]+a*.01+.05);left-=a;if(left<=0)break}
+  for(const k of ks){const a=Math.min(STATMAX,left);b[k]=Math.min(.99,b[k]+a*.01+.03);left-=a;if(left<=0)break}
   const E=EVO[tier(p)],ev=E.boost.reduce((a,c)=>a+c,0);for(const [k] of STATK)b[k]=Math.min(.99,b[k]+ev*.01);return Math.min(OVRCAP[tier(p)]+3,ovr(b))}
 // the club keeper: one shared goalkeeper whose Goalkeeping you can train up
 const GKMAX=8,gkCost=lv=>Math.round(600*Math.pow(1.6,lv)/50)*50;
@@ -1420,8 +1431,8 @@ function evoDo(id){const p=byId(id),N=p&&evoNeed(p);if(!N)return;if(N.have.m<N.m
   if(club.coins<N.coins||res().tt<N.tt){toast('Not enough coins or Training Tokens.');return}
   const before=effOvr(p);club.coins-=N.coins;club.tt-=N.tt;club.evo[id]={st:N.stage+1,m:0,g:0,p:0,t:0};stat('evos');if(!evoNeed(p))stat('evomax');
   toast(`${p.name} evolved! ${before} → ${effOvr(p)} OVR`);S.goal();confetti(tier(p));achCheck();saveClub();renderMenu()}
-function trainDo(id){const p=byId(id);if(!p||res().tt<2)return;club.tt-=2;club.xp=club.xp||{};const b=lvlOf(id);club.xp[id]=(club.xp[id]||0)+150;
-  toast(`Training session: ${p.short} +150 XP`+(lvlOf(id)>b?` · now Lv ${lvlOf(id)}`:''));S.skill(1);saveClub();renderMenu()}
+function trainDo(id){const p=byId(id);if(!p||res().tt<2)return;club.tt-=2;club.xp=club.xp||{};const b=lvlOf(id);club.xp[id]=(club.xp[id]||0)+100;
+  toast(`Training session: ${p.short} +100 XP`+(lvlOf(id)>b?` · now Lv ${lvlOf(id)}`:''));S.skill(1);saveClub();renderMenu()}
 function gkTrain(){const lv=club.gkLv||0;if(lv>=GKMAX)return;const c=gkCost(lv);if(club.coins<c){toast(`Needs ${c.toLocaleString()} coins.`);return}club.coins-=c;club.gkLv=lv+1;toast(`Keeper training: Goalkeeping now ${gkRating()}`);S.skill(1);saveClub();renderMenu()}
 const gkRating=()=>70+(club.gkLv||0)*3;
 
@@ -1444,7 +1455,7 @@ function renderModes(){const lv=m=>{const L=(club.lg||{})[m];return L?DIVS[L.div
    <button class="modecard cl" data-gm="classical" aria-pressed="${GM==='classical'}"><div class="mh"><b>CLASSICAL</b><i>9v9</i></div><span>Full-pitch tactical football</span><em>1.5× coins on everything</em><small>${lv('classical')}${w('classical')}</small></button>`}
 const kd=k=>`<span class="kitdot" style="background:${k}"></span>`;
 function renderLeague(){let L=lgOf();if(!L)L=newSeason(GM,0,1);const D=DIVS[L.div],T=lgTable(L);
-  $('diff-note').textContent=`${GM==='classical'?'Classical 9v9':'Volta 5v5'} · Season ${L.season} · ${D.n}. Top 3 go up${L.div===4?' (you’re at the top)':''}, bottom 3 go down${L.div===0?' (not from here)':''}. A top-3 finish also earns a World Club Championship place.`;
+  $('diff-note').textContent=`${LV().name}: ${LV().note} ${GM==='classical'?'Classical 9v9':'Volta 5v5'} · Season ${L.season} · ${D.n}. Top 3 go up${L.div===4?' (you’re at the top)':''}, bottom 3 go down${L.div===0?' (not from here)':''}. A top-3 finish also earns a World Club Championship place.`;
   const tabs=`<div class="subtabs">${[['table','League table'],['fix','Fixtures & results'],['rew','Season rewards']].map(([k,n])=>`<button data-lgv="${k}" aria-pressed="${lgView===k}">${n}</button>`).join('')}</div>`;
   let body='';
   if(L.done&&L.summary){const S0=L.summary;body+=`<div class="panel welcome"><h4>Season ${L.season} complete: ${ordinal(S0.pos)} in the ${D.n}</h4><p>${S0.lines.join(' · ')||'Mid-table finish.'}</p><p>Rewards: ${S0.got}</p><button class="go" data-lgnext="1" style="font-size:18px">Start season ${L.season+1} in the ${DIVS[S0.next].n}</button></div>`}
@@ -1482,7 +1493,7 @@ function renderSquadExtras(){
   $('sqhead').innerHTML=`<span class="hint" style="margin:0">Editing your</span>`+['volta','classical'].map(m=>`<button class="ghost" data-sqgm="${m}" aria-pressed="${GM===m}" style="${GM===m?'color:var(--sun);border-color:var(--sun)':''}">${m==='volta'?'Volta 5v5':'Classical 9v9'} line-up</button>`).join('');
   $('team-chemistry').textContent=chemOf();
   const T=tacSet();$('tactics').innerHTML=TAC.map(x=>`<div class="panel"><div class="lab">${x.l.toUpperCase()}</div><div class="forms">${x.o.map((o,i)=>`<button data-tac="${x.k}" data-v="${i}" aria-pressed="${T[x.k]===i}">${o}</button>`).join('')}</div></div>`).join('')+
-    `<div class="panel"><div class="lab">CHEMISTRY ${chemOf()}/100</div><p class="hint" style="margin:0">Players in their own position, a settled line-up that keeps playing together, and a mix of defenders, creators and finishers. At 100 every player gets +3 on every stat.</p></div>`}
+    `<div class="panel"><div class="lab">CHEMISTRY ${chemOf()}/100</div><p class="hint" style="margin:0">Players in their own position, a settled line-up that keeps playing together, and a mix of defenders, creators and finishers. At 100 every player gets +2 on every stat.</p></div>`}
 $('sqhead').addEventListener('click',e=>{const b=e.target.closest('[data-sqgm]');if(b)setGM(b.dataset.sqgm)});
 $('tactics').addEventListener('click',e=>{const b=e.target.closest('[data-tac]');if(!b)return;tacSet()[b.dataset.tac]=+b.dataset.v;saveClub();renderMenu()});
 $('legpill').onclick=()=>{tab='club';ctab='legacy';renderMenu()};
@@ -1535,7 +1546,7 @@ function devHTML(){const mine=ownedPlayers().filter(p=>!p.isCustom);if(!upId||!c
     <div class="panel t-${tier(p)}"><h4>Upgrades · ${spent}/${cap} points used</h4><p><span class="ovrbig">${effOvr(p)}</span> now · potential <b>${potOvr(p)}</b> · base card ${ovr(p)}</p>
     ${upFlash&&upFlash.id===p.id?`<p class="flash">Upgraded: ${upFlash.o0} → ${upFlash.o1} OVR</p>`:''}
     <p class="hint">Level ${L} unlocks ${room} of ${cap} upgrade points${room<cap?' · play him or train him to level up for more':''}. Each stat can go up by ${STATMAX}. Each point costs a little more than the last.</p>${rows}</div>
-    <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +150 XP.</p><button class="btn" data-train2="1" ${club.tt<2?'disabled':''}>Train · 2 Training Tokens</button></div>
+    <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +100 XP. Every two levels adds +1 to his five best stats (up to +3).</p><button class="btn" data-train2="1" ${club.tt<2?'disabled':''}>Train · 2 Training Tokens</button></div>
     ${evo}${p.ab?`<div class="panel"><h4>Signature ability · ${ABIL[p.ab].name}</h4><p>${ABIL[p.ab].d}. Always on when he plays.</p></div>`:''}${gk}</div></div>`}
 $('club-body').addEventListener('change',e=>{if(e.target.id==='dev-pick'){upId=e.target.value;upFlash=null;renderMenu()}});
 $('club-body').addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
@@ -2775,7 +2786,7 @@ let oppSeed=0;
 function setup(){oppSeed=(Math.random()*OPPNAMES.length)|0;
   const o={pace:.7,shot:.72,fin:.6,skill:.55,pass:.65,tackle:.6,str:.6,sk:'roulette',sp:'curler'},gk={pace:.5,shot:.6,fin:.6,skill:.3,pass:.65,tackle:.5,str:.8,sk:'shield',sp:'turbo'};
   const q=sq(),slots=FORMS[q.f],n=slots.length;if(q.s.filter(Boolean).length<n){const keep=q.s.slice();autoPick(q);keep.forEach((id,i)=>{if(id&&!q.s.includes(id))q.s[i]=id})}
-  const chem=NET.on?0:chemOf(q)*.0003;
+  const chem=NET.on?0:chemOf(q)*.0002;
   const mine=q.s.map((id,i)=>{let p=byId(id)||STARTERS[i%3];p=playStats(p);if(chem){p={...p};for(const [k] of STATK)p[k]=Math.min(.99,p[k]+chem)}const f=posFit(natPos(p),slots[i].r);
     if(f>=1)return p;const c={...p};for(const [k] of STATK)c[k]=p[k]*f;return c});
   const avg={};for(const [k] of STATK)avg[k]=clamp(mine.reduce((a,p)=>a+p[k],0)/mine.length+OPP.off,.3,.99);Object.assign(o,avg);// opponents get stronger each round
@@ -3246,6 +3257,7 @@ addEventListener('keydown',e=>{
   const c=e.code;
   if(state==='menu')return;
   if(c==='Escape'||c==='KeyP'){e.preventDefault();if(!e.repeat)setPause(!paused);return}
+  if(c==='KeyV'&&state!=='menu'&&!e.repeat){toggleFull();return}
   if(paused)return;
   if(state==='play'&&introT>0){if(c==='Space'||c==='Enter')introT=Math.min(introT,12);e.preventDefault();return}
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab'].includes(c))e.preventDefault();
@@ -3327,7 +3339,7 @@ function startMatch(){
   else{if(cupOver()){newCup(diffKey);renderMenu();return}
   {const o=OPPS[club.cup.opps[club.cup.round]];OPP={name:o[0].toUpperCase(),kit:o[1],off:ROFF[club.cup.round]};cupEvent=null;eventText=null}}
   initAudio();if(ac&&ac.state==='suspended')ac.resume();
-  DF=levelDF(comp==='tour'?tourDF(OPP.club):comp==='league'?DIVS[lgOf().div].df:comp==='wcc'?(OPP.str>.9?'legend':'hard'):diffKey);setup();players.forEach(p=>{if(p.team===1)p.spCd=rnd(140,380)});hat=null;score=[0,0];mercy=false;clock=PITCH==='classical'?240:150;style=0;shownStyle=0;hype=0;fire=0;streak=0;
+  DF=levelDF(comp==='tour'?tourDF(OPP.club):comp==='league'?DIVS[lgOf().div].df:comp==='wcc'?(OPP.str>.9?'legend':'hard'):diffKey);setup();players.forEach(p=>{if(p.team===1)p.spCd=rnd(140,380)});hat=null;score=[0,0];mercy=false;clock=PITCH==='classical'?180:150;style=0;shownStyle=0;hype=0;fire=0;streak=0;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];
   menuEl.hidden=true;edEl.hidden=true;cv.focus();kickoff(0);modeStart();matchRatings=null;
   introT=SG||state!=='play'?0:INTRO;
@@ -3768,7 +3780,7 @@ function teamAI(team,dt){
       if(team===1&&p.st.sp==='stomp'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<95&&Math.random()<.02*dt&&doStomp(p)){p.spCd=SPECIALS.stomp.cd*1.7;continue}
       if(team===1&&p.st.sp==='slide'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<110&&dist(p,owner)>25&&notBehind(p,owner)&&Math.random()<.015*dt){
         p.spCd=SPECIALS.slide.cd*1.15;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
-      if(team===1&&DF.slide&&owner&&owner.team===0&&p.tackleCd<=0&&dist(p,owner)>30&&dist(p,owner)<60&&Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir))>.3&&Math.random()<.0035*dt){p.windup=10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
+      if(team===1&&owner&&owner.team===0&&p.tackleCd<=0&&dist(p,owner)>30&&dist(p,owner)<60&&Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir))>.3&&Math.random()<(LV().extreme?.006:DF.slide?.0035:.0016)*dt){p.windup=10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
       steer(p,tgt.x,tgt.y,topSpeed(p)*(team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
       if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
       continue;
@@ -5286,6 +5298,12 @@ cv.addEventListener('contextrestored',()=>{dropCaches();cleanCtx()});cv.addEvent
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){dropCaches();last=performance.now()}});
 if(document.fonts&&document.fonts.load)document.fonts.load('40px "Lilita One"').catch(()=>{});
 $('fixscr').onclick=fixScreen;$('fixscr2').onclick=()=>{setPause(false);fixScreen()};
+// full screen: the whole stage (pitch and menus) fills the screen; Esc or V again to leave
+function toggleFull(){const st=document.querySelector('.stage'),fs=document.fullscreenElement||document.webkitFullscreenElement;
+  try{if(fs)(document.exitFullscreen||document.webkitExitFullscreen).call(document);else(st.requestFullscreen||st.webkitRequestFullscreen).call(st)}catch(e){toast('Full screen isn’t available here.')}cv.focus()}
+$('fullscr').onclick=toggleFull;$('fullscr2').onclick=toggleFull;
+const fsLabel=()=>{const on=!!(document.fullscreenElement||document.webkitFullscreenElement);$('fullscr').textContent=on?'Exit full screen (V)':'Full screen (V)';$('fullscr2').textContent=on?'Exit full screen':'Full screen'};
+document.addEventListener('fullscreenchange',fsLabel);document.addEventListener('webkitfullscreenchange',fsLabel);
 window.__kick={errs:()=>loopErrs,dbg:{allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p)})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({gm:{on:gMe.on,seq:gT.seq,ack:gT.ack,lob:gT.lob,wait:netGuestWait,rtt:netRtt,v2:netV2},RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 startLoop();
 })();

@@ -1,1221 +1,1221 @@
 ﻿Rank,Real player,Country,Position,Rarity,Rating,Card id
-1,Lionel Messi,Argentina,ATT,Icon,99,rafa
-2,Cristiano Ronaldo,Portugal,ATT,Icon,98,marco
-3,Diego Maradona,Argentina,ATT,Icon,97,g911
-4,Pelé,Brazil,ATT,Icon,97,g910
-5,Johan Cruyff,Netherlands,ATT,Icon,96,g912
-6,Ronaldo Nazário,Brazil,ATT,Icon,96,g913
-7,Zinedine Zidane,France,MID,Icon,96,dimi
-8,Alfredo Di Stéfano,Argentina,ATT,Icon,95,g915
-9,Franz Beckenbauer,Germany,DEF,Icon,95,g914
-10,Paolo Maldini,Italy,DEF,Icon,95,alessio
-11,Ronaldinho,Brazil,ATT,Icon,95,g916
-12,Andrés Iniesta,Spain,MID,Icon,94,pau
-13,Eusébio,Portugal,ATT,Icon,94,g917
-14,Ferenc Puskás,Hungary,ATT,Icon,94,g918
-15,Gerd Müller,Germany,ATT,Icon,94,g919
-16,Marco van Basten,Netherlands,ATT,Icon,94,g920
-17,Michel Platini,France,MID,Icon,94,g921
-18,Xavi,Spain,MID,Icon,94,marc
-19,Kylian Mbappé,France,ATT,Special,94,kai
-20,Bobby Charlton,England,MID,Icon,93,g923
-21,Franco Baresi,Italy,DEF,Icon,93,g928
-22,Garrincha,Brazil,ATT,Icon,93,g926
-23,George Best,Northern Ireland,ATT,Icon,93,g922
-24,Kaká,Brazil,MID,Icon,93,davi
-25,Lothar Matthäus,Germany,MID,Icon,93,g929
-26,Roberto Baggio,Italy,ATT,Icon,93,g927
-27,Romário,Brazil,ATT,Icon,93,g925
-28,Thierry Henry,France,ATT,Icon,93,lucien
-29,Zico,Brazil,MID,Icon,93,g924
-30,Zlatan Ibrahimović,Sweden,ATT,Icon,93,gxi50
-31,Erling Haaland,Norway,ATT,Special,93,sverre
-32,Harry Kane,England,ATT,Special,93,g811
-33,Vinícius Júnior,Brazil,ATT,Special,93,g810
-34,Alessandro Del Piero,Italy,ATT,Icon,92,g935
-35,Andrea Pirlo,Italy,MID,Icon,92,g933
-36,Andriy Shevchenko,Ukraine,ATT,Icon,92,g953
-37,Arjen Robben,Netherlands,ATT,Icon,92,gxi52
-38,Bobby Moore,England,DEF,Icon,92,gxi67
-39,Cafu,Brazil,DEF,Icon,92,marcos
-40,Dennis Bergkamp,Netherlands,ATT,Icon,92,g932
-41,Didier Drogba,Ivory Coast,ATT,Icon,92,g950
-42,Fabio Cannavaro,Italy,DEF,Icon,92,g936
-43,Francesco Totti,Italy,MID,Icon,92,g934
-44,Gabriel Batistuta,Argentina,ATT,Icon,92,gxi57
-45,George Weah,Liberia,ATT,Icon,92,g952
-46,Karim Benzema,France,ATT,Icon,92,gxi82
-47,Kenny Dalglish,Scotland,ATT,Icon,92,gxi60
-48,Luís Figo,Portugal,ATT,Icon,92,gxi46
-49,Neymar,Brazil,ATT,Icon,92,tiago
-50,Raúl,Spain,ATT,Icon,92,g947
-51,Roberto Carlos,Brazil,DEF,Icon,92,joao
-52,Ruud Gullit,Netherlands,MID,Icon,92,g930
-53,Samuel Eto'o,Cameroon,ATT,Icon,92,g951
-54,Sergio Agüero,Argentina,ATT,Icon,92,gxi72
-55,Sócrates,Brazil,MID,Icon,92,gxi66
-56,Steven Gerrard,England,MID,Icon,92,g937
-57,Toni Kroos,Germany,MID,Icon,92,gxi77
-58,Wayne Rooney,England,ATT,Icon,92,g940
-59,Ousmane Dembélé,France,ATT,Special,92,g813
-60,Rodri,Spain,MID,Special,92,g812
-61,Alan Shearer,England,ATT,Icon,91,g941
-62,Bastian Schweinsteiger,Germany,MID,Icon,91,gxi55
-63,Carles Puyol,Spain,DEF,Icon,91,g946
-64,Clarence Seedorf,Netherlands,MID,Icon,91,gxi48
-65,David Beckham,England,MID,Icon,91,gxi71
-66,Eden Hazard,Belgium,ATT,Icon,91,gxi75
-67,Eric Cantona,France,ATT,Icon,91,gxi61
-68,Frank Lampard,England,MID,Icon,91,g938
-69,Frank Rijkaard,Netherlands,MID,Icon,91,g931
-70,Gareth Bale,Wales,ATT,Icon,91,gxi74
-71,Gheorghe Hagi,Romania,MID,Icon,91,gxi69
-72,Hristo Stoichkov,Bulgaria,ATT,Icon,91,g954
-73,John Terry,England,DEF,Icon,91,g945
-74,Juan Román Riquelme,Argentina,MID,Icon,91,gxi58
-75,Lilian Thuram,France,DEF,Icon,91,gxi63
-76,Michael Laudrup,Denmark,MID,Icon,91,gxi49
-77,Miroslav Klose,Germany,ATT,Icon,91,gxi56
-78,Patrick Vieira,France,MID,Icon,91,g942
-79,Paul Scholes,England,MID,Icon,91,g939
-80,Pavel Nedvěd,Czech Republic,MID,Icon,91,gxi45
-81,Philipp Lahm,Germany,DEF,Icon,91,gxi54
-82,Rio Ferdinand,England,DEF,Icon,91,g944
-83,Robin van Persie,Netherlands,ATT,Icon,91,gxi73
-84,Roy Keane,Ireland,MID,Icon,91,g943
-85,Ryan Giggs,Wales,ATT,Icon,91,gxi70
-86,Sergio Ramos,Spain,DEF,Icon,91,rodrigo
-87,Xabi Alonso,Spain,MID,Icon,91,gxi53
-88,Jude Bellingham,England,MID,Special,91,jordan
-89,Mohamed Salah,Egypt,ATT,Special,91,yusuf
-90,Dani Alves,Brazil,DEF,Icon,90,edinho
-91,David Villa,Spain,ATT,Icon,90,g949
-92,Fernando Torres,Spain,ATT,Icon,90,g948
-93,Franck Ribéry,France,ATT,Icon,90,gxi80
-94,Gary Lineker,England,ATT,Icon,90,gxi68
-95,Gerard Piqué,Spain,DEF,Icon,90,gxi79
-96,Javier Zanetti,Argentina,DEF,Icon,90,gxi59
-97,Jürgen Klinsmann,Germany,ATT,Icon,90,gxi62
-98,Marcel Desailly,France,DEF,Icon,90,gxi64
-99,Marcelo,Brazil,DEF,Icon,90,gxi81
-100,Mats Hummels,Germany,DEF,Icon,90,gxi84
-101,Mesut Özil,Germany,MID,Icon,90,gxi76
-102,Nemanja Vidić,Serbia,DEF,Icon,90,gxi65
-103,Rui Costa,Portugal,MID,Icon,90,gxi47
-104,Sergio Busquets,Spain,MID,Icon,90,gxi78
-105,Thiago Silva,Brazil,DEF,Icon,90,gxi83
-106,Wesley Sneijder,Netherlands,MID,Icon,90,gxi51
-107,Bukayo Saka,England,ATT,Special,90,g815
-108,Federico Valverde,Uruguay,MID,Special,90,g823
-109,Florian Wirtz,Germany,ATT,Special,90,g816
-110,Jamal Musiala,Germany,ATT,Special,90,g817
-111,Lamine Yamal,Spain,ATT,Special,90,nico
-112,Lautaro Martínez,Argentina,ATT,Special,90,g818
-113,Pedri,Spain,MID,Special,90,g820
-114,Raphinha,Brazil,ATT,Special,90,g822
-115,Robert Lewandowski,Poland,ATT,Special,90,g814
-116,Virgil van Dijk,Netherlands,DEF,Special,90,ade
-117,Ashley Cole,England,DEF,Icon,89,shaun
-118,Achraf Hakimi,Morocco,DEF,Special,89,g824
-119,Alexander Isak,Sweden,ATT,Special,89,g825
-120,Joshua Kimmich,Germany,MID,Special,89,g831
-121,Kevin De Bruyne,Belgium,MID,Special,89,kees
-122,Khvicha Kvaratskhelia,Georgia,ATT,Special,89,g827
-123,Martin Ødegaard,Norway,MID,Special,89,g819
-124,Michael Olise,France,ATT,Special,89,g843
-125,Phil Foden,England,ATT,Special,89,g821
-126,Rúben Dias,Portugal,DEF,Special,89,g828
-127,Vitinha,Portugal,MID,Special,89,g835
-128,Luis Suárez,Uruguay,ATT,Icon,88,diego
-129,Alessandro Bastoni,Italy,DEF,Special,88,g830
-130,Alexis Mac Allister,Argentina,MID,Special,88,g834
-131,Antoine Griezmann,France,MID,Special,88,g846
-132,Antonio Rüdiger,Germany,DEF,Special,88,g829
-133,Bernardo Silva,Portugal,MID,Special,88,g832
-134,Bruno Guimarães,Brazil,MID,Special,88,g833
-135,Cole Palmer,England,MID,Special,88,cal
-136,Declan Rice,England,MID,Special,88,dylan
-137,Gabriel Magalhães,Brazil,DEF,Special,88,g858
-138,Joško Gvardiol,Croatia,DEF,Special,88,g856
-139,Julián Álvarez,Argentina,ATT,Special,88,g845
-140,Luis Díaz,Colombia,ATT,Special,88,g871
-141,Luka Modrić,Croatia,MID,Special,88,ilya
-142,Marquinhos,Brazil,DEF,Special,88,g857
-143,Moisés Caicedo,Ecuador,MID,Special,88,g874
-144,Nico Williams,Spain,ATT,Special,88,g851
-145,Nicolò Barella,Italy,MID,Special,88,g837
-146,Nuno Mendes,Portugal,DEF,Special,88,g864
-147,Rafael Leão,Portugal,ATT,Special,88,g842
-148,Serhou Guirassy,Guinea,ATT,Special,88,g877
-149,Theo Hernández,France,DEF,Special,88,g854
-150,Trent Alexander-Arnold,England,DEF,Special,88,g855
-151,Victor Osimhen,Nigeria,ATT,Special,88,g826
-152,Viktor Gyökeres,Sweden,ATT,Special,88,g850
-153,William Saliba,France,DEF,Special,88,moussa
-154,Ademola Lookman,Nigeria,ATT,Special,87,g878
-155,Álex Grimaldo,Spain,DEF,Special,87,g853
-156,Alphonso Davies,Canada,DEF,Special,87,g865
-157,Arda Güler,Turkey,ATT,Special,87,g869
-158,Aurélien Tchouaméni,France,MID,Special,87,g840
-159,Bradley Barcola,France,ATT,Special,87,g867
-160,Bruno Fernandes,Portugal,MID,Special,87,rui
-161,Christian Pulisic,USA,ATT,Special,87,g891
-162,Cristian Romero,Argentina,DEF,Special,87,g882
-163,Dani Olmo,Spain,ATT,Special,87,g852
-164,Désiré Doué,France,ATT,Special,87,g868
-165,Dominik Szoboszlai,Hungary,MID,Special,87,g872
-166,Éder Militão,Brazil,DEF,Special,87,g863
-167,Eduardo Camavinga,France,MID,Special,87,g841
-168,Enzo Fernández,Argentina,MID,Special,87,g875
-169,Federico Dimarco,Italy,DEF,Special,87,g866
-170,Frenkie de Jong,Netherlands,MID,Special,87,g839
-171,Hakan Çalhanoğlu,Turkey,MID,Special,87,g838
-172,Ibrahima Konaté,France,DEF,Special,87,g883
-173,João Neves,Portugal,MID,Special,87,g836
-174,Jules Koundé,France,DEF,Special,87,g861
-175,Kim Min-jae,South Korea,DEF,Special,87,g859
-176,Leroy Sané,Germany,ATT,Special,87,g844
-177,Marcus Thuram,France,ATT,Special,87,g849
-178,Martín Zubimendi,Spain,MID,Special,87,g884
-179,Omar Marmoush,Egypt,ATT,Special,87,g879
-180,Pau Cubarsí,Spain,DEF,Special,87,g862
-181,Paulo Dybala,Argentina,ATT,Special,87,g847
-182,Rodrygo,Brazil,ATT,Special,87,g876
-183,Ronald Araújo,Uruguay,DEF,Special,87,g860
-184,Ryan Gravenberch,Netherlands,MID,Special,87,g873
-185,Sadio Mané,Senegal,ATT,Special,87,g848
-186,Scott McTominay,Scotland,MID,Special,87,g890
-187,Tijjani Reijnders,Netherlands,MID,Special,87,g885
-188,Xavi Simons,Netherlands,ATT,Special,87,g870
-189,Andrew Robertson,Scotland,DEF,Special,86,g904
-190,Antoine Semenyo,Ghana,ATT,Special,86,g909
-191,Benjamin Šeško,Slovenia,ATT,Special,86,g893
-192,Bryan Mbeumo,Cameroon,ATT,Special,86,g889
-193,Dani Carvajal,Spain,DEF,Special,86,g901
-194,Dušan Vlahović,Serbia,ATT,Special,86,g897
-195,Fabián Ruiz,Spain,MID,Special,86,g906
-196,Granit Xhaka,Switzerland,MID,Special,86,g880
-197,Hugo Ekitiké,France,ATT,Special,86,g894
-198,Jérémy Doku,Belgium,ATT,Special,86,g907
-199,Jonathan David,Canada,ATT,Special,86,g898
-200,Jonathan Tah,Germany,DEF,Special,86,g892
-201,Kai Havertz,Germany,ATT,Special,86,g886
-202,Kenan Yıldız,Turkey,ATT,Special,86,g888
-203,Kingsley Coman,France,ATT,Special,86,g900
-204,Manuel Akanji,Switzerland,DEF,Special,86,g899
-205,Mateo Retegui,Italy,ATT,Special,86,g896
-206,Mikel Merino,Spain,MID,Special,86,g905
-207,Mikel Oyarzabal,Spain,ATT,Special,86,g881
-208,Mohammed Kudus,Ghana,ATT,Special,86,g887
-209,Rayan Cherki,France,ATT,Special,86,g902
-210,Reece James,England,DEF,Special,86,g908
-211,Riyad Mahrez,Algeria,ATT,Special,86,g895
-212,Sandro Tonali,Italy,MID,Special,86,g903
-213,Eberechi Eze,England,ATT,Gold,85,g581
-214,N’Golo Kanté,France,MID,Gold,85,omar
-215,Son Heung-min,South Korea,ATT,Gold,85,han
-216,Anthony Gordon,England,ATT,Gold,84,g582
-217,Christopher Nkunku,France,ATT,Gold,84,g669
-218,Cody Gakpo,Netherlands,ATT,Gold,84,g737
-219,Dean Huijsen,Spain,DEF,Gold,84,g630
-220,Gabriel Martinelli,Brazil,ATT,Gold,84,g772
-221,Gavi,Spain,MID,Gold,84,g646
-222,Jarrod Bowen,England,ATT,Gold,84,g580
-223,Jeremie Frimpong,Netherlands,DEF,Gold,84,g738
-224,João Cancelo,Portugal,DEF,Gold,84,g657
-225,Marc Guéhi,England,DEF,Gold,84,g583
-226,Matheus Cunha,Brazil,ATT,Gold,84,g763
-227,Micky van de Ven,Netherlands,DEF,Gold,84,jens
-228,Morgan Rogers,England,ATT,Gold,84,g591
-229,Adrien Rabiot,France,MID,Gold,83,g671
-230,Álex Baena,Spain,ATT,Gold,83,g635
-231,Bremer,Brazil,DEF,Gold,83,g764
-232,Denzel Dumfries,Netherlands,DEF,Gold,83,g730
-233,Elliot Anderson,England,MID,Gold,83,g589
-234,João Palhinha,Portugal,MID,Gold,83,g658
-235,João Pedro,Brazil,ATT,Gold,83,g762
-236,John Stones,England,DEF,Gold,83,jack
-237,Kaoru Mitoma,Japan,ATT,Gold,83,gxg260
-238,Leandro Trossard,Belgium,ATT,Gold,83,g742
-239,Levi Colwill,England,DEF,Gold,83,g585
-240,Marc Cucurella,Spain,DEF,Gold,83,g629
-241,Mateo Kovačić,Croatia,MID,Gold,83,g748
-242,Moise Kean,Italy,ATT,Gold,83,g711
-243,Morgan Gibbs-White,England,MID,Gold,83,g590
-244,Nico Schlotterbeck,Germany,DEF,Gold,83,g693
-245,Ollie Watkins,England,ATT,Gold,83,callum
-246,Takefusa Kubo,Japan,ATT,Gold,83,gxg259
-247,Thomas Müller,Germany,ATT,Gold,83,g706
-248,Willian Pacho,Ecuador,DEF,Gold,83,g797
-249,Adam Wharton,England,MID,Gold,82,g587
-250,Alejandro Balde,Spain,DEF,Gold,82,g648
-251,Aleksandar Pavlović,Germany,MID,Gold,82,g697
-252,Alexander Sørloth,Norway,ATT,Gold,82,gxg268
-253,Amad Diallo,Ivory Coast,ATT,Gold,82,gxg240
-254,Benjamin Pavard,France,DEF,Gold,82,g675
-255,Casemiro,Brazil,MID,Gold,82,g773
-256,Dejan Kulusevski,Sweden,ATT,Gold,82,gxg270
-257,Ezri Konsa,England,DEF,Gold,82,g584
-258,Fermín López,Spain,ATT,Gold,82,g634
-259,Ferran Torres,Spain,ATT,Gold,82,g650
-260,Giovanni Di Lorenzo,Italy,DEF,Gold,82,g714
-261,Gonçalo Inácio,Portugal,DEF,Gold,82,g662
-262,İlkay Gündoğan,Germany,MID,Gold,82,g689
-263,Ivan Toney,England,ATT,Gold,82,g595
-264,Jack Grealish,England,ATT,Gold,82,g592
-265,Julian Brandt,Germany,MID,Gold,82,g703
-266,Jurriën Timber,Netherlands,DEF,Gold,82,g731
-267,Kobbie Mainoo,England,MID,Gold,82,g586
-268,Kyle Walker,England,DEF,Gold,82,g618
-269,Leon Goretzka,Germany,MID,Gold,82,g688
-270,Lisandro Martínez,Argentina,DEF,Gold,82,g778
-271,Lucas Paquetá,Brazil,MID,Gold,82,g757
-272,Manu Koné,France,MID,Gold,82,g672
-273,Marcos Llorente,Spain,MID,Gold,82,g639
-274,Matthijs de Ligt,Netherlands,DEF,Gold,82,g727
-275,Nathan Aké,Netherlands,DEF,Gold,82,g728
-276,Pedro Neto,Portugal,ATT,Gold,82,g660
-277,Pedro Porro,Spain,DEF,Gold,82,g631
-278,Piero Hincapié,Ecuador,DEF,Gold,82,g796
-279,Rayan Aït-Nouri,Algeria,DEF,Gold,82,gxg234
-280,Rodrigo De Paul,Argentina,MID,Gold,82,g653
-281,Romelu Lukaku,Belgium,ATT,Gold,82,g739
-282,Rúben Neves,Portugal,MID,Gold,82,g656
-283,Serge Gnabry,Germany,ATT,Gold,82,g690
-284,Teun Koopmeiners,Netherlands,MID,Gold,82,g726
-285,Warren Zaïre-Emery,France,MID,Gold,82,g673
-286,Alejandro Garnacho,Argentina,ATT,Gold,81,g781
-287,Alessandro Buongiorno,Italy,DEF,Gold,81,g718
-288,Amadou Onana,Belgium,MID,Gold,81,g741
-289,André-Frank Zambo Anguissa,Cameroon,MID,Gold,81,gxg252
-290,Andrea Cambiaso,Italy,DEF,Gold,81,g715
-291,Angelo Stiller,Germany,MID,Gold,81,g698
-292,Antonee Robinson,USA,DEF,Gold,81,g805
-293,Aymeric Laporte,Spain,DEF,Gold,81,g633
-294,Ben White,England,DEF,Gold,81,toby
-295,Brahim Díaz,Morocco,ATT,Gold,81,g809
-296,Castello Lukeba,France,DEF,Gold,81,g684
-297,Charles De Ketelaere,Belgium,MID,Gold,81,g743
-298,Curtis Jones,England,MID,Gold,81,g588
-299,Darwin Núñez,Uruguay,ATT,Gold,81,dario
-300,David Raum,Germany,DEF,Gold,81,g694
-301,Deniz Undav,Germany,ATT,Gold,81,g692
-302,Diogo Dalot,Portugal,DEF,Gold,81,g655
-303,Dominic Solanke,England,ATT,Gold,81,g594
-304,Estêvão,Brazil,ATT,Gold,81,g761
-305,Ferdi Kadıoğlu,Turkey,DEF,Gold,81,gxg289
-306,Ferland Mendy,France,DEF,Gold,81,g677
-307,Fikayo Tomori,England,DEF,Gold,81,g604
-308,Francisco Conceição,Portugal,ATT,Gold,81,g661
-309,Giorgian de Arrascaeta,Uruguay,MID,Gold,81,g787
-310,Gonçalo Ramos,Portugal,ATT,Gold,81,g659
-311,Iliman Ndiaye,Senegal,ATT,Gold,81,gxg243
-312,Isco,Spain,MID,Gold,81,g638
-313,James Maddison,England,MID,Gold,81,jake
-314,Jarrad Branthwaite,England,DEF,Gold,81,g603
-315,Jean-Philippe Mateta,France,ATT,Gold,81,g682
-316,João Félix,Portugal,ATT,Gold,81,g654
-317,John McGinn,Scotland,MID,Gold,81,g620
-318,Karim Adeyemi,Germany,ATT,Gold,81,g699
-319,Konrad Laimer,Austria,MID,Gold,81,gxg283
-320,Lee Kang-in,South Korea,MID,Gold,81,gxg265
-321,Loïs Openda,Belgium,ATT,Gold,81,g744
-322,Lucas Hernández,France,DEF,Gold,81,g676
-323,Manuel Locatelli,Italy,MID,Gold,81,g719
-324,Marcus Rashford,England,ATT,Gold,81,tyrese
-325,Milos Kerkez,Hungary,DEF,Gold,81,gxg297
-326,Nick Woltemade,Germany,ATT,Gold,81,g700
-327,Noni Madueke,England,ATT,Gold,81,g602
-328,Orkun Kökçü,Turkey,MID,Gold,81,gxg290
-329,Pablo Barrios,Spain,MID,Gold,81,g642
-330,Patrik Schick,Czech Republic,ATT,Gold,81,gxg301
-331,Piotr Zieliński,Poland,MID,Gold,81,gxg279
-332,Randal Kolo Muani,France,ATT,Gold,81,g670
-333,Riccardo Calafiori,Italy,DEF,Gold,81,g713
-334,Robin Le Normand,Spain,DEF,Gold,81,g632
-335,Rodrigo Bentancur,Uruguay,MID,Gold,81,g786
-336,Savinho,Brazil,ATT,Gold,81,g760
-337,Stanislav Lobotka,Slovakia,MID,Gold,81,gxg298
-338,Yoane Wissa,DR Congo,ATT,Gold,81,gxg255
-339,Youri Tielemans,Belgium,MID,Gold,81,g740
-340,Youssouf Fofana,France,MID,Gold,81,g674
-341,Aleksandar Mitrović,Serbia,ATT,Gold,80,gxg286
-342,Álvaro Morata,Spain,ATT,Gold,80,g628
-343,André,Brazil,MID,Gold,80,g767
-344,Andrej Kramarić,Croatia,ATT,Gold,80,g751
-345,Ángel Di María,Argentina,ATT,Gold,80,g777
-346,Anthony Elanga,Sweden,ATT,Gold,80,gxg271
-347,António Silva,Portugal,DEF,Gold,80,g663
-348,Artem Dovbyk,Ukraine,ATT,Gold,80,gxg293
-349,Brennan Johnson,Wales,ATT,Gold,80,g623
-350,Carlos Baleba,Cameroon,MID,Gold,80,gxg253
-351,Chris Wood,New Zealand,ATT,Gold,80,g619
-352,Conor Gallagher,England,MID,Gold,80,rory
-353,Dan Ndoye,Switzerland,ATT,Gold,80,gxg280
-354,Daniel Muñoz,Colombia,DEF,Gold,80,g791
-355,Dávid Hancko,Slovakia,DEF,Gold,80,gxg299
-356,Davide Frattesi,Italy,MID,Gold,80,g708
-357,Destiny Udogie,Italy,DEF,Gold,80,g716
-358,Donyell Malen,Netherlands,ATT,Gold,80,g725
-359,Eric García,Spain,DEF,Gold,80,g649
-360,Exequiel Palacios,Argentina,MID,Gold,80,g783
-361,Francisco Trincão,Portugal,ATT,Gold,80,g664
-362,Franck Kessié,Ivory Coast,MID,Gold,80,gxg237
-363,Gabriel Jesus,Brazil,ATT,Gold,80,g759
-364,Gerard Moreno,Spain,ATT,Gold,80,g641
-365,Iago Aspas,Spain,ATT,Gold,80,g644
-366,Ilya Zabarnyi,Ukraine,DEF,Gold,80,gxg294
-367,Iñaki Williams,Ghana,ATT,Gold,80,g652
-368,Ismaïla Sarr,Senegal,ATT,Gold,80,gxg242
-369,Jhon Lucumí,Colombia,DEF,Gold,80,g795
-370,Joelinton,Brazil,MID,Gold,80,g768
-371,José María Giménez,Uruguay,DEF,Gold,80,g788
-372,Kieran Trippier,England,DEF,Gold,80,g598
-373,Koke,Spain,MID,Gold,80,g640
-374,Lewis Hall,England,DEF,Gold,80,g615
-375,Maghnes Akliouche,France,ATT,Gold,80,g681
-376,Malo Gusto,France,DEF,Gold,80,g678
-377,Manuel Ugarte,Uruguay,MID,Gold,80,g785
-378,Marcel Sabitzer,Austria,MID,Gold,80,gxg282
-379,Marcelo Brozović,Croatia,MID,Gold,80,g749
-380,Mason Mount,England,MID,Gold,80,g606
-381,Matheus Nunes,Portugal,MID,Gold,80,g666
-382,Matteo Guendouzi,France,MID,Gold,80,g680
-383,Memphis Depay,Netherlands,ATT,Gold,80,g724
-384,Morten Hjulmand,Denmark,MID,Gold,80,gxg276
-385,Myles Lewis-Skelly,England,DEF,Gold,80,g601
-386,Nicolas Jackson,Senegal,ATT,Gold,80,gxg241
-387,Nikola Milenković,Serbia,DEF,Gold,80,gxg288
-388,Noussair Mazraoui,Morocco,DEF,Gold,80,gxg230
-389,Oihan Sancet,Spain,MID,Gold,80,g637
-390,Pape Matar Sarr,Senegal,MID,Gold,80,gxg244
-391,Pascal Groß,Germany,MID,Gold,80,g702
-392,Pervis Estupiñán,Ecuador,DEF,Gold,80,g798
-393,Pierre-Emile Højbjerg,Denmark,MID,Gold,80,gxg275
-394,Raheem Sterling,England,ATT,Gold,80,g593
-395,Rasmus Højlund,Denmark,ATT,Gold,80,gxg274
-396,Ritsu Dōan,Japan,ATT,Gold,80,gxg262
-397,Robert Andrich,Germany,MID,Gold,80,g696
-398,Santiago Giménez,Mexico,ATT,Gold,80,g801
-399,Sergej Milinković-Savić,Serbia,MID,Gold,80,gxg287
-400,Thiago Almada,Argentina,ATT,Gold,80,g782
-401,Thomas Partey,Ghana,MID,Gold,80,gxg251
-402,Tino Livramento,England,DEF,Gold,80,g600
-403,Trevoh Chalobah,England,DEF,Gold,80,g605
-404,Vangelis Pavlidis,Greece,ATT,Gold,80,gxg302
-405,Victor Boniface,Nigeria,ATT,Gold,80,gxg249
-406,Wesley Fofana,France,DEF,Gold,80,g683
-407,Youssef En-Nesyri,Morocco,ATT,Gold,80,g808
-408,Amine Gouiri,Algeria,ATT,Gold,79,gxg235
-409,Amir Rrahmani,Kosovo,DEF,Gold,79,gxg303
-410,Ángel Correa,Argentina,ATT,Gold,79,g784
-411,Billy Gilmour,Scotland,MID,Gold,79,g621
-412,Callum Hudson-Odoi,England,ATT,Gold,79,g607
-413,Christoph Baumgartner,Austria,MID,Gold,79,gxg284
-414,Daichi Kamada,Japan,MID,Gold,79,gxg263
-415,Dani Ceballos,Spain,MID,Gold,79,g645
-416,David Alaba,Austria,DEF,Gold,79,gxg281
-417,Davinson Sánchez,Colombia,DEF,Gold,79,g792
-418,Denis Bouanga,Gabon,ATT,Gold,79,gxg257
-419,Dodi Lukébakio,Belgium,ATT,Gold,79,g746
-420,Douglas Luiz,Brazil,MID,Gold,79,g769
-421,Edmond Tapsoba,Burkina Faso,DEF,Gold,79,gxg254
-422,Edon Zhegrova,Kosovo,ATT,Gold,79,gxg304
-423,Edson Álvarez,Mexico,MID,Gold,79,g799
-424,Emile Smith Rowe,England,ATT,Gold,79,g614
-425,Evan Ndicka,Ivory Coast,DEF,Gold,79,gxg238
-426,Fabinho,Brazil,MID,Gold,79,g771
-427,Federico Chiesa,Italy,ATT,Gold,79,g707
-428,Federico Gatti,Italy,DEF,Gold,79,g717
-429,Felix Nmecha,Germany,MID,Gold,79,g701
-430,Georges Mikautadze,Georgia,ATT,Gold,79,gxg292
-431,Gerson,Brazil,MID,Gold,79,g770
-432,Giacomo Raspadori,Italy,ATT,Gold,79,g710
-433,Gianluca Scamacca,Italy,ATT,Gold,79,g712
-434,Giovani Lo Celso,Argentina,MID,Gold,79,g775
-435,Harry Maguire,England,DEF,Gold,79,hamish
-436,Harry Wilson,Wales,ATT,Gold,79,g624
-437,Ismaël Bennacer,Algeria,MID,Gold,79,gxg233
-438,Ivan Perišić,Croatia,DEF,Gold,79,g750
-439,Jacob Murphy,England,ATT,Gold,79,g613
-440,Jadon Sancho,England,ATT,Gold,79,g608
-441,James Rodríguez,Colombia,MID,Gold,79,g789
-442,James Ward-Prowse,England,MID,Gold,79,g616
-443,Jamie Vardy,England,ATT,Gold,79,gary
-444,Jerdy Schouten,Netherlands,MID,Gold,79,g733
-445,Jhon Durán,Colombia,ATT,Gold,79,g790
-446,Joachim Andersen,Denmark,DEF,Gold,79,gxg277
-447,Joey Veerman,Netherlands,MID,Gold,79,g732
-448,Jordan Henderson,England,MID,Gold,79,g597
-449,Jørgen Strand Larsen,Norway,ATT,Gold,79,gxg269
-450,Kalidou Koulibaly,Senegal,DEF,Gold,79,gxg245
-451,Kerem Aktürkoğlu,Turkey,ATT,Gold,79,gxg291
-452,Leandro Paredes,Argentina,MID,Gold,79,g774
-453,Leny Yoro,France,DEF,Gold,79,g685
-454,Lewis Dunk,England,DEF,Gold,79,g610
-455,Lorenzo Pellegrini,Italy,MID,Gold,79,g709
-456,Lucas Digne,France,DEF,Gold,79,g679
-457,Luke Shaw,England,DEF,Gold,79,g599
-458,Martin Baturina,Croatia,MID,Gold,79,g754
-459,Maximilian Mittelstädt,Germany,DEF,Gold,79,g695
-460,Milan Škriniar,Slovakia,DEF,Gold,79,gxg300
-461,Nahuel Molina,Argentina,DEF,Gold,79,g780
-462,Nayef Aguerd,Morocco,DEF,Gold,79,gxg232
-463,Nélson Semedo,Portugal,DEF,Gold,79,g667
-464,Niclas Füllkrug,Germany,ATT,Gold,79,g691
-465,Nico González,Spain,MID,Gold,79,g651
-466,Nicolás González,Argentina,ATT,Gold,79,g776
-467,Ola Aina,Nigeria,DEF,Gold,79,gxg248
-468,Pierre-Emerick Aubameyang,Gabon,ATT,Gold,79,gxg256
-469,Rafa Silva,Portugal,ATT,Gold,79,g665
-470,Richard Ríos,Colombia,MID,Gold,79,g794
-471,Richarlison,Brazil,ATT,Gold,79,g758
-472,Samu Omorodion,Spain,ATT,Gold,79,g643
-473,Samuele Ricci,Italy,MID,Gold,79,g722
-474,Stefan de Vrij,Netherlands,DEF,Gold,79,g729
-475,Waldemar Anton,Germany,DEF,Gold,79,g705
-476,Wataru Endō,Japan,MID,Gold,79,gxg261
-477,Weston McKennie,USA,MID,Gold,79,g803
-478,Yeremy Pino,Spain,ATT,Gold,79,g636
-479,Yves Bissouma,Mali,MID,Gold,79,gxg236
-480,Alex Iwobi,Nigeria,MID,Gold,78,gxg246
-481,Alexandre Lacazette,France,ATT,Gold,78,g686
-482,Antony,Brazil,ATT,Gold,78,anderson
-483,Arthur Theate,Belgium,DEF,Gold,78,g745
-484,Bryan Cristante,Italy,MID,Gold,78,g720
-485,Christian Eriksen,Denmark,MID,Gold,78,gxg273
-486,Danny Welbeck,England,ATT,Gold,78,g612
-487,Dominic Calvert-Lewin,England,ATT,Gold,78,g596
-488,Emre Can,Germany,MID,Gold,78,g704
-489,Folarin Balogun,USA,ATT,Gold,78,g806
-490,Francesco Acerbi,Italy,DEF,Gold,78,g723
-491,Georgiy Sudakov,Ukraine,MID,Gold,78,gxg296
-492,Hakim Ziyech,Morocco,ATT,Gold,78,g807
-493,Hugo Larsson,Sweden,MID,Gold,78,gxg272
-494,Jefferson Lerma,Colombia,MID,Gold,78,g793
-495,Joe Gomez,England,DEF,Gold,78,g609
-496,Josip Stanišić,Croatia,DEF,Gold,78,g753
-497,Josip Šutalo,Croatia,DEF,Gold,78,g752
-498,Kevin Danso,Austria,DEF,Gold,78,gxg285
-499,Leon Bailey,Jamaica,ATT,Gold,78,gxg307
-500,Lewis Ferguson,Scotland,MID,Gold,78,g622
-501,Lutsharel Geertruida,Netherlands,DEF,Gold,78,g735
-502,Marc Casadó,Spain,MID,Gold,78,g647
-503,Marten de Roon,Netherlands,MID,Gold,78,g734
-504,Mehdi Taremi,Iran,ATT,Gold,78,gxg267
-505,Nathan Collins,Ireland,DEF,Gold,78,g626
-506,Nicolás Otamendi,Argentina,DEF,Gold,78,g779
-507,Nikola Vlašić,Croatia,MID,Gold,78,g755
-508,Odilon Kossounou,Ivory Coast,DEF,Gold,78,gxg239
-509,Patrick Dorgu,Denmark,DEF,Gold,78,gxg278
-510,Quinten Timber,Netherlands,MID,Gold,78,g736
-511,Raúl Jiménez,Mexico,ATT,Gold,78,g800
-512,Roberto Firmino,Brazil,ATT,Gold,78,g766
-513,Sofyan Amrabat,Morocco,MID,Gold,78,gxg231
-514,Tomáš Souček,Czech Republic,MID,Gold,78,tomas
-515,Tyler Adams,USA,MID,Gold,78,g804
-516,Wilfred Ndidi,Nigeria,MID,Gold,78,gxg247
-517,Abdukodir Khusanov,Uzbekistan,DEF,Gold,77,gxg311
-518,Albert Guðmundsson,Iceland,MID,Gold,77,gxg310
-519,Calvin Bassey,Nigeria,DEF,Gold,77,gxg250
-520,Ciro Immobile,Italy,ATT,Gold,77,g721
-521,Dan Burn,England,DEF,Gold,77,g611
-522,Edin Džeko,Bosnia and Herzegovina,ATT,Gold,77,gxg308
-523,Ellyes Skhiri,Tunisia,MID,Gold,77,gxg258
-524,Hirving Lozano,Mexico,ATT,Gold,77,g802
-525,Hwang Hee-chan,South Korea,ATT,Gold,77,gxg266
-526,Jonathan Clauss,France,DEF,Gold,77,g687
-527,Kristjan Asllani,Albania,MID,Gold,77,gxg306
-528,Luka Sučić,Croatia,MID,Gold,77,g756
-529,Oleksandr Zinchenko,Ukraine,DEF,Gold,77,gxg295
-530,Philippe Coutinho,Brazil,MID,Gold,77,g765
-531,Radu Drăgușin,Romania,DEF,Gold,77,gxg309
-532,Tyrick Mitchell,England,DEF,Gold,77,g617
-533,Vedat Muriqi,Kosovo,ATT,Gold,77,gxg305
-534,Yannick Carrasco,Belgium,ATT,Gold,77,g747
-535,Eric Dier,England,DEF,Gold,76,evan
-536,Ethan Ampadu,Wales,MID,Gold,76,g625
-537,Evan Ferguson,Ireland,ATT,Gold,76,g627
-538,Geovany Quenda,Portugal,ATT,Gold,76,g668
-539,Takehiro Tomiyasu,Japan,DEF,Gold,76,gxg264
-540,Abde Ezzalzouli,Morocco,ATT,Silver,74,g396
-541,Andreas Christensen,Denmark,DEF,Silver,74,g576
-542,Antonio Nusa,Norway,ATT,Silver,74,g568
-543,Ayoze Pérez,Spain,ATT,Silver,74,g387
-544,Brais Méndez,Spain,MID,Silver,74,g379
-545,Carlos Soler,Spain,MID,Silver,74,g390
-546,Crysencio Summerville,Netherlands,ATT,Silver,74,g446
-547,Cucho Hernández,Colombia,ATT,Silver,74,g491
-548,Daizen Maeda,Japan,ATT,Silver,74,g372
-549,Domenico Berardi,Italy,ATT,Silver,74,g398
-550,Dwight McNeil,England,ATT,Silver,74,g341
-551,Ermedin Demirović,Bosnia and Herzegovina,ATT,Silver,74,g424
-552,Ethan Nwaneri,England,ATT,Silver,74,g361
-553,Florian Thauvin,France,ATT,Silver,74,g426
-554,Franco Mastantuono,Argentina,ATT,Silver,74,g483
-555,Gianluca Mancini,Italy,DEF,Silver,74,g405
-556,Hákon Arnar Haraldsson,Iceland,MID,Silver,74,gxs267
-557,Harvey Barnes,England,ATT,Silver,74,g368
-558,Hiroki Itō,Japan,DEF,Silver,74,g553
-559,Hwang In-beom,South Korea,MID,Silver,74,g561
-560,Ian Maatsen,Netherlands,DEF,Silver,74,g447
-561,Ibrahim Sangaré,Ivory Coast,MID,Silver,74,g548
-562,Igor Paixão,Brazil,ATT,Silver,74,g481
-563,Iñigo Martínez,Spain,DEF,Silver,74,g381
-564,Jack Clarke,England,ATT,Silver,74,g355
-565,Jack Harrison,England,ATT,Silver,74,g340
-566,James Tarkowski,England,DEF,Silver,74,g343
-567,Jamie Gittens,England,ATT,Silver,74,g358
-568,Jamie Leweling,Germany,ATT,Silver,74,g420
-569,Jarell Quansah,England,DEF,Silver,74,g349
-570,Jhon Arias,Colombia,ATT,Silver,74,g510
-571,Justin Kluivert,Netherlands,ATT,Silver,74,g449
-572,Kiernan Dewsbury-Hall,England,MID,Silver,74,g356
-573,Lamine Camara,Senegal,MID,Silver,74,g533
-574,Leonardo Balerdi,Argentina,DEF,Silver,74,g485
-575,Liam Delap,England,ATT,Silver,74,g363
-576,Luiz Henrique,Brazil,ATT,Silver,74,g479
-577,Malcom,Brazil,ATT,Silver,74,g471
-578,Malick Fofana,Belgium,ATT,Silver,74,g461
-579,Malik Tillman,USA,MID,Silver,74,g500
-580,Mats Wieffer,Netherlands,MID,Silver,74,g444
-581,Matteo Politano,Italy,ATT,Silver,74,g399
-582,Mattia Zaccagni,Italy,ATT,Silver,74,g401
-583,Maximilian Beier,Germany,ATT,Silver,74,g421
-584,Merih Demiral,Turkey,DEF,Silver,74,gxs251
-585,Mikkel Damsgaard,Denmark,MID,Silver,74,g575
-586,Moussa Niakhaté,Senegal,DEF,Silver,74,g535
-587,Nicolás Paz,Argentina,MID,Silver,74,g484
-588,Noa Lang,Netherlands,ATT,Silver,74,g445
-589,Pedro,Brazil,ATT,Silver,74,g474
-590,Raphaël Guerreiro,Portugal,DEF,Silver,74,g466
-591,Riccardo Orsolini,Italy,ATT,Silver,74,g403
-592,Rico Lewis,England,DEF,Silver,74,g359
-593,Robin Gosens,Germany,DEF,Silver,74,g417
-594,Ruben Loftus-Cheek,England,MID,Silver,74,g345
-595,Samu Aghehowa,Spain,ATT,Silver,74,g397
-596,Samuel Chukwueze,Nigeria,ATT,Silver,74,g526
-597,Strahinja Pavlović,Serbia,DEF,Silver,74,gxs248
-598,Sven Botman,Netherlands,DEF,Silver,74,g451
-599,Takumi Minamino,Japan,MID,Silver,74,g555
-600,Alberto Moleiro,Spain,ATT,Silver,73,g385
-601,Alessio Romagnoli,Italy,DEF,Silver,73,g406
-602,Amadou Haidara,Mali,MID,Silver,73,g541
-603,Ander Barrenetxea,Spain,ATT,Silver,73,g384
-604,Andreas Pereira,Brazil,MID,Silver,73,g370
-605,Arnaud Kalimuendo,France,ATT,Silver,73,g435
-606,Ayase Ueda,Japan,ATT,Silver,73,g559
-607,Azzedine Ounahi,Morocco,MID,Silver,73,g543
-608,Barış Alper Yılmaz,Turkey,ATT,Silver,73,gxs252
-609,Bilal El Khannouss,Morocco,MID,Silver,73,g545
-610,Breel Embolo,Switzerland,ATT,Silver,73,gxs242
-611,Brian Brobbey,Netherlands,ATT,Silver,73,g452
-612,Callum McGregor,Scotland,MID,Silver,73,g371
-613,Callum Wilson,England,ATT,Silver,73,g342
-614,Calvin Stengs,Netherlands,MID,Silver,73,g440
-615,Chris Richards,USA,DEF,Silver,73,g506
-616,Eljif Elmas,North Macedonia,MID,Silver,73,gxs264
-617,Hans Vanaken,Belgium,MID,Silver,73,g454
-618,Hany Mukhtar,Germany,MID,Silver,73,g492
-619,Hidemasa Morita,Japan,MID,Silver,73,g558
-620,Jakub Kiwior,Poland,DEF,Silver,73,g578
-621,Javi Guerra,Spain,MID,Silver,73,g383
-622,Johan Vásquez,Mexico,DEF,Silver,73,g517
-623,Jonas Hofmann,Germany,MID,Silver,73,g412
-624,José Luis Gayà,Spain,DEF,Silver,73,g391
-625,Kenneth Taylor,Netherlands,MID,Silver,73,g443
-626,Kevin Schade,Germany,ATT,Silver,73,g419
-627,Ladislav Krejčí,Czech Republic,DEF,Silver,73,gxs260
-628,Lewis Cook,England,MID,Silver,73,g354
-629,Lucas Bergvall,Sweden,MID,Silver,73,g574
-630,Marcos Senesi,Argentina,DEF,Silver,73,g486
-631,Mario Götze,Germany,MID,Silver,73,g413
-632,Mathías Olivera,Uruguay,DEF,Silver,73,g512
-633,Matthias Ginter,Germany,DEF,Silver,73,g418
-634,Maximiliano Araújo,Uruguay,DEF,Silver,73,g513
-635,Nicolas Kühn,Germany,ATT,Silver,73,g375
-636,Nicolas Seiwald,Austria,MID,Silver,73,gxs246
-637,Nordi Mukiele,France,DEF,Silver,73,g436
-638,Óscar Mingueza,Spain,DEF,Silver,73,g380
-639,Reo Hatate,Japan,MID,Silver,73,g373
-640,Ricardo Horta,Portugal,ATT,Silver,73,g464
-641,Sander Berge,Norway,MID,Silver,73,g570
-642,Sebastian Szymański,Poland,MID,Silver,73,gxs240
-643,Simon Adingra,Ivory Coast,ATT,Silver,73,g547
-644,Stephen Eustáquio,Canada,MID,Silver,73,g509
-645,Tim Weah,USA,ATT,Silver,73,g503
-646,Tyrone Mings,England,DEF,Silver,73,g353
-647,Victor Lindelöf,Sweden,DEF,Silver,73,g572
-648,Viktor Tsyhankov,Ukraine,ATT,Silver,73,gxs255
-649,Willi Orbán,Hungary,DEF,Silver,73,gxs257
-650,Yan Couto,Brazil,DEF,Silver,73,g480
-651,Abdul Fatawu,Ghana,ATT,Silver,72,g529
-652,Adam Hložek,Czech Republic,ATT,Silver,72,gxs259
-653,Akram Afif,Qatar,ATT,Silver,72,g564
-654,Amine Harit,Morocco,ATT,Silver,72,g544
-655,Andrea Pinamonti,Italy,ATT,Silver,72,g407
-656,Archie Gray,England,MID,Silver,72,g360
-657,Arthur Vermeeren,Belgium,MID,Silver,72,g457
-658,Ben Chilwell,England,DEF,Silver,72,g344
-659,Ben Davies,Wales,DEF,Silver,72,g350
-660,Benjamin André,France,MID,Silver,72,g432
-661,Benjamin Henrichs,Germany,DEF,Silver,72,g416
-662,Berat Djimsiti,Albania,DEF,Silver,72,gxs265
-663,Boulaye Dia,Senegal,ATT,Silver,72,g536
-664,Brenden Aaronson,USA,MID,Silver,72,g499
-665,Danilo,Brazil,DEF,Silver,72,g482
-666,Dele Alli,England,MID,Silver,72,femi
-667,Denis Zakaria,Switzerland,MID,Silver,72,gxs281
-668,Dušan Tadić,Serbia,ATT,Silver,72,gxs247
-669,Eldor Shomurodov,Uzbekistan,ATT,Silver,72,g567
-670,Elye Wahi,France,ATT,Silver,72,g434
-671,Evander,Brazil,MID,Silver,72,g497
-672,Fábio Vieira,Portugal,MID,Silver,72,g465
-673,Francesco Pio Esposito,Italy,ATT,Silver,72,g410
-674,Gio Reyna,USA,MID,Silver,72,g502
-675,Gonzalo Montiel,Argentina,DEF,Silver,72,g487
-676,Gorka Guruzeta,Spain,ATT,Silver,72,g386
-677,Habib Diarra,Senegal,MID,Silver,72,g537
-678,Haji Wright,USA,ATT,Silver,72,g501
-679,Idrissa Gueye,Senegal,MID,Silver,72,g534
-680,Jonas Wind,Denmark,ATT,Silver,72,g577
-681,Jonathan Rowe,England,ATT,Silver,72,g364
-682,Jordi Alba,Spain,DEF,Silver,72,gxs279
-683,Jorge de Frutos,Spain,ATT,Silver,72,g388
-684,Junya Itō,Japan,ATT,Silver,72,g560
-685,Keito Nakamura,Japan,ATT,Silver,72,g557
-686,Konstantinos Mavropanos,Greece,DEF,Silver,72,gxs263
-687,Kostas Tsimikas,Greece,DEF,Silver,72,gxs262
-688,Kou Itakura,Japan,DEF,Silver,72,g556
-689,Lazar Samardžić,Serbia,MID,Silver,72,gxs249
-690,Lorenzo Lucca,Italy,ATT,Silver,72,g402
-691,Lovro Majer,Croatia,MID,Silver,72,gxs269
-692,Luciano Acosta,Argentina,MID,Silver,72,g490
-693,Luis Sinisterra,Colombia,ATT,Silver,72,g511
-694,Marco Reus,Germany,ATT,Silver,72,g425
-695,Marko Arnautović,Austria,ATT,Silver,72,gxs245
-696,Maxim De Cuyper,Belgium,DEF,Silver,72,g456
-697,Michael Keane,England,DEF,Silver,72,g352
-698,Mohammed Salisu,Ghana,DEF,Silver,72,g531
-699,Moses Simon,Nigeria,ATT,Silver,72,g527
-700,Mykhailo Mudryk,Ukraine,ATT,Silver,72,gxs254
-701,Nicola Zalewski,Poland,DEF,Silver,72,g579
-702,Nicolas Pépé,Ivory Coast,ATT,Silver,72,g551
-703,Nicolás Tagliafico,Argentina,DEF,Silver,72,g488
-704,Olivier Giroud,France,ATT,Silver,72,g439
-705,Orel Mangala,Belgium,MID,Silver,72,g460
-706,Oscar Bobb,Norway,ATT,Silver,72,g569
-707,Otávio,Portugal,MID,Silver,72,g469
-708,Pape Gueye,Senegal,MID,Silver,72,g538
-709,Paul Onuachu,Nigeria,ATT,Silver,72,g523
-710,Pavel Šulc,Czech Republic,MID,Silver,72,gxs261
-711,Pepê,Brazil,ATT,Silver,72,g470
-712,Petar Sučić,Croatia,MID,Silver,72,gxs270
-713,Remo Freuler,Switzerland,MID,Silver,72,gxs243
-714,Renan Lodi,Brazil,DEF,Silver,72,g477
-715,Ricardo Pepi,USA,ATT,Silver,72,g505
-716,Riqui Puig,Spain,MID,Silver,72,g496
-717,Roland Sallai,Hungary,ATT,Silver,72,gxs256
-718,Ross Barkley,England,MID,Silver,72,g346
-719,Salem Al-Dawsari,Saudi Arabia,ATT,Silver,72,g565
-720,Seko Fofana,Ivory Coast,MID,Silver,72,g549
-721,Sergiño Dest,USA,DEF,Silver,72,g504
-722,Sergio Canales,Spain,MID,Silver,72,g395
-723,Steven Berghuis,Netherlands,ATT,Silver,72,g441
-724,Steven Bergwijn,Netherlands,ATT,Silver,72,g453
-725,Tajon Buchanan,Canada,ATT,Silver,72,g508
-726,Terem Moffi,Nigeria,ATT,Silver,72,g429
-727,Timo Werner,Germany,ATT,Silver,72,g415
-728,Timothy Castagne,Belgium,DEF,Silver,72,g462
-729,Valentin Rongier,France,MID,Silver,72,g433
-730,Vitor Roque,Brazil,ATT,Silver,72,g478
-731,Wilfried Zaha,Ivory Coast,ATT,Silver,72,g550
-732,Wout Faes,Belgium,DEF,Silver,72,g459
-733,Yukinari Sugawara,Japan,DEF,Silver,72,g554
-734,Yunus Musah,USA,MID,Silver,72,g507
-735,Zeno Debast,Belgium,DEF,Silver,72,g455
-736,Anthony Martial,France,ATT,Silver,71,g437
-737,Duje Ćaleta-Car,Croatia,DEF,Silver,71,gxs268
-738,Facundo Pellistri,Uruguay,ATT,Silver,71,g514
-739,Isi Palazón,Spain,ATT,Silver,71,g394
-740,Jan Bednarek,Poland,DEF,Silver,71,gxs241
-741,Joe Willock,England,MID,Silver,71,g365
-742,Jordan Ayew,Ghana,ATT,Silver,71,g530
-743,Kalvin Phillips,England,MID,Silver,71,g347
-744,Kristoffer Ajer,Norway,DEF,Silver,71,g571
-745,Kyogo Furuhashi,Japan,ATT,Silver,71,g374
-746,Lorenzo Insigne,Italy,ATT,Silver,71,g411
-747,Marcos Acuña,Argentina,DEF,Silver,71,g489
-748,Nicolò Zaniolo,Italy,ATT,Silver,71,g404
-749,Saïd Benrahma,Algeria,ATT,Silver,71,g521
-750,Sardar Azmoun,Iran,ATT,Silver,71,g566
-751,Sean Longstaff,England,MID,Silver,71,g366
-752,Sébastien Haller,Ivory Coast,ATT,Silver,71,g546
-753,Sergi Darder,Spain,MID,Silver,71,g382
-754,Tommaso Baldanzi,Italy,ATT,Silver,71,g408
-755,Alexis Sánchez,Chile,ATT,Silver,70,g515
-756,André Silva,Portugal,ATT,Silver,70,g463
-757,Armando Broja,Albania,ATT,Silver,70,gxs266
-758,Bobby De Cordova-Reid,Jamaica,ATT,Silver,70,g369
-759,Cengiz Ünder,Turkey,ATT,Silver,70,gxs253
-760,Daniel Maldini,Italy,ATT,Silver,70,g409
-761,Danny Ings,England,ATT,Silver,70,g351
-762,Davy Klaassen,Netherlands,MID,Silver,70,g442
-763,Dennis Man,Romania,ATT,Silver,70,gxs274
-764,Diego Rossi,Uruguay,ATT,Silver,70,g498
-765,El Bilal Touré,Mali,ATT,Silver,70,g542
-766,Emil Forsberg,Sweden,MID,Silver,70,g573
-767,Federico Bernardeschi,Italy,ATT,Silver,70,g494
-768,Filip Kostić,Serbia,DEF,Silver,70,gxs250
-769,Frank Onyeka,Nigeria,MID,Silver,70,g525
-770,Gaëtan Laborde,France,ATT,Silver,70,g428
-771,Grischa Prömel,Germany,MID,Silver,70,g423
-772,Harry Souttar,Australia,DEF,Silver,70,gxs276
-773,Harry Winks,England,MID,Silver,70,g357
-774,Hugo Duro,Spain,ATT,Silver,70,g392
-775,Hulk,Brazil,ATT,Silver,70,g472
-776,Jackson Irvine,Australia,MID,Silver,70,gxs277
-777,Javi Puado,Spain,ATT,Silver,70,g393
-778,Joe Aribo,Nigeria,MID,Silver,70,g524
-779,Jonathan Bamba,Ivory Coast,ATT,Silver,70,g431
-780,Kelechi Iheanacho,Nigeria,ATT,Silver,70,g522
-781,Krépin Diatta,Senegal,ATT,Silver,70,g532
-782,Lucas Moura,Brazil,ATT,Silver,70,g476
-783,Luuk de Jong,Netherlands,ATT,Silver,70,g450
-784,Michail Antonio,Jamaica,ATT,Silver,70,gxs271
-785,Nicolae Stanciu,Romania,MID,Silver,70,gxs275
-786,Ondrej Duda,Slovakia,MID,Silver,70,gxs258
-787,Ricardo Rodríguez,Switzerland,DEF,Silver,70,gxs244
-788,Ryan Christie,Scotland,MID,Silver,70,g376
-789,Ryan Gauld,Scotland,MID,Silver,70,g495
-790,Stephan El Shaarawy,Italy,ATT,Silver,70,g400
-791,Tariq Lamptey,Ghana,DEF,Silver,70,g528
-792,Téji Savanier,France,MID,Silver,70,g427
-793,Tom Cairney,Scotland,MID,Silver,70,g348
-794,Trézéguet,Egypt,ATT,Silver,70,g519
-795,Vincent Aboubakar,Cameroon,ATT,Silver,70,g552
-796,Xherdan Shaqiri,Switzerland,ATT,Silver,70,gxs278
-797,Bryan Gil,Spain,ATT,Silver,69,g389
-798,Carney Chukwuemeka,England,MID,Silver,69,g362
-799,Cho Gue-sung,South Korea,ATT,Silver,69,g562
-800,Chris Smalling,England,DEF,Silver,69,g367
-801,Christian Benteke,Belgium,ATT,Silver,69,g493
-802,Demarai Gray,Jamaica,ATT,Silver,69,gxs272
-803,Dimitri Payet,France,MID,Silver,69,g438
-804,Emam Ashour,Egypt,MID,Silver,69,g520
-805,Eric Maxim Choupo-Moting,Cameroon,ATT,Silver,69,g539
-806,Everton Cebolinha,Brazil,ATT,Silver,69,g473
-807,Julian Draxler,Germany,MID,Silver,69,g414
-808,Lee Jae-sung,South Korea,MID,Silver,69,g563
-809,Ludovic Ajorque,France,ATT,Silver,69,g430
-810,Michy Batshuayi,Belgium,ATT,Silver,69,g458
-811,Naby Keïta,Guinea,MID,Silver,69,g540
-812,Oscar,Brazil,MID,Silver,69,g475
-813,Rade Krunić,Bosnia and Herzegovina,MID,Silver,69,gxs273
-814,Renato Sanches,Portugal,MID,Silver,69,g467
-815,Tyrell Malacia,Netherlands,DEF,Silver,69,g448
-816,William Carvalho,Portugal,MID,Silver,69,g468
-817,Abdou Diallo,Senegal,DEF,Silver,68,gxs282
-818,Arturo Vidal,Chile,MID,Silver,68,g516
-819,Carles Gil,Spain,MID,Silver,68,gxs280
-820,Lawrence Shankland,Scotland,ATT,Silver,68,g378
-821,Nathan Patterson,Scotland,DEF,Silver,68,g377
-822,Phil Jones,England,DEF,Silver,68,pete
-823,Youssoufa Moukoko,Germany,ATT,Silver,68,g422
-824,Mohamed Elneny,Egypt,MID,Silver,66,g518
-825,Aaron Wan-Bissaka,DR Congo,DEF,Bronze,64,g280
-826,Adam Armstrong,England,ATT,Bronze,64,g11
-827,Ante Budimir,Croatia,ATT,Bronze,64,g123
-828,Christian Nørgaard,Denmark,MID,Bronze,64,g99
-829,Conor Bradley,Northern Ireland,DEF,Bronze,64,g40
-830,Fredrik Aursnes,Norway,MID,Bronze,64,g79
-831,Gustav Isaksen,Denmark,ATT,Bronze,64,g105
-832,Isak Hien,Sweden,DEF,Bronze,64,g91
-833,Joël Piroe,Netherlands,ATT,Bronze,64,g8
-834,Johan Bakayoko,Belgium,ATT,Bronze,64,g145
-835,Johnny Cardoso,USA,MID,Bronze,64,g56
-836,Josh Brownhill,England,MID,Bronze,64,g29
-837,Josh Sargent,USA,ATT,Bronze,64,g59
-838,Kasper Dolberg,Denmark,ATT,Bronze,64,g94
-839,Marcus Tavernier,England,ATT,Bronze,64,g15
-840,Mario Pašalić,Croatia,MID,Bronze,64,g129
-841,Mohamed Amoura,Algeria,ATT,Bronze,64,g204
-842,Neco Williams,Wales,DEF,Bronze,64,g35
-843,Sebastián Driussi,Argentina,ATT,Bronze,64,g76
-844,Yankuba Minteh,Gambia,ATT,Bronze,64,g266
-845,Andreas Skov Olsen,Denmark,ATT,Bronze,63,g96
-846,Eliesse Ben Seghir,Morocco,ATT,Bronze,63,g211
-847,Julio Enciso,Paraguay,ATT,Bronze,63,g312
-848,Adama Traoré,Spain,ATT,Bronze,62,g267
-849,Andreas Schjelderup,Norway,ATT,Bronze,62,g85
-850,Ao Tanaka,Japan,MID,Bronze,62,g170
-851,Chuba Akpom,England,ATT,Bronze,62,g18
-852,Emil Holm,Sweden,DEF,Bronze,62,g86
-853,Ismaël Koné,Canada,MID,Bronze,62,gxb346
-854,Ismael Saibari,Morocco,MID,Bronze,62,g212
-855,Ivan Ilić,Serbia,MID,Bronze,62,g134
-856,Jay Stansfield,England,ATT,Bronze,62,g31
-857,Jesper Lindstrøm,Denmark,ATT,Bronze,62,g97
-858,Jesse Lingard,England,ATT,Bronze,62,g49
-859,Joakim Mæhle,Denmark,DEF,Bronze,62,g101
-860,Joe Scally,USA,DEF,Bronze,62,g67
-861,Joel Pohjanpalo,Finland,ATT,Bronze,62,g107
-862,Josh Maja,Nigeria,ATT,Bronze,62,g9
-863,Kaishu Sano,Japan,MID,Bronze,62,g164
-864,Kamaldeen Sulemana,Ghana,ATT,Bronze,62,g247
-865,Kendry Páez,Ecuador,ATT,Bronze,62,g300
-866,Kieffer Moore,Wales,ATT,Bronze,62,g7
-867,Kristian Thorstvedt,Norway,MID,Bronze,62,g78
-868,Leo Østigård,Norway,DEF,Bronze,62,g82
-869,Mario Hermoso,Spain,DEF,Bronze,62,gxb391
-870,Mathias Jensen,Denmark,MID,Bronze,62,g98
-871,Matt Grimes,England,MID,Bronze,62,g16
-872,Mattias Svanberg,Sweden,MID,Bronze,62,g89
-873,Moïse Bombito,Canada,DEF,Bronze,62,gxb349
-874,Orri Óskarsson,Iceland,ATT,Bronze,62,g118
-875,Patson Daka,Zambia,ATT,Bronze,62,g270
-876,Ramy Bensebaini,Algeria,DEF,Bronze,62,g202
-877,Reiss Nelson,England,ATT,Bronze,62,g27
-878,Roony Bardghji,Sweden,ATT,Bronze,62,g93
-879,Sammie Szmodics,Ireland,ATT,Bronze,62,g10
-880,Taiwo Awoniyi,Nigeria,ATT,Bronze,62,g241
-881,Victor Kristiansen,Denmark,DEF,Bronze,62,g106
-882,Wilfried Singo,Ivory Coast,DEF,Bronze,62,g229
-883,Aidan Morris,USA,MID,Bronze,60,g60
-884,Akor Adams,Nigeria,ATT,Bronze,60,g239
-885,Alistair Johnston,Canada,DEF,Bronze,60,gxb352
-886,András Schäfer,Hungary,MID,Bronze,60,gxb387
-887,Andrija Živković,Serbia,ATT,Bronze,60,g136
-888,Arnaut Danjuma,Netherlands,ATT,Bronze,60,g150
-889,Auston Trusty,USA,DEF,Bronze,60,g66
-890,Ayoub El Kaabi,Morocco,ATT,Bronze,60,g210
-891,Borna Sosa,Croatia,DEF,Bronze,60,g131
-892,Bruno Petković,Croatia,ATT,Bronze,60,g120
-893,Chancel Mbemba,DR Congo,DEF,Bronze,60,g282
-894,Cheick Doucouré,Mali,MID,Bronze,60,g259
-895,Diego Gómez,Paraguay,MID,Bronze,60,g314
-896,Emmanuel Agbadou,Ivory Coast,DEF,Bronze,60,g230
-897,Ernest Nuamah,Ghana,ATT,Bronze,60,g246
-898,Fabian Rieder,Switzerland,MID,Bronze,60,gxb390
-899,Gianluca Busio,USA,MID,Bronze,60,g55
-900,Houssem Aouar,Algeria,MID,Bronze,60,g203
-901,Jens Cajuste,Sweden,MID,Bronze,60,g90
-902,Joel Ordóñez,Ecuador,DEF,Bronze,60,g302
-903,Koki Machida,Japan,DEF,Bronze,60,g172
-904,Lucas Torreira,Uruguay,MID,Bronze,60,g307
-905,Lukáš Provod,Czech Republic,MID,Bronze,60,gxb379
-906,Lyle Foster,South Africa,ATT,Bronze,60,g273
-907,Lyndon Dykes,Scotland,ATT,Bronze,60,g6
-908,Marcus Holmgren Pedersen,Norway,DEF,Bronze,60,g83
-909,Mark McKenzie,USA,DEF,Bronze,60,g65
-910,Miguel Almirón,Paraguay,ATT,Bronze,60,g311
-911,Mislav Oršić,Croatia,ATT,Bronze,60,g121
-912,Mostafa Mohamed,Egypt,ATT,Bronze,60,g197
-913,Neil El Aynaoui,Morocco,MID,Bronze,60,g213
-914,Oh Hyeon-gyu,South Korea,ATT,Bronze,60,g178
-915,Omar Alderete,Paraguay,DEF,Bronze,60,g316
-916,Pascal Struijk,Netherlands,DEF,Bronze,60,g152
-917,Patrick Agyemang,USA,ATT,Bronze,60,g62
-918,Patrick Wimmer,Austria,ATT,Bronze,60,gxb386
-919,Raphael Onyedika,Nigeria,MID,Bronze,60,g234
-920,Rodrigo Zalazar,Uruguay,MID,Bronze,60,g308
-921,Ryan Manning,Ireland,DEF,Bronze,60,g21
-922,Saša Lukić,Serbia,MID,Bronze,60,g133
-923,Tolu Arokodare,Nigeria,ATT,Bronze,60,g238
-924,Vladimír Coufal,Czech Republic,DEF,Bronze,60,gxb380
-925,Will Hughes,England,MID,Bronze,60,g22
-926,Wout Weghorst,Netherlands,ATT,Bronze,60,g155
-927,Yangel Herrera,Venezuela,MID,Bronze,60,g325
-928,Yasin Ayari,Sweden,MID,Bronze,60,g92
-929,Yerson Mosquera,Colombia,DEF,Bronze,60,g287
-930,Yussuf Poulsen,Denmark,ATT,Bronze,60,g95
-931,Ainsley Maitland-Niles,England,DEF,Bronze,59,g26
-932,Chris Mepham,Wales,DEF,Bronze,59,g37
-933,Connor Roberts,Wales,DEF,Bronze,59,g36
-934,James Milner,England,DEF,Bronze,59,dave
-935,Jesper Karlsson,Sweden,ATT,Bronze,59,g88
-936,Ryan Shawcross,England,DEF,Bronze,59,gaz
-937,Yuito Suzuki,Japan,MID,Bronze,59,g168
-938,Aaron Ramsey,Wales,MID,Bronze,58,g34
-939,Abbosbek Fayzullaev,Uzbekistan,MID,Bronze,58,g191
-940,Abdallah Sima,Senegal,ATT,Bronze,58,g221
-941,Almoez Ali,Qatar,ATT,Bronze,58,g186
-942,Ashley Young,England,DEF,Bronze,58,g46
-943,Axel Witsel,Belgium,MID,Bronze,58,g146
-944,Bae Jun-ho,South Korea,MID,Bronze,58,g180
-945,Ben Brereton Díaz,Chile,ATT,Bronze,58,g333
-946,Calum Chambers,England,DEF,Bronze,58,g25
-947,Carlos Cuesta,Colombia,DEF,Bronze,58,g291
-948,Cédric Bakambu,DR Congo,ATT,Bronze,58,g283
-949,Conor Coady,England,DEF,Bronze,58,g47
-950,Cyle Larin,Canada,ATT,Bronze,58,gxb353
-951,Cyriel Dessers,Nigeria,ATT,Bronze,58,g236
-952,Daley Blind,Netherlands,DEF,Bronze,58,g153
-953,Duván Zapata,Colombia,ATT,Bronze,58,g293
-954,Ellis Simms,England,ATT,Bronze,58,g12
-955,Ethan Pinnock,Jamaica,DEF,Bronze,58,gxb343
-956,Facundo Torres,Uruguay,ATT,Bronze,58,g303
-957,Fisayo Dele-Bashiru,Nigeria,MID,Bronze,58,g235
-958,Franjo Ivanović,Croatia,ATT,Bronze,58,g130
-959,Georginio Wijnaldum,Netherlands,MID,Bronze,58,g154
-960,Giorgi Kochorashvili,Georgia,MID,Bronze,58,gxb388
-961,Glen Kamara,Finland,MID,Bronze,58,g109
-962,Gonzalo Plata,Ecuador,ATT,Bronze,58,g296
-963,Hicham Boudaoui,Algeria,MID,Bronze,58,g205
-964,Igor Matanović,Croatia,ATT,Bronze,58,g126
-965,Ilaix Moriba,Guinea,MID,Bronze,58,g254
-966,Ilias Chair,Morocco,MID,Bronze,58,g207
-967,Isaac Price,Northern Ireland,MID,Bronze,58,g41
-968,Ísak Bergmann Jóhannesson,Iceland,MID,Bronze,58,g117
-969,Ivan Rakitić,Croatia,MID,Bronze,58,g128
-970,Jannik Vestergaard,Denmark,DEF,Bronze,58,g100
-971,Jed Wallace,England,ATT,Bronze,58,g14
-972,Jens Petter Hauge,Norway,ATT,Bronze,58,g81
-973,Jeong Woo-yeong,South Korea,ATT,Bronze,58,g179
-974,Jérémie Boga,Ivory Coast,ATT,Bronze,58,g225
-975,Jesús Ferreira,USA,ATT,Bronze,58,g70
-976,Jordan James,Wales,MID,Bronze,58,g38
-977,Jordan Morris,USA,ATT,Bronze,58,g69
-978,Josh Windass,England,MID,Bronze,58,g13
-979,Joshua King,Norway,ATT,Bronze,58,g4
-980,Julián Quiñones,Mexico,ATT,Bronze,58,gxb359
-981,Kevin Denkey,Togo,ATT,Bronze,58,g261
-982,Krzysztof Piątek,Poland,ATT,Bronze,58,gxb389
-983,Luca de la Torre,USA,MID,Bronze,58,g57
-984,Lucas Zelarayán,Armenia,MID,Bronze,58,g75
-985,Luka Jović,Serbia,ATT,Bronze,58,g135
-986,Marko Grujić,Serbia,MID,Bronze,58,g139
-987,Marko Livaja,Croatia,ATT,Bronze,58,g122
-988,Miles Robinson,USA,DEF,Bronze,58,g71
-989,Milot Rashica,Kosovo,ATT,Bronze,58,gxb383
-990,Nemanja Gudelj,Serbia,MID,Bronze,58,g132
-991,Nicolás de la Cruz,Uruguay,MID,Bronze,58,g304
-992,Nikola Moro,Croatia,MID,Bronze,58,g124
-993,Ola Solbakken,Norway,ATT,Bronze,58,g77
-994,Oli McBurnie,Scotland,ATT,Bronze,58,g17
-995,Paxten Aaronson,USA,MID,Bronze,58,g54
-996,Răzvan Marin,Romania,MID,Bronze,58,gxb385
-997,Ryan Fraser,Scotland,ATT,Bronze,58,g3
-998,Sam Lammers,Netherlands,ATT,Bronze,58,g148
-999,Sead Kolašinac,Bosnia and Herzegovina,DEF,Bronze,58,gxb384
-1000,Shea Charles,Northern Ireland,MID,Bronze,58,g42
-1001,Silas Katompa Mvumpa,DR Congo,ATT,Bronze,58,g275
-1002,Takuma Asano,Japan,ATT,Bronze,58,g165
-1003,Teboho Mokoena,South Africa,MID,Bronze,58,g272
-1004,Thorgan Hazard,Belgium,MID,Bronze,58,g143
-1005,Tom Ince,England,ATT,Bronze,58,g2
-1006,Willum Þór Willumsson,Iceland,MID,Bronze,58,g116
-1007,Yáser Asprilla,Colombia,ATT,Bronze,58,g290
-1008,Youcef Belaïli,Algeria,ATT,Bronze,58,g200
-1009,Brandon Vázquez,USA,ATT,Bronze,57,g63
-1010,Gustaf Nilsson,Sweden,ATT,Bronze,57,g87
-1011,Isaac Hayden,England,MID,Bronze,57,g20
-1012,Rob Holding,England,DEF,Bronze,57,g24
-1013,Shane Duffy,Ireland,DEF,Bronze,57,g23
-1014,Shuto Machino,Japan,ATT,Bronze,57,g167
-1015,Theo Walcott,England,ATT,Bronze,57,leon
-1016,Vincent Janssen,Netherlands,ATT,Bronze,57,g156
-1017,Walker Zimmerman,USA,DEF,Bronze,57,g72
-1018,Achraf Dari,Morocco,DEF,Bronze,56,g215
-1019,Adalberto Carrasquilla,Panama,MID,Bronze,56,g337
-1020,Ahmed Sayed Zizo,Egypt,ATT,Bronze,56,g198
-1021,Aïssa Mandi,Algeria,DEF,Bronze,56,g201
-1022,Andri Guðjohnsen,Iceland,ATT,Bronze,56,g119
-1023,Andy Carroll,England,ATT,Bronze,56,g0
-1024,Arnór Sigurðsson,Iceland,MID,Bronze,56,g115
-1025,Bamba Dieng,Senegal,ATT,Bronze,56,g223
-1026,César Huerta,Mexico,ATT,Bronze,56,gxb365
-1027,César Montes,Mexico,DEF,Bronze,56,gxb358
-1028,Daniel Ballard,Northern Ireland,DEF,Bronze,56,g43
-1029,Darío Osorio,Chile,ATT,Bronze,56,g331
-1030,Dennis Praet,Belgium,MID,Bronze,56,g142
-1031,Edinson Cavani,Uruguay,ATT,Bronze,56,g309
-1032,Enner Valencia,Ecuador,ATT,Bronze,56,g301
-1033,Firas Al-Buraikan,Saudi Arabia,ATT,Bronze,56,g184
-1034,Germán Berterame,Mexico,ATT,Bronze,56,gxb367
-1035,Giorgos Masouras,Greece,ATT,Bronze,56,gxb381
-1036,Hamed Traorè,Ivory Coast,MID,Bronze,56,g228
-1037,Hannibal Mejbri,Tunisia,MID,Bronze,56,g219
-1038,Jack McGlynn,USA,MID,Bronze,56,g61
-1039,James Garner,England,MID,Bronze,56,wes
-1040,Joe Allen,Wales,MID,Bronze,56,g33
-1041,John Tolkin,USA,DEF,Bronze,56,g68
-1042,Jón Dagur Þorsteinsson,Iceland,ATT,Bronze,56,g114
-1043,Jonny Evans,Northern Ireland,DEF,Bronze,56,g39
-1044,Jorge Carrascal,Colombia,MID,Bronze,56,g289
-1045,Joseph Paintsil,Ghana,ATT,Bronze,56,g242
-1046,Karl Toko Ekambi,Cameroon,ATT,Bronze,56,g251
-1047,Kevin Castaño,Colombia,MID,Bronze,56,g286
-1048,Kevin Diks,Indonesia,DEF,Bronze,56,g161
-1049,Koji Miyoshi,Japan,MID,Bronze,56,g166
-1050,Kristoffer Lund,USA,DEF,Bronze,56,g51
-1051,Leander Dendoncker,Belgium,MID,Bronze,56,g141
-1052,Mario Lemina,Gabon,MID,Bronze,56,g285
-1053,Miguel Borja,Colombia,ATT,Bronze,56,g295
-1054,Mohamed Abdelmonem,Egypt,DEF,Bronze,56,g196
-1055,Mohamed Elyounoussi,Norway,ATT,Bronze,56,g80
-1056,Myron Boadu,Netherlands,ATT,Bronze,56,g149
-1057,Nemanja Radonjić,Serbia,ATT,Bronze,56,g138
-1058,Noah Sadiki,DR Congo,MID,Bronze,56,g281
-1059,Obed Vargas,USA,MID,Bronze,56,g52
-1060,Patrick Berg,Norway,MID,Bronze,56,g84
-1061,Percy Tau,South Africa,ATT,Bronze,56,g271
-1062,Ramón Sosa,Paraguay,ATT,Bronze,56,g313
-1063,Riley McGree,Australia,MID,Bronze,56,gxb369
-1064,Robert Skov,Denmark,DEF,Bronze,56,g104
-1065,Salis Abdul Samed,Ghana,MID,Bronze,56,g244
-1066,Saud Abdulhamid,Saudi Arabia,DEF,Bronze,56,g182
-1067,Seol Young-woo,South Korea,DEF,Bronze,56,g177
-1068,Soufiane Rahimi,Morocco,ATT,Bronze,56,g209
-1069,Teemu Pukki,Finland,ATT,Bronze,56,g108
-1070,Toni Fruk,Croatia,MID,Bronze,56,g125
-1071,Trai Hume,Northern Ireland,DEF,Bronze,56,g44
-1072,Umar Sadiq,Nigeria,ATT,Bronze,56,g237
-1073,Veljko Birmančević,Serbia,ATT,Bronze,56,g137
-1074,Wilmar Barrios,Colombia,MID,Bronze,56,g294
-1075,Yang Hyun-jun,South Korea,ATT,Bronze,56,g181
-1076,Youcef Atal,Algeria,DEF,Bronze,56,g206
-1077,Benjamin Cremaschi,USA,MID,Bronze,55,g53
-1078,Callum Robinson,Ireland,ATT,Bronze,55,g19
-1079,Gylfi Sigurðsson,Iceland,MID,Bronze,55,g112
-1080,Jordan Rhodes,Scotland,ATT,Bronze,55,g1
-1081,Martin Braithwaite,Denmark,ATT,Bronze,55,g103
-1082,Ravel Morrison,Jamaica,MID,Bronze,55,g50
-1083,Thomas Meunier,Belgium,DEF,Bronze,55,g147
-1084,Tim Ream,USA,DEF,Bronze,55,g64
-1085,Wes Burns,Wales,ATT,Bronze,55,g32
-1086,Yuki Soma,Japan,ATT,Bronze,55,g173
-1087,Aïssa Laïdouni,Tunisia,MID,Bronze,54,g216
-1088,Ali Ahmed,Canada,ATT,Bronze,54,gxb347
-1089,Alidu Seidu,Ghana,DEF,Bronze,54,g245
-1090,Alireza Jahanbakhsh,Iran,ATT,Bronze,54,g188
-1091,Anastasios Bakasetas,Greece,MID,Bronze,54,gxb382
-1092,Antonio Sanabria,Paraguay,ATT,Bronze,54,g315
-1093,Ashley Barnes,England,ATT,Bronze,54,g30
-1094,Axel Tuanzebe,DR Congo,DEF,Bronze,54,g279
-1095,Benjamin Källman,Finland,ATT,Bronze,54,g111
-1096,Bright Osayi-Samuel,Nigeria,DEF,Bronze,54,g233
-1097,Christian Kouamé,Ivory Coast,ATT,Bronze,54,g227
-1098,Darlington Nagbe,USA,MID,Bronze,54,g73
-1099,Dejan Lovren,Croatia,DEF,Bronze,54,g127
-1100,Derek Cornelius,Canada,DEF,Bronze,54,gxb350
-1101,Erick Pulgar,Chile,MID,Bronze,54,g328
-1102,Fashion Sakala,Zambia,ATT,Bronze,54,g269
-1103,Félix Torres,Ecuador,DEF,Bronze,54,g298
-1104,Filip Đuričić,Serbia,MID,Bronze,54,g140
-1105,Frank Magri,Cameroon,ATT,Bronze,54,g250
-1106,Guillermo Maripán,Chile,DEF,Bronze,54,g329
-1107,Gustavo Gómez,Paraguay,DEF,Bronze,54,g317
-1108,Ismail Jakobs,Senegal,DEF,Bronze,54,g222
-1109,Jacob Shaffelburg,Canada,ATT,Bronze,54,gxb348
-1110,Jaloliddin Masharipov,Uzbekistan,ATT,Bronze,54,g193
-1111,James McClean,Ireland,DEF,Bronze,54,g28
-1112,Jay Idzes,Indonesia,DEF,Bronze,54,g158
-1113,Jeremy Sarmiento,Ecuador,ATT,Bronze,54,g297
-1114,Jóhann Berg Guðmundsson,Iceland,ATT,Bronze,54,g113
-1115,Lassana Coulibaly,Mali,MID,Bronze,54,g257
-1116,Logan Costa,Cape Verde,DEF,Bronze,54,g264
-1117,Luis Chávez,Mexico,MID,Bronze,54,gxb356
-1118,Luis Palma,Honduras,ATT,Bronze,54,gxb340
-1119,Mama Baldé,Guinea-Bissau,ATT,Bronze,54,g253
-1120,Manfred Ugalde,Costa Rica,ATT,Bronze,54,g334
-1121,Mao Hosoya,Japan,ATT,Bronze,54,g169
-1122,Marcelino Núñez,Chile,MID,Bronze,54,g330
-1123,Mees Hilgers,Indonesia,DEF,Bronze,54,g159
-1124,Michael Olunga,Kenya,ATT,Bronze,54,g268
-1125,Mohamed Kanno,Saudi Arabia,MID,Bronze,54,g183
-1126,Montassar Talbi,Tunisia,DEF,Bronze,54,g217
-1127,Musa Barrow,Gambia,ATT,Bronze,54,g265
-1128,Nene Dorgeles,Mali,ATT,Bronze,54,g260
-1129,Orbelín Pineda,Mexico,MID,Bronze,54,gxb357
-1130,Osman Bukari,Ghana,ATT,Bronze,54,g243
-1131,Owen Wijndal,Netherlands,DEF,Bronze,54,g151
-1132,Promise David,Canada,ATT,Bronze,54,gxb354
-1133,Rafael Santos Borré,Colombia,ATT,Bronze,54,g288
-1134,Robin Lod,Finland,MID,Bronze,54,g110
-1135,Salomón Rondón,Venezuela,ATT,Bronze,54,g323
-1136,Sebastián Cáceres,Uruguay,DEF,Bronze,54,g306
-1137,Semi Ajayi,Nigeria,DEF,Bronze,54,g232
-1138,Shogo Taniguchi,Japan,DEF,Bronze,54,g174
-1139,Sofiane Boufal,Morocco,ATT,Bronze,54,g214
-1140,Théo Bongonda,DR Congo,ATT,Bronze,54,g277
-1141,William Troost-Ekong,Nigeria,DEF,Bronze,54,g231
-1142,Yeferson Soteldo,Venezuela,ATT,Bronze,54,g324
-1143,Paddy McNair,Northern Ireland,DEF,Bronze,53,g45
-1144,Thomas Delaney,Denmark,MID,Bronze,53,g102
-1145,Agustín Canobbio,Uruguay,ATT,Bronze,52,g310
-1146,Ajdin Hrustić,Australia,MID,Bronze,52,gxb370
-1147,Alberth Elis,Honduras,ATT,Bronze,52,gxb341
-1148,Alexis Vega,Mexico,ATT,Bronze,52,gxb360
-1149,Ali Abdi,Tunisia,DEF,Bronze,52,g218
-1150,Amadou Diawara,Guinea,MID,Bronze,52,g255
-1151,André Ayew,Ghana,ATT,Bronze,52,g248
-1152,Andrés Cubas,Paraguay,MID,Bronze,52,g318
-1153,Ángelo Preciado,Ecuador,DEF,Bronze,52,g299
-1154,Billy Sharp,England,ATT,Bronze,52,g5
-1155,Brian Rodríguez,Uruguay,ATT,Bronze,52,g305
-1156,Calvin Verdonk,Indonesia,DEF,Bronze,52,g160
-1157,Christopher Wooh,Cameroon,DEF,Bronze,52,g249
-1158,DeAndre Yedlin,USA,DEF,Bronze,52,g74
-1159,Divock Origi,Belgium,ATT,Bronze,52,g144
-1160,Gabriel Suazo,Chile,DEF,Bronze,52,g332
-1161,Georges-Kévin Nkoudou,Cameroon,ATT,Bronze,52,g252
-1162,Hamari Traoré,Mali,DEF,Bronze,52,g258
-1163,Hwang Ui-jo,South Korea,ATT,Bronze,52,g175
-1164,Jefferson Savarino,Venezuela,ATT,Bronze,52,g326
-1165,Johan Mojica,Colombia,DEF,Bronze,52,g292
-1166,Jonathan Osorio,Canada,MID,Bronze,52,gxb355
-1167,Jonathan Rodríguez,Uruguay,ATT,Bronze,52,gxb378
-1168,Kellyn Acosta,USA,MID,Bronze,52,g58
-1169,Martin Boyle,Australia,ATT,Bronze,52,gxb371
-1170,Mathew Leckie,Australia,ATT,Bronze,52,gxb368
-1171,Meschak Elia,DR Congo,ATT,Bronze,52,g276
-1172,Michael Murillo,Panama,DEF,Bronze,52,g338
-1173,Mohamed Bayo,Guinea,ATT,Bronze,52,g256
-1174,Mohammad Mohebi,Iran,ATT,Bronze,52,g190
-1175,Ole Romeny,Indonesia,ATT,Bronze,52,g162
-1176,Oston Urunov,Uzbekistan,ATT,Bronze,52,g192
-1177,Paik Seung-ho,South Korea,MID,Bronze,52,g176
-1178,Ramadan Sobhi,Egypt,ATT,Bronze,52,g199
-1179,Richie Laryea,Canada,DEF,Bronze,52,gxb351
-1180,Roberto Alvarado,Mexico,ATT,Bronze,52,gxb361
-1181,Shamar Nicholson,Jamaica,ATT,Bronze,52,gxb342
-1182,Thom Haye,Indonesia,MID,Bronze,52,g157
-1183,Zito Luvumbo,Angola,ATT,Bronze,52,g284
-1184,Cheikhou Kouyaté,Senegal,MID,Bronze,50,g224
-1185,Craig Goodwin,Australia,DEF,Bronze,50,gxb372
-1186,Danny Rose,England,DEF,Bronze,50,g48
-1187,Diego Lainez,Mexico,ATT,Bronze,50,gxb366
-1188,Gédéon Kalulu,DR Congo,DEF,Bronze,50,g278
-1189,Genki Haraguchi,Japan,MID,Bronze,50,g171
-1190,Gianluca Lapadula,Peru,ATT,Bronze,50,g319
-1191,Hassan Tambakti,Saudi Arabia,DEF,Bronze,50,g185
-1192,Henry Martín,Mexico,ATT,Bronze,50,gxb364
-1193,Jesús Gallardo,Mexico,DEF,Bronze,50,gxb363
-1194,Jewison Bennette,Costa Rica,ATT,Bronze,50,g335
-1195,Jorge Sánchez,Mexico,DEF,Bronze,50,gxb362
-1196,Jovane Cabral,Cape Verde,ATT,Bronze,50,g263
-1197,Kasey Palmer,Jamaica,MID,Bronze,50,gxb344
-1198,Marselino Ferdinan,Indonesia,MID,Bronze,50,g163
-1199,Otabek Shukurov,Uzbekistan,MID,Bronze,50,g194
-1200,Renato Tapia,Peru,MID,Bronze,50,g320
-1201,Romain Saïss,Morocco,DEF,Bronze,50,g208
-1202,Saeid Ezatolahi,Iran,MID,Bronze,50,g189
-1203,Serge Aurier,Ivory Coast,DEF,Bronze,50,g226
-1204,Steve Mounié,Benin,ATT,Bronze,50,g262
-1205,Themba Zwane,South Africa,MID,Bronze,50,g274
-1206,Wu Lei,China,ATT,Bronze,50,gxb377
-1207,Ali Mabkhout,UAE,ATT,Bronze,48,g195
-1208,Aziz Behich,Australia,DEF,Bronze,48,gxb373
-1209,Darwin Machís,Venezuela,ATT,Bronze,48,g327
-1210,Eduardo Vargas,Chile,ATT,Bronze,48,gxb375
-1211,Ismael Díaz,Panama,ATT,Bronze,48,g339
-1212,Luis Advíncula,Peru,DEF,Bronze,48,g321
-1213,Mitchell Duke,Australia,ATT,Bronze,48,gxb374
-1214,Youssef Msakni,Tunisia,ATT,Bronze,48,g220
-1215,Ahmed Musa,Nigeria,ATT,Bronze,46,g240
-1216,André Carrillo,Peru,ATT,Bronze,46,g322
-1217,Duckens Nazon,Haiti,ATT,Bronze,46,gxb345
-1218,Hassan Al-Haydos,Qatar,MID,Bronze,46,g187
-1219,Joel Campbell,Costa Rica,ATT,Bronze,46,g336
-1220,Paolo Guerrero,Peru,ATT,Bronze,46,gxb376
+1,Lionel Messi,Argentina,ATT,Icon,97,rafa
+2,Cristiano Ronaldo,Portugal,ATT,Icon,96,marco
+3,Diego Maradona,Argentina,ATT,Icon,95,g911
+4,Pelé,Brazil,ATT,Icon,95,g910
+5,Johan Cruyff,Netherlands,ATT,Icon,93,g912
+6,Ronaldo Nazário,Brazil,ATT,Icon,93,g913
+7,Zinedine Zidane,France,MID,Icon,93,dimi
+8,Alfredo Di Stéfano,Argentina,ATT,Icon,92,g915
+9,Franz Beckenbauer,Germany,DEF,Icon,92,g914
+10,Paolo Maldini,Italy,DEF,Icon,92,alessio
+11,Ronaldinho,Brazil,ATT,Icon,92,g916
+12,Kylian Mbappé,France,ATT,Special,92,kai
+13,Erling Haaland,Norway,ATT,Special,91,sverre
+14,Harry Kane,England,ATT,Special,91,g811
+15,Vinícius Júnior,Brazil,ATT,Special,91,g810
+16,Ousmane Dembélé,France,ATT,Special,90,g813
+17,Rodri,Spain,MID,Special,90,g812
+18,Jude Bellingham,England,MID,Special,89,jordan
+19,Mohamed Salah,Egypt,ATT,Special,89,yusuf
+20,Andrés Iniesta,Spain,MID,Icon,88,pau
+21,Eusébio,Portugal,ATT,Icon,88,g917
+22,Ferenc Puskás,Hungary,ATT,Icon,88,g918
+23,Gerd Müller,Germany,ATT,Icon,88,g919
+24,Marco van Basten,Netherlands,ATT,Icon,88,g920
+25,Michel Platini,France,MID,Icon,88,g921
+26,Xavi,Spain,MID,Icon,88,marc
+27,Bukayo Saka,England,ATT,Special,88,g815
+28,Federico Valverde,Uruguay,MID,Special,88,g823
+29,Florian Wirtz,Germany,ATT,Special,88,g816
+30,Jamal Musiala,Germany,ATT,Special,88,g817
+31,Lamine Yamal,Spain,ATT,Special,88,nico
+32,Lautaro Martínez,Argentina,ATT,Special,88,g818
+33,Pedri,Spain,MID,Special,88,g820
+34,Raphinha,Brazil,ATT,Special,88,g822
+35,Robert Lewandowski,Poland,ATT,Special,88,g814
+36,Virgil van Dijk,Netherlands,DEF,Special,88,ade
+37,Bobby Charlton,England,MID,Icon,87,g923
+38,Franco Baresi,Italy,DEF,Icon,87,g928
+39,Garrincha,Brazil,ATT,Icon,87,g926
+40,George Best,Northern Ireland,ATT,Icon,87,g922
+41,Kaká,Brazil,MID,Icon,87,davi
+42,Lothar Matthäus,Germany,MID,Icon,87,g929
+43,Roberto Baggio,Italy,ATT,Icon,87,g927
+44,Romário,Brazil,ATT,Icon,87,g925
+45,Thierry Henry,France,ATT,Icon,87,lucien
+46,Zico,Brazil,MID,Icon,87,g924
+47,Zlatan Ibrahimović,Sweden,ATT,Icon,87,gxi50
+48,Achraf Hakimi,Morocco,DEF,Special,87,g824
+49,Alexander Isak,Sweden,ATT,Special,87,g825
+50,Joshua Kimmich,Germany,MID,Special,87,g831
+51,Kevin De Bruyne,Belgium,MID,Special,87,kees
+52,Khvicha Kvaratskhelia,Georgia,ATT,Special,87,g827
+53,Martin Ødegaard,Norway,MID,Special,87,g819
+54,Michael Olise,France,ATT,Special,87,g843
+55,Phil Foden,England,ATT,Special,87,g821
+56,Rúben Dias,Portugal,DEF,Special,87,g828
+57,Vitinha,Portugal,MID,Special,87,g835
+58,Alessandro Del Piero,Italy,ATT,Icon,86,g935
+59,Andrea Pirlo,Italy,MID,Icon,86,g933
+60,Andriy Shevchenko,Ukraine,ATT,Icon,86,g953
+61,Arjen Robben,Netherlands,ATT,Icon,86,gxi52
+62,Bobby Moore,England,DEF,Icon,86,gxi67
+63,Cafu,Brazil,DEF,Icon,86,marcos
+64,Dennis Bergkamp,Netherlands,ATT,Icon,86,g932
+65,Didier Drogba,Ivory Coast,ATT,Icon,86,g950
+66,Fabio Cannavaro,Italy,DEF,Icon,86,g936
+67,Francesco Totti,Italy,MID,Icon,86,g934
+68,Gabriel Batistuta,Argentina,ATT,Icon,86,gxi57
+69,George Weah,Liberia,ATT,Icon,86,g952
+70,Karim Benzema,France,ATT,Icon,86,gxi82
+71,Kenny Dalglish,Scotland,ATT,Icon,86,gxi60
+72,Luís Figo,Portugal,ATT,Icon,86,gxi46
+73,Neymar,Brazil,ATT,Icon,86,tiago
+74,Raúl,Spain,ATT,Icon,86,g947
+75,Roberto Carlos,Brazil,DEF,Icon,86,joao
+76,Ruud Gullit,Netherlands,MID,Icon,86,g930
+77,Samuel Eto'o,Cameroon,ATT,Icon,86,g951
+78,Sergio Agüero,Argentina,ATT,Icon,86,gxi72
+79,Sócrates,Brazil,MID,Icon,86,gxi66
+80,Steven Gerrard,England,MID,Icon,86,g937
+81,Toni Kroos,Germany,MID,Icon,86,gxi77
+82,Wayne Rooney,England,ATT,Icon,86,g940
+83,Alessandro Bastoni,Italy,DEF,Special,86,g830
+84,Alexis Mac Allister,Argentina,MID,Special,86,g834
+85,Antoine Griezmann,France,MID,Special,86,g846
+86,Antonio Rüdiger,Germany,DEF,Special,86,g829
+87,Bernardo Silva,Portugal,MID,Special,86,g832
+88,Bruno Guimarães,Brazil,MID,Special,86,g833
+89,Cole Palmer,England,MID,Special,86,cal
+90,Declan Rice,England,MID,Special,86,dylan
+91,Gabriel Magalhães,Brazil,DEF,Special,86,g858
+92,Joško Gvardiol,Croatia,DEF,Special,86,g856
+93,Julián Álvarez,Argentina,ATT,Special,86,g845
+94,Luis Díaz,Colombia,ATT,Special,86,g871
+95,Luka Modrić,Croatia,MID,Special,86,ilya
+96,Marquinhos,Brazil,DEF,Special,86,g857
+97,Moisés Caicedo,Ecuador,MID,Special,86,g874
+98,Nico Williams,Spain,ATT,Special,86,g851
+99,Nicolò Barella,Italy,MID,Special,86,g837
+100,Nuno Mendes,Portugal,DEF,Special,86,g864
+101,Rafael Leão,Portugal,ATT,Special,86,g842
+102,Serhou Guirassy,Guinea,ATT,Special,86,g877
+103,Theo Hernández,France,DEF,Special,86,g854
+104,Trent Alexander-Arnold,England,DEF,Special,86,g855
+105,Victor Osimhen,Nigeria,ATT,Special,86,g826
+106,Viktor Gyökeres,Sweden,ATT,Special,86,g850
+107,William Saliba,France,DEF,Special,86,moussa
+108,Alan Shearer,England,ATT,Icon,85,g941
+109,Bastian Schweinsteiger,Germany,MID,Icon,85,gxi55
+110,Carles Puyol,Spain,DEF,Icon,85,g946
+111,Clarence Seedorf,Netherlands,MID,Icon,85,gxi48
+112,David Beckham,England,MID,Icon,85,gxi71
+113,Eden Hazard,Belgium,ATT,Icon,85,gxi75
+114,Eric Cantona,France,ATT,Icon,85,gxi61
+115,Frank Lampard,England,MID,Icon,85,g938
+116,Frank Rijkaard,Netherlands,MID,Icon,85,g931
+117,Gareth Bale,Wales,ATT,Icon,85,gxi74
+118,Gheorghe Hagi,Romania,MID,Icon,85,gxi69
+119,Hristo Stoichkov,Bulgaria,ATT,Icon,85,g954
+120,John Terry,England,DEF,Icon,85,g945
+121,Juan Román Riquelme,Argentina,MID,Icon,85,gxi58
+122,Lilian Thuram,France,DEF,Icon,85,gxi63
+123,Michael Laudrup,Denmark,MID,Icon,85,gxi49
+124,Miroslav Klose,Germany,ATT,Icon,85,gxi56
+125,Patrick Vieira,France,MID,Icon,85,g942
+126,Paul Scholes,England,MID,Icon,85,g939
+127,Pavel Nedvěd,Czech Republic,MID,Icon,85,gxi45
+128,Philipp Lahm,Germany,DEF,Icon,85,gxi54
+129,Rio Ferdinand,England,DEF,Icon,85,g944
+130,Robin van Persie,Netherlands,ATT,Icon,85,gxi73
+131,Roy Keane,Ireland,MID,Icon,85,g943
+132,Ryan Giggs,Wales,ATT,Icon,85,gxi70
+133,Sergio Ramos,Spain,DEF,Icon,85,rodrigo
+134,Xabi Alonso,Spain,MID,Icon,85,gxi53
+135,Ademola Lookman,Nigeria,ATT,Special,85,g878
+136,Álex Grimaldo,Spain,DEF,Special,85,g853
+137,Alphonso Davies,Canada,DEF,Special,85,g865
+138,Arda Güler,Turkey,ATT,Special,85,g869
+139,Aurélien Tchouaméni,France,MID,Special,85,g840
+140,Bradley Barcola,France,ATT,Special,85,g867
+141,Bruno Fernandes,Portugal,MID,Special,85,rui
+142,Christian Pulisic,USA,ATT,Special,85,g891
+143,Cristian Romero,Argentina,DEF,Special,85,g882
+144,Dani Olmo,Spain,ATT,Special,85,g852
+145,Désiré Doué,France,ATT,Special,85,g868
+146,Dominik Szoboszlai,Hungary,MID,Special,85,g872
+147,Éder Militão,Brazil,DEF,Special,85,g863
+148,Eduardo Camavinga,France,MID,Special,85,g841
+149,Enzo Fernández,Argentina,MID,Special,85,g875
+150,Federico Dimarco,Italy,DEF,Special,85,g866
+151,Frenkie de Jong,Netherlands,MID,Special,85,g839
+152,Hakan Çalhanoğlu,Turkey,MID,Special,85,g838
+153,Ibrahima Konaté,France,DEF,Special,85,g883
+154,João Neves,Portugal,MID,Special,85,g836
+155,Jules Koundé,France,DEF,Special,85,g861
+156,Kim Min-jae,South Korea,DEF,Special,85,g859
+157,Leroy Sané,Germany,ATT,Special,85,g844
+158,Marcus Thuram,France,ATT,Special,85,g849
+159,Martín Zubimendi,Spain,MID,Special,85,g884
+160,Omar Marmoush,Egypt,ATT,Special,85,g879
+161,Pau Cubarsí,Spain,DEF,Special,85,g862
+162,Paulo Dybala,Argentina,ATT,Special,85,g847
+163,Rodrygo,Brazil,ATT,Special,85,g876
+164,Ronald Araújo,Uruguay,DEF,Special,85,g860
+165,Ryan Gravenberch,Netherlands,MID,Special,85,g873
+166,Sadio Mané,Senegal,ATT,Special,85,g848
+167,Scott McTominay,Scotland,MID,Special,85,g890
+168,Tijjani Reijnders,Netherlands,MID,Special,85,g885
+169,Xavi Simons,Netherlands,ATT,Special,85,g870
+170,Dani Alves,Brazil,DEF,Icon,84,edinho
+171,David Villa,Spain,ATT,Icon,84,g949
+172,Fernando Torres,Spain,ATT,Icon,84,g948
+173,Franck Ribéry,France,ATT,Icon,84,gxi80
+174,Gary Lineker,England,ATT,Icon,84,gxi68
+175,Gerard Piqué,Spain,DEF,Icon,84,gxi79
+176,Javier Zanetti,Argentina,DEF,Icon,84,gxi59
+177,Jürgen Klinsmann,Germany,ATT,Icon,84,gxi62
+178,Marcel Desailly,France,DEF,Icon,84,gxi64
+179,Marcelo,Brazil,DEF,Icon,84,gxi81
+180,Mats Hummels,Germany,DEF,Icon,84,gxi84
+181,Mesut Özil,Germany,MID,Icon,84,gxi76
+182,Nemanja Vidić,Serbia,DEF,Icon,84,gxi65
+183,Rui Costa,Portugal,MID,Icon,84,gxi47
+184,Sergio Busquets,Spain,MID,Icon,84,gxi78
+185,Thiago Silva,Brazil,DEF,Icon,84,gxi83
+186,Wesley Sneijder,Netherlands,MID,Icon,84,gxi51
+187,Andrew Robertson,Scotland,DEF,Special,84,g904
+188,Antoine Semenyo,Ghana,ATT,Special,84,g909
+189,Benjamin Šeško,Slovenia,ATT,Special,84,g893
+190,Bryan Mbeumo,Cameroon,ATT,Special,84,g889
+191,Dani Carvajal,Spain,DEF,Special,84,g901
+192,Dušan Vlahović,Serbia,ATT,Special,84,g897
+193,Fabián Ruiz,Spain,MID,Special,84,g906
+194,Granit Xhaka,Switzerland,MID,Special,84,g880
+195,Hugo Ekitiké,France,ATT,Special,84,g894
+196,Jérémy Doku,Belgium,ATT,Special,84,g907
+197,Jonathan David,Canada,ATT,Special,84,g898
+198,Jonathan Tah,Germany,DEF,Special,84,g892
+199,Kai Havertz,Germany,ATT,Special,84,g886
+200,Kenan Yıldız,Turkey,ATT,Special,84,g888
+201,Kingsley Coman,France,ATT,Special,84,g900
+202,Manuel Akanji,Switzerland,DEF,Special,84,g899
+203,Mateo Retegui,Italy,ATT,Special,84,g896
+204,Mikel Merino,Spain,MID,Special,84,g905
+205,Mikel Oyarzabal,Spain,ATT,Special,84,g881
+206,Mohammed Kudus,Ghana,ATT,Special,84,g887
+207,Rayan Cherki,France,ATT,Special,84,g902
+208,Reece James,England,DEF,Special,84,g908
+209,Riyad Mahrez,Algeria,ATT,Special,84,g895
+210,Sandro Tonali,Italy,MID,Special,84,g903
+211,Ashley Cole,England,DEF,Icon,83,shaun
+212,Eberechi Eze,England,ATT,Gold,83,g581
+213,N’Golo Kanté,France,MID,Gold,83,omar
+214,Son Heung-min,South Korea,ATT,Gold,83,han
+215,Luis Suárez,Uruguay,ATT,Icon,82,diego
+216,Anthony Gordon,England,ATT,Gold,82,g582
+217,Christopher Nkunku,France,ATT,Gold,82,g669
+218,Cody Gakpo,Netherlands,ATT,Gold,82,g737
+219,Dean Huijsen,Spain,DEF,Gold,82,g630
+220,Gabriel Martinelli,Brazil,ATT,Gold,82,g772
+221,Gavi,Spain,MID,Gold,82,g646
+222,Jarrod Bowen,England,ATT,Gold,82,g580
+223,Jeremie Frimpong,Netherlands,DEF,Gold,82,g738
+224,João Cancelo,Portugal,DEF,Gold,82,g657
+225,Marc Guéhi,England,DEF,Gold,82,g583
+226,Matheus Cunha,Brazil,ATT,Gold,82,g763
+227,Micky van de Ven,Netherlands,DEF,Gold,82,jens
+228,Morgan Rogers,England,ATT,Gold,82,g591
+229,Adrien Rabiot,France,MID,Gold,81,g671
+230,Álex Baena,Spain,ATT,Gold,81,g635
+231,Bremer,Brazil,DEF,Gold,81,g764
+232,Denzel Dumfries,Netherlands,DEF,Gold,81,g730
+233,Elliot Anderson,England,MID,Gold,81,g589
+234,João Palhinha,Portugal,MID,Gold,81,g658
+235,João Pedro,Brazil,ATT,Gold,81,g762
+236,John Stones,England,DEF,Gold,81,jack
+237,Kaoru Mitoma,Japan,ATT,Gold,81,gxg260
+238,Leandro Trossard,Belgium,ATT,Gold,81,g742
+239,Levi Colwill,England,DEF,Gold,81,g585
+240,Marc Cucurella,Spain,DEF,Gold,81,g629
+241,Mateo Kovačić,Croatia,MID,Gold,81,g748
+242,Moise Kean,Italy,ATT,Gold,81,g711
+243,Morgan Gibbs-White,England,MID,Gold,81,g590
+244,Nico Schlotterbeck,Germany,DEF,Gold,81,g693
+245,Ollie Watkins,England,ATT,Gold,81,callum
+246,Takefusa Kubo,Japan,ATT,Gold,81,gxg259
+247,Thomas Müller,Germany,ATT,Gold,81,g706
+248,Willian Pacho,Ecuador,DEF,Gold,81,g797
+249,Adam Wharton,England,MID,Gold,80,g587
+250,Alejandro Balde,Spain,DEF,Gold,80,g648
+251,Aleksandar Pavlović,Germany,MID,Gold,80,g697
+252,Alexander Sørloth,Norway,ATT,Gold,80,gxg268
+253,Amad Diallo,Ivory Coast,ATT,Gold,80,gxg240
+254,Benjamin Pavard,France,DEF,Gold,80,g675
+255,Casemiro,Brazil,MID,Gold,80,g773
+256,Dejan Kulusevski,Sweden,ATT,Gold,80,gxg270
+257,Ezri Konsa,England,DEF,Gold,80,g584
+258,Fermín López,Spain,ATT,Gold,80,g634
+259,Ferran Torres,Spain,ATT,Gold,80,g650
+260,Giovanni Di Lorenzo,Italy,DEF,Gold,80,g714
+261,Gonçalo Inácio,Portugal,DEF,Gold,80,g662
+262,İlkay Gündoğan,Germany,MID,Gold,80,g689
+263,Ivan Toney,England,ATT,Gold,80,g595
+264,Jack Grealish,England,ATT,Gold,80,g592
+265,Julian Brandt,Germany,MID,Gold,80,g703
+266,Jurriën Timber,Netherlands,DEF,Gold,80,g731
+267,Kobbie Mainoo,England,MID,Gold,80,g586
+268,Kyle Walker,England,DEF,Gold,80,g618
+269,Leon Goretzka,Germany,MID,Gold,80,g688
+270,Lisandro Martínez,Argentina,DEF,Gold,80,g778
+271,Lucas Paquetá,Brazil,MID,Gold,80,g757
+272,Manu Koné,France,MID,Gold,80,g672
+273,Marcos Llorente,Spain,MID,Gold,80,g639
+274,Matthijs de Ligt,Netherlands,DEF,Gold,80,g727
+275,Nathan Aké,Netherlands,DEF,Gold,80,g728
+276,Pedro Neto,Portugal,ATT,Gold,80,g660
+277,Pedro Porro,Spain,DEF,Gold,80,g631
+278,Piero Hincapié,Ecuador,DEF,Gold,80,g796
+279,Rayan Aït-Nouri,Algeria,DEF,Gold,80,gxg234
+280,Rodrigo De Paul,Argentina,MID,Gold,80,g653
+281,Romelu Lukaku,Belgium,ATT,Gold,80,g739
+282,Rúben Neves,Portugal,MID,Gold,80,g656
+283,Serge Gnabry,Germany,ATT,Gold,80,g690
+284,Teun Koopmeiners,Netherlands,MID,Gold,80,g726
+285,Warren Zaïre-Emery,France,MID,Gold,80,g673
+286,Alejandro Garnacho,Argentina,ATT,Gold,79,g781
+287,Alessandro Buongiorno,Italy,DEF,Gold,79,g718
+288,Amadou Onana,Belgium,MID,Gold,79,g741
+289,André-Frank Zambo Anguissa,Cameroon,MID,Gold,79,gxg252
+290,Andrea Cambiaso,Italy,DEF,Gold,79,g715
+291,Angelo Stiller,Germany,MID,Gold,79,g698
+292,Antonee Robinson,USA,DEF,Gold,79,g805
+293,Aymeric Laporte,Spain,DEF,Gold,79,g633
+294,Ben White,England,DEF,Gold,79,toby
+295,Brahim Díaz,Morocco,ATT,Gold,79,g809
+296,Castello Lukeba,France,DEF,Gold,79,g684
+297,Charles De Ketelaere,Belgium,MID,Gold,79,g743
+298,Curtis Jones,England,MID,Gold,79,g588
+299,Darwin Núñez,Uruguay,ATT,Gold,79,dario
+300,David Raum,Germany,DEF,Gold,79,g694
+301,Deniz Undav,Germany,ATT,Gold,79,g692
+302,Diogo Dalot,Portugal,DEF,Gold,79,g655
+303,Dominic Solanke,England,ATT,Gold,79,g594
+304,Estêvão,Brazil,ATT,Gold,79,g761
+305,Ferdi Kadıoğlu,Turkey,DEF,Gold,79,gxg289
+306,Ferland Mendy,France,DEF,Gold,79,g677
+307,Fikayo Tomori,England,DEF,Gold,79,g604
+308,Francisco Conceição,Portugal,ATT,Gold,79,g661
+309,Giorgian de Arrascaeta,Uruguay,MID,Gold,79,g787
+310,Gonçalo Ramos,Portugal,ATT,Gold,79,g659
+311,Iliman Ndiaye,Senegal,ATT,Gold,79,gxg243
+312,Isco,Spain,MID,Gold,79,g638
+313,James Maddison,England,MID,Gold,79,jake
+314,Jarrad Branthwaite,England,DEF,Gold,79,g603
+315,Jean-Philippe Mateta,France,ATT,Gold,79,g682
+316,João Félix,Portugal,ATT,Gold,79,g654
+317,John McGinn,Scotland,MID,Gold,79,g620
+318,Karim Adeyemi,Germany,ATT,Gold,79,g699
+319,Konrad Laimer,Austria,MID,Gold,79,gxg283
+320,Lee Kang-in,South Korea,MID,Gold,79,gxg265
+321,Loïs Openda,Belgium,ATT,Gold,79,g744
+322,Lucas Hernández,France,DEF,Gold,79,g676
+323,Manuel Locatelli,Italy,MID,Gold,79,g719
+324,Marcus Rashford,England,ATT,Gold,79,tyrese
+325,Milos Kerkez,Hungary,DEF,Gold,79,gxg297
+326,Nick Woltemade,Germany,ATT,Gold,79,g700
+327,Noni Madueke,England,ATT,Gold,79,g602
+328,Orkun Kökçü,Turkey,MID,Gold,79,gxg290
+329,Pablo Barrios,Spain,MID,Gold,79,g642
+330,Patrik Schick,Czech Republic,ATT,Gold,79,gxg301
+331,Piotr Zieliński,Poland,MID,Gold,79,gxg279
+332,Randal Kolo Muani,France,ATT,Gold,79,g670
+333,Riccardo Calafiori,Italy,DEF,Gold,79,g713
+334,Robin Le Normand,Spain,DEF,Gold,79,g632
+335,Rodrigo Bentancur,Uruguay,MID,Gold,79,g786
+336,Savinho,Brazil,ATT,Gold,79,g760
+337,Stanislav Lobotka,Slovakia,MID,Gold,79,gxg298
+338,Yoane Wissa,DR Congo,ATT,Gold,79,gxg255
+339,Youri Tielemans,Belgium,MID,Gold,79,g740
+340,Youssouf Fofana,France,MID,Gold,79,g674
+341,Aleksandar Mitrović,Serbia,ATT,Gold,78,gxg286
+342,Álvaro Morata,Spain,ATT,Gold,78,g628
+343,André,Brazil,MID,Gold,78,g767
+344,Andrej Kramarić,Croatia,ATT,Gold,78,g751
+345,Ángel Di María,Argentina,ATT,Gold,78,g777
+346,Anthony Elanga,Sweden,ATT,Gold,78,gxg271
+347,António Silva,Portugal,DEF,Gold,78,g663
+348,Artem Dovbyk,Ukraine,ATT,Gold,78,gxg293
+349,Brennan Johnson,Wales,ATT,Gold,78,g623
+350,Carlos Baleba,Cameroon,MID,Gold,78,gxg253
+351,Chris Wood,New Zealand,ATT,Gold,78,g619
+352,Conor Gallagher,England,MID,Gold,78,rory
+353,Dan Ndoye,Switzerland,ATT,Gold,78,gxg280
+354,Daniel Muñoz,Colombia,DEF,Gold,78,g791
+355,Dávid Hancko,Slovakia,DEF,Gold,78,gxg299
+356,Davide Frattesi,Italy,MID,Gold,78,g708
+357,Destiny Udogie,Italy,DEF,Gold,78,g716
+358,Donyell Malen,Netherlands,ATT,Gold,78,g725
+359,Eric García,Spain,DEF,Gold,78,g649
+360,Exequiel Palacios,Argentina,MID,Gold,78,g783
+361,Francisco Trincão,Portugal,ATT,Gold,78,g664
+362,Franck Kessié,Ivory Coast,MID,Gold,78,gxg237
+363,Gabriel Jesus,Brazil,ATT,Gold,78,g759
+364,Gerard Moreno,Spain,ATT,Gold,78,g641
+365,Iago Aspas,Spain,ATT,Gold,78,g644
+366,Ilya Zabarnyi,Ukraine,DEF,Gold,78,gxg294
+367,Iñaki Williams,Ghana,ATT,Gold,78,g652
+368,Ismaïla Sarr,Senegal,ATT,Gold,78,gxg242
+369,Jhon Lucumí,Colombia,DEF,Gold,78,g795
+370,Joelinton,Brazil,MID,Gold,78,g768
+371,José María Giménez,Uruguay,DEF,Gold,78,g788
+372,Kieran Trippier,England,DEF,Gold,78,g598
+373,Koke,Spain,MID,Gold,78,g640
+374,Lewis Hall,England,DEF,Gold,78,g615
+375,Maghnes Akliouche,France,ATT,Gold,78,g681
+376,Malo Gusto,France,DEF,Gold,78,g678
+377,Manuel Ugarte,Uruguay,MID,Gold,78,g785
+378,Marcel Sabitzer,Austria,MID,Gold,78,gxg282
+379,Marcelo Brozović,Croatia,MID,Gold,78,g749
+380,Mason Mount,England,MID,Gold,78,g606
+381,Matheus Nunes,Portugal,MID,Gold,78,g666
+382,Matteo Guendouzi,France,MID,Gold,78,g680
+383,Memphis Depay,Netherlands,ATT,Gold,78,g724
+384,Morten Hjulmand,Denmark,MID,Gold,78,gxg276
+385,Myles Lewis-Skelly,England,DEF,Gold,78,g601
+386,Nicolas Jackson,Senegal,ATT,Gold,78,gxg241
+387,Nikola Milenković,Serbia,DEF,Gold,78,gxg288
+388,Noussair Mazraoui,Morocco,DEF,Gold,78,gxg230
+389,Oihan Sancet,Spain,MID,Gold,78,g637
+390,Pape Matar Sarr,Senegal,MID,Gold,78,gxg244
+391,Pascal Groß,Germany,MID,Gold,78,g702
+392,Pervis Estupiñán,Ecuador,DEF,Gold,78,g798
+393,Pierre-Emile Højbjerg,Denmark,MID,Gold,78,gxg275
+394,Raheem Sterling,England,ATT,Gold,78,g593
+395,Rasmus Højlund,Denmark,ATT,Gold,78,gxg274
+396,Ritsu Dōan,Japan,ATT,Gold,78,gxg262
+397,Robert Andrich,Germany,MID,Gold,78,g696
+398,Santiago Giménez,Mexico,ATT,Gold,78,g801
+399,Sergej Milinković-Savić,Serbia,MID,Gold,78,gxg287
+400,Thiago Almada,Argentina,ATT,Gold,78,g782
+401,Thomas Partey,Ghana,MID,Gold,78,gxg251
+402,Tino Livramento,England,DEF,Gold,78,g600
+403,Trevoh Chalobah,England,DEF,Gold,78,g605
+404,Vangelis Pavlidis,Greece,ATT,Gold,78,gxg302
+405,Victor Boniface,Nigeria,ATT,Gold,78,gxg249
+406,Wesley Fofana,France,DEF,Gold,78,g683
+407,Youssef En-Nesyri,Morocco,ATT,Gold,78,g808
+408,Amine Gouiri,Algeria,ATT,Gold,77,gxg235
+409,Amir Rrahmani,Kosovo,DEF,Gold,77,gxg303
+410,Ángel Correa,Argentina,ATT,Gold,77,g784
+411,Billy Gilmour,Scotland,MID,Gold,77,g621
+412,Callum Hudson-Odoi,England,ATT,Gold,77,g607
+413,Christoph Baumgartner,Austria,MID,Gold,77,gxg284
+414,Daichi Kamada,Japan,MID,Gold,77,gxg263
+415,Dani Ceballos,Spain,MID,Gold,77,g645
+416,David Alaba,Austria,DEF,Gold,77,gxg281
+417,Davinson Sánchez,Colombia,DEF,Gold,77,g792
+418,Denis Bouanga,Gabon,ATT,Gold,77,gxg257
+419,Dodi Lukébakio,Belgium,ATT,Gold,77,g746
+420,Douglas Luiz,Brazil,MID,Gold,77,g769
+421,Edmond Tapsoba,Burkina Faso,DEF,Gold,77,gxg254
+422,Edon Zhegrova,Kosovo,ATT,Gold,77,gxg304
+423,Edson Álvarez,Mexico,MID,Gold,77,g799
+424,Emile Smith Rowe,England,ATT,Gold,77,g614
+425,Evan Ndicka,Ivory Coast,DEF,Gold,77,gxg238
+426,Fabinho,Brazil,MID,Gold,77,g771
+427,Federico Chiesa,Italy,ATT,Gold,77,g707
+428,Federico Gatti,Italy,DEF,Gold,77,g717
+429,Felix Nmecha,Germany,MID,Gold,77,g701
+430,Georges Mikautadze,Georgia,ATT,Gold,77,gxg292
+431,Gerson,Brazil,MID,Gold,77,g770
+432,Giacomo Raspadori,Italy,ATT,Gold,77,g710
+433,Gianluca Scamacca,Italy,ATT,Gold,77,g712
+434,Giovani Lo Celso,Argentina,MID,Gold,77,g775
+435,Harry Maguire,England,DEF,Gold,77,hamish
+436,Harry Wilson,Wales,ATT,Gold,77,g624
+437,Ismaël Bennacer,Algeria,MID,Gold,77,gxg233
+438,Ivan Perišić,Croatia,DEF,Gold,77,g750
+439,Jacob Murphy,England,ATT,Gold,77,g613
+440,Jadon Sancho,England,ATT,Gold,77,g608
+441,James Rodríguez,Colombia,MID,Gold,77,g789
+442,James Ward-Prowse,England,MID,Gold,77,g616
+443,Jamie Vardy,England,ATT,Gold,77,gary
+444,Jerdy Schouten,Netherlands,MID,Gold,77,g733
+445,Jhon Durán,Colombia,ATT,Gold,77,g790
+446,Joachim Andersen,Denmark,DEF,Gold,77,gxg277
+447,Joey Veerman,Netherlands,MID,Gold,77,g732
+448,Jordan Henderson,England,MID,Gold,77,g597
+449,Jørgen Strand Larsen,Norway,ATT,Gold,77,gxg269
+450,Kalidou Koulibaly,Senegal,DEF,Gold,77,gxg245
+451,Kerem Aktürkoğlu,Turkey,ATT,Gold,77,gxg291
+452,Leandro Paredes,Argentina,MID,Gold,77,g774
+453,Leny Yoro,France,DEF,Gold,77,g685
+454,Lewis Dunk,England,DEF,Gold,77,g610
+455,Lorenzo Pellegrini,Italy,MID,Gold,77,g709
+456,Lucas Digne,France,DEF,Gold,77,g679
+457,Luke Shaw,England,DEF,Gold,77,g599
+458,Martin Baturina,Croatia,MID,Gold,77,g754
+459,Maximilian Mittelstädt,Germany,DEF,Gold,77,g695
+460,Milan Škriniar,Slovakia,DEF,Gold,77,gxg300
+461,Nahuel Molina,Argentina,DEF,Gold,77,g780
+462,Nayef Aguerd,Morocco,DEF,Gold,77,gxg232
+463,Nélson Semedo,Portugal,DEF,Gold,77,g667
+464,Niclas Füllkrug,Germany,ATT,Gold,77,g691
+465,Nico González,Spain,MID,Gold,77,g651
+466,Nicolás González,Argentina,ATT,Gold,77,g776
+467,Ola Aina,Nigeria,DEF,Gold,77,gxg248
+468,Pierre-Emerick Aubameyang,Gabon,ATT,Gold,77,gxg256
+469,Rafa Silva,Portugal,ATT,Gold,77,g665
+470,Richard Ríos,Colombia,MID,Gold,77,g794
+471,Richarlison,Brazil,ATT,Gold,77,g758
+472,Samu Omorodion,Spain,ATT,Gold,77,g643
+473,Samuele Ricci,Italy,MID,Gold,77,g722
+474,Stefan de Vrij,Netherlands,DEF,Gold,77,g729
+475,Waldemar Anton,Germany,DEF,Gold,77,g705
+476,Wataru Endō,Japan,MID,Gold,77,gxg261
+477,Weston McKennie,USA,MID,Gold,77,g803
+478,Yeremy Pino,Spain,ATT,Gold,77,g636
+479,Yves Bissouma,Mali,MID,Gold,77,gxg236
+480,Alex Iwobi,Nigeria,MID,Gold,76,gxg246
+481,Alexandre Lacazette,France,ATT,Gold,76,g686
+482,Antony,Brazil,ATT,Gold,76,anderson
+483,Arthur Theate,Belgium,DEF,Gold,76,g745
+484,Bryan Cristante,Italy,MID,Gold,76,g720
+485,Christian Eriksen,Denmark,MID,Gold,76,gxg273
+486,Danny Welbeck,England,ATT,Gold,76,g612
+487,Dominic Calvert-Lewin,England,ATT,Gold,76,g596
+488,Emre Can,Germany,MID,Gold,76,g704
+489,Folarin Balogun,USA,ATT,Gold,76,g806
+490,Francesco Acerbi,Italy,DEF,Gold,76,g723
+491,Georgiy Sudakov,Ukraine,MID,Gold,76,gxg296
+492,Hakim Ziyech,Morocco,ATT,Gold,76,g807
+493,Hugo Larsson,Sweden,MID,Gold,76,gxg272
+494,Jefferson Lerma,Colombia,MID,Gold,76,g793
+495,Joe Gomez,England,DEF,Gold,76,g609
+496,Josip Stanišić,Croatia,DEF,Gold,76,g753
+497,Josip Šutalo,Croatia,DEF,Gold,76,g752
+498,Kevin Danso,Austria,DEF,Gold,76,gxg285
+499,Leon Bailey,Jamaica,ATT,Gold,76,gxg307
+500,Lewis Ferguson,Scotland,MID,Gold,76,g622
+501,Lutsharel Geertruida,Netherlands,DEF,Gold,76,g735
+502,Marc Casadó,Spain,MID,Gold,76,g647
+503,Marten de Roon,Netherlands,MID,Gold,76,g734
+504,Mehdi Taremi,Iran,ATT,Gold,76,gxg267
+505,Nathan Collins,Ireland,DEF,Gold,76,g626
+506,Nicolás Otamendi,Argentina,DEF,Gold,76,g779
+507,Nikola Vlašić,Croatia,MID,Gold,76,g755
+508,Odilon Kossounou,Ivory Coast,DEF,Gold,76,gxg239
+509,Patrick Dorgu,Denmark,DEF,Gold,76,gxg278
+510,Quinten Timber,Netherlands,MID,Gold,76,g736
+511,Raúl Jiménez,Mexico,ATT,Gold,76,g800
+512,Roberto Firmino,Brazil,ATT,Gold,76,g766
+513,Sofyan Amrabat,Morocco,MID,Gold,76,gxg231
+514,Tomáš Souček,Czech Republic,MID,Gold,76,tomas
+515,Tyler Adams,USA,MID,Gold,76,g804
+516,Wilfred Ndidi,Nigeria,MID,Gold,76,gxg247
+517,Abdukodir Khusanov,Uzbekistan,DEF,Gold,75,gxg311
+518,Albert Guðmundsson,Iceland,MID,Gold,75,gxg310
+519,Calvin Bassey,Nigeria,DEF,Gold,75,gxg250
+520,Ciro Immobile,Italy,ATT,Gold,75,g721
+521,Dan Burn,England,DEF,Gold,75,g611
+522,Edin Džeko,Bosnia and Herzegovina,ATT,Gold,75,gxg308
+523,Ellyes Skhiri,Tunisia,MID,Gold,75,gxg258
+524,Hirving Lozano,Mexico,ATT,Gold,75,g802
+525,Hwang Hee-chan,South Korea,ATT,Gold,75,gxg266
+526,Jonathan Clauss,France,DEF,Gold,75,g687
+527,Kristjan Asllani,Albania,MID,Gold,75,gxg306
+528,Luka Sučić,Croatia,MID,Gold,75,g756
+529,Oleksandr Zinchenko,Ukraine,DEF,Gold,75,gxg295
+530,Philippe Coutinho,Brazil,MID,Gold,75,g765
+531,Radu Drăgușin,Romania,DEF,Gold,75,gxg309
+532,Tyrick Mitchell,England,DEF,Gold,75,g617
+533,Vedat Muriqi,Kosovo,ATT,Gold,75,gxg305
+534,Yannick Carrasco,Belgium,ATT,Gold,75,g747
+535,Ethan Ampadu,Wales,MID,Gold,74,g625
+536,Evan Ferguson,Ireland,ATT,Gold,74,g627
+537,Geovany Quenda,Portugal,ATT,Gold,74,g668
+538,Takehiro Tomiyasu,Japan,DEF,Gold,74,gxg264
+539,Eric Dier,England,DEF,Silver,74,evan
+540,Abde Ezzalzouli,Morocco,ATT,Silver,72,g396
+541,Andreas Christensen,Denmark,DEF,Silver,72,g576
+542,Antonio Nusa,Norway,ATT,Silver,72,g568
+543,Ayoze Pérez,Spain,ATT,Silver,72,g387
+544,Brais Méndez,Spain,MID,Silver,72,g379
+545,Carlos Soler,Spain,MID,Silver,72,g390
+546,Crysencio Summerville,Netherlands,ATT,Silver,72,g446
+547,Cucho Hernández,Colombia,ATT,Silver,72,g491
+548,Daizen Maeda,Japan,ATT,Silver,72,g372
+549,Domenico Berardi,Italy,ATT,Silver,72,g398
+550,Dwight McNeil,England,ATT,Silver,72,g341
+551,Ermedin Demirović,Bosnia and Herzegovina,ATT,Silver,72,g424
+552,Ethan Nwaneri,England,ATT,Silver,72,g361
+553,Florian Thauvin,France,ATT,Silver,72,g426
+554,Franco Mastantuono,Argentina,ATT,Silver,72,g483
+555,Gianluca Mancini,Italy,DEF,Silver,72,g405
+556,Hákon Arnar Haraldsson,Iceland,MID,Silver,72,gxs267
+557,Harvey Barnes,England,ATT,Silver,72,g368
+558,Hiroki Itō,Japan,DEF,Silver,72,g553
+559,Hwang In-beom,South Korea,MID,Silver,72,g561
+560,Ian Maatsen,Netherlands,DEF,Silver,72,g447
+561,Ibrahim Sangaré,Ivory Coast,MID,Silver,72,g548
+562,Igor Paixão,Brazil,ATT,Silver,72,g481
+563,Iñigo Martínez,Spain,DEF,Silver,72,g381
+564,Jack Clarke,England,ATT,Silver,72,g355
+565,Jack Harrison,England,ATT,Silver,72,g340
+566,James Tarkowski,England,DEF,Silver,72,g343
+567,Jamie Gittens,England,ATT,Silver,72,g358
+568,Jamie Leweling,Germany,ATT,Silver,72,g420
+569,Jarell Quansah,England,DEF,Silver,72,g349
+570,Jhon Arias,Colombia,ATT,Silver,72,g510
+571,Justin Kluivert,Netherlands,ATT,Silver,72,g449
+572,Kiernan Dewsbury-Hall,England,MID,Silver,72,g356
+573,Lamine Camara,Senegal,MID,Silver,72,g533
+574,Leonardo Balerdi,Argentina,DEF,Silver,72,g485
+575,Liam Delap,England,ATT,Silver,72,g363
+576,Luiz Henrique,Brazil,ATT,Silver,72,g479
+577,Malcom,Brazil,ATT,Silver,72,g471
+578,Malick Fofana,Belgium,ATT,Silver,72,g461
+579,Malik Tillman,USA,MID,Silver,72,g500
+580,Mats Wieffer,Netherlands,MID,Silver,72,g444
+581,Matteo Politano,Italy,ATT,Silver,72,g399
+582,Mattia Zaccagni,Italy,ATT,Silver,72,g401
+583,Maximilian Beier,Germany,ATT,Silver,72,g421
+584,Merih Demiral,Turkey,DEF,Silver,72,gxs251
+585,Mikkel Damsgaard,Denmark,MID,Silver,72,g575
+586,Moussa Niakhaté,Senegal,DEF,Silver,72,g535
+587,Nicolás Paz,Argentina,MID,Silver,72,g484
+588,Noa Lang,Netherlands,ATT,Silver,72,g445
+589,Pedro,Brazil,ATT,Silver,72,g474
+590,Raphaël Guerreiro,Portugal,DEF,Silver,72,g466
+591,Riccardo Orsolini,Italy,ATT,Silver,72,g403
+592,Rico Lewis,England,DEF,Silver,72,g359
+593,Robin Gosens,Germany,DEF,Silver,72,g417
+594,Ruben Loftus-Cheek,England,MID,Silver,72,g345
+595,Samu Aghehowa,Spain,ATT,Silver,72,g397
+596,Samuel Chukwueze,Nigeria,ATT,Silver,72,g526
+597,Strahinja Pavlović,Serbia,DEF,Silver,72,gxs248
+598,Sven Botman,Netherlands,DEF,Silver,72,g451
+599,Takumi Minamino,Japan,MID,Silver,72,g555
+600,Alberto Moleiro,Spain,ATT,Silver,71,g385
+601,Alessio Romagnoli,Italy,DEF,Silver,71,g406
+602,Amadou Haidara,Mali,MID,Silver,71,g541
+603,Ander Barrenetxea,Spain,ATT,Silver,71,g384
+604,Andreas Pereira,Brazil,MID,Silver,71,g370
+605,Arnaud Kalimuendo,France,ATT,Silver,71,g435
+606,Ayase Ueda,Japan,ATT,Silver,71,g559
+607,Azzedine Ounahi,Morocco,MID,Silver,71,g543
+608,Barış Alper Yılmaz,Turkey,ATT,Silver,71,gxs252
+609,Bilal El Khannouss,Morocco,MID,Silver,71,g545
+610,Breel Embolo,Switzerland,ATT,Silver,71,gxs242
+611,Brian Brobbey,Netherlands,ATT,Silver,71,g452
+612,Callum McGregor,Scotland,MID,Silver,71,g371
+613,Callum Wilson,England,ATT,Silver,71,g342
+614,Calvin Stengs,Netherlands,MID,Silver,71,g440
+615,Chris Richards,USA,DEF,Silver,71,g506
+616,Eljif Elmas,North Macedonia,MID,Silver,71,gxs264
+617,Hans Vanaken,Belgium,MID,Silver,71,g454
+618,Hany Mukhtar,Germany,MID,Silver,71,g492
+619,Hidemasa Morita,Japan,MID,Silver,71,g558
+620,Jakub Kiwior,Poland,DEF,Silver,71,g578
+621,Javi Guerra,Spain,MID,Silver,71,g383
+622,Johan Vásquez,Mexico,DEF,Silver,71,g517
+623,Jonas Hofmann,Germany,MID,Silver,71,g412
+624,José Luis Gayà,Spain,DEF,Silver,71,g391
+625,Kenneth Taylor,Netherlands,MID,Silver,71,g443
+626,Kevin Schade,Germany,ATT,Silver,71,g419
+627,Ladislav Krejčí,Czech Republic,DEF,Silver,71,gxs260
+628,Lewis Cook,England,MID,Silver,71,g354
+629,Lucas Bergvall,Sweden,MID,Silver,71,g574
+630,Marcos Senesi,Argentina,DEF,Silver,71,g486
+631,Mario Götze,Germany,MID,Silver,71,g413
+632,Mathías Olivera,Uruguay,DEF,Silver,71,g512
+633,Matthias Ginter,Germany,DEF,Silver,71,g418
+634,Maximiliano Araújo,Uruguay,DEF,Silver,71,g513
+635,Nicolas Kühn,Germany,ATT,Silver,71,g375
+636,Nicolas Seiwald,Austria,MID,Silver,71,gxs246
+637,Nordi Mukiele,France,DEF,Silver,71,g436
+638,Óscar Mingueza,Spain,DEF,Silver,71,g380
+639,Reo Hatate,Japan,MID,Silver,71,g373
+640,Ricardo Horta,Portugal,ATT,Silver,71,g464
+641,Sander Berge,Norway,MID,Silver,71,g570
+642,Sebastian Szymański,Poland,MID,Silver,71,gxs240
+643,Simon Adingra,Ivory Coast,ATT,Silver,71,g547
+644,Stephen Eustáquio,Canada,MID,Silver,71,g509
+645,Tim Weah,USA,ATT,Silver,71,g503
+646,Tyrone Mings,England,DEF,Silver,71,g353
+647,Victor Lindelöf,Sweden,DEF,Silver,71,g572
+648,Viktor Tsyhankov,Ukraine,ATT,Silver,71,gxs255
+649,Willi Orbán,Hungary,DEF,Silver,71,gxs257
+650,Yan Couto,Brazil,DEF,Silver,71,g480
+651,Abdul Fatawu,Ghana,ATT,Silver,70,g529
+652,Adam Hložek,Czech Republic,ATT,Silver,70,gxs259
+653,Akram Afif,Qatar,ATT,Silver,70,g564
+654,Amine Harit,Morocco,ATT,Silver,70,g544
+655,Andrea Pinamonti,Italy,ATT,Silver,70,g407
+656,Archie Gray,England,MID,Silver,70,g360
+657,Arthur Vermeeren,Belgium,MID,Silver,70,g457
+658,Ben Chilwell,England,DEF,Silver,70,g344
+659,Ben Davies,Wales,DEF,Silver,70,g350
+660,Benjamin André,France,MID,Silver,70,g432
+661,Benjamin Henrichs,Germany,DEF,Silver,70,g416
+662,Berat Djimsiti,Albania,DEF,Silver,70,gxs265
+663,Boulaye Dia,Senegal,ATT,Silver,70,g536
+664,Brenden Aaronson,USA,MID,Silver,70,g499
+665,Danilo,Brazil,DEF,Silver,70,g482
+666,Dele Alli,England,MID,Silver,70,femi
+667,Denis Zakaria,Switzerland,MID,Silver,70,gxs281
+668,Dušan Tadić,Serbia,ATT,Silver,70,gxs247
+669,Eldor Shomurodov,Uzbekistan,ATT,Silver,70,g567
+670,Elye Wahi,France,ATT,Silver,70,g434
+671,Evander,Brazil,MID,Silver,70,g497
+672,Fábio Vieira,Portugal,MID,Silver,70,g465
+673,Francesco Pio Esposito,Italy,ATT,Silver,70,g410
+674,Gio Reyna,USA,MID,Silver,70,g502
+675,Gonzalo Montiel,Argentina,DEF,Silver,70,g487
+676,Gorka Guruzeta,Spain,ATT,Silver,70,g386
+677,Habib Diarra,Senegal,MID,Silver,70,g537
+678,Haji Wright,USA,ATT,Silver,70,g501
+679,Idrissa Gueye,Senegal,MID,Silver,70,g534
+680,Jonas Wind,Denmark,ATT,Silver,70,g577
+681,Jonathan Rowe,England,ATT,Silver,70,g364
+682,Jordi Alba,Spain,DEF,Silver,70,gxs279
+683,Jorge de Frutos,Spain,ATT,Silver,70,g388
+684,Junya Itō,Japan,ATT,Silver,70,g560
+685,Keito Nakamura,Japan,ATT,Silver,70,g557
+686,Konstantinos Mavropanos,Greece,DEF,Silver,70,gxs263
+687,Kostas Tsimikas,Greece,DEF,Silver,70,gxs262
+688,Kou Itakura,Japan,DEF,Silver,70,g556
+689,Lazar Samardžić,Serbia,MID,Silver,70,gxs249
+690,Lorenzo Lucca,Italy,ATT,Silver,70,g402
+691,Lovro Majer,Croatia,MID,Silver,70,gxs269
+692,Luciano Acosta,Argentina,MID,Silver,70,g490
+693,Luis Sinisterra,Colombia,ATT,Silver,70,g511
+694,Marco Reus,Germany,ATT,Silver,70,g425
+695,Marko Arnautović,Austria,ATT,Silver,70,gxs245
+696,Maxim De Cuyper,Belgium,DEF,Silver,70,g456
+697,Michael Keane,England,DEF,Silver,70,g352
+698,Mohammed Salisu,Ghana,DEF,Silver,70,g531
+699,Moses Simon,Nigeria,ATT,Silver,70,g527
+700,Mykhailo Mudryk,Ukraine,ATT,Silver,70,gxs254
+701,Nicola Zalewski,Poland,DEF,Silver,70,g579
+702,Nicolas Pépé,Ivory Coast,ATT,Silver,70,g551
+703,Nicolás Tagliafico,Argentina,DEF,Silver,70,g488
+704,Olivier Giroud,France,ATT,Silver,70,g439
+705,Orel Mangala,Belgium,MID,Silver,70,g460
+706,Oscar Bobb,Norway,ATT,Silver,70,g569
+707,Otávio,Portugal,MID,Silver,70,g469
+708,Pape Gueye,Senegal,MID,Silver,70,g538
+709,Paul Onuachu,Nigeria,ATT,Silver,70,g523
+710,Pavel Šulc,Czech Republic,MID,Silver,70,gxs261
+711,Pepê,Brazil,ATT,Silver,70,g470
+712,Petar Sučić,Croatia,MID,Silver,70,gxs270
+713,Remo Freuler,Switzerland,MID,Silver,70,gxs243
+714,Renan Lodi,Brazil,DEF,Silver,70,g477
+715,Ricardo Pepi,USA,ATT,Silver,70,g505
+716,Riqui Puig,Spain,MID,Silver,70,g496
+717,Roland Sallai,Hungary,ATT,Silver,70,gxs256
+718,Ross Barkley,England,MID,Silver,70,g346
+719,Salem Al-Dawsari,Saudi Arabia,ATT,Silver,70,g565
+720,Seko Fofana,Ivory Coast,MID,Silver,70,g549
+721,Sergiño Dest,USA,DEF,Silver,70,g504
+722,Sergio Canales,Spain,MID,Silver,70,g395
+723,Steven Berghuis,Netherlands,ATT,Silver,70,g441
+724,Steven Bergwijn,Netherlands,ATT,Silver,70,g453
+725,Tajon Buchanan,Canada,ATT,Silver,70,g508
+726,Terem Moffi,Nigeria,ATT,Silver,70,g429
+727,Timo Werner,Germany,ATT,Silver,70,g415
+728,Timothy Castagne,Belgium,DEF,Silver,70,g462
+729,Valentin Rongier,France,MID,Silver,70,g433
+730,Vitor Roque,Brazil,ATT,Silver,70,g478
+731,Wilfried Zaha,Ivory Coast,ATT,Silver,70,g550
+732,Wout Faes,Belgium,DEF,Silver,70,g459
+733,Yukinari Sugawara,Japan,DEF,Silver,70,g554
+734,Yunus Musah,USA,MID,Silver,70,g507
+735,Zeno Debast,Belgium,DEF,Silver,70,g455
+736,Anthony Martial,France,ATT,Silver,69,g437
+737,Duje Ćaleta-Car,Croatia,DEF,Silver,69,gxs268
+738,Facundo Pellistri,Uruguay,ATT,Silver,69,g514
+739,Isi Palazón,Spain,ATT,Silver,69,g394
+740,Jan Bednarek,Poland,DEF,Silver,69,gxs241
+741,Joe Willock,England,MID,Silver,69,g365
+742,Jordan Ayew,Ghana,ATT,Silver,69,g530
+743,Kalvin Phillips,England,MID,Silver,69,g347
+744,Kristoffer Ajer,Norway,DEF,Silver,69,g571
+745,Kyogo Furuhashi,Japan,ATT,Silver,69,g374
+746,Lorenzo Insigne,Italy,ATT,Silver,69,g411
+747,Marcos Acuña,Argentina,DEF,Silver,69,g489
+748,Nicolò Zaniolo,Italy,ATT,Silver,69,g404
+749,Saïd Benrahma,Algeria,ATT,Silver,69,g521
+750,Sardar Azmoun,Iran,ATT,Silver,69,g566
+751,Sean Longstaff,England,MID,Silver,69,g366
+752,Sébastien Haller,Ivory Coast,ATT,Silver,69,g546
+753,Sergi Darder,Spain,MID,Silver,69,g382
+754,Tommaso Baldanzi,Italy,ATT,Silver,69,g408
+755,Alexis Sánchez,Chile,ATT,Silver,68,g515
+756,André Silva,Portugal,ATT,Silver,68,g463
+757,Armando Broja,Albania,ATT,Silver,68,gxs266
+758,Bobby De Cordova-Reid,Jamaica,ATT,Silver,68,g369
+759,Cengiz Ünder,Turkey,ATT,Silver,68,gxs253
+760,Daniel Maldini,Italy,ATT,Silver,68,g409
+761,Danny Ings,England,ATT,Silver,68,g351
+762,Davy Klaassen,Netherlands,MID,Silver,68,g442
+763,Dennis Man,Romania,ATT,Silver,68,gxs274
+764,Diego Rossi,Uruguay,ATT,Silver,68,g498
+765,El Bilal Touré,Mali,ATT,Silver,68,g542
+766,Emil Forsberg,Sweden,MID,Silver,68,g573
+767,Federico Bernardeschi,Italy,ATT,Silver,68,g494
+768,Filip Kostić,Serbia,DEF,Silver,68,gxs250
+769,Frank Onyeka,Nigeria,MID,Silver,68,g525
+770,Gaëtan Laborde,France,ATT,Silver,68,g428
+771,Grischa Prömel,Germany,MID,Silver,68,g423
+772,Harry Souttar,Australia,DEF,Silver,68,gxs276
+773,Harry Winks,England,MID,Silver,68,g357
+774,Hugo Duro,Spain,ATT,Silver,68,g392
+775,Hulk,Brazil,ATT,Silver,68,g472
+776,Jackson Irvine,Australia,MID,Silver,68,gxs277
+777,Javi Puado,Spain,ATT,Silver,68,g393
+778,Joe Aribo,Nigeria,MID,Silver,68,g524
+779,Jonathan Bamba,Ivory Coast,ATT,Silver,68,g431
+780,Kelechi Iheanacho,Nigeria,ATT,Silver,68,g522
+781,Krépin Diatta,Senegal,ATT,Silver,68,g532
+782,Lucas Moura,Brazil,ATT,Silver,68,g476
+783,Luuk de Jong,Netherlands,ATT,Silver,68,g450
+784,Michail Antonio,Jamaica,ATT,Silver,68,gxs271
+785,Nicolae Stanciu,Romania,MID,Silver,68,gxs275
+786,Ondrej Duda,Slovakia,MID,Silver,68,gxs258
+787,Ricardo Rodríguez,Switzerland,DEF,Silver,68,gxs244
+788,Ryan Christie,Scotland,MID,Silver,68,g376
+789,Ryan Gauld,Scotland,MID,Silver,68,g495
+790,Stephan El Shaarawy,Italy,ATT,Silver,68,g400
+791,Tariq Lamptey,Ghana,DEF,Silver,68,g528
+792,Téji Savanier,France,MID,Silver,68,g427
+793,Tom Cairney,Scotland,MID,Silver,68,g348
+794,Trézéguet,Egypt,ATT,Silver,68,g519
+795,Vincent Aboubakar,Cameroon,ATT,Silver,68,g552
+796,Xherdan Shaqiri,Switzerland,ATT,Silver,68,gxs278
+797,Bryan Gil,Spain,ATT,Silver,67,g389
+798,Carney Chukwuemeka,England,MID,Silver,67,g362
+799,Cho Gue-sung,South Korea,ATT,Silver,67,g562
+800,Chris Smalling,England,DEF,Silver,67,g367
+801,Christian Benteke,Belgium,ATT,Silver,67,g493
+802,Demarai Gray,Jamaica,ATT,Silver,67,gxs272
+803,Dimitri Payet,France,MID,Silver,67,g438
+804,Emam Ashour,Egypt,MID,Silver,67,g520
+805,Eric Maxim Choupo-Moting,Cameroon,ATT,Silver,67,g539
+806,Everton Cebolinha,Brazil,ATT,Silver,67,g473
+807,Julian Draxler,Germany,MID,Silver,67,g414
+808,Lee Jae-sung,South Korea,MID,Silver,67,g563
+809,Ludovic Ajorque,France,ATT,Silver,67,g430
+810,Michy Batshuayi,Belgium,ATT,Silver,67,g458
+811,Naby Keïta,Guinea,MID,Silver,67,g540
+812,Oscar,Brazil,MID,Silver,67,g475
+813,Rade Krunić,Bosnia and Herzegovina,MID,Silver,67,gxs273
+814,Renato Sanches,Portugal,MID,Silver,67,g467
+815,Tyrell Malacia,Netherlands,DEF,Silver,67,g448
+816,William Carvalho,Portugal,MID,Silver,67,g468
+817,Abdou Diallo,Senegal,DEF,Silver,66,gxs282
+818,Arturo Vidal,Chile,MID,Silver,66,g516
+819,Carles Gil,Spain,MID,Silver,66,gxs280
+820,Lawrence Shankland,Scotland,ATT,Silver,66,g378
+821,Nathan Patterson,Scotland,DEF,Silver,66,g377
+822,Phil Jones,England,DEF,Silver,66,pete
+823,Youssoufa Moukoko,Germany,ATT,Silver,66,g422
+824,Mohamed Elneny,Egypt,MID,Silver,64,g518
+825,Aaron Wan-Bissaka,DR Congo,DEF,Bronze,62,g280
+826,Adam Armstrong,England,ATT,Bronze,62,g11
+827,Ante Budimir,Croatia,ATT,Bronze,62,g123
+828,Christian Nørgaard,Denmark,MID,Bronze,62,g99
+829,Conor Bradley,Northern Ireland,DEF,Bronze,62,g40
+830,Fredrik Aursnes,Norway,MID,Bronze,62,g79
+831,Gustav Isaksen,Denmark,ATT,Bronze,62,g105
+832,Isak Hien,Sweden,DEF,Bronze,62,g91
+833,Joël Piroe,Netherlands,ATT,Bronze,62,g8
+834,Johan Bakayoko,Belgium,ATT,Bronze,62,g145
+835,Johnny Cardoso,USA,MID,Bronze,62,g56
+836,Josh Brownhill,England,MID,Bronze,62,g29
+837,Josh Sargent,USA,ATT,Bronze,62,g59
+838,Kasper Dolberg,Denmark,ATT,Bronze,62,g94
+839,Marcus Tavernier,England,ATT,Bronze,62,g15
+840,Mario Pašalić,Croatia,MID,Bronze,62,g129
+841,Mohamed Amoura,Algeria,ATT,Bronze,62,g204
+842,Neco Williams,Wales,DEF,Bronze,62,g35
+843,Sebastián Driussi,Argentina,ATT,Bronze,62,g76
+844,Yankuba Minteh,Gambia,ATT,Bronze,62,g266
+845,Andreas Skov Olsen,Denmark,ATT,Bronze,61,g96
+846,Eliesse Ben Seghir,Morocco,ATT,Bronze,61,g211
+847,Julio Enciso,Paraguay,ATT,Bronze,61,g312
+848,Adama Traoré,Spain,ATT,Bronze,60,g267
+849,Andreas Schjelderup,Norway,ATT,Bronze,60,g85
+850,Ao Tanaka,Japan,MID,Bronze,60,g170
+851,Chuba Akpom,England,ATT,Bronze,60,g18
+852,Emil Holm,Sweden,DEF,Bronze,60,g86
+853,Ismaël Koné,Canada,MID,Bronze,60,gxb346
+854,Ismael Saibari,Morocco,MID,Bronze,60,g212
+855,Ivan Ilić,Serbia,MID,Bronze,60,g134
+856,Jay Stansfield,England,ATT,Bronze,60,g31
+857,Jesper Lindstrøm,Denmark,ATT,Bronze,60,g97
+858,Jesse Lingard,England,ATT,Bronze,60,g49
+859,Joakim Mæhle,Denmark,DEF,Bronze,60,g101
+860,Joe Scally,USA,DEF,Bronze,60,g67
+861,Joel Pohjanpalo,Finland,ATT,Bronze,60,g107
+862,Josh Maja,Nigeria,ATT,Bronze,60,g9
+863,Kaishu Sano,Japan,MID,Bronze,60,g164
+864,Kamaldeen Sulemana,Ghana,ATT,Bronze,60,g247
+865,Kendry Páez,Ecuador,ATT,Bronze,60,g300
+866,Kieffer Moore,Wales,ATT,Bronze,60,g7
+867,Kristian Thorstvedt,Norway,MID,Bronze,60,g78
+868,Leo Østigård,Norway,DEF,Bronze,60,g82
+869,Mario Hermoso,Spain,DEF,Bronze,60,gxb391
+870,Mathias Jensen,Denmark,MID,Bronze,60,g98
+871,Matt Grimes,England,MID,Bronze,60,g16
+872,Mattias Svanberg,Sweden,MID,Bronze,60,g89
+873,Moïse Bombito,Canada,DEF,Bronze,60,gxb349
+874,Orri Óskarsson,Iceland,ATT,Bronze,60,g118
+875,Patson Daka,Zambia,ATT,Bronze,60,g270
+876,Ramy Bensebaini,Algeria,DEF,Bronze,60,g202
+877,Reiss Nelson,England,ATT,Bronze,60,g27
+878,Roony Bardghji,Sweden,ATT,Bronze,60,g93
+879,Sammie Szmodics,Ireland,ATT,Bronze,60,g10
+880,Taiwo Awoniyi,Nigeria,ATT,Bronze,60,g241
+881,Victor Kristiansen,Denmark,DEF,Bronze,60,g106
+882,Wilfried Singo,Ivory Coast,DEF,Bronze,60,g229
+883,Aidan Morris,USA,MID,Bronze,58,g60
+884,Akor Adams,Nigeria,ATT,Bronze,58,g239
+885,Alistair Johnston,Canada,DEF,Bronze,58,gxb352
+886,András Schäfer,Hungary,MID,Bronze,58,gxb387
+887,Andrija Živković,Serbia,ATT,Bronze,58,g136
+888,Arnaut Danjuma,Netherlands,ATT,Bronze,58,g150
+889,Auston Trusty,USA,DEF,Bronze,58,g66
+890,Ayoub El Kaabi,Morocco,ATT,Bronze,58,g210
+891,Borna Sosa,Croatia,DEF,Bronze,58,g131
+892,Bruno Petković,Croatia,ATT,Bronze,58,g120
+893,Chancel Mbemba,DR Congo,DEF,Bronze,58,g282
+894,Cheick Doucouré,Mali,MID,Bronze,58,g259
+895,Diego Gómez,Paraguay,MID,Bronze,58,g314
+896,Emmanuel Agbadou,Ivory Coast,DEF,Bronze,58,g230
+897,Ernest Nuamah,Ghana,ATT,Bronze,58,g246
+898,Fabian Rieder,Switzerland,MID,Bronze,58,gxb390
+899,Gianluca Busio,USA,MID,Bronze,58,g55
+900,Houssem Aouar,Algeria,MID,Bronze,58,g203
+901,Jens Cajuste,Sweden,MID,Bronze,58,g90
+902,Joel Ordóñez,Ecuador,DEF,Bronze,58,g302
+903,Koki Machida,Japan,DEF,Bronze,58,g172
+904,Lucas Torreira,Uruguay,MID,Bronze,58,g307
+905,Lukáš Provod,Czech Republic,MID,Bronze,58,gxb379
+906,Lyle Foster,South Africa,ATT,Bronze,58,g273
+907,Lyndon Dykes,Scotland,ATT,Bronze,58,g6
+908,Marcus Holmgren Pedersen,Norway,DEF,Bronze,58,g83
+909,Mark McKenzie,USA,DEF,Bronze,58,g65
+910,Miguel Almirón,Paraguay,ATT,Bronze,58,g311
+911,Mislav Oršić,Croatia,ATT,Bronze,58,g121
+912,Mostafa Mohamed,Egypt,ATT,Bronze,58,g197
+913,Neil El Aynaoui,Morocco,MID,Bronze,58,g213
+914,Oh Hyeon-gyu,South Korea,ATT,Bronze,58,g178
+915,Omar Alderete,Paraguay,DEF,Bronze,58,g316
+916,Pascal Struijk,Netherlands,DEF,Bronze,58,g152
+917,Patrick Agyemang,USA,ATT,Bronze,58,g62
+918,Patrick Wimmer,Austria,ATT,Bronze,58,gxb386
+919,Raphael Onyedika,Nigeria,MID,Bronze,58,g234
+920,Rodrigo Zalazar,Uruguay,MID,Bronze,58,g308
+921,Ryan Manning,Ireland,DEF,Bronze,58,g21
+922,Saša Lukić,Serbia,MID,Bronze,58,g133
+923,Tolu Arokodare,Nigeria,ATT,Bronze,58,g238
+924,Vladimír Coufal,Czech Republic,DEF,Bronze,58,gxb380
+925,Will Hughes,England,MID,Bronze,58,g22
+926,Wout Weghorst,Netherlands,ATT,Bronze,58,g155
+927,Yangel Herrera,Venezuela,MID,Bronze,58,g325
+928,Yasin Ayari,Sweden,MID,Bronze,58,g92
+929,Yerson Mosquera,Colombia,DEF,Bronze,58,g287
+930,Yussuf Poulsen,Denmark,ATT,Bronze,58,g95
+931,Ainsley Maitland-Niles,England,DEF,Bronze,57,g26
+932,Chris Mepham,Wales,DEF,Bronze,57,g37
+933,Connor Roberts,Wales,DEF,Bronze,57,g36
+934,James Milner,England,DEF,Bronze,57,dave
+935,Jesper Karlsson,Sweden,ATT,Bronze,57,g88
+936,Ryan Shawcross,England,DEF,Bronze,57,gaz
+937,Yuito Suzuki,Japan,MID,Bronze,57,g168
+938,Aaron Ramsey,Wales,MID,Bronze,56,g34
+939,Abbosbek Fayzullaev,Uzbekistan,MID,Bronze,56,g191
+940,Abdallah Sima,Senegal,ATT,Bronze,56,g221
+941,Almoez Ali,Qatar,ATT,Bronze,56,g186
+942,Ashley Young,England,DEF,Bronze,56,g46
+943,Axel Witsel,Belgium,MID,Bronze,56,g146
+944,Bae Jun-ho,South Korea,MID,Bronze,56,g180
+945,Ben Brereton Díaz,Chile,ATT,Bronze,56,g333
+946,Calum Chambers,England,DEF,Bronze,56,g25
+947,Carlos Cuesta,Colombia,DEF,Bronze,56,g291
+948,Cédric Bakambu,DR Congo,ATT,Bronze,56,g283
+949,Conor Coady,England,DEF,Bronze,56,g47
+950,Cyle Larin,Canada,ATT,Bronze,56,gxb353
+951,Cyriel Dessers,Nigeria,ATT,Bronze,56,g236
+952,Daley Blind,Netherlands,DEF,Bronze,56,g153
+953,Duván Zapata,Colombia,ATT,Bronze,56,g293
+954,Ellis Simms,England,ATT,Bronze,56,g12
+955,Ethan Pinnock,Jamaica,DEF,Bronze,56,gxb343
+956,Facundo Torres,Uruguay,ATT,Bronze,56,g303
+957,Fisayo Dele-Bashiru,Nigeria,MID,Bronze,56,g235
+958,Franjo Ivanović,Croatia,ATT,Bronze,56,g130
+959,Georginio Wijnaldum,Netherlands,MID,Bronze,56,g154
+960,Giorgi Kochorashvili,Georgia,MID,Bronze,56,gxb388
+961,Glen Kamara,Finland,MID,Bronze,56,g109
+962,Gonzalo Plata,Ecuador,ATT,Bronze,56,g296
+963,Hicham Boudaoui,Algeria,MID,Bronze,56,g205
+964,Igor Matanović,Croatia,ATT,Bronze,56,g126
+965,Ilaix Moriba,Guinea,MID,Bronze,56,g254
+966,Ilias Chair,Morocco,MID,Bronze,56,g207
+967,Isaac Price,Northern Ireland,MID,Bronze,56,g41
+968,Ísak Bergmann Jóhannesson,Iceland,MID,Bronze,56,g117
+969,Ivan Rakitić,Croatia,MID,Bronze,56,g128
+970,Jannik Vestergaard,Denmark,DEF,Bronze,56,g100
+971,Jed Wallace,England,ATT,Bronze,56,g14
+972,Jens Petter Hauge,Norway,ATT,Bronze,56,g81
+973,Jeong Woo-yeong,South Korea,ATT,Bronze,56,g179
+974,Jérémie Boga,Ivory Coast,ATT,Bronze,56,g225
+975,Jesús Ferreira,USA,ATT,Bronze,56,g70
+976,Jordan James,Wales,MID,Bronze,56,g38
+977,Jordan Morris,USA,ATT,Bronze,56,g69
+978,Josh Windass,England,MID,Bronze,56,g13
+979,Joshua King,Norway,ATT,Bronze,56,g4
+980,Julián Quiñones,Mexico,ATT,Bronze,56,gxb359
+981,Kevin Denkey,Togo,ATT,Bronze,56,g261
+982,Krzysztof Piątek,Poland,ATT,Bronze,56,gxb389
+983,Luca de la Torre,USA,MID,Bronze,56,g57
+984,Lucas Zelarayán,Armenia,MID,Bronze,56,g75
+985,Luka Jović,Serbia,ATT,Bronze,56,g135
+986,Marko Grujić,Serbia,MID,Bronze,56,g139
+987,Marko Livaja,Croatia,ATT,Bronze,56,g122
+988,Miles Robinson,USA,DEF,Bronze,56,g71
+989,Milot Rashica,Kosovo,ATT,Bronze,56,gxb383
+990,Nemanja Gudelj,Serbia,MID,Bronze,56,g132
+991,Nicolás de la Cruz,Uruguay,MID,Bronze,56,g304
+992,Nikola Moro,Croatia,MID,Bronze,56,g124
+993,Ola Solbakken,Norway,ATT,Bronze,56,g77
+994,Oli McBurnie,Scotland,ATT,Bronze,56,g17
+995,Paxten Aaronson,USA,MID,Bronze,56,g54
+996,Răzvan Marin,Romania,MID,Bronze,56,gxb385
+997,Ryan Fraser,Scotland,ATT,Bronze,56,g3
+998,Sam Lammers,Netherlands,ATT,Bronze,56,g148
+999,Sead Kolašinac,Bosnia and Herzegovina,DEF,Bronze,56,gxb384
+1000,Shea Charles,Northern Ireland,MID,Bronze,56,g42
+1001,Silas Katompa Mvumpa,DR Congo,ATT,Bronze,56,g275
+1002,Takuma Asano,Japan,ATT,Bronze,56,g165
+1003,Teboho Mokoena,South Africa,MID,Bronze,56,g272
+1004,Thorgan Hazard,Belgium,MID,Bronze,56,g143
+1005,Tom Ince,England,ATT,Bronze,56,g2
+1006,Willum Þór Willumsson,Iceland,MID,Bronze,56,g116
+1007,Yáser Asprilla,Colombia,ATT,Bronze,56,g290
+1008,Youcef Belaïli,Algeria,ATT,Bronze,56,g200
+1009,Brandon Vázquez,USA,ATT,Bronze,55,g63
+1010,Gustaf Nilsson,Sweden,ATT,Bronze,55,g87
+1011,Isaac Hayden,England,MID,Bronze,55,g20
+1012,Rob Holding,England,DEF,Bronze,55,g24
+1013,Shane Duffy,Ireland,DEF,Bronze,55,g23
+1014,Shuto Machino,Japan,ATT,Bronze,55,g167
+1015,Theo Walcott,England,ATT,Bronze,55,leon
+1016,Vincent Janssen,Netherlands,ATT,Bronze,55,g156
+1017,Walker Zimmerman,USA,DEF,Bronze,55,g72
+1018,Achraf Dari,Morocco,DEF,Bronze,54,g215
+1019,Adalberto Carrasquilla,Panama,MID,Bronze,54,g337
+1020,Ahmed Sayed Zizo,Egypt,ATT,Bronze,54,g198
+1021,Aïssa Mandi,Algeria,DEF,Bronze,54,g201
+1022,Andri Guðjohnsen,Iceland,ATT,Bronze,54,g119
+1023,Andy Carroll,England,ATT,Bronze,54,g0
+1024,Arnór Sigurðsson,Iceland,MID,Bronze,54,g115
+1025,Bamba Dieng,Senegal,ATT,Bronze,54,g223
+1026,César Huerta,Mexico,ATT,Bronze,54,gxb365
+1027,César Montes,Mexico,DEF,Bronze,54,gxb358
+1028,Daniel Ballard,Northern Ireland,DEF,Bronze,54,g43
+1029,Darío Osorio,Chile,ATT,Bronze,54,g331
+1030,Dennis Praet,Belgium,MID,Bronze,54,g142
+1031,Edinson Cavani,Uruguay,ATT,Bronze,54,g309
+1032,Enner Valencia,Ecuador,ATT,Bronze,54,g301
+1033,Firas Al-Buraikan,Saudi Arabia,ATT,Bronze,54,g184
+1034,Germán Berterame,Mexico,ATT,Bronze,54,gxb367
+1035,Giorgos Masouras,Greece,ATT,Bronze,54,gxb381
+1036,Hamed Traorè,Ivory Coast,MID,Bronze,54,g228
+1037,Hannibal Mejbri,Tunisia,MID,Bronze,54,g219
+1038,Jack McGlynn,USA,MID,Bronze,54,g61
+1039,James Garner,England,MID,Bronze,54,wes
+1040,Joe Allen,Wales,MID,Bronze,54,g33
+1041,John Tolkin,USA,DEF,Bronze,54,g68
+1042,Jón Dagur Þorsteinsson,Iceland,ATT,Bronze,54,g114
+1043,Jonny Evans,Northern Ireland,DEF,Bronze,54,g39
+1044,Jorge Carrascal,Colombia,MID,Bronze,54,g289
+1045,Joseph Paintsil,Ghana,ATT,Bronze,54,g242
+1046,Karl Toko Ekambi,Cameroon,ATT,Bronze,54,g251
+1047,Kevin Castaño,Colombia,MID,Bronze,54,g286
+1048,Kevin Diks,Indonesia,DEF,Bronze,54,g161
+1049,Koji Miyoshi,Japan,MID,Bronze,54,g166
+1050,Kristoffer Lund,USA,DEF,Bronze,54,g51
+1051,Leander Dendoncker,Belgium,MID,Bronze,54,g141
+1052,Mario Lemina,Gabon,MID,Bronze,54,g285
+1053,Miguel Borja,Colombia,ATT,Bronze,54,g295
+1054,Mohamed Abdelmonem,Egypt,DEF,Bronze,54,g196
+1055,Mohamed Elyounoussi,Norway,ATT,Bronze,54,g80
+1056,Myron Boadu,Netherlands,ATT,Bronze,54,g149
+1057,Nemanja Radonjić,Serbia,ATT,Bronze,54,g138
+1058,Noah Sadiki,DR Congo,MID,Bronze,54,g281
+1059,Obed Vargas,USA,MID,Bronze,54,g52
+1060,Patrick Berg,Norway,MID,Bronze,54,g84
+1061,Percy Tau,South Africa,ATT,Bronze,54,g271
+1062,Ramón Sosa,Paraguay,ATT,Bronze,54,g313
+1063,Riley McGree,Australia,MID,Bronze,54,gxb369
+1064,Robert Skov,Denmark,DEF,Bronze,54,g104
+1065,Salis Abdul Samed,Ghana,MID,Bronze,54,g244
+1066,Saud Abdulhamid,Saudi Arabia,DEF,Bronze,54,g182
+1067,Seol Young-woo,South Korea,DEF,Bronze,54,g177
+1068,Soufiane Rahimi,Morocco,ATT,Bronze,54,g209
+1069,Teemu Pukki,Finland,ATT,Bronze,54,g108
+1070,Toni Fruk,Croatia,MID,Bronze,54,g125
+1071,Trai Hume,Northern Ireland,DEF,Bronze,54,g44
+1072,Umar Sadiq,Nigeria,ATT,Bronze,54,g237
+1073,Veljko Birmančević,Serbia,ATT,Bronze,54,g137
+1074,Wilmar Barrios,Colombia,MID,Bronze,54,g294
+1075,Yang Hyun-jun,South Korea,ATT,Bronze,54,g181
+1076,Youcef Atal,Algeria,DEF,Bronze,54,g206
+1077,Benjamin Cremaschi,USA,MID,Bronze,53,g53
+1078,Callum Robinson,Ireland,ATT,Bronze,53,g19
+1079,Gylfi Sigurðsson,Iceland,MID,Bronze,53,g112
+1080,Jordan Rhodes,Scotland,ATT,Bronze,53,g1
+1081,Martin Braithwaite,Denmark,ATT,Bronze,53,g103
+1082,Ravel Morrison,Jamaica,MID,Bronze,53,g50
+1083,Thomas Meunier,Belgium,DEF,Bronze,53,g147
+1084,Tim Ream,USA,DEF,Bronze,53,g64
+1085,Wes Burns,Wales,ATT,Bronze,53,g32
+1086,Yuki Soma,Japan,ATT,Bronze,53,g173
+1087,Aïssa Laïdouni,Tunisia,MID,Bronze,52,g216
+1088,Ali Ahmed,Canada,ATT,Bronze,52,gxb347
+1089,Alidu Seidu,Ghana,DEF,Bronze,52,g245
+1090,Alireza Jahanbakhsh,Iran,ATT,Bronze,52,g188
+1091,Anastasios Bakasetas,Greece,MID,Bronze,52,gxb382
+1092,Antonio Sanabria,Paraguay,ATT,Bronze,52,g315
+1093,Ashley Barnes,England,ATT,Bronze,52,g30
+1094,Axel Tuanzebe,DR Congo,DEF,Bronze,52,g279
+1095,Benjamin Källman,Finland,ATT,Bronze,52,g111
+1096,Bright Osayi-Samuel,Nigeria,DEF,Bronze,52,g233
+1097,Christian Kouamé,Ivory Coast,ATT,Bronze,52,g227
+1098,Darlington Nagbe,USA,MID,Bronze,52,g73
+1099,Dejan Lovren,Croatia,DEF,Bronze,52,g127
+1100,Derek Cornelius,Canada,DEF,Bronze,52,gxb350
+1101,Erick Pulgar,Chile,MID,Bronze,52,g328
+1102,Fashion Sakala,Zambia,ATT,Bronze,52,g269
+1103,Félix Torres,Ecuador,DEF,Bronze,52,g298
+1104,Filip Đuričić,Serbia,MID,Bronze,52,g140
+1105,Frank Magri,Cameroon,ATT,Bronze,52,g250
+1106,Guillermo Maripán,Chile,DEF,Bronze,52,g329
+1107,Gustavo Gómez,Paraguay,DEF,Bronze,52,g317
+1108,Ismail Jakobs,Senegal,DEF,Bronze,52,g222
+1109,Jacob Shaffelburg,Canada,ATT,Bronze,52,gxb348
+1110,Jaloliddin Masharipov,Uzbekistan,ATT,Bronze,52,g193
+1111,James McClean,Ireland,DEF,Bronze,52,g28
+1112,Jay Idzes,Indonesia,DEF,Bronze,52,g158
+1113,Jeremy Sarmiento,Ecuador,ATT,Bronze,52,g297
+1114,Jóhann Berg Guðmundsson,Iceland,ATT,Bronze,52,g113
+1115,Lassana Coulibaly,Mali,MID,Bronze,52,g257
+1116,Logan Costa,Cape Verde,DEF,Bronze,52,g264
+1117,Luis Chávez,Mexico,MID,Bronze,52,gxb356
+1118,Luis Palma,Honduras,ATT,Bronze,52,gxb340
+1119,Mama Baldé,Guinea-Bissau,ATT,Bronze,52,g253
+1120,Manfred Ugalde,Costa Rica,ATT,Bronze,52,g334
+1121,Mao Hosoya,Japan,ATT,Bronze,52,g169
+1122,Marcelino Núñez,Chile,MID,Bronze,52,g330
+1123,Mees Hilgers,Indonesia,DEF,Bronze,52,g159
+1124,Michael Olunga,Kenya,ATT,Bronze,52,g268
+1125,Mohamed Kanno,Saudi Arabia,MID,Bronze,52,g183
+1126,Montassar Talbi,Tunisia,DEF,Bronze,52,g217
+1127,Musa Barrow,Gambia,ATT,Bronze,52,g265
+1128,Nene Dorgeles,Mali,ATT,Bronze,52,g260
+1129,Orbelín Pineda,Mexico,MID,Bronze,52,gxb357
+1130,Osman Bukari,Ghana,ATT,Bronze,52,g243
+1131,Owen Wijndal,Netherlands,DEF,Bronze,52,g151
+1132,Promise David,Canada,ATT,Bronze,52,gxb354
+1133,Rafael Santos Borré,Colombia,ATT,Bronze,52,g288
+1134,Robin Lod,Finland,MID,Bronze,52,g110
+1135,Salomón Rondón,Venezuela,ATT,Bronze,52,g323
+1136,Sebastián Cáceres,Uruguay,DEF,Bronze,52,g306
+1137,Semi Ajayi,Nigeria,DEF,Bronze,52,g232
+1138,Shogo Taniguchi,Japan,DEF,Bronze,52,g174
+1139,Sofiane Boufal,Morocco,ATT,Bronze,52,g214
+1140,Théo Bongonda,DR Congo,ATT,Bronze,52,g277
+1141,William Troost-Ekong,Nigeria,DEF,Bronze,52,g231
+1142,Yeferson Soteldo,Venezuela,ATT,Bronze,52,g324
+1143,Paddy McNair,Northern Ireland,DEF,Bronze,51,g45
+1144,Thomas Delaney,Denmark,MID,Bronze,51,g102
+1145,Agustín Canobbio,Uruguay,ATT,Bronze,50,g310
+1146,Ajdin Hrustić,Australia,MID,Bronze,50,gxb370
+1147,Alberth Elis,Honduras,ATT,Bronze,50,gxb341
+1148,Alexis Vega,Mexico,ATT,Bronze,50,gxb360
+1149,Ali Abdi,Tunisia,DEF,Bronze,50,g218
+1150,Amadou Diawara,Guinea,MID,Bronze,50,g255
+1151,André Ayew,Ghana,ATT,Bronze,50,g248
+1152,Andrés Cubas,Paraguay,MID,Bronze,50,g318
+1153,Ángelo Preciado,Ecuador,DEF,Bronze,50,g299
+1154,Billy Sharp,England,ATT,Bronze,50,g5
+1155,Brian Rodríguez,Uruguay,ATT,Bronze,50,g305
+1156,Calvin Verdonk,Indonesia,DEF,Bronze,50,g160
+1157,Christopher Wooh,Cameroon,DEF,Bronze,50,g249
+1158,DeAndre Yedlin,USA,DEF,Bronze,50,g74
+1159,Divock Origi,Belgium,ATT,Bronze,50,g144
+1160,Gabriel Suazo,Chile,DEF,Bronze,50,g332
+1161,Georges-Kévin Nkoudou,Cameroon,ATT,Bronze,50,g252
+1162,Hamari Traoré,Mali,DEF,Bronze,50,g258
+1163,Hwang Ui-jo,South Korea,ATT,Bronze,50,g175
+1164,Jefferson Savarino,Venezuela,ATT,Bronze,50,g326
+1165,Johan Mojica,Colombia,DEF,Bronze,50,g292
+1166,Jonathan Osorio,Canada,MID,Bronze,50,gxb355
+1167,Jonathan Rodríguez,Uruguay,ATT,Bronze,50,gxb378
+1168,Kellyn Acosta,USA,MID,Bronze,50,g58
+1169,Martin Boyle,Australia,ATT,Bronze,50,gxb371
+1170,Mathew Leckie,Australia,ATT,Bronze,50,gxb368
+1171,Meschak Elia,DR Congo,ATT,Bronze,50,g276
+1172,Michael Murillo,Panama,DEF,Bronze,50,g338
+1173,Mohamed Bayo,Guinea,ATT,Bronze,50,g256
+1174,Mohammad Mohebi,Iran,ATT,Bronze,50,g190
+1175,Ole Romeny,Indonesia,ATT,Bronze,50,g162
+1176,Oston Urunov,Uzbekistan,ATT,Bronze,50,g192
+1177,Paik Seung-ho,South Korea,MID,Bronze,50,g176
+1178,Ramadan Sobhi,Egypt,ATT,Bronze,50,g199
+1179,Richie Laryea,Canada,DEF,Bronze,50,gxb351
+1180,Roberto Alvarado,Mexico,ATT,Bronze,50,gxb361
+1181,Shamar Nicholson,Jamaica,ATT,Bronze,50,gxb342
+1182,Thom Haye,Indonesia,MID,Bronze,50,g157
+1183,Zito Luvumbo,Angola,ATT,Bronze,50,g284
+1184,Cheikhou Kouyaté,Senegal,MID,Bronze,48,g224
+1185,Craig Goodwin,Australia,DEF,Bronze,48,gxb372
+1186,Danny Rose,England,DEF,Bronze,48,g48
+1187,Diego Lainez,Mexico,ATT,Bronze,48,gxb366
+1188,Gédéon Kalulu,DR Congo,DEF,Bronze,48,g278
+1189,Genki Haraguchi,Japan,MID,Bronze,48,g171
+1190,Gianluca Lapadula,Peru,ATT,Bronze,48,g319
+1191,Hassan Tambakti,Saudi Arabia,DEF,Bronze,48,g185
+1192,Henry Martín,Mexico,ATT,Bronze,48,gxb364
+1193,Jesús Gallardo,Mexico,DEF,Bronze,48,gxb363
+1194,Jewison Bennette,Costa Rica,ATT,Bronze,48,g335
+1195,Jorge Sánchez,Mexico,DEF,Bronze,48,gxb362
+1196,Jovane Cabral,Cape Verde,ATT,Bronze,48,g263
+1197,Kasey Palmer,Jamaica,MID,Bronze,48,gxb344
+1198,Marselino Ferdinan,Indonesia,MID,Bronze,48,g163
+1199,Otabek Shukurov,Uzbekistan,MID,Bronze,48,g194
+1200,Renato Tapia,Peru,MID,Bronze,48,g320
+1201,Romain Saïss,Morocco,DEF,Bronze,48,g208
+1202,Saeid Ezatolahi,Iran,MID,Bronze,48,g189
+1203,Serge Aurier,Ivory Coast,DEF,Bronze,48,g226
+1204,Steve Mounié,Benin,ATT,Bronze,48,g262
+1205,Themba Zwane,South Africa,MID,Bronze,48,g274
+1206,Wu Lei,China,ATT,Bronze,48,gxb377
+1207,Ali Mabkhout,UAE,ATT,Bronze,46,g195
+1208,Aziz Behich,Australia,DEF,Bronze,46,gxb373
+1209,Darwin Machís,Venezuela,ATT,Bronze,46,g327
+1210,Eduardo Vargas,Chile,ATT,Bronze,46,gxb375
+1211,Ismael Díaz,Panama,ATT,Bronze,46,g339
+1212,Luis Advíncula,Peru,DEF,Bronze,46,g321
+1213,Mitchell Duke,Australia,ATT,Bronze,46,gxb374
+1214,Youssef Msakni,Tunisia,ATT,Bronze,46,g220
+1215,Ahmed Musa,Nigeria,ATT,Bronze,44,g240
+1216,André Carrillo,Peru,ATT,Bronze,44,g322
+1217,Duckens Nazon,Haiti,ATT,Bronze,44,gxb345
+1218,Hassan Al-Haydos,Qatar,MID,Bronze,44,g187
+1219,Joel Campbell,Costa Rica,ATT,Bronze,44,g336
+1220,Paolo Guerrero,Peru,ATT,Bronze,44,gxb376

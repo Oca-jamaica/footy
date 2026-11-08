@@ -6,7 +6,7 @@ let oppSeed=0;
 function setup(){oppSeed=(Math.random()*OPPNAMES.length)|0;
   const o={pace:.7,shot:.72,fin:.6,skill:.55,pass:.65,tackle:.6,str:.6,sk:'roulette',sp:'curler'},gk={pace:.5,shot:.6,fin:.6,skill:.3,pass:.65,tackle:.5,str:.8,sk:'shield',sp:'turbo'};
   const q=sq(),slots=FORMS[q.f],n=slots.length;if(q.s.filter(Boolean).length<n){const keep=q.s.slice();autoPick(q);keep.forEach((id,i)=>{if(id&&!q.s.includes(id))q.s[i]=id})}
-  const chem=NET.on?0:chemOf(q)*.0003;
+  const chem=NET.on?0:chemOf(q)*.0002;
   const mine=q.s.map((id,i)=>{let p=byId(id)||STARTERS[i%3];p=playStats(p);if(chem){p={...p};for(const [k] of STATK)p[k]=Math.min(.99,p[k]+chem)}const f=posFit(natPos(p),slots[i].r);
     if(f>=1)return p;const c={...p};for(const [k] of STATK)c[k]=p[k]*f;return c});
   const avg={};for(const [k] of STATK)avg[k]=clamp(mine.reduce((a,p)=>a+p[k],0)/mine.length+OPP.off,.3,.99);Object.assign(o,avg);// opponents get stronger each round
@@ -477,6 +477,7 @@ addEventListener('keydown',e=>{
   const c=e.code;
   if(state==='menu')return;
   if(c==='Escape'||c==='KeyP'){e.preventDefault();if(!e.repeat)setPause(!paused);return}
+  if(c==='KeyV'&&state!=='menu'&&!e.repeat){toggleFull();return}
   if(paused)return;
   if(state==='play'&&introT>0){if(c==='Space'||c==='Enter')introT=Math.min(introT,12);e.preventDefault();return}
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab'].includes(c))e.preventDefault();
@@ -558,7 +559,7 @@ function startMatch(){
   else{if(cupOver()){newCup(diffKey);renderMenu();return}
   {const o=OPPS[club.cup.opps[club.cup.round]];OPP={name:o[0].toUpperCase(),kit:o[1],off:ROFF[club.cup.round]};cupEvent=null;eventText=null}}
   initAudio();if(ac&&ac.state==='suspended')ac.resume();
-  DF=levelDF(comp==='tour'?tourDF(OPP.club):comp==='league'?DIVS[lgOf().div].df:comp==='wcc'?(OPP.str>.9?'legend':'hard'):diffKey);setup();players.forEach(p=>{if(p.team===1)p.spCd=rnd(140,380)});hat=null;score=[0,0];mercy=false;clock=PITCH==='classical'?240:150;style=0;shownStyle=0;hype=0;fire=0;streak=0;
+  DF=levelDF(comp==='tour'?tourDF(OPP.club):comp==='league'?DIVS[lgOf().div].df:comp==='wcc'?(OPP.str>.9?'legend':'hard'):diffKey);setup();players.forEach(p=>{if(p.team===1)p.spCd=rnd(140,380)});hat=null;score=[0,0];mercy=false;clock=PITCH==='classical'?180:150;style=0;shownStyle=0;hype=0;fire=0;streak=0;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];
   menuEl.hidden=true;edEl.hidden=true;cv.focus();kickoff(0);modeStart();matchRatings=null;
   introT=SG||state!=='play'?0:INTRO;
@@ -999,7 +1000,7 @@ function teamAI(team,dt){
       if(team===1&&p.st.sp==='stomp'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<95&&Math.random()<.02*dt&&doStomp(p)){p.spCd=SPECIALS.stomp.cd*1.7;continue}
       if(team===1&&p.st.sp==='slide'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<110&&dist(p,owner)>25&&notBehind(p,owner)&&Math.random()<.015*dt){
         p.spCd=SPECIALS.slide.cd*1.15;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
-      if(team===1&&DF.slide&&owner&&owner.team===0&&p.tackleCd<=0&&dist(p,owner)>30&&dist(p,owner)<60&&Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir))>.3&&Math.random()<.0035*dt){p.windup=10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
+      if(team===1&&owner&&owner.team===0&&p.tackleCd<=0&&dist(p,owner)>30&&dist(p,owner)<60&&Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir))>.3&&Math.random()<(LV().extreme?.006:DF.slide?.0035:.0016)*dt){p.windup=10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
       steer(p,tgt.x,tgt.y,topSpeed(p)*(team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
       if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
       continue;
