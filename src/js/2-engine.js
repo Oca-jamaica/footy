@@ -834,6 +834,7 @@ function switchPlayer(manual){
 
 /* ---------- tackles ---------- */
 const notBehind=(d,c)=>Math.cos(angDiff(Math.atan2(d.y-c.y,d.x-c.x),c.dir))>-.2;
+const fromSide=(d,c)=>Math.cos(angDiff(Math.atan2(d.y-c.y,d.x-c.x),c.dir))>-.6;
 const SLIDE_CD=360,LUNGE_CD=40,BLUNGE_CD=50;
 // Tackle lunge: a committed stab at the ball. Touch the ball during it and you tackle; miss and you need a moment to recover.
 function startLunge(p){if(koGrace(p)){pop('let them kick off',p.x,p.y-30,C.muted,13,40);return}p.lunge=13;p.slide=false;p.tackleCd=LUNGE_CD;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);S.swoosh()}
@@ -853,7 +854,7 @@ function tackle(def,car){
   // Where is the tackler relative to the carrier? In front of the ball = clean tackle; from behind = you have to go through them.
   const front=Math.cos(angDiff(Math.atan2(def.y-car.y,def.x-car.x),car.dir));
   const mySlide=def.slide&&(def.team===0||hum(def));
-  const pos=front>.35?1:front>-.25?(mySlide?.9:def.slide?.7:.55):(mySlide?.5:def.slide?.3:.12);
+  const pos=front>.35?1:front>-.25?(mySlide?.9:def.slide?.8:.55):(mySlide?.5:def.slide?.4:.12);
   let ch;
   if(def.inter)ch=1;
   else{
@@ -988,7 +989,7 @@ function teamAI(team,dt){
     if(p.aiLunge>0){p.aiLunge-=dt;const tb=Math.atan2(B.y-p.y,B.x-p.x),a=p.lungeDir+angDiff(tb,p.lungeDir)*(p.inter?1:p.bit?.04:.4),sp=p.inter?8.5:p.aiLunge>5?6.4:2.6;p.vx=Math.cos(a)*sp;p.vy=Math.sin(a)*sp;p.dir=a;
       if(!p.bit&&owner&&owner.team!==team&&!owner.keeper&&dist(p,B)<23&&notBehind(p,owner)){p.aiLunge=0;tackle(p,owner);p.bit=false}else if(p.aiLunge<=0){p.inter=false;p.bit=false;if(owner&&owner.team!==team&&dist(p,owner)<70)whiff(p,50,owner,true);else p.stun=14}continue}
     if(p.aiSlide>0){p.aiSlide-=dt;p.vx=Math.cos(p.dir)*7.2;p.vy=Math.sin(p.dir)*7.2;if(t%2<1)grass(p.x,p.y,1);
-      if(owner&&owner.team!==team&&!owner.keeper&&notBehind(p,owner)&&(dist(p,B)<22||dist(p,owner)<25))tackle(p,owner);
+      if(owner&&owner.team!==team&&!owner.keeper&&(team===1?fromSide(p,owner):notBehind(p,owner))&&(dist(p,B)<22||dist(p,owner)<25))tackle(p,owner);
       if(p.aiSlide<=0&&p.slide){p.slide=false;p.stun=40}continue}
     if(p.shadow>0&&owner===p.shadowOf){p.shadow-=dt;const f={x:B.x+Math.cos(owner.dir)*12,y:B.y+Math.sin(owner.dir)*12};
       p.vx=owner.vx*.92+(f.x-p.x)*.12;p.vy=owner.vy*.92+(f.y-p.y)*.12;
@@ -996,13 +997,18 @@ function teamAI(team,dt){
     if(p===chaser&&team===1&&owner&&owner.team===0&&owner.x<MIDX-20-(DF.press-.5)*260){
       const a=Math.atan2(MY-owner.y,FX1-owner.x);steer(p,owner.x+Math.cos(a)*60,owner.y+Math.sin(a)*60,topSpeed(p)*.8,dt);continue}
     if(p===chaser){
-      const tgt=owner?{x:B.x+Math.cos(owner.dir)*10,y:B.y+Math.sin(owner.dir)*10}:chipIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*6,y:B.y+B.vy*6};
+      let tgt=owner?{x:B.x+Math.cos(owner.dir)*10,y:B.y+Math.sin(owner.dir)*10}:chipIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*6,y:B.y+B.vy*6};
+      // you're strolling with it: they don't just trail you, they get round in front and win it
+      const csp=owner?Math.hypot(owner.vx,owner.vy):9,slow=team===1&&owner&&owner.team===0&&!owner.keeper&&csp<topSpeed(p)*1.02,side=owner?Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir)):1;
+      // caught you from behind: draw level on your shoulder (not tucked in behind), ready to slide or nick it
+      const trailing=slow&&side<-.1&&dist(p,owner)<160;
+      if(trailing){const sd=Math.sign(Math.sin(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir)))||1,a=owner.dir+sd*Math.PI/2;tgt={x:owner.x+Math.cos(owner.dir)*14+Math.cos(a)*20,y:owner.y+Math.sin(owner.dir)*14+Math.sin(a)*20}}
       if(team===1&&p.st.sp==='stomp'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<95&&Math.random()<.02*dt&&doStomp(p)){p.spCd=SPECIALS.stomp.cd*1.7;continue}
       if(team===1&&p.st.sp==='slide'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<110&&dist(p,owner)>25&&notBehind(p,owner)&&Math.random()<.015*dt){
         p.spCd=SPECIALS.slide.cd*1.15;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
-      if(team===1&&owner&&owner.team===0&&p.tackleCd<=0&&dist(p,owner)>30&&dist(p,owner)<60&&Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir))>.3&&Math.random()<(LV().extreme?.006:DF.slide?.0035:.0016)*dt){p.windup=10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
-      steer(p,tgt.x,tgt.y,topSpeed(p)*(team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
-      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
+      if(team===1&&owner&&owner.team===0&&!owner.keeper&&p.tackleCd<=0&&dist(p,owner)>(slow?20:28)&&dist(p,owner)<(slow?75:60)&&side>(slow?-.55:.3)&&Math.random()<(LV().extreme?.006:DF.slide?.0035:.0016)*(slow?(side<.3?9:3.5):1)*dt){p.windup=slow?5:10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
+      steer(p,tgt.x,tgt.y,topSpeed(p)*(trailing?1.16:slow?.92:team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
+      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai*(slow?3.5:1):.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
       continue;
     }
     if(p===cover){steer(p,p.coverPt.x,p.coverPt.y,topSpeed(p)*(team===1?.86:.95),dt);

@@ -54,6 +54,7 @@ function genPlayers(){
   const used=new Set(ROWS.map(r=>r[1])),out=[],CC=realCC(),seen=new Set(origInsp());
   const SH={f:'finisher',s:'speed',d:'dribbler',p:'power',m:'playmaker',b:'b2b',x:'destroyer',c:'cb',l:'fb',a:'ballcb',w:'wingback'};
   const POS={finisher:'ATT',speed:'ATT',dribbler:'ATT',power:'ATT',playmaker:'MID',b2b:'MID',destroyer:'MID',cb:'DEF',fb:'DEF',ballcb:'DEF',wingback:'DEF'};
+  const LK={},HC={k:0,d:1,b:2,r:3,g:4};for(const l of realLooks().split('\n')){const [n,sk,h,st,bd,ht]=l.split('|');LK[n]={skin:SKINS[+sk]||SKINS[1],hair:HAIRS[HC[h]??0],look:[st,0,+bd?1:0,+ht||1]}}
   const BASE={bronze:[0,340],silver:[340,240],gold:[580,230],special:[810,100],icon:[910,45]},D=realPlayers();
   for(const rar of ['bronze','silver','gold','special','icon']){let k=0;
     for(const line of D[rar].split('\n')){const [real,cc,sc,rt]=line.split('|');if(!real||seen.has(real))continue;seen.add(real);
@@ -64,6 +65,7 @@ function genPlayers(){
         tag:rar==='special'?P(SPEC):rar==='icon'?P(ICT):P(TAG[shape]),pos,pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],sk:P(SKS),sp:P(SPS),celeb:(R()*6)|0,
         skin:P(SKINS),hair:R()<.85?P(HAIRS.slice(0,5)):P(HAIRS),look:[P(STY),0,R()<.3?1:0,Math.round((.94+R()*.14)*100)/100],plays:PLAYS[shape],rar,insp:[real,(CC[cc]||[cc])[0]]};
       if(rar==='special'||rar==='icon')p.ab=ABI[shape];
+      if(LK[real])Object.assign(p,LK[real]);// looks like the real player
       out.push(p)}}
   return out}
 

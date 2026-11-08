@@ -582,7 +582,7 @@ const ROWS=[
  ['evan','Evan Dreyer','DREYER',15,'Utility Man','DEF',66,'cb','Shield','Rocket',2,'#f2cfae','#4a2c1a',['buzz',0,0,1.08],'Solid, unspectacular, gets the job done'],
  ['pete','Pete Jennings','JENNINGS',4,'Committed','DEF',60,'cb','Dragback','Interceptor',2,'#f2cfae','#4a2c1a',['short',0,0,1.04],'Throws himself into everything'],
  ['jens','Jens van Dam','VAN DAM',37,'Speed Demon','DEF',82,'fb','Knock','Turbo',0,'#f2cfae','#d9b56a',['short',0,0,1.1],'Fastest centre-back you’ll ever see'],
- ['dave','Dave Pike','PIKE',14,'Old Reliable','DEF',59,'cb','Shield','Turbo',2,'#f2cfae','#8a8a8a',['balding',0,0,1],'Has played every Sunday since 1998'],
+ ['dave','Dave Pike','PIKE',14,'Old Reliable','DEF',59,'cb','Shield','Turbo',2,'#f2cfae','#b5562b',['short',0,0,1],'Has played every Sunday since 1998'],
  ['leon','Leon Fry','FRY',17,'Pub Winger','ATT',57,'speed','Step-over','Curler',3,'#c68d63','#111111',['quiff',0,0,1],'Thinks he’s a winger. Sometimes is'],
  ['gaz','Gaz Moss','MOSS',3,'Sunday Stopper','DEF',59,'cb','Dragback','Interceptor',5,'#e8b88c','#4a2c1a',['buzz',0,1,1.04],'Will put a foot in. Always'],
  ['wes','Wes Hollis','HOLLIS',12,'Keen Bean','MID',56,'b2b','Step-over','Turbo',0,'#f2cfae','#b5562b',['curly',0,0,.98],'Keen as mustard']];
@@ -1158,6 +1158,7 @@ function genPlayers(){
   const used=new Set(ROWS.map(r=>r[1])),out=[],CC=realCC(),seen=new Set(origInsp());
   const SH={f:'finisher',s:'speed',d:'dribbler',p:'power',m:'playmaker',b:'b2b',x:'destroyer',c:'cb',l:'fb',a:'ballcb',w:'wingback'};
   const POS={finisher:'ATT',speed:'ATT',dribbler:'ATT',power:'ATT',playmaker:'MID',b2b:'MID',destroyer:'MID',cb:'DEF',fb:'DEF',ballcb:'DEF',wingback:'DEF'};
+  const LK={},HC={k:0,d:1,b:2,r:3,g:4};for(const l of realLooks().split('\n')){const [n,sk,h,st,bd,ht]=l.split('|');LK[n]={skin:SKINS[+sk]||SKINS[1],hair:HAIRS[HC[h]??0],look:[st,0,+bd?1:0,+ht||1]}}
   const BASE={bronze:[0,340],silver:[340,240],gold:[580,230],special:[810,100],icon:[910,45]},D=realPlayers();
   for(const rar of ['bronze','silver','gold','special','icon']){let k=0;
     for(const line of D[rar].split('\n')){const [real,cc,sc,rt]=line.split('|');if(!real||seen.has(real))continue;seen.add(real);
@@ -1168,6 +1169,7 @@ function genPlayers(){
         tag:rar==='special'?P(SPEC):rar==='icon'?P(ICT):P(TAG[shape]),pos,pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],sk:P(SKS),sp:P(SPS),celeb:(R()*6)|0,
         skin:P(SKINS),hair:R()<.85?P(HAIRS.slice(0,5)):P(HAIRS),look:[P(STY),0,R()<.3?1:0,Math.round((.94+R()*.14)*100)/100],plays:PLAYS[shape],rar,insp:[real,(CC[cc]||[cc])[0]]};
       if(rar==='special'||rar==='icon')p.ab=ABI[shape];
+      if(LK[real])Object.assign(p,LK[real]);// looks like the real player
       out.push(p)}}
   return out}
 
@@ -2777,6 +2779,229 @@ function realCC(){return{ARG:['Argentina','AR'],POR:['Portugal','PT'],FRA:['Fran
   COD:['DR Congo','CD'],TUN:['Tunisia','TN'],RSA:['South Africa','ZA'],JAM:['Jamaica','JM'],CRC:['Costa Rica','CR'],PAN:['Panama','PA'],HON:['Honduras','HN'],HAI:['Haiti','HT'],IRN:['Iran','IR'],KSA:['Saudi Arabia','SA'],
   QAT:['Qatar','QA'],UAE:['UAE','AE'],CHN:['China','CN'],UZB:['Uzbekistan','UZ'],ARM:['Armenia','AM'],ZAM:['Zambia','ZM'],ANG:['Angola','AO'],CPV:['Cape Verde','CV'],GAM:['Gambia','GM'],TOG:['Togo','TG'],
   BEN:['Benin','BJ'],KEN:['Kenya','KE'],GNB:['Guinea-Bissau','GW'],IDN:['Indonesia','ID']}}
+// How the best-known players look: skin tone 0 (lightest) to 4 (darkest) | hair k black, d dark brown, b blond, r ginger, g grey |
+// hairstyle | beard 1/0 | height (1 = average). Everyone not listed gets a generated look.
+function realLooks(){return`Pelé|4|k|buzz|0|.98
+Diego Maradona|2|k|curly|0|.9
+Johan Cruyff|0|d|long|0|1
+Ronaldo Nazário|2|k|bald|0|1.02
+Franz Beckenbauer|0|d|short|0|1.02
+Alfredo Di Stéfano|1|d|balding|0|1
+Ronaldinho|3|k|long|0|1.02
+Eusébio|4|k|short|0|1
+Ferenc Puskás|0|d|short|0|.95
+Gerd Müller|0|d|short|0|.94
+Marco van Basten|0|b|short|0|1.06
+Michel Platini|0|d|curly|0|1
+George Best|0|k|long|1|.98
+Bobby Charlton|0|b|balding|0|.98
+Zico|1|k|curly|0|.98
+Romário|2|k|buzz|0|.9
+Garrincha|2|k|short|0|.95
+Roberto Baggio|1|d|bun|1|.96
+Franco Baresi|0|d|balding|0|.98
+Lothar Matthäus|0|d|short|0|.98
+Ruud Gullit|3|k|dreads|1|1.08
+Frank Rijkaard|3|k|dreads|0|1.06
+Dennis Bergkamp|0|b|short|0|1.03
+Andrea Pirlo|0|d|long|1|1
+Francesco Totti|1|d|short|0|1
+Alessandro Del Piero|1|k|short|0|.96
+Fabio Cannavaro|1|k|buzz|0|.95
+Steven Gerrard|0|d|buzz|0|1.02
+Frank Lampard|0|d|short|0|1
+Paul Scholes|0|r|short|0|.94
+Wayne Rooney|0|d|buzz|0|.97
+Alan Shearer|0|d|short|0|1.03
+Patrick Vieira|4|k|buzz|0|1.1
+Roy Keane|0|d|short|1|1
+Rio Ferdinand|3|k|buzz|0|1.06
+John Terry|0|d|short|0|1.05
+Carles Puyol|1|d|long|0|1
+Raúl|1|k|short|0|1
+Fernando Torres|0|b|short|0|1.05
+David Villa|1|k|short|1|.94
+Didier Drogba|4|k|buzz|1|1.08
+Samuel Eto'o|4|k|buzz|0|.98
+George Weah|4|k|buzz|0|1.06
+Andriy Shevchenko|0|d|short|0|1.03
+Hristo Stoichkov|1|k|short|0|.98
+Pavel Nedvěd|0|b|long|0|.98
+Luís Figo|1|k|short|0|1
+Rui Costa|1|k|long|0|1
+Clarence Seedorf|3|k|buzz|0|.98
+Michael Laudrup|0|d|short|0|1
+Zlatan Ibrahimović|1|k|bun|1|1.1
+Wesley Sneijder|0|b|short|0|.94
+Arjen Robben|0|b|balding|0|1
+Xabi Alonso|0|d|short|1|1.03
+Philipp Lahm|0|d|short|0|.92
+Bastian Schweinsteiger|0|b|short|0|1.02
+Miroslav Klose|0|d|short|0|1.03
+Gabriel Batistuta|1|d|long|0|1.03
+Juan Román Riquelme|2|k|short|0|1
+Javier Zanetti|1|k|short|0|.98
+Kenny Dalglish|0|r|short|0|.97
+Eric Cantona|0|d|short|1|1.05
+Jürgen Klinsmann|0|b|short|0|1.03
+Lilian Thuram|4|k|buzz|0|1.03
+Marcel Desailly|4|k|bald|0|1.05
+Nemanja Vidić|0|d|buzz|1|1.05
+Sócrates|2|k|curly|1|1.1
+Bobby Moore|0|b|short|0|1.03
+Gary Lineker|0|d|short|0|1
+Gheorghe Hagi|0|k|short|0|.96
+Ryan Giggs|0|d|short|0|1
+David Beckham|0|b|quiff|0|1.02
+Sergio Agüero|1|k|short|0|.93
+Robin van Persie|0|d|short|0|1.03
+Gareth Bale|0|d|bun|1|1.03
+Eden Hazard|1|d|short|1|.95
+Mesut Özil|1|k|quiff|1|.99
+Toni Kroos|0|b|short|0|1.03
+Sergio Busquets|1|k|short|1|1.07
+Gerard Piqué|0|d|short|1|1.1
+Franck Ribéry|0|d|buzz|1|.94
+Marcelo|2|k|afro|0|.98
+Karim Benzema|1|k|buzz|1|1.03
+Thiago Silva|2|k|short|1|1.02
+Mats Hummels|0|d|short|1|1.06
+Vinícius Júnior|3|k|dreads|0|.98
+Harry Kane|0|d|short|0|1.03
+Rodri|1|d|short|1|1.06
+Ousmane Dembélé|3|k|buzz|0|.97
+Robert Lewandowski|0|d|short|0|1.03
+Bukayo Saka|4|k|short|0|.97
+Florian Wirtz|0|d|short|0|.98
+Jamal Musiala|3|k|curly|0|1
+Lautaro Martínez|1|k|short|1|.97
+Martin Ødegaard|0|d|quiff|0|.97
+Pedri|1|k|short|0|.96
+Phil Foden|0|b|short|0|.95
+Raphinha|2|k|curly|0|.98
+Federico Valverde|1|d|short|1|1.02
+Achraf Hakimi|2|k|short|1|1
+Alexander Isak|3|k|short|0|1.08
+Victor Osimhen|4|k|mohawk|0|1.03
+Khvicha Kvaratskhelia|0|d|long|0|1
+Rúben Dias|1|k|short|1|1.05
+Antonio Rüdiger|4|k|buzz|1|1.08
+Alessandro Bastoni|0|d|short|0|1.08
+Joshua Kimmich|0|d|short|0|.97
+Bernardo Silva|1|k|short|1|.9
+Bruno Guimarães|1|k|short|1|.99
+Alexis Mac Allister|0|r|short|1|.98
+Vitinha|1|k|short|1|.92
+João Neves|1|d|curly|0|.92
+Nicolò Barella|0|d|short|1|.95
+Hakan Çalhanoğlu|0|d|short|1|.98
+Frenkie de Jong|0|d|long|0|1
+Aurélien Tchouaméni|4|k|buzz|0|1.06
+Eduardo Camavinga|4|k|dreads|0|1
+Rafael Leão|3|k|buzz|1|1.05
+Michael Olise|3|k|short|0|.98
+Leroy Sané|3|k|buzz|1|1
+Julián Álvarez|1|d|short|0|.95
+Antoine Griezmann|0|d|short|1|.96
+Paulo Dybala|1|k|short|1|.95
+Sadio Mané|4|k|buzz|1|.95
+Marcus Thuram|4|k|dreads|0|1.08
+Viktor Gyökeres|0|d|short|0|1.04
+Nico Williams|4|k|buzz|0|1
+Dani Olmo|1|k|short|0|.98
+Álex Grimaldo|0|d|short|0|.95
+Theo Hernández|1|k|short|1|1.04
+Trent Alexander-Arnold|2|k|short|0|1
+Joško Gvardiol|0|d|short|0|1.06
+Marquinhos|1|k|short|1|1
+Gabriel Magalhães|2|k|long|1|1.08
+Kim Min-jae|1|k|short|0|1.08
+Ronald Araújo|2|k|short|0|1.07
+Jules Koundé|3|k|afro|0|.98
+Pau Cubarsí|0|d|short|0|1.03
+Éder Militão|2|k|buzz|1|1.05
+Nuno Mendes|3|k|short|0|1.03
+Alphonso Davies|4|k|short|0|.98
+Federico Dimarco|0|d|short|1|.97
+Bradley Barcola|3|k|curly|0|1
+Désiré Doué|3|k|short|0|1
+Arda Güler|0|d|short|0|.95
+Xavi Simons|3|k|curly|0|.95
+Luis Díaz|2|k|curly|1|1
+Dominik Szoboszlai|0|b|short|0|1.03
+Ryan Gravenberch|3|k|short|0|1.08
+Moisés Caicedo|3|k|short|0|1
+Enzo Fernández|1|d|short|1|1
+Rodrygo|2|k|short|0|.96
+Serhou Guirassy|4|k|buzz|1|1.05
+Ademola Lookman|4|k|short|0|.95
+Omar Marmoush|2|k|curly|1|1
+Granit Xhaka|1|k|short|1|1.03
+Mikel Oyarzabal|0|d|short|1|1
+Cristian Romero|1|k|buzz|1|1
+Ibrahima Konaté|4|k|buzz|0|1.1
+Martín Zubimendi|0|d|short|0|1
+Tijjani Reijnders|2|k|curly|1|1
+Kai Havertz|0|d|short|0|1.08
+Mohammed Kudus|4|k|short|0|.98
+Kenan Yıldız|1|k|short|0|1.03
+Bryan Mbeumo|4|k|buzz|0|.94
+Scott McTominay|0|r|short|0|1.08
+Christian Pulisic|0|d|short|0|.95
+Jonathan Tah|3|k|buzz|0|1.1
+Benjamin Šeško|0|d|short|0|1.1
+Hugo Ekitiké|3|k|short|0|1.07
+Riyad Mahrez|2|k|short|1|.98
+Mateo Retegui|1|d|long|1|1.03
+Dušan Vlahović|0|d|bun|0|1.08
+Jonathan David|4|k|short|0|.97
+Manuel Akanji|3|k|short|0|1.05
+Kingsley Coman|3|k|buzz|0|.98
+Dani Carvajal|0|d|short|1|.97
+Rayan Cherki|2|k|curly|0|.97
+Sandro Tonali|0|d|long|1|1
+Andrew Robertson|0|d|short|0|.94
+Mikel Merino|0|d|short|1|1.08
+Fabián Ruiz|1|d|long|1|1.03
+Jérémy Doku|4|k|short|0|.93
+Reece James|3|k|buzz|1|1
+Antoine Semenyo|4|k|short|0|1
+Jarrod Bowen|0|d|short|0|.97
+Jack Grealish|0|d|long|0|1
+Eberechi Eze|4|k|short|0|1
+Anthony Gordon|0|b|short|0|1
+Marc Guéhi|4|k|short|0|1.02
+Raheem Sterling|4|k|buzz|0|.92
+Cody Gakpo|3|k|short|0|1.08
+Romelu Lukaku|4|k|buzz|0|1.1
+Casemiro|1|k|buzz|1|1
+Thomas Müller|0|d|short|0|1.03
+Kyle Walker|3|k|bald|0|1
+Ivan Toney|4|k|short|1|1.03
+Gavi|1|k|short|0|.94
+João Félix|1|d|short|0|1.02
+Ángel Di María|1|k|short|0|.98
+Lisandro Martínez|1|k|long|1|.9
+Moise Kean|4|k|short|0|1.02
+Chris Wood|0|d|short|0|1.08
+Takefusa Kubo|1|k|short|0|.9
+Kaoru Mitoma|1|k|short|0|.97
+Gabriel Martinelli|1|k|short|0|.98
+Alexander Sørloth|0|b|bun|0|1.1
+Morgan Rogers|3|k|short|0|1.03
+Rodrigo De Paul|1|k|short|1|1
+Lucas Paquetá|2|k|short|0|1
+Jeremie Frimpong|4|k|dreads|0|.92
+Leandro Trossard|0|d|short|0|.97
+Matheus Cunha|2|k|short|0|1.02
+João Cancelo|1|k|short|1|1
+Kobbie Mainoo|3|k|short|0|1
+Mason Mount|0|d|short|0|.98
+Jadon Sancho|3|k|short|0|.98
+Pierre-Emerick Aubameyang|4|k|mohawk|1|1
+Edin Džeko|0|d|short|1|1.1
+Christian Eriksen|0|b|short|0|.98
+Memphis Depay|3|k|bun|1|.97`}
 
 function mk(team,i,st,kit,kx,ky,keeper=false){return{team,i,st,kit,kx,ky,keeper,x:kx,y:ky,vx:0,vy:0,dir:team?Math.PI:0,stun:0,stam:100,tackleCd:0,skillCd:0,spCd:0,anim:null,animT:0,animMax:1,rot:0,jump:0,arms:0,flip:1,lunge:0,slide:false,turbo:0,hold:0,react:0,dec:0,sprint:false,recvT:-99,track:false,burstT:-99,burstNear:false,slideCd:0,aiSlide:0,inter:false}}
 const KIT=()=>{if(NET.guest){const p=players.find(q=>q.team===0&&!q.keeper);if(p)return p.kit}return mode==='club'?club.kit:C.coral};
@@ -3614,6 +3839,7 @@ function switchPlayer(manual){
 
 /* ---------- tackles ---------- */
 const notBehind=(d,c)=>Math.cos(angDiff(Math.atan2(d.y-c.y,d.x-c.x),c.dir))>-.2;
+const fromSide=(d,c)=>Math.cos(angDiff(Math.atan2(d.y-c.y,d.x-c.x),c.dir))>-.6;
 const SLIDE_CD=360,LUNGE_CD=40,BLUNGE_CD=50;
 // Tackle lunge: a committed stab at the ball. Touch the ball during it and you tackle; miss and you need a moment to recover.
 function startLunge(p){if(koGrace(p)){pop('let them kick off',p.x,p.y-30,C.muted,13,40);return}p.lunge=13;p.slide=false;p.tackleCd=LUNGE_CD;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);S.swoosh()}
@@ -3633,7 +3859,7 @@ function tackle(def,car){
   // Where is the tackler relative to the carrier? In front of the ball = clean tackle; from behind = you have to go through them.
   const front=Math.cos(angDiff(Math.atan2(def.y-car.y,def.x-car.x),car.dir));
   const mySlide=def.slide&&(def.team===0||hum(def));
-  const pos=front>.35?1:front>-.25?(mySlide?.9:def.slide?.7:.55):(mySlide?.5:def.slide?.3:.12);
+  const pos=front>.35?1:front>-.25?(mySlide?.9:def.slide?.8:.55):(mySlide?.5:def.slide?.4:.12);
   let ch;
   if(def.inter)ch=1;
   else{
@@ -3768,7 +3994,7 @@ function teamAI(team,dt){
     if(p.aiLunge>0){p.aiLunge-=dt;const tb=Math.atan2(B.y-p.y,B.x-p.x),a=p.lungeDir+angDiff(tb,p.lungeDir)*(p.inter?1:p.bit?.04:.4),sp=p.inter?8.5:p.aiLunge>5?6.4:2.6;p.vx=Math.cos(a)*sp;p.vy=Math.sin(a)*sp;p.dir=a;
       if(!p.bit&&owner&&owner.team!==team&&!owner.keeper&&dist(p,B)<23&&notBehind(p,owner)){p.aiLunge=0;tackle(p,owner);p.bit=false}else if(p.aiLunge<=0){p.inter=false;p.bit=false;if(owner&&owner.team!==team&&dist(p,owner)<70)whiff(p,50,owner,true);else p.stun=14}continue}
     if(p.aiSlide>0){p.aiSlide-=dt;p.vx=Math.cos(p.dir)*7.2;p.vy=Math.sin(p.dir)*7.2;if(t%2<1)grass(p.x,p.y,1);
-      if(owner&&owner.team!==team&&!owner.keeper&&notBehind(p,owner)&&(dist(p,B)<22||dist(p,owner)<25))tackle(p,owner);
+      if(owner&&owner.team!==team&&!owner.keeper&&(team===1?fromSide(p,owner):notBehind(p,owner))&&(dist(p,B)<22||dist(p,owner)<25))tackle(p,owner);
       if(p.aiSlide<=0&&p.slide){p.slide=false;p.stun=40}continue}
     if(p.shadow>0&&owner===p.shadowOf){p.shadow-=dt;const f={x:B.x+Math.cos(owner.dir)*12,y:B.y+Math.sin(owner.dir)*12};
       p.vx=owner.vx*.92+(f.x-p.x)*.12;p.vy=owner.vy*.92+(f.y-p.y)*.12;
@@ -3776,13 +4002,18 @@ function teamAI(team,dt){
     if(p===chaser&&team===1&&owner&&owner.team===0&&owner.x<MIDX-20-(DF.press-.5)*260){
       const a=Math.atan2(MY-owner.y,FX1-owner.x);steer(p,owner.x+Math.cos(a)*60,owner.y+Math.sin(a)*60,topSpeed(p)*.8,dt);continue}
     if(p===chaser){
-      const tgt=owner?{x:B.x+Math.cos(owner.dir)*10,y:B.y+Math.sin(owner.dir)*10}:chipIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*6,y:B.y+B.vy*6};
+      let tgt=owner?{x:B.x+Math.cos(owner.dir)*10,y:B.y+Math.sin(owner.dir)*10}:chipIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*6,y:B.y+B.vy*6};
+      // you're strolling with it: they don't just trail you, they get round in front and win it
+      const csp=owner?Math.hypot(owner.vx,owner.vy):9,slow=team===1&&owner&&owner.team===0&&!owner.keeper&&csp<topSpeed(p)*1.02,side=owner?Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir)):1;
+      // caught you from behind: draw level on your shoulder (not tucked in behind), ready to slide or nick it
+      const trailing=slow&&side<-.1&&dist(p,owner)<160;
+      if(trailing){const sd=Math.sign(Math.sin(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir)))||1,a=owner.dir+sd*Math.PI/2;tgt={x:owner.x+Math.cos(owner.dir)*14+Math.cos(a)*20,y:owner.y+Math.sin(owner.dir)*14+Math.sin(a)*20}}
       if(team===1&&p.st.sp==='stomp'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<95&&Math.random()<.02*dt&&doStomp(p)){p.spCd=SPECIALS.stomp.cd*1.7;continue}
       if(team===1&&p.st.sp==='slide'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<110&&dist(p,owner)>25&&notBehind(p,owner)&&Math.random()<.015*dt){
         p.spCd=SPECIALS.slide.cd*1.15;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
-      if(team===1&&owner&&owner.team===0&&p.tackleCd<=0&&dist(p,owner)>30&&dist(p,owner)<60&&Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir))>.3&&Math.random()<(LV().extreme?.006:DF.slide?.0035:.0016)*dt){p.windup=10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
-      steer(p,tgt.x,tgt.y,topSpeed(p)*(team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
-      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
+      if(team===1&&owner&&owner.team===0&&!owner.keeper&&p.tackleCd<=0&&dist(p,owner)>(slow?20:28)&&dist(p,owner)<(slow?75:60)&&side>(slow?-.55:.3)&&Math.random()<(LV().extreme?.006:DF.slide?.0035:.0016)*(slow?(side<.3?9:3.5):1)*dt){p.windup=slow?5:10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
+      steer(p,tgt.x,tgt.y,topSpeed(p)*(trailing?1.16:slow?.92:team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
+      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai*(slow?3.5:1):.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
       continue;
     }
     if(p===cover){steer(p,p.coverPt.x,p.coverPt.y,topSpeed(p)*(team===1?.86:.95),dt);
@@ -5304,7 +5535,7 @@ function toggleFull(){const st=document.querySelector('.stage'),fs=document.full
 $('fullscr').onclick=toggleFull;$('fullscr2').onclick=toggleFull;
 const fsLabel=()=>{const on=!!(document.fullscreenElement||document.webkitFullscreenElement);$('fullscr').textContent=on?'Exit full screen (V)':'Full screen (V)';$('fullscr2').textContent=on?'Exit full screen':'Full screen'};
 document.addEventListener('fullscreenchange',fsLabel);document.addEventListener('webkitfullscreenchange',fsLabel);
-window.__kick={errs:()=>loopErrs,dbg:{allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p)})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({gm:{on:gMe.on,seq:gT.seq,ack:gT.ack,lob:gT.lob,wait:netGuestWait,rtt:netRtt,v2:netV2},RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+window.__kick={errs:()=>loopErrs,dbg:{allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p),look:p.look,skin:p.skin})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({gm:{on:gMe.on,seq:gT.seq,ack:gT.ack,lob:gT.lob,wait:netGuestWait,rtt:netRtt,v2:netV2},RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 startLoop();
 })();
 </script>

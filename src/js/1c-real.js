@@ -1191,3 +1191,226 @@ function realCC(){return{ARG:['Argentina','AR'],POR:['Portugal','PT'],FRA:['Fran
   COD:['DR Congo','CD'],TUN:['Tunisia','TN'],RSA:['South Africa','ZA'],JAM:['Jamaica','JM'],CRC:['Costa Rica','CR'],PAN:['Panama','PA'],HON:['Honduras','HN'],HAI:['Haiti','HT'],IRN:['Iran','IR'],KSA:['Saudi Arabia','SA'],
   QAT:['Qatar','QA'],UAE:['UAE','AE'],CHN:['China','CN'],UZB:['Uzbekistan','UZ'],ARM:['Armenia','AM'],ZAM:['Zambia','ZM'],ANG:['Angola','AO'],CPV:['Cape Verde','CV'],GAM:['Gambia','GM'],TOG:['Togo','TG'],
   BEN:['Benin','BJ'],KEN:['Kenya','KE'],GNB:['Guinea-Bissau','GW'],IDN:['Indonesia','ID']}}
+// How the best-known players look: skin tone 0 (lightest) to 4 (darkest) | hair k black, d dark brown, b blond, r ginger, g grey |
+// hairstyle | beard 1/0 | height (1 = average). Everyone not listed gets a generated look.
+function realLooks(){return`Pelé|4|k|buzz|0|.98
+Diego Maradona|2|k|curly|0|.9
+Johan Cruyff|0|d|long|0|1
+Ronaldo Nazário|2|k|bald|0|1.02
+Franz Beckenbauer|0|d|short|0|1.02
+Alfredo Di Stéfano|1|d|balding|0|1
+Ronaldinho|3|k|long|0|1.02
+Eusébio|4|k|short|0|1
+Ferenc Puskás|0|d|short|0|.95
+Gerd Müller|0|d|short|0|.94
+Marco van Basten|0|b|short|0|1.06
+Michel Platini|0|d|curly|0|1
+George Best|0|k|long|1|.98
+Bobby Charlton|0|b|balding|0|.98
+Zico|1|k|curly|0|.98
+Romário|2|k|buzz|0|.9
+Garrincha|2|k|short|0|.95
+Roberto Baggio|1|d|bun|1|.96
+Franco Baresi|0|d|balding|0|.98
+Lothar Matthäus|0|d|short|0|.98
+Ruud Gullit|3|k|dreads|1|1.08
+Frank Rijkaard|3|k|dreads|0|1.06
+Dennis Bergkamp|0|b|short|0|1.03
+Andrea Pirlo|0|d|long|1|1
+Francesco Totti|1|d|short|0|1
+Alessandro Del Piero|1|k|short|0|.96
+Fabio Cannavaro|1|k|buzz|0|.95
+Steven Gerrard|0|d|buzz|0|1.02
+Frank Lampard|0|d|short|0|1
+Paul Scholes|0|r|short|0|.94
+Wayne Rooney|0|d|buzz|0|.97
+Alan Shearer|0|d|short|0|1.03
+Patrick Vieira|4|k|buzz|0|1.1
+Roy Keane|0|d|short|1|1
+Rio Ferdinand|3|k|buzz|0|1.06
+John Terry|0|d|short|0|1.05
+Carles Puyol|1|d|long|0|1
+Raúl|1|k|short|0|1
+Fernando Torres|0|b|short|0|1.05
+David Villa|1|k|short|1|.94
+Didier Drogba|4|k|buzz|1|1.08
+Samuel Eto'o|4|k|buzz|0|.98
+George Weah|4|k|buzz|0|1.06
+Andriy Shevchenko|0|d|short|0|1.03
+Hristo Stoichkov|1|k|short|0|.98
+Pavel Nedvěd|0|b|long|0|.98
+Luís Figo|1|k|short|0|1
+Rui Costa|1|k|long|0|1
+Clarence Seedorf|3|k|buzz|0|.98
+Michael Laudrup|0|d|short|0|1
+Zlatan Ibrahimović|1|k|bun|1|1.1
+Wesley Sneijder|0|b|short|0|.94
+Arjen Robben|0|b|balding|0|1
+Xabi Alonso|0|d|short|1|1.03
+Philipp Lahm|0|d|short|0|.92
+Bastian Schweinsteiger|0|b|short|0|1.02
+Miroslav Klose|0|d|short|0|1.03
+Gabriel Batistuta|1|d|long|0|1.03
+Juan Román Riquelme|2|k|short|0|1
+Javier Zanetti|1|k|short|0|.98
+Kenny Dalglish|0|r|short|0|.97
+Eric Cantona|0|d|short|1|1.05
+Jürgen Klinsmann|0|b|short|0|1.03
+Lilian Thuram|4|k|buzz|0|1.03
+Marcel Desailly|4|k|bald|0|1.05
+Nemanja Vidić|0|d|buzz|1|1.05
+Sócrates|2|k|curly|1|1.1
+Bobby Moore|0|b|short|0|1.03
+Gary Lineker|0|d|short|0|1
+Gheorghe Hagi|0|k|short|0|.96
+Ryan Giggs|0|d|short|0|1
+David Beckham|0|b|quiff|0|1.02
+Sergio Agüero|1|k|short|0|.93
+Robin van Persie|0|d|short|0|1.03
+Gareth Bale|0|d|bun|1|1.03
+Eden Hazard|1|d|short|1|.95
+Mesut Özil|1|k|quiff|1|.99
+Toni Kroos|0|b|short|0|1.03
+Sergio Busquets|1|k|short|1|1.07
+Gerard Piqué|0|d|short|1|1.1
+Franck Ribéry|0|d|buzz|1|.94
+Marcelo|2|k|afro|0|.98
+Karim Benzema|1|k|buzz|1|1.03
+Thiago Silva|2|k|short|1|1.02
+Mats Hummels|0|d|short|1|1.06
+Vinícius Júnior|3|k|dreads|0|.98
+Harry Kane|0|d|short|0|1.03
+Rodri|1|d|short|1|1.06
+Ousmane Dembélé|3|k|buzz|0|.97
+Robert Lewandowski|0|d|short|0|1.03
+Bukayo Saka|4|k|short|0|.97
+Florian Wirtz|0|d|short|0|.98
+Jamal Musiala|3|k|curly|0|1
+Lautaro Martínez|1|k|short|1|.97
+Martin Ødegaard|0|d|quiff|0|.97
+Pedri|1|k|short|0|.96
+Phil Foden|0|b|short|0|.95
+Raphinha|2|k|curly|0|.98
+Federico Valverde|1|d|short|1|1.02
+Achraf Hakimi|2|k|short|1|1
+Alexander Isak|3|k|short|0|1.08
+Victor Osimhen|4|k|mohawk|0|1.03
+Khvicha Kvaratskhelia|0|d|long|0|1
+Rúben Dias|1|k|short|1|1.05
+Antonio Rüdiger|4|k|buzz|1|1.08
+Alessandro Bastoni|0|d|short|0|1.08
+Joshua Kimmich|0|d|short|0|.97
+Bernardo Silva|1|k|short|1|.9
+Bruno Guimarães|1|k|short|1|.99
+Alexis Mac Allister|0|r|short|1|.98
+Vitinha|1|k|short|1|.92
+João Neves|1|d|curly|0|.92
+Nicolò Barella|0|d|short|1|.95
+Hakan Çalhanoğlu|0|d|short|1|.98
+Frenkie de Jong|0|d|long|0|1
+Aurélien Tchouaméni|4|k|buzz|0|1.06
+Eduardo Camavinga|4|k|dreads|0|1
+Rafael Leão|3|k|buzz|1|1.05
+Michael Olise|3|k|short|0|.98
+Leroy Sané|3|k|buzz|1|1
+Julián Álvarez|1|d|short|0|.95
+Antoine Griezmann|0|d|short|1|.96
+Paulo Dybala|1|k|short|1|.95
+Sadio Mané|4|k|buzz|1|.95
+Marcus Thuram|4|k|dreads|0|1.08
+Viktor Gyökeres|0|d|short|0|1.04
+Nico Williams|4|k|buzz|0|1
+Dani Olmo|1|k|short|0|.98
+Álex Grimaldo|0|d|short|0|.95
+Theo Hernández|1|k|short|1|1.04
+Trent Alexander-Arnold|2|k|short|0|1
+Joško Gvardiol|0|d|short|0|1.06
+Marquinhos|1|k|short|1|1
+Gabriel Magalhães|2|k|long|1|1.08
+Kim Min-jae|1|k|short|0|1.08
+Ronald Araújo|2|k|short|0|1.07
+Jules Koundé|3|k|afro|0|.98
+Pau Cubarsí|0|d|short|0|1.03
+Éder Militão|2|k|buzz|1|1.05
+Nuno Mendes|3|k|short|0|1.03
+Alphonso Davies|4|k|short|0|.98
+Federico Dimarco|0|d|short|1|.97
+Bradley Barcola|3|k|curly|0|1
+Désiré Doué|3|k|short|0|1
+Arda Güler|0|d|short|0|.95
+Xavi Simons|3|k|curly|0|.95
+Luis Díaz|2|k|curly|1|1
+Dominik Szoboszlai|0|b|short|0|1.03
+Ryan Gravenberch|3|k|short|0|1.08
+Moisés Caicedo|3|k|short|0|1
+Enzo Fernández|1|d|short|1|1
+Rodrygo|2|k|short|0|.96
+Serhou Guirassy|4|k|buzz|1|1.05
+Ademola Lookman|4|k|short|0|.95
+Omar Marmoush|2|k|curly|1|1
+Granit Xhaka|1|k|short|1|1.03
+Mikel Oyarzabal|0|d|short|1|1
+Cristian Romero|1|k|buzz|1|1
+Ibrahima Konaté|4|k|buzz|0|1.1
+Martín Zubimendi|0|d|short|0|1
+Tijjani Reijnders|2|k|curly|1|1
+Kai Havertz|0|d|short|0|1.08
+Mohammed Kudus|4|k|short|0|.98
+Kenan Yıldız|1|k|short|0|1.03
+Bryan Mbeumo|4|k|buzz|0|.94
+Scott McTominay|0|r|short|0|1.08
+Christian Pulisic|0|d|short|0|.95
+Jonathan Tah|3|k|buzz|0|1.1
+Benjamin Šeško|0|d|short|0|1.1
+Hugo Ekitiké|3|k|short|0|1.07
+Riyad Mahrez|2|k|short|1|.98
+Mateo Retegui|1|d|long|1|1.03
+Dušan Vlahović|0|d|bun|0|1.08
+Jonathan David|4|k|short|0|.97
+Manuel Akanji|3|k|short|0|1.05
+Kingsley Coman|3|k|buzz|0|.98
+Dani Carvajal|0|d|short|1|.97
+Rayan Cherki|2|k|curly|0|.97
+Sandro Tonali|0|d|long|1|1
+Andrew Robertson|0|d|short|0|.94
+Mikel Merino|0|d|short|1|1.08
+Fabián Ruiz|1|d|long|1|1.03
+Jérémy Doku|4|k|short|0|.93
+Reece James|3|k|buzz|1|1
+Antoine Semenyo|4|k|short|0|1
+Jarrod Bowen|0|d|short|0|.97
+Jack Grealish|0|d|long|0|1
+Eberechi Eze|4|k|short|0|1
+Anthony Gordon|0|b|short|0|1
+Marc Guéhi|4|k|short|0|1.02
+Raheem Sterling|4|k|buzz|0|.92
+Cody Gakpo|3|k|short|0|1.08
+Romelu Lukaku|4|k|buzz|0|1.1
+Casemiro|1|k|buzz|1|1
+Thomas Müller|0|d|short|0|1.03
+Kyle Walker|3|k|bald|0|1
+Ivan Toney|4|k|short|1|1.03
+Gavi|1|k|short|0|.94
+João Félix|1|d|short|0|1.02
+Ángel Di María|1|k|short|0|.98
+Lisandro Martínez|1|k|long|1|.9
+Moise Kean|4|k|short|0|1.02
+Chris Wood|0|d|short|0|1.08
+Takefusa Kubo|1|k|short|0|.9
+Kaoru Mitoma|1|k|short|0|.97
+Gabriel Martinelli|1|k|short|0|.98
+Alexander Sørloth|0|b|bun|0|1.1
+Morgan Rogers|3|k|short|0|1.03
+Rodrigo De Paul|1|k|short|1|1
+Lucas Paquetá|2|k|short|0|1
+Jeremie Frimpong|4|k|dreads|0|.92
+Leandro Trossard|0|d|short|0|.97
+Matheus Cunha|2|k|short|0|1.02
+João Cancelo|1|k|short|1|1
+Kobbie Mainoo|3|k|short|0|1
+Mason Mount|0|d|short|0|.98
+Jadon Sancho|3|k|short|0|.98
+Pierre-Emerick Aubameyang|4|k|mohawk|1|1
+Edin Džeko|0|d|short|1|1.1
+Christian Eriksen|0|b|short|0|.98
+Memphis Depay|3|k|bun|1|.97`}

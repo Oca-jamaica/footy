@@ -94,7 +94,7 @@ const ROWS=[
  ['evan','Evan Dreyer','DREYER',15,'Utility Man','DEF',66,'cb','Shield','Rocket',2,'#f2cfae','#4a2c1a',['buzz',0,0,1.08],'Solid, unspectacular, gets the job done'],
  ['pete','Pete Jennings','JENNINGS',4,'Committed','DEF',60,'cb','Dragback','Interceptor',2,'#f2cfae','#4a2c1a',['short',0,0,1.04],'Throws himself into everything'],
  ['jens','Jens van Dam','VAN DAM',37,'Speed Demon','DEF',82,'fb','Knock','Turbo',0,'#f2cfae','#d9b56a',['short',0,0,1.1],'Fastest centre-back you’ll ever see'],
- ['dave','Dave Pike','PIKE',14,'Old Reliable','DEF',59,'cb','Shield','Turbo',2,'#f2cfae','#8a8a8a',['balding',0,0,1],'Has played every Sunday since 1998'],
+ ['dave','Dave Pike','PIKE',14,'Old Reliable','DEF',59,'cb','Shield','Turbo',2,'#f2cfae','#b5562b',['short',0,0,1],'Has played every Sunday since 1998'],
  ['leon','Leon Fry','FRY',17,'Pub Winger','ATT',57,'speed','Step-over','Curler',3,'#c68d63','#111111',['quiff',0,0,1],'Thinks he’s a winger. Sometimes is'],
  ['gaz','Gaz Moss','MOSS',3,'Sunday Stopper','DEF',59,'cb','Dragback','Interceptor',5,'#e8b88c','#4a2c1a',['buzz',0,1,1.04],'Will put a foot in. Always'],
  ['wes','Wes Hollis','HOLLIS',12,'Keen Bean','MID',56,'b2b','Step-over','Turbo',0,'#f2cfae','#b5562b',['curly',0,0,.98],'Keen as mustard']];
