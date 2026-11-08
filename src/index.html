@@ -235,6 +235,85 @@ kbd{font-family:var(--body);font-weight:800;font-size:12px;background:var(--grou
 .coins.bump{animation:coinbump .5s ease-out}
 @keyframes coinbump{40%{transform:scale(1.18);color:#fff}}
 @media (prefers-reduced-motion:reduce){.menu:not([hidden]) .menu-inner,.coins.bump{animation:none}.go:active:not(:disabled){transform:none}}
+
+/* ---------- career screens ---------- */
+.res{font-family:var(--display);font-size:16px;border-radius:999px;padding:2px 10px;background:#12303e;color:var(--cream);border:1px solid var(--line);white-space:nowrap}
+.res.tt{color:var(--mint)}.res.cp{color:#9fd3ff}.res.leg{cursor:pointer;color:var(--sun);font-family:var(--display)}
+.res.tt::before{content:"\25B2 ";font-size:12px}.res.cp::before{content:"\2605 ";font-size:12px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;width:100%}
+.modecard{text-align:left;border:2px solid var(--line);border-radius:16px;padding:12px 14px;background:linear-gradient(135deg,#1d4256,#12303e);color:var(--cream);cursor:pointer;display:grid;gap:3px;font-family:var(--body);transition:transform .12s,box-shadow .2s,border-color .15s}
+.modecard:hover{transform:translateY(-2px)}
+.modecard.cl{background:linear-gradient(135deg,#24402a,#12303e)}
+.modecard .mh{display:flex;align-items:baseline;gap:8px}
+.modecard b{font-family:var(--display);font-weight:400;font-size:30px;line-height:1}
+.modecard i{font-style:normal;font-family:var(--display);font-size:20px;color:var(--muted)}
+.modecard span{font-size:13px;color:var(--muted)}
+.modecard em{font-style:normal;font-weight:800;color:var(--sun);font-size:14px}
+.modecard small{font-size:12px;color:var(--mint);font-weight:700}
+.modecard[aria-pressed="true"]{border-color:var(--sun);box-shadow:0 0 0 2px var(--sun),0 10px 30px -14px var(--sun)}
+.t-special{--tc:#5ee6d0}
+.card.t-icon{background:linear-gradient(160deg,#3a2440,var(--ground-2) 55%)}.card.t-special{background:linear-gradient(160deg,#173f45,var(--ground-2) 55%)}
+.subtabs,.ctabs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.subtabs button,.ctabs button{font-family:var(--body);font-weight:800;font-size:13px;border:1px solid var(--line);background:var(--ground-2);color:var(--muted);padding:5px 12px;border-radius:999px;cursor:pointer}
+.subtabs button[aria-pressed="true"],.ctabs button[aria-selected="true"]{background:var(--sun);color:var(--ground);border-color:var(--sun)}
+.ctabs button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--coral);margin-left:5px;vertical-align:middle}
+.panel{border:1px solid var(--line);border-radius:14px;background:var(--ground-2);padding:10px 12px;text-align:left;width:100%;box-sizing:border-box}
+.panel h4{margin:0 0 6px;font-family:var(--display);font-weight:400;font-size:19px;color:var(--sun)}
+.panel p{margin:4px 0}
+.twocol{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;width:100%}
+.ltwrap{overflow-x:auto}
+table.lt{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+table.lt th{font-size:11px;color:var(--muted);font-weight:800;text-align:right;padding:3px 5px;border-bottom:1px solid var(--line)}
+table.lt td{padding:4px 5px;text-align:right;border-bottom:1px solid rgba(255,255,255,.05)}
+table.lt td:nth-child(2),table.lt th:nth-child(2){text-align:left}
+table.lt tr.me td{color:var(--sun);font-weight:800;background:rgba(255,209,102,.08)}
+table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.down td:first-child{box-shadow:inset 3px 0 var(--coral)}
+.kitdot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid rgba(0,0,0,.4)}
+.frm{display:inline-block;width:14px;height:14px;line-height:14px;text-align:center;border-radius:3px;font-size:10px;font-weight:800;margin-left:2px;color:#13212b}
+.frm.W{background:var(--mint)}.frm.D{background:#cfd8e0}.frm.L{background:var(--coral)}
+.fxl{display:grid;gap:4px;font-size:13px}
+.fxr{display:grid;grid-template-columns:52px 1fr 46px 1fr;gap:6px;align-items:center;padding:3px 6px;border-radius:8px;background:#12303e}
+.fxr.me{outline:1px solid var(--sun)}.fxr .sc{text-align:center;font-family:var(--display);font-size:16px}.fxr .a{text-align:right}
+.fxr i{font-style:normal;color:var(--muted);font-size:11px;font-weight:800}
+.bracket{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(180px,1fr);gap:8px;overflow-x:auto;padding-bottom:6px}
+.bcol{display:grid;gap:4px;align-content:start}.bcol>b{font-family:var(--display);font-weight:400;font-size:15px;color:var(--sun)}
+.bm{font-size:12px;background:#12303e;border-radius:6px;padding:3px 6px;display:grid;gap:1px}.bm.me{outline:1px solid var(--sun)}
+.bm span{display:flex;justify-content:space-between;gap:6px}.bm .w{color:var(--mint);font-weight:800}.bm .l{color:var(--muted)}
+.prize{display:flex;flex-wrap:wrap;gap:6px}.prize span{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted)}.prize span.got{color:var(--mint);border-color:var(--mint)}
+.tactics{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;width:100%}
+.tactics .lab{margin-bottom:3px}
+.sqhead{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.benchctl,.collctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;width:100%}
+.collctl input,.collctl select,.benchctl select{font:inherit;font-size:13px;border-radius:999px;border:1px solid var(--line);background:var(--ground-2);color:var(--cream);padding:4px 10px}
+.pager{display:flex;gap:6px;justify-content:center;align-items:center;margin-top:8px;font-size:13px;color:var(--muted)}
+.card .cact{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.card .cact button{font:inherit;font-size:11px;font-weight:800;border-radius:999px;border:1px solid var(--line);background:#12303e;color:var(--cream);padding:2px 8px;cursor:pointer}
+.card .cact button[aria-pressed="true"]{border-color:var(--sun);color:var(--sun)}
+.card .abl{display:block;font-size:11px;font-weight:800;color:var(--tc);margin-top:2px}
+.card .eff{font-size:11px;color:var(--mint);font-weight:800}
+.cmp{width:100%}
+.upg{display:grid;grid-template-columns:minmax(200px,260px) 1fr;gap:12px;align-items:start}
+@media (max-width:640px){.upg{grid-template-columns:1fr}}
+.strow{display:grid;grid-template-columns:44px 1fr 44px 92px;gap:6px;align-items:center;font-size:13px;margin:3px 0}
+.strow .bar{height:8px;border-radius:4px;background:#12303e;overflow:hidden;position:relative}.strow .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--tc,var(--sun))}.strow .bar u{position:absolute;top:0;bottom:0;background:var(--mint);opacity:.85}
+.strow b{font-family:var(--display);font-weight:400;font-size:17px;text-align:right}
+.strow button,.btn{font:inherit;font-size:12px;font-weight:800;border-radius:999px;border:1px solid var(--mint);background:transparent;color:var(--mint);padding:3px 8px;cursor:pointer}
+.strow button:disabled,.btn:disabled{opacity:.4;cursor:default}
+.btn.gold{border-color:var(--sun);color:var(--sun)}
+.flash{color:var(--mint);font-weight:800}
+.ovrbig{font-family:var(--display);font-size:46px;line-height:1;color:var(--tc,var(--sun))}
+.prog{height:7px;border-radius:4px;background:#12303e;overflow:hidden;margin:3px 0}.prog i{display:block;height:100%;background:var(--mint)}
+.chl{display:grid;gap:6px}
+.chi{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;background:#12303e;border-radius:10px;padding:6px 10px;font-size:13px}
+.chi .prog{grid-column:1/3}.chi em{font-style:normal;color:var(--muted);font-size:12px}
+.achg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.ach{border:1px solid var(--line);border-radius:12px;padding:7px 9px;background:#12303e;font-size:12px;display:grid;gap:2px}
+.ach b{font-family:var(--display);font-weight:400;font-size:15px}.ach.done{border-color:var(--sun)}.ach.claimed{border-color:var(--mint);opacity:.85}.ach.claimed b::after{content:" \2713";color:var(--mint)}
+.cosg{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px}
+.soon{display:grid;place-items:center;gap:6px;padding:26px 12px;border:2px dashed var(--line);border-radius:16px;text-align:center}
+.soon b{font-family:var(--display);font-weight:400;font-size:28px;color:var(--sun)}
+.cabinet{display:flex;flex-wrap:wrap;gap:8px}.troph{border:1px solid var(--line);border-radius:12px;padding:6px 10px;background:#12303e;font-size:12px;text-align:center;min-width:110px}.troph b{display:block;font-size:24px}
+.welcome{border:1px solid var(--mint);color:var(--mint)}
 </style>
 
 <div class="stage">
@@ -245,34 +324,33 @@ kbd{font-family:var(--body);font-weight:800;font-size:12px;background:var(--grou
     <div class="clubbar">
       <label for="club-name" style="display:flex;align-items:center;gap:6px">CLUB<input type="text" id="club-name" maxlength="14"></label>
       <div class="sw" id="club-kit" aria-label="Kit colour"></div>
-      <span class="coins" id="coins"></span>
+      <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button>
     </div>
-    <div class="tabs" role="tablist"><button role="tab" id="tab-team" aria-selected="true">Team</button><button role="tab" id="tab-packs" aria-selected="false">Packs</button><button role="tab" id="tab-coll" aria-selected="false">Collection</button><button role="tab" id="tab-online" aria-selected="false">Online</button></div>
+    <div class="tabs" role="tablist"><button role="tab" id="tab-team" aria-selected="true">Play</button><button role="tab" id="tab-squad" aria-selected="false">Squad</button><button role="tab" id="tab-club" aria-selected="false">Club</button><button role="tab" id="tab-online" aria-selected="false">Online</button></div>
     <p class="result" id="result" hidden></p>
     <p class="toast" id="toast" aria-live="polite"></p>
     <section id="sec-team" style="width:100%;display:grid;gap:12px;justify-items:center">
+      <h3 class="sec-title" style="margin:0">Play football</h3>
+      <div class="modes" id="modes"></div>
       <div class="row">
         <div class="lvl" role="group" aria-label="Difficulty"><span>DIFFICULTY</span>
           <button data-lv="chill" aria-pressed="false">Chill</button>
           <button data-lv="normal" aria-pressed="false">Normal</button>
           <button data-lv="hard" aria-pressed="false">Hard</button>
         </div>
-        <div class="diff" role="group" aria-label="Competition">
-          <button data-d="easy" aria-pressed="false">Sunday Cup</button>
-          <button data-d="tour" aria-pressed="false">Grand Tournament</button>
-          <button data-d="friendly" aria-pressed="false">Friendly</button>
-          <button data-d="chal" aria-pressed="false">Challenges</button>
-          <button data-d="skill" aria-pressed="false">Skill games</button>
-        </div>
+        <div class="diff" id="comps" role="group" aria-label="Competition"></div>
         <button class="go" id="go">Kick off</button>
       </div>
       <p class="hint" id="diff-note"></p>
       <div class="cup" id="cup"></div>
+    </section>
+    <section id="sec-squad" hidden style="width:100%;display:grid;gap:12px;justify-items:center">
+      <div class="sqhead" id="sqhead"></div>
       <div class="builder">
         <div class="pitchmini" id="pitchmini" aria-label="Your 5-a-side line-up"></div>
         <div class="bside">
           <div class="sqtabs" id="sqtabs"></div>
-          <div class="bstats"><div class="bstat"><b id="team-rating">0</b><span>TEAM RATING</span></div><div class="bstat"><b id="team-chem">0/4</b><span>IN POSITION</span></div></div>
+          <div class="bstats"><div class="bstat"><b id="team-rating">0</b><span>TEAM RATING</span></div><div class="bstat"><b id="team-chem">0/4</b><span>IN POSITION</span></div><div class="bstat"><b id="team-chemistry">0</b><span>CHEMISTRY</span></div></div>
           <div><div class="lab">FORMATION</div><div class="forms" id="forms"></div></div>
           <div><div class="lab">ROLES · for the selected position</div><div class="forms" id="roles"></div><p class="hint" id="roles-note" style="margin:4px 0 0"></p></div>
           <p class="hint" style="margin:0">Tap a position, then tap a player to put them there. Tap two positions to swap them. Players out of position play at reduced stats.</p>
@@ -283,18 +361,24 @@ kbd{font-family:var(--body);font-weight:800;font-size:12px;background:var(--grou
           <dt>PAC · Pace</dt><dd>Running speed, with or without the ball. A 99 is about 45% quicker than a 50. Decides who wins races and breakaways.</dd>
           <dt>SHO · Shot power</dt><dd>How hard your shots fly. High power beats the keeper before he can dive, and powers Rockets and Knuckleballs.</dd>
           <dt>FIN · Finishing</dt><dd>Accuracy. Low finishing sprays shots wide of where you aimed, especially at full power. Also sharpens your penalties and ultimate shots.</dd>
-          <dt>SKL · Skill</dt><dd>How often your skill moves (E) put a defender on the floor, and how close the ball stays to your feet. High skill makes you very hard to tackle.</dd>
+          <dt>DRI · Dribbling</dt><dd>How often your skill moves (E) put a defender on the floor, and how close the ball stays to your feet. High skill makes you very hard to tackle.</dd>
           <dt>PAS · Passing</dt><dd>Pass accuracy and pace. Poor passers drift off target and play softer balls that get cut out. Also makes Through Balls cleaner.</dd>
           <dt>DEF · Defending</dt><dd>How often your lunges and slides actually win the ball when you reach it. A 90 defender wins it about twice as often as a 50.</dd>
-          <dt>STR · Strength</dt><dd>Holding off defenders. Strong players barely get bumped, can lean through weaker markers, resist tackles and knock players over when they bounce off.</dd>
+          <dt>PHY · Physical</dt><dd>Holding off defenders. Strong players barely get bumped, can lean through weaker markers, resist tackles and knock players over when they bounce off.</dd>
         </dl>
       </details>
+      <div class="tactics" id="tactics"></div>
       <h3 class="sec-title">Your players</h3>
+      <div class="benchctl" id="benchctl"></div>
       <div class="roster" id="bench"></div>
+    </section>
+    <section id="sec-club" hidden style="width:100%;display:grid;gap:10px">
+      <div class="ctabs" id="ctabs" role="tablist"></div>
+      <div id="club-body"></div>
     </section>
     <section id="sec-packs" hidden style="width:100%">
       <div class="packs" id="packs"></div>
-      <p class="hint" style="margin-top:10px">Each pick shows you three players and you sign one. Win matches to earn coins. Signing a player you already own sells the duplicate for coins.</p>
+      <p class="hint" style="margin-top:10px">Every pack shows you three players of one rarity and you sign one. All packs are bought with coins you earn by playing: no real money, ever. Signing a player you already own keeps the duplicate for Exchanges.</p>
     </section>
     <section id="sec-online" hidden style="width:100%">
       <div class="online">
@@ -316,19 +400,22 @@ kbd{font-family:var(--body);font-weight:800;font-size:12px;background:var(--grou
         <div class="row" style="justify-content:flex-start;margin-top:6px"><button class="ghost" id="save-load">Load save</button></div>
       </details>
       <details class="guide" id="whobox"><summary>Who’s who: the real players behind the cards</summary>
-        <p class="hint" style="margin:8px 0">Each card is a made-up player inspired by a real one. The country is the real player’s, and shows on every card. Spot a mistake? Fix it here and save.</p>
+        <p class="hint" style="margin:8px 0">Each of the original cards is a made-up player inspired by a real one (the newer cards are made up from scratch). The country is the real player’s, and shows on every card. Spot a mistake? Fix it here and save.</p>
         <div class="who" id="who"></div>
         <div class="row" style="margin-top:8px"><button class="go" id="who-save" style="font-size:18px">Save</button><button class="ghost" id="who-reset">Put back the originals</button></div>
       </details>
       <details class="guide" id="bulkbox"><summary>Rename players in one go</summary>
-        <p class="hint" style="margin:8px 0">Type a name in any box, then save. Leave a box empty to keep the card’s own name. Your names are saved to your account, and your online opponent sees them too.</p>
+        <p class="hint" style="margin:8px 0">Lists the players you own. Type a name in any box, then save. Leave a box empty to keep the card’s own name. Your names are saved to your account, and your online opponent sees them too.</p>
         <div class="bulk" id="bulk"></div>
         <label class="lab" for="bulk-paste" style="display:block;margin-top:10px">OR PASTE A LIST, ONE PER LINE: CARD NAME = NEW NAME</label>
         <textarea id="bulk-paste" rows="3" placeholder="Rafa Nuñez = Your name for him"></textarea>
         <div class="row" style="margin-top:8px"><button class="go" id="bulk-save" style="font-size:18px">Save names</button><button class="ghost" id="bulk-clear">Reset all to card names</button></div>
       </details>
       <div id="album"></div>
+      <div class="collctl" id="collctl"></div>
+      <div class="cmp" id="compare"></div>
       <div class="roster" id="market"></div>
+      <div class="pager" id="pager"></div>
     </section>
   </div></div>
   <div class="pack" id="pack" hidden><div class="confetti" id="confetti"></div><div class="pack-inner">

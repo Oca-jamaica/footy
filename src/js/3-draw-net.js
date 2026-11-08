@@ -124,7 +124,10 @@ function drawHUD(){
 }
 let hudKey=null,hudBumpT=-999;
 // Team sheets before kick-off: both line-ups slide in, with what's at stake
-function compLabel(){if(comp==='cup'&&club.cup)return `${CUPS[club.cup.tier].toUpperCase()}  ·  ${ROUNDS[Math.min(2,club.cup.round)].toUpperCase()}`;
+function compLabel(){const md=PITCH==='classical'?'CLASSICAL':'VOLTA';
+  if(comp==='league'&&lgOf())return `${md}  ·  ${DIVS[lgOf().div].n.toUpperCase()}  ·  ROUND ${lgOf().round+1} OF 18`;
+  if(comp==='wcc'&&wccOf())return OPP.final?`WORLD CLUB CHAMPIONSHIP  ·  THE FINAL`:`${md}  ·  WORLD CLUB CHAMPIONSHIP  ·  ${WROUNDS[wccOf().round].toUpperCase()}`;
+  if(comp==='cup'&&club.cup)return `${CUPS[club.cup.tier].toUpperCase()}  ·  ${ROUNDS[Math.min(2,club.cup.round)].toUpperCase()}`;
   if(comp==='tour'&&club.tour)return `GRAND TOURNAMENT  ·  ${TROUNDS[club.tour.round].toUpperCase()}`;
   if(comp==='chal'&&chalCur)return `CHALLENGE  ·  ${chalCur.name.toUpperCase()}`;return comp==='friendly'?'FRIENDLY':'MATCH DAY'}
 // Rain: streaks falling across the screen, a damp darkening and the odd splash on the grass
@@ -238,6 +241,7 @@ function draw(){
   const ents=players.map(p=>({y:p.y,f:()=>drawPlayer(p)}));ents.push({y:B.y+.1,f:()=>{drawTrail();drawBall()}});
   drawWorld(ents);
   if(hr('night')&&state!=='menu'){ctx.fillStyle='rgba(6,10,40,.42)';ctx.fillRect(0,0,W,H);for(const fx of [W*.15,W*.85]){const gr=ctx.createRadialGradient(fx,40,10,fx,40,420);gr.addColorStop(0,'rgba(255,250,220,.18)');gr.addColorStop(1,'rgba(255,250,220,0)');ctx.fillStyle=gr;ctx.fillRect(0,0,W,H)}}
+  {const th=cosOn('theme');if(th!=='theme_day'&&state!=='menu'){ctx.fillStyle=th==='theme_dusk'?'rgba(255,140,60,.13)':th==='theme_night'?'rgba(10,16,60,.3)':'rgba(212,175,55,.12)';ctx.fillRect(0,0,W,H)}}
   drawRain();drawModeWorld();
   drawSwipes();drawParts();drawDizzy();drawCtrlMarker();drawPops();drawBanner();drawFireGlow();
   {const v=state!=='menu';if(vigOn!==v){vigOn=v;const e=$('vig');if(e)e.hidden=!v}}
@@ -273,7 +277,8 @@ const NETNOTE='Your friend doesn’t need Claude. Send them the Sunday Kickabout
 async function netRoom(){if(roomNS)return roomNS;try{roomNS=window.claude&&window.claude.use?await window.claude.use('room'):null}catch(e){roomNS=null}return roomNS}
 function netStatus(s,bad){const el=$('net-status');if(el){el.textContent=s;el.style.color=bad?'var(--coral)':''}}
 function netCustom(){const c=custom;return{name:c.name,short:c.short,num:c.num,skin:c.skin,hair:c.hair,look:c.look||null,pace:c.pace,shot:c.shot,fin:c.fin,skill:c.skill,pass:c.pass,tackle:c.tackle,str:c.str,sk:c.sk,sp:c.sp,celeb:c.celeb||0}}
-function netMyTeam(){const q=sq();if(q.s.filter(Boolean).length<4)autoPick(q);const ids=q.s.map((id,i)=>id||STARTERS[i%3].id);
+function netMyTeam(){const q=club.squads[club.active];// online is always Volta 5-a-side
+  if(q.s.filter(Boolean).length<4)autoPick(q);const ids=q.s.map((id,i)=>id||STARTERS[i%3].id);
   return{s:ids,f:q.f,att:q.att??null,cap:q.cap??null,nm:ids.map(id=>{const p=byId(id);return p?p.name:''}),sh:ids.map(id=>{const p=byId(id);return p?p.short:''})}}
 const netPeer=role=>nroom?nroom.find(role):null;
 // Two ways to reach the other laptop, tried together: the Claude room (both signed in on claude.ai) and a direct
@@ -389,7 +394,7 @@ function netStart(){const g=netPeer('guest');if(!g){netStatus('Your friend isn�
   let kit=netGuest.kit;if(kitClash(kit,club.kit))kit=KITS.find(k=>!kitClash(k,club.kit)&&k!=='#2f2f3a')||'#4fb3ff';
   OPP={name:netGuest.club.toUpperCase(),kit,off:0};cupEvent=null;eventText=null;comp='online';
   NET.on=true;NET.host=true;NET.guest=false;netMatch=(Date.now()%100000)+1;
-  initAudio();if(ac&&ac.state==='suspended')ac.resume();DF=levelDF('normal');setup();hat=null;score=[0,0];mercy=false;clock=150;style=0;shownStyle=0;hype=0;fire=0;streak=0;
+  initAudio();if(ac&&ac.state==='suspended')ac.resume();DF=levelDF('normal');setPitch('volta');{const g0=GM;GM='volta';setup();GM=g0}hat=null;score=[0,0];mercy=false;clock=150;style=0;shownStyle=0;hype=0;fire=0;streak=0;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];RS={x:0,y:0,charging:false,charge:0};netSeenEv=netSeenEvOf(g);RME=null;netTk=0;netFe=0;netImp=0;netCim=null;netPre=null;netGuestAt=performance.now();netWaiting=false;
   menuEl.hidden=true;edEl.hidden=true;cv.focus();kickoff(0);ctrl2=outfield(1).reduce((a,b)=>b.slot.x>a.slot.x?b:a);
   const roster=players.map(p=>{const s=p.st;return[p.team,p.keeper?1:0,p.kit,String(s.id||'').replace(/_opp$/,'').replace(/^custom$/,'hcustom'),String(s.name||'').slice(0,16),String(s.short||'').slice(0,10),s.num||0,s.skin||'',s.hair||'',s.look||null,s.sk||'',s.sp||'',s.celeb||0,Object.fromEntries(STATK.map(([k])=>[k,Math.round((+s[k]||.6)*100)/100]))]});
@@ -519,7 +524,7 @@ function guestBuild(h){const R=h.presence.r;if(!Array.isArray(R)||R.length<4)ret
     const kit=typeof r[2]==='string'&&/^#[0-9a-f]{6}$/i.test(r[2])?r[2]:'#999999',p=mk(1-(+r[0]?1:0),j,st,kit,0,0,!!r[1]);p.slot={x:.3,y:.5,r:'MID'};return p});
   const hk=players.find(p=>p.team===1&&!p.keeper);OPP={name:String(h.presence.club||'Host').toUpperCase().slice(0,16),kit:hk?hk.kit:'#8e8ff0',off:0};
   return true}
-function guestBegin(h){if(!guestBuild(h))return;NET.on=true;NET.guest=true;NET.host=false;comp='online';netLock=false;netGotMatch=h.presence.m;netGState='';
+function guestBegin(h){setPitch('volta');if(!guestBuild(h))return;NET.on=true;NET.guest=true;NET.host=false;comp='online';netLock=false;netGotMatch=h.presence.m;netGState='';
   netSeenPop=Infinity;netSeenSfx=Infinity;score=[0,0];clock=150;style=0;shownStyle=0;hype=0;fire=0;streak=0;hat=null;mercy=false;pen=null;cupEvent=null;eventText=null;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];charging=false;
   menuEl.hidden=true;edEl.hidden=true;$('pack').hidden=true;cv.focus();state='play';stT=0;S.whistle(1);netLastSnapAt=performance.now();netGuestWait=false;gMe.p=null;gMe.on=false;gMe.hx=null;netLastEcho=0;gT.seq=0;gT.ack=0;gT.pk=null;gT.lob=false;gFe.length=0;gFeN=0;gPrev=null;gImp=0;netEvSent={};netApply(h.presence.g,true)}
@@ -644,7 +649,7 @@ $('save-load').onclick=()=>{const raw=($('save-code').value||'').trim().replace(
   try{localStorage.setItem('kickabout-club',JSON.stringify(club));localStorage.setItem('kickabout-names',JSON.stringify(NAMES));localStorage.setItem('kickabout-custom',JSON.stringify(custom));localStorage.setItem('kickabout-best3',best)}catch(e){}
   cloudPush();setup();$('save-code').value='';$('save-note').style.color='';$('save-note').textContent='';renderMenu();S.goal&&S.goal();toast(`Save loaded: ${club.name||'your club'}, ${club.owned.length} players, ${club.coins.toLocaleString()} coins.`)};
 /* who's who */
-function whoRender(){const list=[...PLAYERS].sort((a,b)=>ovr(b)-ovr(a)),opts=Object.keys(COUNTRIES).sort();
+function whoRender(){const list=PLAYERS.filter(p=>!p.rar).sort((a,b)=>ovr(b)-ovr(a)),opts=Object.keys(COUNTRIES).sort();
   $('who').innerHTML=`<div class="wr wh"><span>CARD</span><span>INSPIRED BY</span><span>COUNTRY</span></div>`+list.map(p=>{const [nm,c]=inspOf(p.id);
     return `<div class="wr"><span><b>${esc(p.name)}</b>${p.name!==p.name0?`<small>card: ${esc(p.name0)}</small>`:''}<small>${ovr(p)} · ${natPos(p)}</small></span><input type="text" maxlength="30" data-wi="${esc(p.id)}" value="${esc(nm)}" aria-label="Inspired by"><select data-wc="${esc(p.id)}" aria-label="Country">${(opts.includes(c)?opts:[c,...opts]).map(o=>`<option${o===c?' selected':''}>${esc(o)}</option>`).join('')}</select></div>`}).join('')}
 $('whobox').addEventListener('toggle',()=>{if($('whobox').open)whoRender()});
@@ -652,7 +657,7 @@ $('who-save').onclick=()=>{const ins={};for(const i of $('who').querySelectorAll
     if(v!==d[0]||c!==d[1])ins[id]=[v,c]}club.insp=ins;saveClub();renderMenu();whoRender();toast('Who’s who saved.')};
 $('who-reset').onclick=()=>{club.insp={};saveClub();renderMenu();whoRender();toast('Back to the original list.')};
 /* rename lots of players at once */
-function bulkRender(){const list=[...PLAYERS].sort((a,b)=>ovr(b)-ovr(a));
+function bulkRender(){const list=PLAYERS.filter(p=>club.owned.includes(p.id)).sort((a,b)=>ovr(b)-ovr(a));
   $('bulk').innerHTML=list.map(p=>`<label><span>${esc(p.name0)} · ${ovr(p)}</span><input type="text" maxlength="16" data-bn="${esc(p.id)}" value="${esc(NAMES[p.id]||'')}" placeholder="${esc(p.name0)}"></label>`).join('')}
 $('bulkbox').addEventListener('toggle',()=>{if($('bulkbox').open)bulkRender()});
 $('bulk-save').onclick=()=>{let n=0;
@@ -688,6 +693,6 @@ cv.addEventListener('contextrestored',()=>{dropCaches();cleanCtx()});cv.addEvent
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){dropCaches();last=performance.now()}});
 if(document.fonts&&document.fonts.load)document.fonts.load('40px "Lilita One"').catch(()=>{});
 $('fixscr').onclick=fixScreen;$('fixscr2').onclick=()=>{setPause(false);fixScreen()};
-window.__kick={errs:()=>loopErrs,dbg:{draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({gm:{on:gMe.on,seq:gT.seq,ack:gT.ack,lob:gT.lob,wait:netGuestWait,rtt:netRtt,v2:netV2},RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+window.__kick={errs:()=>loopErrs,dbg:{draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({gm:{on:gMe.on,seq:gT.seq,ack:gT.ack,lob:gT.lob,wait:netGuestWait,rtt:netRtt,v2:netV2},RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 startLoop();
 })();

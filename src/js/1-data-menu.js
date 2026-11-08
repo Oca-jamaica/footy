@@ -4,7 +4,8 @@ const W=1000,H=620,DPR=Math.min(2,window.devicePixelRatio||1);
 cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // Pitch is now ~55% longer and ~47% wider than before; the broadcast camera pans to follow play.
-const FX0=175,FX1=1325,FY0=122,FY1=762,MIDX=750,MY=442,GY0=MY-62,GY1=MY+62,BOX=175,BOXH=165,SPOT=135,BAR=32;
+// pitch geometry: Volta (5-a-side) by default, swapped for the big Classical pitch by setPitch()
+let FX0=175,FX1=1325,FY0=122,FY1=762,MIDX=750,MY=442,GY0=MY-62,GY1=MY+62,BOX=175,BOXH=165,SPOT=135,PITCH='volta';const BAR=32;
 const C={g1:'#6fbe77',g2:'#64b26c',line:'rgba(255,250,235,.85)',coral:'#ff6f59',lilac:'#8e8ff0',sun:'#ffd166',mint:'#7fe0b4',cream:'#fff6e4',muted:'#a9c4cf',ink:'#14303f',stand:'#1c4053',stand2:'#183849'};
 const CONF=['#ff6f59','#ffd166','#7fe0b4','#8e8ff0','#ff9ecb','#fff6e4','#5ec8ff'];
 const rnd=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -33,7 +34,7 @@ const SPECIALS={
 
   slide:{name:'INTERCEPTOR',cd:960,d:'Lightning lunge that always wins the ball if you reach the carrier.'},
   turbo:{name:'TURBO',cd:1080,d:'Three seconds of top speed without using stamina.'}};
-const STATK=[['pace','PAC'],['shot','SHO'],['fin','FIN'],['skill','SKL'],['pass','PAS'],['tackle','DEF'],['str','STR']];
+const STATK=[['pace','PAC'],['shot','SHO'],['fin','FIN'],['skill','DRI'],['pass','PAS'],['tackle','DEF'],['str','PHY']];
 // [id,name,short,num,tag,pace,shot,fin,skill,pass,tackle,str,skill,special,celeb,skin,hair]
 // Stat shapes: how a player's seven stats sit relative to their rating. Stats are then shifted so the card rating matches.
 const SHAPES={
@@ -97,24 +98,27 @@ const ROWS=[
  ['leon','Leon Fry','FRY',17,'Pub Winger','ATT',57,'speed','Step-over','Curler',3,'#c68d63','#111111',['quiff',0,0,1],'Thinks he’s a winger. Sometimes is'],
  ['gaz','Gaz Moss','MOSS',3,'Sunday Stopper','DEF',59,'cb','Dragback','Interceptor',5,'#e8b88c','#4a2c1a',['buzz',0,1,1.04],'Will put a foot in. Always'],
  ['wes','Wes Hollis','HOLLIS',12,'Keen Bean','MID',56,'b2b','Step-over','Turbo',0,'#f2cfae','#b5562b',['curly',0,0,.98],'Keen as mustard']];
-const PLAYERS0=ROWS.map(r=>{const v=statsFor(r[6],r[7]);return{id:r[0],name:r[1],short:r[2],num:r[3],tag:r[4],pos:r[5],pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],
+const PLAYERS0=ROWS.map(r=>{const v=statsFor(r[6]>=87?Math.min(98,r[6]+3):r[6],r[7]);return{id:r[0],name:r[1],short:r[2],num:r[3],tag:r[4],pos:r[5],pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],
   sk:SKMAP[r[8]],sp:SPMAP[r[9]],celeb:r[10],skin:r[11],hair:r[12],look:r[13],plays:r[14]}});
 // saves from older versions: carry over players whose inspiration survived, refund the rest
 const OLDMAP={lena:'marc',andre:'sverre',finn:'nico',baz:'alessio',ze:'lucien',bruno:'moussa',sami:'jordan',nia:'shaun',luca:'jake',theo:'diego',yuki:'han',kofi:'edinho',ama:'rui',jonny:'callum',pablo:'anderson',ivo:'hamish',max:'rory',ray:'evan',tom:'femi',sid:'toby',joe:'gary'};
 
+const SKINS=['#f2cfae','#e8b88c','#c68d63','#8d5a3b','#5e3a24'],HAIRS=['#111111','#4a2c1a','#c9a15b','#b5562b','#e8e2d6','#5ec8ff'];
 const PLAYERS=PLAYERS0;
+// the wider database: about a thousand made-up footballers, the same for everyone (see 1b-career.js)
+for(const p of genPlayers())PLAYERS.push(p);
 let cloud=null,cloudTm=0,cloudBusy=false;
 let NAMES={};try{NAMES=JSON.parse(localStorage.getItem('kickabout-names')||'{}')||{}}catch(e){}
 for(const p of PLAYERS){p.name0=p.name;p.short0=p.short;if(NAMES[p.id]){p.name=NAMES[p.id];p.short=NAMES[p.id].split(' ').pop().toUpperCase().slice(0,10)}}
 const ROSTER=PLAYERS,STARTERS=PLAYERS.filter(p=>['dave','leon','gaz'].includes(p.id)),MID=[];
-const SKINS=['#f2cfae','#e8b88c','#c68d63','#8d5a3b','#5e3a24'],HAIRS=['#111111','#4a2c1a','#c9a15b','#b5562b','#e8e2d6','#5ec8ff'];
 const BUDGET=470;
 let custom={id:'custom',name:'Your Name',short:'NAME',num:99,tag:'Created player',pace:.75,shot:.75,fin:.7,skill:.7,pass:.7,tackle:.5,str:.6,sk:'roulette',sp:'curler',celeb:0,skin:SKINS[1],hair:HAIRS[0],isCustom:true};
 try{const c=JSON.parse(localStorage.getItem('kickabout-custom')||'null');if(c&&c.name)custom={...custom,...c,isCustom:true}}catch(e){}
 function natPos(p){if(p.pos)return p.pos;const d=p.tackle*1.6+p.str*.6,m=p.pass*1.3+p.skill*.7,a=(p.shot+p.fin)*.8+p.pace*.3;return d>=m&&d>=a?'DEF':m>=a?'MID':'ATT'}
 const allPlayers=()=>[...PLAYERS,custom];
 const everyone=allPlayers;
-const byId=id=>everyone().find(p=>p.id===id);
+const PMAP=new Map();
+function byId(id){if(id==='custom')return custom;if(PMAP.size!==PLAYERS.length){PMAP.clear();for(const p of PLAYERS)PMAP.set(p.id,p)}return PMAP.get(id)}
 const KITS=['#ff6f59','#4fb3ff','#e8475f','#f4f1ea','#2f2f3a','#b06cf0'];
 // 5-a-side: a keeper plus four outfield slots. x = how far up the pitch (0 own goal, 1 their goal), y = 0 left touchline to 1 right.
 const FORMS={
@@ -122,27 +126,42 @@ const FORMS={
   '1-2-1':[{r:'DEF',x:.18,y:.5},{r:'MID',x:.38,y:.24},{r:'MID',x:.38,y:.76},{r:'ATT',x:.6,y:.5}],
   '2-1-1':[{r:'DEF',x:.2,y:.3},{r:'DEF',x:.2,y:.7},{r:'MID',x:.4,y:.5},{r:'ATT',x:.6,y:.5}],
   '1-1-2':[{r:'DEF',x:.18,y:.5},{r:'MID',x:.36,y:.5},{r:'ATT',x:.58,y:.3},{r:'ATT',x:.58,y:.7}],
-  '3-1':[{r:'DEF',x:.24,y:.2},{r:'DEF',x:.18,y:.5},{r:'DEF',x:.24,y:.8},{r:'ATT',x:.56,y:.5}]};
+  '3-1':[{r:'DEF',x:.24,y:.2},{r:'DEF',x:.18,y:.5},{r:'DEF',x:.24,y:.8},{r:'ATT',x:.56,y:.5}],
+  // Classical 9-a-side: a keeper plus eight outfield slots
+  '3-3-2':[{r:'DEF',x:.17,y:.22},{r:'DEF',x:.15,y:.5},{r:'DEF',x:.17,y:.78},{r:'MID',x:.37,y:.2},{r:'MID',x:.34,y:.5},{r:'MID',x:.37,y:.8},{r:'ATT',x:.6,y:.36},{r:'ATT',x:.6,y:.64}],
+  '3-2-3':[{r:'DEF',x:.17,y:.22},{r:'DEF',x:.15,y:.5},{r:'DEF',x:.17,y:.78},{r:'MID',x:.36,y:.36},{r:'MID',x:.36,y:.64},{r:'ATT',x:.58,y:.16},{r:'ATT',x:.62,y:.5},{r:'ATT',x:.58,y:.84}],
+  '2-4-2':[{r:'DEF',x:.16,y:.34},{r:'DEF',x:.16,y:.66},{r:'MID',x:.36,y:.12},{r:'MID',x:.33,y:.38},{r:'MID',x:.33,y:.62},{r:'MID',x:.36,y:.88},{r:'ATT',x:.6,y:.36},{r:'ATT',x:.6,y:.64}],
+  '3-4-1':[{r:'DEF',x:.17,y:.22},{r:'DEF',x:.15,y:.5},{r:'DEF',x:.17,y:.78},{r:'MID',x:.37,y:.12},{r:'MID',x:.34,y:.38},{r:'MID',x:.34,y:.62},{r:'MID',x:.37,y:.88},{r:'ATT',x:.62,y:.5}],
+  '4-3-1':[{r:'DEF',x:.18,y:.14},{r:'DEF',x:.15,y:.38},{r:'DEF',x:.15,y:.62},{r:'DEF',x:.18,y:.86},{r:'MID',x:.36,y:.24},{r:'MID',x:.34,y:.5},{r:'MID',x:.36,y:.76},{r:'ATT',x:.6,y:.5}]};
+const FORM_KEYS={volta:['2-2','1-2-1','2-1-1','1-1-2','3-1'],classical:['3-3-2','3-2-3','2-4-2','3-4-1','4-3-1']};
 const posFit=(pos,r)=>pos===r?1:(pos==='MID'||r==='MID')?.93:.86;
-let club={name:'Sunday XI',kit:KITS[0],coins:400,owned:['dave','leon','gaz','custom','wes'],squads:[{f:'2-2',s:['gaz','dave','leon','custom']},{f:'1-2-1',s:[null,null,null,null]},{f:'2-1-1',s:[null,null,null,null]}],active:0,gift:true,played:0};
+const E8=()=>[null,null,null,null,null,null,null,null];
+let club={name:'Sunday XI',kit:KITS[0],coins:400,owned:['dave','leon','gaz','custom','wes'],squads:[{f:'2-2',s:['gaz','dave','leon','custom']},{f:'1-2-1',s:[null,null,null,null]},{f:'2-1-1',s:[null,null,null,null]}],active:0,
+  csquads:[{f:'3-3-2',s:E8()},{f:'3-2-3',s:E8()},{f:'2-4-2',s:E8()}],cactive:0,gm:'volta',gift:true,played:0};
 function loadClubFrom(c){if(c&&c.cup&&!Array.isArray(c.cup.opps))delete c.cup;if(c&&Array.isArray(c.owned)){club={...club,...c};delete club.squad;
   club.squads=(club.squads||[]).map((q,i)=>Array.isArray(q)?{f:['2-2','1-2-1','2-1-1'][i]||'2-2',s:[...q,null,null,null,null].slice(0,4)}:q);
   while(club.squads.length<3)club.squads.push({f:'2-2',s:[null,null,null,null]});
+  if(!Array.isArray(club.csquads))club.csquads=[{f:'3-3-2',s:E8()},{f:'3-2-3',s:E8()},{f:'2-4-2',s:E8()}];
+  for(const q of club.csquads){if(!FORM_KEYS.classical.includes(q.f))q.f='3-3-2';q.s=[...(q.s||[]),...E8()].slice(0,8)}club.cactive=clamp(club.cactive|0,0,2);
   if(!club.owned.includes('wes'))club.owned.push('wes');
   const known=new Set([...PLAYERS0.map(p=>p.id),'custom']);let refund=0;
   club.owned=[...new Set(club.owned.map(id=>known.has(id)?id:OLDMAP[id]?OLDMAP[id]:(refund+=150,null)).filter(Boolean))];
   for(const q of club.squads)q.s=q.s.map(id=>id&&known.has(id)?id:id&&OLDMAP[id]&&club.owned.includes(OLDMAP[id])?OLDMAP[id]:null);
+  for(const q of club.csquads)q.s=q.s.map(id=>id&&(known.has(id)||club.owned.includes(id))?id:null);
   club.coins+=refund}}
 try{loadClubFrom(JSON.parse(localStorage.getItem('kickabout-club')||'null'))}catch(e){}
-const sq=()=>club.squads[club.active];
-const ownedPlayers=()=>club.owned.map(id=>byId(id)).filter(Boolean).sort((a,b)=>ovr(b)-ovr(a));
-function slotRating(id,i,q=sq()){const p=byId(id);if(!p)return 0;return Math.round(ovr(p)*posFit(natPos(p),FORMS[q.f][i].r))}
-function teamRating(q=sq()){const v=q.s.map((id,i)=>slotRating(id,i,q)).filter(Boolean);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/4):0}
+// Volta (5-a-side) and Classical (9-a-side) each keep their own line-ups, picked from the one shared collection
+let GM=club.gm==='classical'?'classical':'volta';
+const sqList=()=>GM==='classical'?club.csquads:club.squads;
+const sq=()=>GM==='classical'?club.csquads[club.cactive||0]:club.squads[club.active];
+const ownedPlayers=()=>club.owned.map(id=>byId(id)).filter(Boolean).sort((a,b)=>effOvr(b)-effOvr(a));
+function slotRating(id,i,q=sq()){const p=byId(id);if(!p)return 0;return Math.round(effOvr(p)*posFit(natPos(p),FORMS[q.f][i].r))}
+function teamRating(q=sq()){const v=q.s.map((id,i)=>slotRating(id,i,q)).filter(Boolean);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/q.s.length):0}
 function autoPick(q=sq()){
-  const used=new Set(),slots=FORMS[q.f];q.s=[null,null,null,null];
+  const used=new Set(),slots=FORMS[q.f];q.s=slots.map(()=>null);
   // fill each slot with the best owned player for that role, best-fit first
-  const order=[0,1,2,3].sort((a,b)=>({DEF:0,ATT:1,MID:2}[slots[a].r]-{DEF:0,ATT:1,MID:2}[slots[b].r]));
-  for(const i of order){let best=null,bs=-1;for(const p of ownedPlayers()){if(used.has(p.id))continue;const v=ovr(p)*posFit(natPos(p),slots[i].r);if(v>bs){bs=v;best=p}}if(best){q.s[i]=best.id;used.add(best.id)}}
+  const order=slots.map((x,i)=>i).sort((a,b)=>({DEF:0,ATT:1,MID:2}[slots[a].r]-{DEF:0,ATT:1,MID:2}[slots[b].r]));
+  for(const i of order){let best=null,bs=-1;for(const p of ownedPlayers()){if(used.has(p.id))continue;const v=effOvr(p)*posFit(natPos(p),slots[i].r);if(v>bs){bs=v;best=p}}if(best){q.s[i]=best.id;used.add(best.id)}}
 }
 const saveClub=()=>{try{localStorage.setItem('kickabout-club',JSON.stringify(club))}catch(e){}cloudPush()};
 /* ---------- cloud save: your club, names and created player follow your Claude account ---------- */
@@ -166,14 +185,18 @@ async function cloudInit(){try{
   cloud=ref;if(!remote||progressOf(remote)<=progressOf(snapshotSave()))cloudPush();
 }catch(e){}}
 let mode='club';
-const tier=p=>{const o=ovr(p);return o>=87?'icon':o>=80?'gold':o>=70?'silver':'bronze'};
-const TIERS={bronze:{name:'Bronze',sell:30},silver:{name:'Silver',sell:90},gold:{name:'Gold',sell:250},icon:{name:'Icon',sell:600}};
+// rarity: generated cards carry their own; the original cards and your created player go by rating
+const tier=p=>{if(p.rar)return p.rar;const o=ovr(p);if(p.isCustom)return tierAt(o);return o>=87?'icon':o>=75?'gold':o>=65?'silver':'bronze'};
+const TIERS={bronze:{name:'Bronze',sell:40},silver:{name:'Silver',sell:120},gold:{name:'Gold',sell:350},special:{name:'Special',sell:900},icon:{name:'Icon',sell:2500}};
 const price=p=>Math.max(150,Math.round(Math.pow(Math.max(0,ovr(p)-50),2)*1.8/50)*50);
+// Every pack shows three players of one rarity and you sign one. Odds are shown on each pack. No real money anywhere.
 const PACKS=[
-  {id:'bronze',name:'Bronze pick',cost:130,odds:{bronze:85,silver:15,gold:0,icon:0},d:'Attacker, midfielder or defender: 3 bronzes (15% chance all silver). Sign 1.'},
-  {id:'silver',name:'Silver pick',cost:400,odds:{bronze:0,silver:88,gold:11,icon:1},d:'3 silvers (11% chance all gold, 1% icons). Sign 1.'},
-  {id:'gold',name:'Gold pick',cost:900,odds:{bronze:0,silver:30,gold:66,icon:4},d:'Usually 3 golds, sometimes silvers (4% chance all icons). Sign 1.'},
-  {id:'icon',name:'Icon pick',cost:2500,odds:{bronze:0,silver:0,gold:35,icon:65},d:'65% chance of three icons, otherwise golds. Sign 1.'}];
+  {id:'bronze',name:'Bronze Pack',cost:250,odds:{bronze:80,silver:20,gold:0,special:0,icon:0},d:'Three bronzes, or three silvers 20% of the time. Sign one.'},
+  {id:'silver',name:'Silver Pack',cost:750,odds:{bronze:0,silver:85,gold:15,special:0,icon:0},d:'Three silvers, or three golds 15% of the time. Sign one.'},
+  {id:'gold',name:'Gold Pack',cost:2000,odds:{bronze:0,silver:0,gold:100,special:0,icon:0},d:'Three golds. Sign one.'},
+  {id:'premium',name:'Premium Gold Pack',cost:5000,odds:{bronze:0,silver:0,gold:80,special:20,icon:0},d:'Three golds, or three Specials 20% of the time. Sign one.'},
+  {id:'elite',name:'Elite Pack',cost:12500,odds:{bronze:0,silver:0,gold:30,special:70,icon:0},d:'Three Specials 70% of the time, otherwise top golds. Sign one.'},
+  {id:'icon',name:'Icon Pack',cost:50000,odds:{bronze:0,silver:0,gold:0,special:0,icon:100},d:'Guaranteed: three Icons. Sign one.'}];
 const ovr=p=>{if(p.isCustom)return customOvr(p);const v=[p.pace,p.shot,p.fin,p.skill,p.pass,p.tackle,p.str].sort((a,b)=>b-a).slice(0,5);return Math.min(99,Math.round(v.reduce((a,b)=>a+b,0)/5*100))};
 
 // Your created player: every stat point counts towards the rating, so training always moves it up.
@@ -242,13 +265,13 @@ const INSP0={rafa:['Lionel Messi','Argentina'],marco:['Cristiano Ronaldo','Portu
 const inspOf=id=>{const o=club.insp&&club.insp[id];const d=INSP0[id]||['',''];return o?[o[0]??d[0],o[1]??d[1]]:d};
 const natHTML=p=>{if(p.isCustom)return '';const c=inspOf(p.id)[1],k=COUNTRIES[c];return c?`<span class="nat" title="${esc(c)}">${k?k[1]+' '+k[0]:esc(c).slice(0,3).toUpperCase()}</span>`:''};
 function cardHTML(p,o={}){
-  const sel=o.sel??-1;
+  const sel=o.sel??-1,mineC=!p.isCustom&&club.owned.includes(p.id)&&!o.base,ps=mineC?playStats(p):p;
   return `<div class="card t-${tier(p)}${o.inteam?' inteam':''}" ${o.pickable?`role="button" tabindex="0"`:''} data-id="${p.id}" ${o.pickable?'':'style="cursor:default"'}>
     ${o.badge?`<span class="badge">${o.badge}</span>`:''}
-    <div class="top"><span class="ovr">${ovr(p)}</span><div style="min-width:0"><h2>${esc(p.name)}</h2><span class="tag">#${p.num} · ${esc(p.tag).toUpperCase()}</span><br><span class="tier">${TIERS[tier(p)].name.toUpperCase()}</span><span class="pos">${natPos(p)}</span>${natHTML(p)}</div></div>
+    <div class="top"><span class="ovr">${mineC?effOvr(p):ovr(p)}</span><div style="min-width:0"><h2>${esc(p.name)}</h2><span class="tag">#${p.num} · ${esc(p.tag).toUpperCase()}</span><br><span class="tier">${TIERS[tier(p)].name.toUpperCase()}</span><span class="pos">${natPos(p)}</span>${natHTML(p)}${mineC&&effOvr(p)>ovr(p)?` <span class="eff">card ${ovr(p)}${evoOf(p.id).st?' · evo '+evoOf(p.id).st:''}${upSpent(p.id)?' · +'+upSpent(p.id)+' up':''}</span>`:''}${p.ab?`<span class="abl">★ ${ABIL[p.ab].name}</span>`:''}</div></div>
     ${o.nolv?'':lvlHTML(p)}
     ${p.plays?`<p class="plays">${esc(p.plays)}</p>`:''}
-    <div class="nums">${STATK.map(([k,l])=>`<span>${l} <b>${Math.round(p[k]*100)}</b></span>`).join('')}</div>
+    <div class="nums">${STATK.map(([k,l])=>`<span>${l} <b>${Math.round(ps[k]*100)}</b></span>`).join('')}</div>
     <div class="abil"><span class="chip">E ${SKILLS[p.sk].name}</span><span class="chip sp">X ${SPECIALS[p.sp].name}</span></div>
     ${o.extra||''}</div>`;
 }
@@ -324,17 +347,33 @@ function renderTour(){
 }
 
 const renameUI=(p,where)=>renaming===p.id&&renameIn===where?`<div class="rn"><input type="text" id="rn-input" maxlength="16" value="${esc(NAMES[p.id]||p.name)}" aria-label="Player name"><button class="buy" data-rn-save="${p.id}">Save</button>${NAMES[p.id]?`<button class="edit" data-rn-reset="${p.id}">Reset</button>`:''}</div>`:`<button class="edit" data-rename="${p.id}">Rename</button>`;
+let ctab='coll',lgView='table',benchAll=false,cmpIds=[],upId=null;const collF={q:'',r:'all',pos:'all',own:'owned',sort:'ovr',page:0};
+const COMPS={volta:['league','wcc','easy','tour','friendly','chal','skill'],classical:['league','wcc','friendly']};
+const COMPN={league:'League',wcc:'World Club Championship',easy:'Sunday Cup',tour:'Grand Tournament',friendly:'Friendly',chal:'Challenges',skill:'Skill games'};
+const compKey=()=>comp==='cup'?'easy':comp;
+// switching game mode swaps the line-up, the league season and the competition you were looking at
+function setGM(g){if(g===GM)return;club.compBy=club.compBy||{};club.compBy[GM]=club.comp;GM=g;club.gm=g;club.comp=club.compBy[g]||'league';
+  if(!COMPS[g].includes(club.comp==='cup'?'easy':club.comp))club.comp='league';selSlot=0;saveClub();renderMenu()}
 function renderMenu(){
-  for(const k of ['team','packs','coll','online']){$('tab-'+k).setAttribute('aria-selected',tab===k);$('sec-'+k).hidden=tab!==k}
-  comp=club.comp||'cup';document.querySelectorAll('.lvl button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lv===(club.level||'normal')?'true':'false'));document.querySelectorAll('.diff button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.d===(comp==='cup'?diffKey:comp)?'true':'false'));
+  careerInit();
+  for(const k of ['team','squad','club','online'])$('tab-'+k).setAttribute('aria-selected',tab===k);
+  $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';
+  $('sec-packs').hidden=!(tab==='club'&&ctab==='packs');$('sec-coll').hidden=!(tab==='club'&&ctab==='coll');
+  comp=club.comp||'league';if(!COMPS[GM].includes(compKey())){comp=club.comp='league'}
+  document.querySelectorAll('.lvl button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lv===(club.level||'normal')?'true':'false'));
+  renderModes();
+  $('comps').innerHTML=COMPS[GM].map(c=>`<button data-d="${c}" aria-pressed="${compKey()===c}">${COMPN[c]}</button>`).join('');
   if(!club.cup||club.cup.tier!==diffKey)newCup(diffKey);
-  if(comp==='friendly')renderFriendly();else if(comp==='chal')renderChal();else if(comp==='skill')renderSkill();
+  if(comp==='league')renderLeague();else if(comp==='wcc')renderWcc();
+  else if(comp==='friendly')renderFriendly();else if(comp==='chal')renderChal();else if(comp==='skill')renderSkill();
   else if(comp==='tour'){if(!club.tour)newTour();$('diff-note').textContent=`${LV().name}: ${LV().note} 16 clubs, straight knockout. Four wins to lift the trophy.`;renderTour()}
   else{$('diff-note').textContent=`${LV().name}: ${LV().note} Coins ×${+(DIFFS[diffKey].coin*LV().coin).toFixed(2)}.`;const c=club.cup,tro=(club.trophies||{})[c.tier]||0;
    $('cup').innerHTML=`<div class="cup-head"><b>${CUPS[c.tier]}</b><span>${tro?'\u{1F3C6} ×'+tro+' won':'Win three in a row to lift the trophy'}</span></div><div class="rounds">`+ROUNDS.map((r,i)=>{const o=OPPS[c.opps[i]],st=i<c.res.length?(c.res[i]?'won':'lost'):i===c.round&&c.alive?'now':'';
      return `<div class="rnd ${st}" style="--k:${o[1]}"><i>${r.toUpperCase()}</i><em>${esc(o[0])}</em>${st==='won'?'<b>WON</b>':st==='lost'?'<b>KNOCKED OUT</b>':st==='now'?'<b style="color:var(--sun)">NEXT</b>':''}</div>`}).join('')+`</div>`}
   $('club-name').value=club.name;{const el=$('coins');el.textContent=club.coins.toLocaleString();if(shownCoins!=null&&club.coins!==shownCoins){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}shownCoins=club.coins}
-  $('club-kit').innerHTML=KITS.map(c=>`<button type="button" style="background:${c}" aria-label="Kit colour" aria-pressed="${club.kit===c}" data-c="${c}"></button>`).join('');
+  res();$('tt').textContent=club.tt;$('cp').textContent=club.cp.toLocaleString();$('legpill').textContent='Legacy Lv '+((club.leg||{}).lvl||0);
+  $('club-kit').innerHTML=[...KITS,...(cosOwned('kit_gold')?['#d4af37']:[])].map(c=>`<button type="button" style="background:${c}" aria-label="Kit colour" aria-pressed="${club.kit===c}" data-c="${c}"></button>`).join('');
+  if(club.welcome){resultEl.hidden=false;resultEl.textContent=club.welcome;delete club.welcome;saveClub()}
   const q=sq();q.s=q.s.map(id=>id&&club.owned.includes(id)?id:null);
   // pitch
   const slots=FORMS[q.f];
@@ -345,28 +384,26 @@ function renderMenu(){
     const fit=natPos(p)===sl.r;
     const rb=q.att===i?'<em class="role att" title="Attacking role">⚡</em>':q.cap===i?'<em class="role" title="Captain">C</em>':'';
     return `<button class="slot t-${tier(p)}${selSlot===i?' sel':''}" data-slot="${i}" style="${pos}">${rb}<b>${slotRating(id,i)}</b><span>${esc(p.short)}</span><i class="${fit?'':'bad'}">${sl.r}${fit?'':' · '+natPos(p)}</i></button>`}).join('');
-  $('forms').innerHTML=Object.keys(FORMS).map(f=>`<button data-f="${f}" aria-pressed="${q.f===f}">${f}</button>`).join('');
+  $('forms').innerHTML=FORM_KEYS[GM].map(f=>`<button data-f="${f}" aria-pressed="${q.f===f}">${f}</button>`).join('');
   {const nm=i=>i!=null&&q.s[i]?esc(byId(q.s[i]).short):'none';
    $('roles').innerHTML=`<button data-role="att" aria-pressed="${q.att===selSlot}">⚡ Attacking: ${nm(q.att)}</button><button data-role="cap" aria-pressed="${q.cap===selSlot}">C Captain: ${nm(q.cap)}</button>`;
    $('roles-note').textContent='Attacking role: pushes right up and makes runs beyond the striker. Captain: sits deeper and stays back when you attack. Tap a role again to remove it.'}
   $('team-rating').textContent=teamRating();
-  $('team-chem').textContent=q.s.filter((id,i)=>id&&natPos(byId(id))===slots[i].r).length+'/4';
-  $('sqtabs').innerHTML=club.squads.map((x,i)=>`<button data-sq="${i}" aria-pressed="${i===club.active}">Squad ${i+1}${teamRating(x)?' · '+teamRating(x):''}</button>`).join('')+'<button data-best="1">Auto-pick best</button>';
+  $('team-chem').textContent=q.s.filter((id,i)=>id&&natPos(byId(id))===slots[i].r).length+'/'+slots.length;
+  $('sqtabs').innerHTML=sqList().map((x,i)=>`<button data-sq="${i}" aria-pressed="${i===(GM==='classical'?club.cactive:club.active)}">Squad ${i+1}${teamRating(x)?' · '+teamRating(x):''}</button>`).join('')+'<button data-best="1">Auto-pick best</button>';
   // bench
-  $('bench').innerHTML=ownedPlayers().map(p=>{const at=q.s.indexOf(p.id);return cardHTML(p,{pickable:true,inteam:at>=0,badge:at>=0?slots[at].r[0]:'',
+  const benchList=ownedPlayers().sort((a,b)=>{const r=slots[selSlot]?slots[selSlot].r:null,fa=r&&natPos(a)===r?1:0,fb=r&&natPos(b)===r?1:0;return (q.s.includes(b.id)-q.s.includes(a.id))||fb-fa||effOvr(b)-effOvr(a)});
+  $('benchctl').innerHTML=`<span class="hint" style="margin:0">${benchList.length} players · best for the selected ${slots[selSlot]?slots[selSlot].r:''} spot first</span>`+(benchList.length>36?`<button class="ghost" data-benchall="1">${benchAll?'Show fewer':'Show all '+benchList.length}</button>`:'');
+  $('bench').innerHTML=(benchAll?benchList:benchList.slice(0,36)).map(p=>{const at=q.s.indexOf(p.id);return cardHTML(p,{pickable:true,inteam:at>=0,badge:at>=0?slots[at].r[0]:'',
     extra:!p.isCustom?renameUI(p,'bench'):
       p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<300||(custom.budget||BUDGET)>=650?'disabled':''}>Train +15 pts · 300</button>`:''})}).join('');
+  renderSquadExtras();
   // packs
-  $('packs').innerHTML=PACKS.map(k=>{const free=k.id==='silver'&&club.gift;return `<button class="packbtn t-${k.id}" data-pack="${k.id}" ${!free&&club.coins<k.cost?'disabled':''}><b>${k.name}</b><span>${k.d}</span><em>${free?'FREE welcome gift':k.cost.toLocaleString()+' coins'}</em></button>`}).join('');
-  // collection
-  const locked=PLAYERS.filter(p=>!club.owned.includes(p.id));
-  $('collect-count').textContent=`${PLAYERS.length-locked.length} of ${PLAYERS.length} collected`;
-  $('album').innerHTML=albumHTML();
-  $('market').innerHTML=[...PLAYERS].sort((a,b)=>ovr(b)-ovr(a)).map(p=>{const own=club.owned.includes(p.id);
-    const h=cardHTML(own?p:{...p,name:NAMES[p.id]||'Locked'},{extra:(own?'':`<span class="owned" style="color:var(--muted)">Found in packs</span> `)+renameUI(p,'coll')});
-    return own?h:h.replace('class="card ','class="card locked ')}).join('');
-  const filled=q.s.filter(Boolean).length,canFill=ownedPlayers().length>=4;
-  goBtn.disabled=!canFill;goBtn.textContent=comp==='friendly'?'Play a friendly':comp==='chal'?`Try: ${CHALS.find(c=>c.id===chalId()).name}`:comp==='skill'?`Play ${SGAMES[sgId()].name}`:comp==='tour'?(tourOver()?'Enter a new tournament':`Play ${TROUNDS[club.tour.round].replace(/s$/,'').toLowerCase()} vs ${clubName(myMatch().a===ME?myMatch().b:myMatch().a)}`):cupOver()?(club.cup.alive?'Defend the trophy':'Enter the cup again'):`Play ${ROUNDS[club.cup.round].toLowerCase()} vs ${OPPS[club.cup.opps[club.cup.round]][0]}`;
+  $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const od=Object.entries(k.odds).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ');
+    return `<button class="packbtn t-${k.id==='premium'||k.id==='elite'?'special':k.id}" data-pack="${k.id}" ${!free&&club.coins<k.cost?'disabled':''}><b>${k.name}</b><span>${k.d}</span><span style="color:var(--tc)">Odds: ${od}</span><em>${free?`FREE${(club.free||{})[k.id]>1?' ×'+club.free[k.id]:''}`:k.cost.toLocaleString()+' coins'}</em></button>`}).join('');
+  if(tab==='club')renderClub();
+  const canFill=ownedPlayers().length>=4;
+  goBtn.disabled=!canFill;goBtn.textContent=goText();
 }
 const renderRoster=renderMenu;let shownCoins=null;
 function toast(m){$('toast').textContent=m}
@@ -390,6 +427,7 @@ const CHALS=[
   {id:'clean',name:'Clean Sheet',d:'Win without conceding. Full 3 minutes.',clock:180,win:()=>score[0]>score[1]&&score[1]===0},
   {id:'hattrick',name:'Hat-trick Hero',d:'One of your players scores three. Full 3 minutes.',clock:180,hat:true}];
 const today=()=>new Date().toISOString().slice(0,10);
+const ordinal=n=>n+(['th','st','nd','rd'][(n%100>10&&n%100<14)?0:n%10]||'th');
 const dailyChal=()=>CHALS[Math.floor(Date.now()/864e5)%CHALS.length];
 const chalId=()=>club.chalSel&&CHALS.some(c=>c.id===club.chalSel)?club.chalSel:dailyChal().id;
 let chalWon=false,chalCur=null;
@@ -403,19 +441,20 @@ let SG=null;
 function renderSkill(){const b=club.sgBest||{};$('diff-note').textContent='Quick games to sharpen up. Coins for good scores, and your bests are saved.';
   $('cup').innerHTML=`<div class="cup-head"><b>Skill games</b><span>Your bests are kept</span></div><div class="chgrid">`+Object.entries(SGAMES).map(([k,g])=>`<button class="chbtn" data-sg="${k}" aria-pressed="${k===sgId()}"><b>${g.name}</b><span>${g.d}</span><em>${b[k]!=null?'Best: '+(k==='slalom'?b[k].toFixed(1)+'s':b[k]+(k==='pens'?' in a row':' pts')):'Not played yet'}</em></button>`).join('')+`</div>`}
 /* ---------- Player XP ---------- */
-const XPL=[0,100,250,450,700,1000];
+const XPL=[0,100,250,450,700,1000,1400,1900,2500];
 const xpOf=id=>(club.xp||{})[id]||0;
-const lvlOf=id=>{const x=xpOf(id);let l=0;while(l<5&&x>=XPL[l+1])l++;return l};
-function lvlHTML(p){if(!club.owned.includes(p.id))return'';const L=lvlOf(p.id),x=xpOf(p.id),a=XPL[L],b=XPL[Math.min(5,L+1)],pc=L>=5?100:Math.round((x-a)/(b-a)*100);
-  return `<span class="lv">Lv ${L}${L?' · +'+L:''}</span><div class="xpbar" title="${x} XP"><i style="width:${pc}%"></i></div>`}
+const lvlOf=id=>{const x=xpOf(id);let l=0;while(l<XPL.length-1&&x>=XPL[l+1])l++;return l};
+function lvlHTML(p){if(!club.owned.includes(p.id))return'';const L=lvlOf(p.id),x=xpOf(p.id),M=XPL.length-1,a=XPL[L],b=XPL[Math.min(M,L+1)],pc=L>=M?100:Math.round((x-a)/(b-a)*100);
+  return `<span class="lv">Lv ${L}${L?' · +'+Math.min(5,L):''}</span><div class="xpbar" title="${x} XP"><i style="width:${pc}%"></i></div>`}
+// the stats a player actually takes onto the pitch: card stats plus everything you've invested in him
 let levelUps=[];
 function grantXP(won){levelUps=[];club.xp=club.xp||{};
   for(const p of players){if(p.team!==0||p.keeper||!p.st.id)continue;const id=p.st.id,before=lvlOf(id);
     const g=25+(p.goals||0)*40+(p.mT||0)*12+(p.mS||0)*8+(won?20:0);club.xp[id]=xpOf(id)+g;const after=lvlOf(id);
     if(after>before)levelUps.push(`${(byId(id)||p.st).short} reached Lv ${after}`)}}
 /* ---------- Sticker album ---------- */
-const ALBUM_REWARD={bronze:200,silver:400,gold:800,icon:2000};
-function albumHTML(){const got=club.album||{};return `<div class="album">`+['bronze','silver','gold','icon'].map(tr=>{const all=PLAYERS.filter(p=>tier(p)===tr),have=all.filter(p=>club.owned.includes(p.id)).length,full=have===all.length;
+const ALBUM_REWARD={bronze:3000,silver:5000,gold:10000,special:15000,icon:25000};
+function albumHTML(){const got=club.album||{};return `<div class="album">`+['bronze','silver','gold','special','icon'].map(tr=>{const all=PLAYERS.filter(p=>tier(p)===tr),have=all.filter(p=>club.owned.includes(p.id)).length,full=have===all.length;
   return `<div class="apage t-${tr}"><b>${TIERS[tr].name} page</b><div class="bar"><i style="width:${Math.round(have/all.length*100)}%"></i></div><span>${have} of ${all.length} stickers · complete it for ${ALBUM_REWARD[tr].toLocaleString()} coins</span>${got[tr]?'<span style="color:var(--mint);font-weight:800">✓ Page complete</span>':full?`<button class="buy" data-album="${tr}">Claim ${ALBUM_REWARD[tr].toLocaleString()}</button>`:''}</div>`}).join('')+`</div>`}
 function placePlayer(id){
   const q=sq(),from=q.s.indexOf(id);
@@ -460,9 +499,9 @@ $('forms').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(
 $('packs').addEventListener('click',e=>{const b=e.target.closest('[data-pack]');if(b)openPack(b.dataset.pack)});
 $('sqtabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.best){autoPick();toast('Picked your best line-up for this formation.')}
-  else{club.active=+b.dataset.sq;selSlot=Math.max(0,sq().s.indexOf(null))}saveClub();renderMenu()});
-for(const k of ['team','packs','coll','online'])$('tab-'+k).onclick=()=>{tab=k;resultEl.hidden=true;toast('');renderMenu()};
-function rollTier(odds){let r=Math.random()*100;for(const k of ['icon','gold','silver','bronze']){r-=odds[k];if(r<0)return k}return 'bronze'}
+  else{if(GM==='classical')club.cactive=+b.dataset.sq;else club.active=+b.dataset.sq;selSlot=Math.max(0,sq().s.indexOf(null))}saveClub();renderMenu()});
+for(const k of ['team','squad','club','online'])$('tab-'+k).onclick=()=>{tab=k;resultEl.hidden=true;toast('');renderMenu()};
+function rollTier(odds){let r=Math.random()*100;for(const k of ['icon','special','gold','silver','bronze']){r-=odds[k]||0;if(r<0)return k}return Object.keys(odds).find(k=>odds[k]>0)||'bronze'}
 // A pack is one tier, one card per position, ratings close together and new cards first, so every pick is a real dilemma.
 function dealHardPick(t){
   // the best players in each tier are the rare ones: the pack's rating level leans hard towards the bottom of the tier
@@ -472,12 +511,12 @@ function dealHardPick(t){
     return pick(pool.slice(0,2))});
   return out.sort(()=>Math.random()-.5)}
 function drawFrom(t){const pool=PLAYERS.filter(p=>tier(p)===t);return pick(pool)}
-const TR={bronze:0,silver:1,gold:2,icon:3};
+const TR={bronze:0,silver:1,gold:2,special:3,icon:3};
 function openPack(id){
-  const k=PACKS.find(x=>x.id===id);const free=id==='silver'&&club.gift;
+  const k=PACKS.find(x=>x.id===id);const gift=id==='silver'&&club.gift,owed=(club.free||{})[id]>0,free=gift||owed;
   if(!free&&club.coins<k.cost)return;
   initAudio();if(ac&&ac.state==='suspended')ac.resume();
-  if(free)club.gift=false;else club.coins-=k.cost;
+  if(gift)club.gift=false;else if(owed)club.free[id]--;else club.coins-=k.cost;
   const cards=dealHardPick(rollTier(k.odds));
   const res=cards.map(p=>({p,dup:club.owned.includes(p.id)}));
   saveClub();
@@ -491,10 +530,10 @@ function openPack(id){
       $('pack-note').textContent='Pick one player to sign. The other two walk away.';
       slots.forEach((slot,j)=>{slot.classList.add('pickme');slot.tabIndex=0;slot.setAttribute('role','button');slot.setAttribute('aria-label','Sign '+res[j].p.name);
         const choose=()=>{if(slots.some(x=>x.classList.contains('chosen')))return;const {p,dup}=res[j];
-          if(dup)club.coins+=TIERS[tier(p)].sell;else club.owned.push(p.id);saveClub();
+          if(dup){club.dupes=club.dupes||{};club.dupes[p.id]=(club.dupes[p.id]||0)+1}else{club.owned.push(p.id);careerSigned(p)}saveClub();
           slots.forEach((x,m)=>{x.classList.remove('pickme');x.removeAttribute('tabindex');x.classList.add(m===j?'chosen':'gone')});
           S.goal();confetti(tier(p));
-          $('pack-note').textContent=dup?`You already had ${p.name}, so the duplicate sold for ${TIERS[tier(p)].sell} coins.`:`${p.name} signed! Put them in your team on the Team tab.`;
+          $('pack-note').textContent=dup?`You already had ${p.name}. The duplicate is kept for Exchanges (or quick-sell it for ${TIERS[tier(p)].sell} coins in Club → Exchanges).`:`${p.name} signed! Put them in your line-up on the Squad tab.`;
           $('pack-done').hidden=false;$('pack-done').focus();renderMenu()};
         slot.onclick=choose;slot.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose()}}});
       slots[res.length-1].focus();return}
@@ -502,21 +541,22 @@ function openPack(id){
     if(TR[tr]>=2){
       slot.className=`pc back tease t-${tr}`;slot.innerHTML=`<span class="sub">${natPos(p)}</span>`;tone(330,.25,'triangle',.1);
       T(()=>{slot.innerHTML=`<span class="sub">${natPos(p)} · ${esc(p.tag).toUpperCase()}</span>`;tone(440,.25,'triangle',.12)},700);
-      T(()=>{slot.innerHTML+=`<span class="big">#${p.num}</span><span class="sub">${tr==='icon'?'ICON':'GOLD'}</span>`;tone(587,.3,'triangle',.14)},1400);
+      T(()=>{slot.innerHTML+=`<span class="big">#${p.num}</span><span class="sub">${TIERS[tr].name.toUpperCase()}</span>`;tone(587,.3,'triangle',.14)},1400);
       T(()=>{reveal(slot,p,dup);S.goal();confetti(tr);T(next,900)},2100);
     }else{T(()=>{reveal(slot,p,dup);S.skill(TR[tr]);T(next,450)},350)}
   }
   T(next,400);
 }
 function reveal(slot,p,dup){const tr=tier(p);slot.className=`pc front t-${tr}`;
-  slot.innerHTML=`<span class="flag ${dup?'dup':''}">${dup?'+'+TIERS[tr].sell+' COINS':'NEW'}</span><span class="big">${ovr(p)}</span><span class="nm">${esc(p.name)}</span><span class="sub">${natPos(p)} · #${p.num} · ${esc(p.tag).toUpperCase()}</span><span class="sub" style="color:var(--tc)">E ${SKILLS[p.sk].name} · X ${SPECIALS[p.sp].name}</span>`}
+  slot.innerHTML=`<span class="flag ${dup?'dup':''}">${dup?'DUPLICATE':'NEW'}</span><span class="big">${ovr(p)}</span><span class="nm">${esc(p.name)}</span><span class="sub">${natPos(p)} · #${p.num} · ${esc(p.tag).toUpperCase()}</span><span class="sub" style="color:var(--tc)">E ${SKILLS[p.sk].name} · X ${SPECIALS[p.sp].name}</span>`}
 function confetti(tr){const c=$('confetti');const cols=tr==='icon'?['#ff9ecb','#fff6e4','#8e8ff0','#ffd166']:['#ffd166','#fff6e4','#ff6f59','#7fe0b4'];
   for(let n=0;n<70;n++){const e=document.createElement('i');e.style.left=Math.random()*100+'%';e.style.background=pick(cols);e.style.animationDelay=Math.random()*.4+'s';e.style.animationDuration=1.4+Math.random()*1.2+'s';c.appendChild(e);setTimeout(()=>e.remove(),3200)}}
 $('pack-done').onclick=()=>{$('pack').hidden=true;renderMenu()};
 $('club-name').addEventListener('input',e=>{club.name=e.target.value.slice(0,14)||'My Club';saveClub()});
 $('club-kit').onclick=e=>{const c=e.target.dataset.c;if(c){club.kit=c;saveClub();renderMenu()}};
 document.querySelectorAll('.lvl button').forEach(b=>b.onclick=()=>{club.level=b.dataset.lv;saveClub();renderMenu()});
-document.querySelectorAll('.diff button').forEach(b=>b.onclick=()=>{if(['friendly','chal','skill'].includes(b.dataset.d)){club.comp=b.dataset.d;saveClub();renderMenu();return}if(b.dataset.d==='tour'){club.comp='tour';saveClub();renderMenu();return}club.comp='cup';if(b.dataset.d!==diffKey&&club.cup&&club.cup.round>0&&!cupOver())toast(`Left the ${CUPS[club.cup.tier]}. Your run there has ended.`);diffKey=b.dataset.d;DF=DIFFS[diffKey];try{localStorage.setItem('kickabout-diff',diffKey)}catch(e){}renderMenu()});
+$('comps').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;if(['friendly','chal','skill','tour','league','wcc'].includes(b.dataset.d)){club.comp=b.dataset.d;saveClub();renderMenu();return}club.comp='cup';if(b.dataset.d!==diffKey&&club.cup&&club.cup.round>0&&!cupOver())toast(`Left the ${CUPS[club.cup.tier]}. Your run there has ended.`);diffKey=b.dataset.d;DF=DIFFS[diffKey];try{localStorage.setItem('kickabout-diff',diffKey)}catch(e){}renderMenu()});
+$('benchctl').addEventListener('click',e=>{if(e.target.closest('[data-benchall]')){benchAll=!benchAll;renderMenu()}});
 
 /* ---------- editor ---------- */
 const edEl=$('editor');let draft=null;

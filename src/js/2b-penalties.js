@@ -351,7 +351,7 @@ function drawPenHUD(){
   const tm=pen.turn,tk=pen.taker,st=tk.st;
   ctx.fillStyle='rgba(13,17,23,.84)';rr(W-264,H-96,250,82,8);ctx.fill();
   if(tm===0){txt(`#${st.num} ${st.short||''}`,W-252,H-80,17,C.sun,'left',false);
-    txt(`FIN ${Math.round(st.fin*100)}   SHO ${Math.round(st.shot*100)}   SKL ${Math.round(st.skill*100)}`,W-252,H-58,13,C.cream,'left',false);
+    txt(`FIN ${Math.round(st.fin*100)}   SHO ${Math.round(st.shot*100)}   DRI ${Math.round(st.skill*100)}`,W-252,H-58,13,C.cream,'left',false);
     const nv=clamp(pen.st.press*(1.35-st.fin)/1.05,0,1);txt('NERVES',W-252,H-34,12,C.muted,'left',false);ctx.fillStyle='#232b36';rr(W-194,H-39,166,9,4);ctx.fill();
     ctx.fillStyle=nv>.6?C.coral:nv>.35?C.sun:C.mint;rr(W-194,H-39,Math.max(6,166*nv*(1-.45*pen.calm)),9,4);ctx.fill()}
   else{txt('YOU’RE IN GOAL',W-252,H-80,17,C.mint,'left',false);txt(`#${st.num} ${st.short||''}  ·  FIN ${Math.round(st.fin*100)}`,W-252,H-58,13,C.cream,'left',false);
