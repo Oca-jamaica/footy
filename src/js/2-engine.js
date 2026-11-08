@@ -10,7 +10,7 @@ function setup(){oppSeed=(Math.random()*OPPNAMES.length)|0;
   const mine=q.s.map((id,i)=>{let p=byId(id)||STARTERS[i%3];p=playStats(p);if(chem){p={...p};for(const [k] of STATK)p[k]=Math.min(.99,p[k]+chem)}const f=posFit(natPos(p),slots[i].r);
     if(f>=1)return p;const c={...p};for(const [k] of STATK)c[k]=p[k]*f;return c});
   const avg={};for(const [k] of STATK)avg[k]=clamp(mine.reduce((a,p)=>a+p[k],0)/mine.length+OPP.off,.3,.99);Object.assign(o,avg);// opponents get stronger each round
-  const keys=FORM_KEYS[PITCH==='classical'?'classical':'volta'],oppF=OPP.form&&keys.includes(OPP.form)?OPP.form:pick(keys),oslots=FORMS[oppF];
+  const keys=FORM_KEYS[PITCH!=='volta'?'classical':'volta'],oppF=OPP.form&&keys.includes(OPP.form)?OPP.form:pick(keys),oslots=FORMS[oppF];
   const looks=[['#a8724f','#1f1a17'],['#e9b98f','#6b4426'],['#7a4b30','#111'],['#f2cfae','#c9a15b'],['#5e3a24','#111'],['#e8b88c','#b5562b'],['#c68d63','#2a1d17'],['#f2cfae','#e8e2d6']];
   const LOOKS=[['short',0,0,1.02],['buzz',0,1,1],['curly',0,0,.97],['quiff',0,0,1.04],['afro',0,1,.98],['bald',0,0,1.05],['bun',0,0,1.01],['mohawk','#e8cf7a',0,.99]];
   const NUMS=n>4?[2,5,4,6,8,7,11,9]:[4,8,10,9];
@@ -170,9 +170,11 @@ let pitchCv=null,cullM=0,PM=640;
 const broadCam=()=>cam.f===BROAD.f&&cam.dist===BROAD.dist&&cam.h===BROAD.h&&cam.y===BROAD.y;let PV=260;
 /* Two pitches: Volta is the tight 5-a-side cage, Classical is a proper 9-a-side field about 1.5x as long and 1.4x as wide,
    with bigger boxes and goals. The broadcast camera pulls back a touch so you still see enough of it. */
-const PITCHES={volta:{w:1150,h:640,goal:62,box:175,boxh:165,spot:135,f:1684,pm:640},classical:{w:1720,h:900,goal:72,box:240,boxh:215,spot:150,f:1500,pm:800}};
+const PITCHES={volta:{w:1150,h:640,goal:62,box:175,boxh:165,spot:135,f:1684,pm:640},classical:{w:1720,h:900,goal:72,box:240,boxh:215,spot:150,f:1500,pm:800},
+  // Classical Expanded: about 1.37x the standard pitch each way (same proportions), slightly bigger goal and boxes
+  expanded:{w:2350,h:1200,goal:78,box:300,boxh:265,spot:165,f:1380,pm:1150}};
 function setPitch(k){const d=PITCHES[k]||PITCHES.volta;if(PITCH===k&&FX1===175+d.w)return;PITCH=k;
-  FX0=175;FX1=175+d.w;FY0=122;FY1=122+d.h;MIDX=(FX0+FX1)/2;MY=(FY0+FY1)/2;GY0=MY-d.goal;GY1=MY+d.goal;BOX=d.box;BOXH=d.boxh;SPOT=d.spot;
+  FX0=175;FX1=175+d.w;PSC=Math.max(1,d.w/1720);FY0=122;FY1=122+d.h;MIDX=(FX0+FX1)/2;MY=(FY0+FY1)/2;GY0=MY-d.goal;GY1=MY+d.goal;BOX=d.box;BOXH=d.boxh;SPOT=d.spot;
   BROAD.x=MIDX;BROAD.y=FY1;BROAD.f=d.f;
   HOR_TOP=72-BROAD.h*BROAD.f/(BROAD.dist+BROAD.y-FY0);HOR_BOT=(H-50)-BROAD.h*BROAD.f/(BROAD.dist+BROAD.y-FY1);BROAD.hor=HOR_TOP;
   PM=d.pm;PV=Math.max(260,Math.ceil(HOR_TOP-HOR_BOT+40));
@@ -181,16 +183,28 @@ function setPitch(k){const d=PITCHES[k]||PITCHES.volta;if(PITCH===k&&FX1===175+d
   Object.assign(B,{x:MIDX,y:MY,z:0,vx:0,vy:0,vz:0,owner:null})}
 // Stands, crowd, boards and pitch are drawn once into a wide image. A sideways pan of the broadcast camera is (almost
 // exactly) a shear of that image, so each frame just draws it once instead of thousands of fans and gradients.
+// The stadium and pitch are drawn once into a few side-by-side tiles. One huge image (the Classical pitches need one
+// about 5000 px wide) can fall off the graphics card and get re-uploaded every frame, which cost ~13 ms a frame;
+// tiles of at most 2048 px each always stay on it, at full sharpness.
+// Resolution of the cached stadium: full on Volta, 1.5x on the big Classical pitches (a full 2x copy of those is enough
+// graphics memory to cause stutters), and lower again if adaptive quality kicks in on a slow machine.
+let QLV=0;const cacheDPR=()=>Math.max(1,Math.min(DPR,PITCH==='volta'?2:1.5)-QLV*.25);
+function buildPitchCache(){PERF.builds=(PERF.builds||0)+1;const DPR=cacheDPR(),full=W+2*PM,TW=Math.floor(2048/DPR),tiles=[];
+  for(let u0=0;u0<full;u0+=TW){const w=Math.min(TW+2,full-u0),cv2=document.createElement('canvas');cv2.width=Math.ceil(w*DPR);cv2.height=Math.round((H+PV)*DPR);
+    const c2=cv2.getContext('2d'),keep=cam,kc=ctx,kt=t;cam={...BROAD,x:MIDX};ctx=c2;t=0;cullM=PM;
+    try{ctx.setTransform(DPR,0,0,DPR,(PM-u0)*DPR,0);
+      {const g=ctx.createLinearGradient(0,0,0,H*.6);g.addColorStop(0,'#05080f');g.addColorStop(.6,'#0e1a2b');g.addColorStop(1,'#1d2d3c');ctx.fillStyle=g;ctx.fillRect(-PM,-10,W+2*PM,H+PV+10);
+       const top=P(MIDX,FY0-170,170),hz=ctx.createRadialGradient(top.x,top.y,10,top.x,top.y,W*.7);hz.addColorStop(0,'rgba(190,210,230,.22)');hz.addColorStop(1,'rgba(190,210,230,0)');ctx.fillStyle=hz;ctx.fillRect(-PM,-10,W+2*PM,H+PV+10)}
+      drawStandsW();drawPitchLive();drawBoards()}finally{ctx=kc;cam=keep;t=kt;cullM=0}
+    tiles.push({cv:cv2,u0,w})}
+  return tiles}
 function drawBackground(){
   const party=state==='goal'||(state==='fulltime'&&score[0]>score[1]);
   if(broadCam()&&!party){
-    if(!pitchCv){pitchCv=document.createElement('canvas');pitchCv.width=Math.round((W+2*PM)*DPR);pitchCv.height=Math.round((H+PV)*DPR);const c2=pitchCv.getContext('2d');
-      const keep=cam,kc=ctx,kt=t;cam={...BROAD,x:MIDX};ctx=c2;t=0;cullM=PM;try{ctx.setTransform(DPR,0,0,DPR,PM*DPR,0);
-      {const g=ctx.createLinearGradient(0,0,0,H*.6);g.addColorStop(0,'#05080f');g.addColorStop(.6,'#0e1a2b');g.addColorStop(1,'#1d2d3c');ctx.fillStyle=g;ctx.fillRect(-PM,-10,W+2*PM,H+PV+10);
-       const top=P(MIDX,FY0-170,170),hz=ctx.createRadialGradient(top.x,top.y,10,top.x,top.y,W*.7);hz.addColorStop(0,'rgba(190,210,230,.22)');hz.addColorStop(1,'rgba(190,210,230,0)');ctx.fillStyle=hz;ctx.fillRect(-PM,-10,W+2*PM,H+PV+10)}
-      drawStandsW();drawPitchLive();drawBoards()}finally{ctx=kc;cam=keep;t=kt;cullM=0}}
-    const d=MIDX-cam.x,dy=cam.hor-BROAD.hor;ctx.save();ctx.translate(0,dy);ctx.transform(1,0,d/cam.h,1,-d*BROAD.hor/cam.h,0);ctx.drawImage(pitchCv,-PM,0,W+2*PM,H+PV);ctx.restore()}
-  else{drawStandsW();drawPitchLive();drawBoards()}
+    if(!pitchCv)pitchCv=buildPitchCache();
+    const d=MIDX-cam.x,dy=cam.hor-BROAD.hor;ctx.save();ctx.translate(0,dy);ctx.transform(1,0,d/cam.h,1,-d*BROAD.hor/cam.h,0);
+    for(const tl of pitchCv)ctx.drawImage(tl.cv,tl.u0-PM,0,tl.w,H+PV);ctx.restore()}
+  else{PERF.live=(PERF.live||0)+1;drawStandsW();drawPitchLive();drawBoards()}
   for(const [x,y] of [[FX0,FY0],[FX1,FY0]]){const b=P(x,y),tp=P(x,y,26);ctx.strokeStyle='#f2f2f2';ctx.lineWidth=Math.max(1,1.4*b.s);ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(tp.x,tp.y);ctx.stroke();
     ctx.fillStyle='#ffd23f';const f=P(x+(x<MIDX?11:-11),y,22+Math.sin(t*.1)*1.2);const l=P(x,y,17);ctx.beginPath();ctx.moveTo(tp.x,tp.y);ctx.lineTo(f.x,f.y);ctx.lineTo(l.x,l.y);ctx.fill()}
 }
@@ -412,7 +426,7 @@ function clockCues(){if(state!=='play'||(SG&&SG.k==='slalom')){lastSec=null;retu
   lastSec=s}
 function trailStep(){const sp=Math.hypot(B.vx,B.vy);
   if(!B.owner&&sp>7&&(state==='play'||state==='goal'||state==='concede')){btrail.push([B.x,B.y,B.z]);if(btrail.length>9)btrail.shift()}else if(btrail.length)btrail.shift();
-  if(parts.length>1200)parts.splice(0,parts.length-1200)}
+  const cap=QLV?600:1200;if(parts.length>cap)parts.splice(0,parts.length-cap)}
 function tone(fr,dur,type='triangle',vol=.18,delay=0,slide=0){
   if(!ac)return;const t0=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(fr,t0);
   if(slide)o.frequency.exponentialRampToValueAtTime(fr*slide,t0+dur);
@@ -449,7 +463,7 @@ function pop(text,x,y,col=C.cream,size=20,z=52){
   for(let k=0;k<4&&pops.some(q=>q.life>38&&Math.abs(q.x-x)<85&&Math.abs(q.y-(y+30))<45&&Math.abs(q.z-z)<15);k++)z+=17;
   pops.push({text,x,y:y+30,z,col,size,life:70})}
 function burst(x,y,n,cols,spd=6,grav=.12,size=[4,8]){const q=P(x,y,14);burstS(q.x,q.y,n,cols,spd,grav,size)}
-function burstS(x,y,n,cols,spd=6,grav=.12,size=[4,8]){for(let i=0;i<n;i++){const a=rnd(0,6.283),s=rnd(1,spd);parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-rnd(0,3),g:grav,life:rnd(60,120),max:120,c:pick(cols),w:rnd(size[0],size[1]),h:rnd(3,6),r:rnd(0,6),vr:rnd(-.3,.3)})}}
+function burstS(x,y,n,cols,spd=6,grav=.12,size=[4,8]){if(QLV)n=Math.ceil(n*(1-QLV*.3));for(let i=0;i<n;i++){const a=rnd(0,6.283),s=rnd(1,spd);parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-rnd(0,3),g:grav,life:rnd(60,120),max:120,c:pick(cols),w:rnd(size[0],size[1]),h:rnd(3,6),r:rnd(0,6),vr:rnd(-.3,.3)})}}
 function grass(wx,wy,n){const q=P(wx,wy);const x=q.x,y=q.y;for(let i=0;i<n;i++)parts.push({x,y,vx:rnd(-2,2),vy:rnd(-2,1),g:.08,life:rnd(15,30),max:30,c:'#3f8a4a',w:2,h:2,r:0,vr:0})}
 function firework(x,y){for(let i=0;i<36;i++){const a=i/36*6.283;parts.push({x,y,vx:Math.cos(a)*3.2,vy:Math.sin(a)*3.2,g:.04,life:60,max:60,c:CONF[(Math.random()*5)|0],w:3,h:3,r:0,vr:0,spark:true})}noise(.4,1400,.07,.6,.002)}
 function ring(x,y,c){parts.push({ring:true,wx:x,wy:y,x:0,y:0,r:0,life:30,max:30,vx:0,vy:0,g:0,c})}
@@ -549,7 +563,7 @@ function startMatch(){
   if(ownedPlayers().length<4)return;
   comp=club.comp||'cup';
   // Classical is played on the big pitch; skill games, challenges and online always use the Volta cage
-  setPitch(GM==='classical'&&!['chal','skill'].includes(comp)?'classical':'volta');
+  setPitch(GM==='classical'&&!['chal','skill'].includes(comp)?(club.cpitch==='expanded'?'expanded':'classical'):'volta');
   if(comp==='league'){let L=lgOf();if(!L)L=newSeason(GM,0,1);if(L.done){renderMenu();return}const f=myFixture(L),o=lgTeam(L,f.h==='me'?f.a:f.h);
     OPP={name:o.name.toUpperCase(),kit:o.kit,off:0,str:o.str,form:o.form,tac:o.tac,home:f.h==='me'};cupEvent=null;eventText=null}
   else if(comp==='wcc'){const W=wccOf();if(!W||!wMy(W)){renderMenu();return}const x=wMy(W),o=wTeam(W,x.a==='me'?x.b:x.a);
@@ -559,7 +573,7 @@ function startMatch(){
   else{if(cupOver()){newCup(diffKey);renderMenu();return}
   {const o=OPPS[club.cup.opps[club.cup.round]];OPP={name:o[0].toUpperCase(),kit:o[1],off:ROFF[club.cup.round]};cupEvent=null;eventText=null}}
   initAudio();if(ac&&ac.state==='suspended')ac.resume();
-  DF=levelDF(comp==='tour'?tourDF(OPP.club):comp==='league'?DIVS[lgOf().div].df:comp==='wcc'?(OPP.str>.9?'legend':'hard'):diffKey);setup();players.forEach(p=>{if(p.team===1)p.spCd=rnd(140,380)});hat=null;score=[0,0];mercy=false;clock=PITCH==='classical'?180:150;style=0;shownStyle=0;hype=0;fire=0;streak=0;
+  DF=levelDF(comp==='tour'?tourDF(OPP.club):comp==='league'?DIVS[lgOf().div].df:comp==='wcc'?(OPP.str>.9?'legend':'hard'):diffKey);setup();players.forEach(p=>{if(p.team===1)p.spCd=rnd(140,380)});hat=null;score=[0,0];mercy=false;clock=PITCH==='volta'?150:PITCH==='expanded'?210:180;style=0;shownStyle=0;hype=0;fire=0;streak=0;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];
   menuEl.hidden=true;edEl.hidden=true;cv.focus();kickoff(0);modeStart();matchRatings=null;
   introT=SG||state!=='play'?0:INTRO;
@@ -583,7 +597,7 @@ let lastPoss=0,introT=0,weather='clear';const INTRO=240;
 function give(p){B.claimBy=null;{const wp=B.pass;if(wp&&wp.from&&wp.from.team===p.team&&wp.from!==p)wp.from.mP=(wp.from.mP||0)+1;if(B.shot&&p.keeper&&B.shot.team!==p.team)p.mSv=(p.mSv||0)+1}if(p.team===0&&!p.keeper&&lastPoss===1&&state==='play'){counterT=t;counterX=p.x}if(B.lobTo){B.lobTo.lobRun=null;B.lobTo=null}if(B.graceTo){B.graceTo.lobRun=null;B.graceTo=null;B.graceT=0}if(p.team===1)swT=Math.min(swT,4);if(lastPoss!==p.team&&!p.keeper&&state==='play'&&p.team===0){const near=outfield(1).sort((a,b)=>dist(a,p)-dist(b,p));near.forEach((q,i)=>q.caughtT=i?110:45)}
   lastPoss=p.team;if(B.owner!==p)p.beatRun=0;if(p.team===1){chain=0}
   const wasPass=B.pass;
-  if(p.team===0&&!p.keeper){passChain=(wasPass&&wasPass.from.team===0)?passChain+1:0;if(wasPass&&wasPass.from.team===0&&wasPass.from!==p){stats.passes++;addHype(4);if(passChain===3)pop('BALL CHARGED!',p.x,p.y-56,C.coral,16,60);if(passChain>=2){const lab=passChain>=6?'TIKI-TAKA':passChain>=4?'SILKY':'NICE MOVE';style+=passChain*6;pop(`${lab}  ${passChain+1} PASSES`,p.x,p.y-34,passChain>=4?C.sun:C.mint,15+Math.min(8,passChain*1.5),70);S.skill(Math.min(3,passChain-1));if(passChain>=4)burst(p.x,p.y,10,[C.sun,C.mint,C.cream],3,.05,[3,5])}if(wasPass.through)addStyle(20,p.x,p.y,'THROUGH BALL');if(wasPass.wall)addStyle(25,p.x,p.y,'ONE-TWO')}if(!p.wallTo)ctrl=p;
+  if(p.team===0&&!p.keeper){passChain=(wasPass&&wasPass.from&&wasPass.from.team===0)?passChain+1:0;if(wasPass&&wasPass.from&&wasPass.from.team===0&&wasPass.from!==p){stats.passes++;addHype(4);if(passChain===3)pop('BALL CHARGED!',p.x,p.y-56,C.coral,16,60);if(passChain>=2){const lab=passChain>=6?'TIKI-TAKA':passChain>=4?'SILKY':'NICE MOVE';style+=passChain*6;pop(`${lab}  ${passChain+1} PASSES`,p.x,p.y-34,passChain>=4?C.sun:C.mint,15+Math.min(8,passChain*1.5),70);S.skill(Math.min(3,passChain-1));if(passChain>=4)burst(p.x,p.y,10,[C.sun,C.mint,C.cream],3,.05,[3,5])}if(wasPass.through)addStyle(20,p.x,p.y,'THROUGH BALL');if(wasPass.wall)addStyle(25,p.x,p.y,'ONE-TWO')}if(!p.wallTo)ctrl=p;
     if(t-p.burstT<70&&p.burstNear){p.burstNear=false;lastSkillT=t;stats.skills++;S.skill(2);addStyle(15,p.x,p.y,'KNOCK-ON');addHype(12)}}
   if(p.team===1)passChain=0;
   if(B.shot&&p.keeper&&B.shot.team!==p.team){if(B.shot.team===0)stats.on++;pop(pick(['SAVED!','GREAT STOP','HELD IT']),p.x,p.y-30,C.cream,20);S.save();if(B.shot.team===1){addHype(10);style+=10}}
@@ -602,7 +616,7 @@ function pass(p,to,through=false,assist=1){
   tx=clamp(tx,FX0+30,FX1-30);ty=clamp(ty,FY0+30,FY1-30);
   const d=Math.hypot(tx-p.x,ty-p.y);
   let a=Math.atan2(ty-p.y,tx-p.x);if(assist<1)a=p.dir+angDiff(a,p.dir)*assist;a+=rnd(-1,1)*(through?.02*(1.3-ps):.09*(1.25-ps));
-  const spd=clamp(d*.046+6.2,6.8,14.5)*(.82+ps*.28);
+  const spd=clamp(d*.046+6.2,6.8,14.5*(1+(PSC-1)*.3))*(.82+ps*.28);
   kick(p,a,spd,d>260?2.2:.4);B.pass={from:p,to,through};p.dir=a;S.pass();
   if(p.team===0&&!p.keeper)passFx={x0:p.x,y0:p.y,x1:p.x+Math.cos(a)*d,y1:p.y+Math.sin(a)*d,t0:t};
   if(through)to.turbo=90;
@@ -612,7 +626,7 @@ function pass(p,to,through=false,assist=1){
 // only nudged 80% of the way towards them. Nobody in the cone = a pass into space along your facing.
 function passTarget(p){
   let best=null,bs=-1e9;
-  const att=p.team?-1:1;for(const m of players){if(m.team!==p.team||m===p)continue;const d=dist(p,m);if(d<35||d>680)continue;
+  const att=p.team?-1:1;for(const m of players){if(m.team!==p.team||m===p)continue;const d=dist(p,m);if(d<35||d>680*PSC)continue;
     const ad=Math.abs(angDiff(Math.atan2(m.y-p.y,m.x-p.x),p.dir));if(ad>.62)continue;
     const fwd=(m.x-p.x)*att/400,open=outfield(1-p.team).every(q=>dist(q,m)>55)?.35:0;
     const sc=-ad*2-d/600-(laneBlocked(p,m,18,p.team)?.6:0)-(m.keeper?1:0)+fwd*.1+open+(m.role==='att'?.45:0)-(m.goals||0)*.12;if(sc>bs){bs=sc;best=m}}
@@ -762,7 +776,7 @@ function lobTo(p,m,tx,ty,T,through){
 // A lofted cross: to the best-placed teammate (ideally one in the box), or into space if nobody's there.
 // Their keeper sometimes comes and claims it; at the far end a defender may head it clear.
 function cross(p){const att=p.team===0?1:-1,gx=goalX(p.team);let best=null,bs=-1e9;
-  for(const m of outfield(p.team)){if(m===p)continue;const d=dist(p,m);if(d<90||d>720)continue;const ad=Math.abs(angDiff(Math.atan2(m.y-p.y,m.x-p.x),p.dir));if(ad>1.25)continue;
+  for(const m of outfield(p.team)){if(m===p)continue;const d=dist(p,m);if(d<90||d>720*PSC)continue;const ad=Math.abs(angDiff(Math.atan2(m.y-p.y,m.x-p.x),p.dir));if(ad>1.25)continue;
     const sc=-ad*1.1-Math.hypot(gx-m.x,MY-m.y)/260+(m.role==='att'?.3:0)+((m.x-p.x)*att>0?.2:0);if(sc>bs){bs=sc;best=m}}
   if(!best){kick(p,p.dir,8.5,4.2);B.pass={from:p,to:null,through:false};S.pass();return}
   const T=clamp(dist(p,best)/7,32,58);airN.cross++;
@@ -816,7 +830,7 @@ function autoSwitchT(dt,tm){
   const cur=tm?ctrl2:ctrl;if(!cur)return;
   if(tm){swT2-=dt;if(swT2>0)return;swT2=6}else{swT-=dt;if(swT>0)return;swT=6}
   const own=B.owner,att=tm?-1:1;if(own&&own.team===tm)return;
-  if(B.pass&&B.pass.to&&B.pass.from.team===tm)return;// our pass in flight: the receiver takes over
+  if(B.pass&&B.pass.to&&B.pass.from&&B.pass.from.team===tm)return;// our pass in flight: the receiver takes over
   if(cur.lunge>0||cur.slide||(cur.locked>0&&cur.stun>0))return;// mid-tackle: let it play out
   const theirs=own&&own.team!==tm&&!own.keeper,myGoal=goalX(1-tm);
   if(theirs&&dist(cur,own)<55&&(own.x-cur.x)*att>-12)return;// already engaged and goal-side
@@ -877,7 +891,7 @@ function tackle(def,car){
 
 /* ---------- movement ---------- */
 function topSpeed(p){
-  let s=p.keeper?2.4:1.85+p.st.pace*1.85;// PACE: ~45% faster at 99 than at 50
+  let s=(p.keeper?2.4:1.85+p.st.pace*1.85)*(1+(PSC-1)*.15);// PACE: ~45% faster at 99 than at 50; a touch quicker on the Expanded pitch
   if(B.owner===p)s*=.8+(p.st.skill??.6)*.1;// dribbling barely slows good dribblers, so you can run away from a chaser
   if(p.caughtT>0)s*=.8;
   if(p.sprint)s*=1.2+p.st.pace*.08;
@@ -1017,14 +1031,14 @@ function teamAI(team,dt){
       const h=homePos(p,true);let tx=h.x,ty=h.y;
       if((p.slot.r==='ATT'||p.role==='att')&&owner)tx+=att*(30+Math.sin(t*.02+p.i)*30)+(p.role==='att'?att*40:0);
       // Classical: runners go beyond the ball and wide players hold the width, so there's always a pass on
-      if(PITCH==='classical'&&owner&&owner!==p){const ahead=(owner.x-p.x)*att;if(p.slot.r!=='DEF'&&ahead>-40)tx+=att*(70+Math.sin(t*.015+p.i*1.7)*50)*tacOf(team).push;
+      if(PITCH!=='volta'&&owner&&owner!==p){const ahead=(owner.x-p.x)*att;if(p.slot.r!=='DEF'&&ahead>-40)tx+=att*(70+Math.sin(t*.015+p.i*1.7)*50)*PSC*tacOf(team).push;
         if(p.slot.y<.22||p.slot.y>.78)ty=FY0+(FY1-FY0)*(p.slot.y<.5?.1:.9)}
       if(owner&&dist({x:tx,y:ty},owner)<80){ty+=(ty<owner.y?-1:1)*60}
       steer(p,clamp(tx,FX0+40,FX1-40),clamp(ty,FY0+25,FY1-25),topSpeed(p)*(p.turbo>0?1:.85),dt);
     }else{
       const h=homePos(p,false);
       // mark the nearest free attacker who has wandered into this player's area, staying goal-side
-      let m=null,md=150;for(const q of attackers){if(taken.has(q))continue;const d=Math.hypot(q.x-h.x,q.y-h.y);if(d<md){md=d;m=q}}
+      let m=null,md=150*PSC;for(const q of attackers){if(taken.has(q))continue;const d=Math.hypot(q.x-h.x,q.y-h.y);if(d<md){md=d;m=q}}
       if(m){taken.add(m);steer(p,m.x+(ownGoal-m.x)*.2,m.y+(MY-m.y)*.2,topSpeed(p)*(team===1?.76+.2*DF.press:1)*.95,dt)}
       else steer(p,h.x,h.y,topSpeed(p)*.85,dt);
     }
@@ -1041,10 +1055,13 @@ function carrierAI(p,dt){
     if(ndd<44){const m=bestMate(p);if(m&&Math.random()<.5*DF.press){pass(p,m);return}
 }
     // on the big pitch the ball does the work: find a team-mate further up who's free and play it forward
-    if(PITCH==='classical'&&dG>DF.range){const dir=Math.sign(gx-p.x);let fm=null,fs=-1e9;
-      for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir,d=dist(p,m);if(fwd<50||d>560)continue;const o=openness(m);if(o<38||laneBlocked(p,m,24,p.team))continue;
+    if(PITCH!=='volta'&&dG>DF.range){const dir=Math.sign(gx-p.x);let fm=null,fs=-1e9;
+      for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir,d=dist(p,m);if(fwd<50||d>560*PSC)continue;const o=openness(m);if(o<38||laneBlocked(p,m,24,p.team))continue;
         const sc=fwd/140+o/70-d/700+(Math.abs(m.y-MY)<(FY1-FY0)*.25?.3:0);if(sc>fs){fs=sc;fm=m}}
       if(fm&&Math.random()<(ndd<110?.65:.32)*(.8+DF.press*.3)*tacOf(p.team).pass){pass(p,fm);return}
+      // a long ball over the top or across to a forward who's got away from his man (more of these on the Expanded pitch)
+      if(!fm||Math.random()<.4){let lm=null,ls=-1e9;for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir,d=dist(p,m);if(fwd<200||d>760*PSC||d<220)continue;const o=openness(m);if(o<45)continue;const sc=fwd/200+o/60;if(sc>ls){ls=sc;lm=m}}
+        if(lm&&Math.random()<(.18+(PSC-1)*.5)*tacOf(p.team).pass){const T=clamp(dist(p,lm)/7.5,38,78);lobTo(p,lm,lm.x+dir*45+lm.vx*T*.5,lm.y+lm.vy*T*.5,T,false);B.pass.chip=true;pop('LONG BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,15,50);return}}
       // switch it to the far side when the near side is crowded
       if(ndd<120&&Math.random()<.25){const far=outfield(p.team).filter(m=>m!==p&&Math.abs(m.y-p.y)>(FY1-FY0)*.4&&openness(m)>45&&!laneBlocked(p,m,24,p.team));if(far.length){pass(p,pick(far));return}}}
     // their own skill move when someone closes them down
@@ -1325,7 +1342,7 @@ function awardCoins(){awardCoins0();
   matchRatings=calcRatings();const m=matchRatings.motm;if(m.p.team===0){const b=Math.round(25*MM());earned+=b;club.coins+=b;saveClub()}
   careerAfterMatch()}
 function awardCoins0(){earned=0;shownEarned=0;
-  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=Math.round((r+score[0]*10)/5)*5;club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;saveClub();return}
+  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=Math.round((r+score[0]*10)*(PITCH!=='volta'?1.5:1)/5)*5;club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;saveClub();return}
   const pw=pen&&pen.winner!=null?pen.winner:null;
   const r=score[0]>score[1]?100:score[0]<score[1]?20:pw===0?80:pw===1?30:45;
   let bonus=0;const won=score[0]>score[1]||pw===0;
@@ -1381,6 +1398,10 @@ function update(dt){
     if(NET.on&&state!=='fulltime'){const quiet=performance.now()-netGuestAt;netWaiting=quiet>1800;
       if(quiet>30000){netWaiting=false;netGuestAt=performance.now();toast('Your friend lost connection, so the match ended.');if(state!=='play')state='play';clock=0}
       else if(netWaiting){t+=dt;updateCam(dt);netPublish();return}}}
+  if(NET.host&&netPrep){const now=performance.now(),g=netPeer('guest');t+=dt;updateCam(dt);
+    if(!netPrep.go&&((g&&+g.presence.rdy===netMatch)||now-netPrep.at>20000))netPrep.go=now;// 20 s fallback if a ready message got lost
+    if(netPrep.go&&now-netPrep.go>=NETCOUNT){netPrep=null;S.whistle(1);netGuestAt=now}
+    netPublish();return}
   if(paused&&!NET.on)return;
   if(state==='play'&&introT>0){introT-=dt;t+=dt;updateCam(dt);if(introT<=0){S.whistle(1);koT=t;noise(1.4,700,.2,.5,.3)}return}
   t+=dt;
@@ -1392,7 +1413,7 @@ function update(dt){
     for(const p of players)tickPlayer(p,dt);
     if(ctrl){if(ctrl.stun>0){ctrl.stun-=dt;ctrl.vx*=.85;ctrl.vy*=.85}else humanUpdate(ctrl,dt)}
     if(NET.host&&ctrl2&&!netV2){if(ctrl2.stun>0){ctrl2.stun-=dt;ctrl2.vx*=.85;ctrl2.vy*=.85}else{const q=ctrl2;withP2(()=>humanUpdate(q,dt))}}
-    teamAI(0,dt);teamAI(1,dt);keeperUpdate(keeperOf(0),dt);keeperUpdate(keeperOf(1),dt);
+    {const _t=performance.now();teamAI(0,dt);teamAI(1,dt);keeperUpdate(keeperOf(0),dt);keeperUpdate(keeperOf(1),dt);PS('ai',_t)}
     if(ctrl)autoSwitch(dt);if(NET.host&&ctrl2&&!netV2)autoSwitchT(dt,1);
     for(const p of players){p.x+=p.vx*dt;p.y+=p.vy*dt;
       if(p.keeper){const gx=p.team===0?FX0:FX1;p.x=clamp(p.x,p.team?gx-BOX:gx-6,p.team?gx+6:gx+BOX);p.y=clamp(p.y,MY-170,MY+170)}
@@ -1413,7 +1434,7 @@ function update(dt){
     for(const p of players){if(B.owner!==p){p.blocked=0;continue}if((p.blocked||0)>18){p.blocked=0;const d=players.filter(q=>q.team!==p.team&&!q.keeper&&q.stun<=0).sort((a,b)=>dist(a,p)-dist(b,p))[0];if(d&&dist(d,p)<30){give(d);p.stun=20;S.tackle();if(d.team===0){stats.tackles++;addStyle(10,d.x,d.y,'STOOD FIRM');ctrl=d}else pop('ran into him',p.x,p.y-30,C.muted,15)}}
       if(B.owner===p&&!players.some(q=>q.team!==p.team&&dist(q,p)<26))p.blocked=Math.max(0,(p.blocked||0)-dt)}
     if(B.owner&&dist(B.owner,B)>48)B.owner=null;
-    ballUpdate(dt,true);sanePitch();
+    {const _t=performance.now();ballUpdate(dt,true);sanePitch();PS('ball',_t)}
     {const o=B.owner;if(o&&!o.keeper&&state==='play'){const gx=goalX(o.team),dir=Math.sign(gx-o.x);
       const clear=!outfield(1-o.team).some(q=>q.fall<=0&&(q.x-o.x)*dir>-6&&Math.abs(q.y-o.y)<Math.abs(q.x-o.x)*.9+40);
       if(clear&&Math.abs(gx-o.x)<700&&!o.breakaway){o.breakaway=true;if(o.team===0){pop('BREAKAWAY!',o.x,o.y-30,C.mint,28,96);addStyle(15,o.x,o.y);addHype(8);noise(1.6,700,.18,.5,.6);S.skill(1)}else pop('they’re through!',o.x,o.y-30,C.muted,16)}
@@ -1439,8 +1460,8 @@ function update(dt){
   trailStep();clockCues();crowdMood(dt);
   if(state!=='replay'&&state!=='menu')for(const p of players){const d=Math.hypot(p.x-(p.lx??p.x),p.y-(p.ly??p.y));p.runPh=(p.runPh||0)+d*.17;p.spdNow=(p.spdNow||0)+(d/Math.max(.2,dt)-(p.spdNow||0))*Math.min(1,.3*dt);p.lx=p.x;p.ly=p.y}
   updateCam(dt);
-  for(let i=parts.length-1;i>=0;i--){const p=parts[i];if(p.ring){p.r+=2.2*dt}else{p.vy+=p.g*dt;p.vx*=.99;p.x+=p.vx*dt;p.y+=p.vy*dt;p.r+=p.vr*dt}p.life-=dt;if(p.life<=0)parts.splice(i,1)}
-  for(let i=pops.length-1;i>=0;i--){const p=pops[i];p.z+=.6*dt;p.life-=dt;if(p.life<=0)pops.splice(i,1)}
+  {let w=0;for(let i=0;i<parts.length;i++){const p=parts[i];if(p.ring){p.r+=2.2*dt}else{p.vy+=p.g*dt;p.vx*=.99;p.x+=p.vx*dt;p.y+=p.vy*dt;p.r+=p.vr*dt}p.life-=dt;if(p.life>0)parts[w++]=p}parts.length=w}
+  {let w=0;for(let i=0;i<pops.length;i++){const p=pops[i];p.z+=.6*dt;p.life-=dt;if(p.life>0)pops[w++]=p}pops.length=w}
   if(shake>0)shake=Math.max(0,shake-.6*dt);if(flash>0)flash=Math.max(0,flash-.05*dt);netShake=netShake.map(n=>Math.max(0,n-dt));
   shownStyle+=(style-shownStyle)*Math.min(1,.08*dt);if(Math.abs(style-shownStyle)<.5)shownStyle=style;
   if(NET.host)netPublish();

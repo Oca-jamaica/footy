@@ -5,7 +5,7 @@ cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // Pitch is now ~55% longer and ~47% wider than before; the broadcast camera pans to follow play.
 // pitch geometry: Volta (5-a-side) by default, swapped for the big Classical pitch by setPitch()
-let FX0=175,FX1=1325,FY0=122,FY1=762,MIDX=750,MY=442,GY0=MY-62,GY1=MY+62,BOX=175,BOXH=165,SPOT=135,PITCH='volta';const BAR=32;
+let FX0=175,FX1=1325,FY0=122,FY1=762,MIDX=750,MY=442,GY0=MY-62,GY1=MY+62,BOX=175,BOXH=165,SPOT=135,PITCH='volta',PSC=1;const BAR=32;// PSC: how much bigger than the standard Classical pitch (1 on Volta and Standard)
 const C={g1:'#6fbe77',g2:'#64b26c',line:'rgba(255,250,235,.85)',coral:'#ff6f59',lilac:'#8e8ff0',sun:'#ffd166',mint:'#7fe0b4',cream:'#fff6e4',muted:'#a9c4cf',ink:'#14303f',stand:'#1c4053',stand2:'#183849'};
 const CONF=['#ff6f59','#ffd166','#7fe0b4','#8e8ff0','#ff9ecb','#fff6e4','#5ec8ff'];
 const rnd=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);

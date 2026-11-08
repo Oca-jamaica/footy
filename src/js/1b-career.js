@@ -121,7 +121,7 @@ function chemParts(q=sq()){const slots=FORMS[q.f],ids=q.s;if(!ids.some(Boolean))
 const TAC=[{k:'ment',l:'Mentality',o:['Defensive','Balanced','Attacking']},{k:'pass',l:'Passing',o:['Patient','Mixed','Direct']},{k:'press',l:'Pressing',o:['Sit back','Normal','High press']}];
 const tacSet=()=>{club.tac=club.tac||{};return club.tac[GM]=club.tac[GM]||{ment:1,pass:1,press:1}};
 function tacOf(team){if(team===1){const o=OPP.tac||{};return{push:o.push||1,pass:o.pass||1,press:o.press||1}}
-  const t=(club.tac||{})[PITCH==='classical'?'classical':'volta']||{ment:1,pass:1,press:1};
+  const t=(club.tac||{})[PITCH!=='volta'?'classical':'volta']||{ment:1,pass:1,press:1};
   return{push:[.75,1,1.25][t.ment],pass:[.7,1,1.4][t.pass],press:[.8,1,1.22][t.press]}}
 
 /* ===== economy ===== */
@@ -353,7 +353,9 @@ function goText(){
   return comp==='friendly'?'Play a friendly':comp==='chal'?`Try: ${CHALS.find(c=>c.id===chalId()).name}`:comp==='skill'?`Play ${SGAMES[sgId()].name}`:comp==='tour'?(tourOver()?'Enter a new tournament':`Play ${TROUNDS[club.tour.round].replace(/s$/,'').toLowerCase()} vs ${clubName(myMatch().a===ME?myMatch().b:myMatch().a)}`):cupOver()?(club.cup.alive?'Defend the trophy':'Enter the cup again'):`Play ${ROUNDS[club.cup.round].toLowerCase()} vs ${OPPS[club.cup.opps[club.cup.round]][0]}`}
 function renderModes(){const lv=m=>{const L=(club.lg||{})[m];return L?DIVS[L.div].n:'Amateur Division'},w=m=>{const W=(club.wcc||{})[m];return W&&!W.done&&W.alive?' · in the World Club Championship':''};
   $('modes').innerHTML=`<button class="modecard" data-gm="volta" aria-pressed="${GM==='volta'}"><div class="mh"><b>VOLTA</b><i>5v5</i></div><span>Fast-paced football in the cage</span><em>1.0× coins</em><small>${lv('volta')}${w('volta')}</small></button>
-   <button class="modecard cl" data-gm="classical" aria-pressed="${GM==='classical'}"><div class="mh"><b>CLASSICAL</b><i>9v9</i></div><span>Full-pitch tactical football</span><em>1.5× coins on everything</em><small>${lv('classical')}${w('classical')}</small></button>`}
+   <button class="modecard cl" data-gm="classical" aria-pressed="${GM==='classical'}"><div class="mh"><b>CLASSICAL</b><i>9v9</i></div><span>Full-pitch tactical football</span><em>1.5× coins on everything</em><small>${lv('classical')}${w('classical')}</small></button>`+
+   (GM==='classical'?`<div class="pitchsel"><span class="lab">PITCH SIZE</span><div class="forms">${[['standard','Classical Standard','Large pitch · 3 min matches'],['expanded','Classical Expanded','Extra-large pitch · 3½ min · more room for passing, long balls and counters']].map(([k,n,d])=>
+     `<button data-pitch="${k}" aria-pressed="${(club.cpitch||'standard')===k}" title="${d}"><b>${n}</b> · ${d}</button>`).join('')}</div></div>`:'')}
 const kd=k=>`<span class="kitdot" style="background:${k}"></span>`;
 function renderLeague(){let L=lgOf();if(!L)L=newSeason(GM,0,1);const D=DIVS[L.div],T=lgTable(L);
   $('diff-note').textContent=`${LV().name}: ${LV().note} ${GM==='classical'?'Classical 9v9':'Volta 5v5'} · Season ${L.season} · ${D.n}. Top 3 go up${L.div===4?' (you’re at the top)':''}, bottom 3 go down${L.div===0?' (not from here)':''}. A top-3 finish also earns a World Club Championship place.`;
@@ -387,7 +389,7 @@ function renderWcc(){const W=wccOf();
     return `<div class="bcol"><b>${WROUNDS[ri]}</b>${shown.map(x=>{const nm=id=>esc(wTeam(W,id).name),cl=id=>x.w?(x.w===id?'w':'l'):'';
       return `<div class="bm ${x.a==='me'||x.b==='me'?'me':''}"><span class="${cl(x.a)}">${nm(x.a)}<em>${x.w?x.sa:''}</em></span><span class="${cl(x.b)}">${nm(x.b)}<em>${x.w?x.sb:''}${x.pen?' p':''}</em></span></div>`}).join('')}${ri<=1&&R.length>shown.length?`<span class="hint" style="font-size:11px">+ ${R.length-shown.length} more ties</span>`:''}</div>`}).join('');
   $('cup').innerHTML=`<div class="cup-head"><b>World Club Championship</b><span>${st}</span></div><div class="prize">${WROUNDS.slice(1).map((r,i)=>`<span class="${W.paid[i+1]?'got':''}">${r}: ${Math.round(WPRIZE[i+1]*MM()).toLocaleString()}</span>`).join('')}<span class="${W.paid[6]?'got':''}">Champions: ${Math.round(WPRIZE[6]*MM()).toLocaleString()}</span></div><div class="bracket">${cols}</div>`}
-$('modes').addEventListener('click',e=>{const b=e.target.closest('[data-gm]');if(b)setGM(b.dataset.gm)});
+$('modes').addEventListener('click',e=>{const pz=e.target.closest('[data-pitch]');if(pz){club.cpitch=pz.dataset.pitch;saveClub();renderMenu();return}const b=e.target.closest('[data-gm]');if(b)setGM(b.dataset.gm)});
 $('cup').addEventListener('click',e=>{const v=e.target.closest('[data-lgv]');if(v){lgView=v.dataset.lgv;renderMenu();return}
   if(e.target.closest('[data-lgnext]')){lgNext();lgView='table';toast('New season, new fixtures. Good luck!');renderMenu()}});
 function renderSquadExtras(){

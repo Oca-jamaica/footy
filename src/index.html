@@ -241,6 +241,7 @@ kbd{font-family:var(--body);font-weight:800;font-size:12px;background:var(--grou
 @media (prefers-reduced-motion:reduce){.menu:not([hidden]) .menu-inner,.coins.bump{animation:none}.go:active:not(:disabled){transform:none}}
 
 /* ---------- career screens ---------- */
+.pitchsel{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}.pitchsel .forms button{font-size:13px}
 .res{font-family:var(--display);font-size:16px;border-radius:999px;padding:2px 10px;background:#12303e;color:var(--cream);border:1px solid var(--line);white-space:nowrap}
 .res.tt{color:var(--mint)}.res.cp{color:#9fd3ff}.res.leg{cursor:pointer;color:var(--sun);font-family:var(--display)}
 .res.tt::before{content:"\25B2 ";font-size:12px}.res.cp::before{content:"\2605 ";font-size:12px}
@@ -387,14 +388,15 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
     </section>
     <section id="sec-online" hidden style="width:100%">
       <div class="online">
-        <div class="ocard"><h3>Host a match</h3><p class="hint">You get a 4-letter code. Your friend types it on their laptop.</p>
+        <div class="ocard"><h3>Host a match</h3><p class="hint">Pick the match, then press Host. You get a 4-letter code; your friend types it on their laptop.</p>
+          <div class="forms" id="net-mode" role="group" aria-label="Match type"></div>
           <button class="go" id="net-host">Host</button><div class="ncode" id="net-code" aria-live="polite"></div><button class="go" id="net-start" hidden>Kick off</button></div>
         <div class="ocard"><h3>Join a match</h3><p class="hint">Got a code from a friend? Type it here.</p>
           <div class="row"><input type="text" id="net-in" maxlength="4" placeholder="CODE" autocomplete="off" aria-label="Match code"><button class="go" id="net-join">Join</button></div></div>
       </div>
       <p class="toast" id="net-status" aria-live="polite"></p>
       <p class="hint" id="net-note"></p>
-      <p class="hint">You each play with your own team and line-up, and you both see yourself attacking left to right. Two and a half minutes, no penalties: a draw is a draw. Coins: 60 for a win, 30 for a draw, 15 for a loss.</p>
+      <p class="hint">You each play with your own team and line-up (your Volta line-up for Volta, your Classical line-up for Classical), and you both see yourself attacking left to right. After Kick off both laptops load the match and confirm they’re ready before a 3-2-1 countdown. No penalties: a draw is a draw. Coins: 60 for a win, 30 for a draw, 15 for a loss (Classical 1.5×).</p>
     </section>
     <section id="sec-coll" hidden style="width:100%">
       <h3 class="sec-title">Collection <span class="hint" id="collect-count"></span></h3>

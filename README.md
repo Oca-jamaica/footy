@@ -3,7 +3,11 @@
 A football game in a single HTML file, with two modes:
 
 - **Volta (5v5):** fast football in the cage. 1.0× coins.
-- **Classical (9v9):** a bigger pitch, 9-a-side formations, more passing and shape. 1.5× coins.
+- **Classical (9v9):** a bigger pitch, 9-a-side formations, more passing and shape. 1.5× coins. Two pitch sizes:
+  Standard and Expanded (about 1.37× bigger each way, for long balls and build-up play).
+
+Online works in all three (Volta, Classical Standard, Classical Expanded): the host picks the match, both laptops load
+and confirm they're ready, then a 3-2-1 countdown.
 
 Each mode has its own five-division league (Amateur, Division 3, 2, 1, Legendary: 10 clubs, 9 rounds (everyone plays everyone once), top 3 up, bottom 3 down)
 and its own World Club Championship (64-club knockout, earned with a top-3 finish). Coins, players, upgrades and cosmetics are shared.
