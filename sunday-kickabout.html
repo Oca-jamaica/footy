@@ -208,6 +208,16 @@ canvas:focus-visible{box-shadow:inset 0 0 0 3px var(--sun)}
 .lvl{display:flex;gap:6px;align-items:center;padding-right:12px;margin-right:4px;border-right:1px solid var(--line)}.lvl span{font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--muted);margin-right:2px}
 .diff button,.lvl button{font-family:var(--body);font-weight:800;font-size:14px;border:1px solid var(--line);background:var(--ground-2);color:var(--muted);padding:6px 14px;border-radius:999px;cursor:pointer}
 .diff button[aria-pressed="true"],.lvl button[aria-pressed="true"]{background:var(--cream);color:var(--ground);border-color:var(--cream)}
+.lvl button[data-lv="chill"]{color:#86e3a8;border-color:rgba(62,207,122,.45)}.lvl button[data-lv="chill"][aria-pressed="true"]{background:linear-gradient(180deg,#5fe095,#2fbf6b);color:#062a16;border-color:#3ecf7a;box-shadow:0 0 0 3px rgba(62,207,122,.22),0 3px 10px rgba(62,207,122,.3)}
+.lvl button[data-lv="normal"]{color:#ffd978;border-color:rgba(255,209,102,.45)}.lvl button[data-lv="normal"][aria-pressed="true"]{background:linear-gradient(180deg,#ffe28f,#ffc93d);color:#2c2104;border-color:#ffd166;box-shadow:0 0 0 3px rgba(255,209,102,.22),0 3px 10px rgba(255,201,61,.3)}
+.lvl button[data-lv="hard"]{color:#ff8a8d;border-color:rgba(255,90,95,.5)}.lvl button[data-lv="hard"][aria-pressed="true"]{background:linear-gradient(180deg,#ff6b70,#e0353b);color:#fff;border-color:#ff5a5f;box-shadow:0 0 0 3px rgba(255,90,95,.22),0 3px 12px rgba(224,53,59,.4)}
+.lvl button[data-lv="extreme"]{position:relative;color:#ffb35c;border-color:rgba(255,120,40,.6)}
+.lvl button[data-lv="extreme"][aria-pressed="true"]{color:#fff;border-color:#ff7a1a;text-shadow:0 1px 2px rgba(120,20,0,.6);background:linear-gradient(120deg,#ff2d00,#ff6a00,#ffb000,#ff6a00,#ff2d00);background-size:300% 100%;animation:fire 2.4s linear infinite;box-shadow:0 0 0 3px rgba(255,106,0,.25),0 0 18px rgba(255,90,0,.55),0 -4px 14px rgba(255,170,0,.35)}
+@keyframes fire{to{background-position:300% 0}}
+@media (max-width:600px){.lvl{flex-wrap:wrap;justify-content:center;border-right:0;padding-right:0;margin-right:0}.seg button{min-width:86px;padding:6px 10px}}
+.lvl button .fl{display:none}.lvl button[data-lv="extreme"][aria-pressed="true"] .fl{display:block;position:absolute;left:8%;right:8%;top:-9px;height:12px;pointer-events:none;background:radial-gradient(6px 9px at 15% 100%,#ffd000 0,rgba(255,120,0,.85) 55%,transparent 75%),radial-gradient(7px 12px at 38% 100%,#fff2a0 0,rgba(255,90,0,.9) 55%,transparent 75%),radial-gradient(6px 10px at 62% 100%,#ffd000 0,rgba(255,60,0,.85) 55%,transparent 75%),radial-gradient(7px 12px at 85% 100%,#fff2a0 0,rgba(255,110,0,.85) 55%,transparent 75%);filter:blur(.6px);transform-origin:50% 100%;animation:flick .18s ease-in-out infinite alternate}
+@keyframes flick{from{transform:scaleY(.8) translateY(1px);opacity:.85}to{transform:scaleY(1.15);opacity:1}}
+@media (prefers-reduced-motion:reduce){.lvl button[data-lv="extreme"][aria-pressed="true"],.lvl button .fl{animation:none}}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 .go{font-family:var(--display);font-size:22px;border:0;border-radius:999px;padding:.45em 1.5em;background:var(--coral);color:#fff;cursor:pointer;box-shadow:0 5px 0 #b8432f}
 .go:disabled{opacity:.45;cursor:not-allowed}
@@ -260,8 +270,17 @@ kbd{font-family:var(--body);font-weight:800;font-size:12px;background:var(--grou
 /* ---------- career screens ---------- */
 .ablv{display:flex;gap:2px}.ablv i{display:block;width:9px;height:9px;border-radius:2px;background:#26313d}.ablv i.on{background:var(--sun)}
 .maxl{color:var(--mint);letter-spacing:.06em}
+.potrow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}.potrow>div{display:flex;flex-direction:column;align-items:center}.potrow small{font-size:11px;color:var(--muted)}.ovrbig.pot{color:var(--mint)}.ovrbig.rem{color:#ffb38a}
+.strow.dv{grid-template-columns:44px 1fr 40px 50px}.strow.dv button{grid-column:1/-1;justify-self:end;margin-bottom:3px}@media (min-width:760px){.strow.dv{grid-template-columns:44px 1fr 40px 50px minmax(220px,auto)}.strow.dv button{grid-column:auto;margin:0}}
+.strow.dv em{font-style:normal;font-size:11px;color:var(--muted);white-space:nowrap}.strow .bar s{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,rgba(127,224,180,.28) 0 3px,transparent 3px 6px);text-decoration:none}
+.res.ctkp{cursor:pointer;color:#ffb38a}.res.ctkp::before{content:"\25C6 ";font-size:12px}
+.deptg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin-top:8px}.dept .dhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.dept h4{margin:0}.dlv{margin-left:auto;font-family:var(--display);font-weight:400;color:var(--cream)}.dnext{color:var(--mint)}.ctk{font-family:var(--display);font-size:24px;color:#ffb38a}
 table.abt td{vertical-align:middle}table.abt td:nth-child(2),table.abt th:nth-child(2),table.abt td:nth-child(3),table.abt th:nth-child(3){text-align:left}
-.pitchsel{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}.pitchsel .forms button{font-size:13px}
+.pitchsw{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;justify-content:center}.pitchsw .lab{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--muted)}.pitchsw small{font-size:12px;color:var(--muted)}
+.seg{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;background:#0d2230;border:1px solid var(--line);border-radius:999px;padding:3px;box-shadow:inset 0 1px 3px rgba(0,0,0,.35)}
+.seg .thumb{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:999px;background:linear-gradient(180deg,#ffe08a,var(--sun));box-shadow:0 2px 8px rgba(255,209,102,.35);transition:transform .22s cubic-bezier(.3,.7,.4,1)}.seg[data-v="expanded"] .thumb{transform:translateX(100%)}
+.seg button{position:relative;z-index:1;font-family:var(--body);font-weight:800;font-size:12px;letter-spacing:.08em;min-width:104px;padding:6px 14px;border:0;background:transparent;color:var(--muted);border-radius:999px;cursor:pointer;transition:color .15s}.seg button[aria-pressed="true"]{color:#1d1a10}.seg button:hover[aria-pressed="false"]{color:var(--cream)}
+.pbonus{font-family:var(--display);font-size:15px;color:#1b2a12;background:linear-gradient(180deg,#b9f3a0,#7fe0b4);border-radius:999px;padding:2px 10px;box-shadow:0 0 12px rgba(127,224,180,.35);animation:pb .35s ease-out}@keyframes pb{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
 .res{font-family:var(--display);font-size:16px;border-radius:999px;padding:2px 10px;background:#12303e;color:var(--cream);border:1px solid var(--line);white-space:nowrap}
 .res.tt{color:var(--mint)}.res.cp{color:#9fd3ff}.res.leg{cursor:pointer;color:var(--sun);font-family:var(--display)}
 .res.tt::before{content:"\25B2 ";font-size:12px}.res.cp::before{content:"\2605 ";font-size:12px}
@@ -349,7 +368,7 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
     <div class="clubbar">
       <label for="club-name" style="display:flex;align-items:center;gap:6px">CLUB<input type="text" id="club-name" maxlength="14"></label>
       <div class="sw" id="club-kit" aria-label="Kit colour"></div>
-      <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button>
+      <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button><button class="res ctkp" id="ctkp" title="Club Tokens (Club Development)"></button>
     </div>
     <div class="tabs" role="tablist"><button role="tab" id="tab-team" aria-selected="true">Play</button><button role="tab" id="tab-squad" aria-selected="false">Squad</button><button role="tab" id="tab-club" aria-selected="false">Club</button><button role="tab" id="tab-online" aria-selected="false">Online</button></div>
     <p class="result" id="result" hidden></p>
@@ -359,10 +378,10 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
       <div class="modes" id="modes"></div>
       <div class="row">
         <div class="lvl" role="group" aria-label="Difficulty"><span>DIFFICULTY</span>
-          <button data-lv="chill" aria-pressed="false">Chill</button>
-          <button data-lv="normal" aria-pressed="false">Normal</button>
-          <button data-lv="hard" aria-pressed="false">Hard</button>
-          <button data-lv="extreme" aria-pressed="false" title="An extreme challenge">Extreme 🔥</button>
+          <button data-lv="chill" aria-pressed="false" title="Relaxed opponents, fewer coins">Chill</button>
+          <button data-lv="normal" aria-pressed="false" title="A fair game">Medium</button>
+          <button data-lv="hard" aria-pressed="false" title="A genuine challenge, 1.8× coins">Hard</button>
+          <button data-lv="extreme" aria-pressed="false" title="For true gamer ballers, 2.5× coins"><span class="fl" aria-hidden="true"></span>Extreme 🔥</button>
         </div>
         <div class="diff" id="comps" role="group" aria-label="Competition"></div>
         <button class="go" id="go">Kick off</button>
@@ -723,10 +742,10 @@ let diffKey='easy';// only the Sunday Cup is left besides the Grand Tournament
 let DF=DIFFS[diffKey];
 // Chill / Normal / Hard sit on top of whatever the opponent is: they shift the AI a level down or up, change how often
 // defenders bite on your cuts (overcommit), and scale the coins.
-const LEVELS={chill:{shift:-1,ai:.9,bite:.62,coin:.8,name:'Chill',note:'Opponents bite on your cuts a lot and press gently, but fewer coins.'},
-  normal:{shift:0,half:.8,ai:1.22,bite:.3,coin:1,name:'Normal',note:'A fair game. Defenders sometimes bite on a sharp cut.'},
-  hard:{shift:2.6,ai:1.75,bite:.04,coin:1.8,boost:.07,name:'Hard',note:'A genuine challenge: opponents beyond Legend level, stronger players, sharp keepers and they almost never bite. 1.8× coins.'},
-  extreme:{shift:4.2,ai:2.1,bite:0,coin:2.5,boost:.12,extreme:true,name:'Extreme',note:'For true gamer ballers only: +12 on every opponent, near-instant reactions, elite keepers, relentless pressing and slide tackles, and they never bite. 2.5× coins.'}};
+const LEVELS={chill:{shift:-1,ai:.9,bite:.62,coin:.8,name:'Chill',note:'Relaxed opponents: they bite on your cuts, press gently and rarely read your passes. Fewer coins.'},
+  normal:{shift:0,half:.8,ai:1.22,bite:.3,coin:1,name:'Medium',note:'A fair game. They mark your runners, sometimes cut out a pass, and still bite on a sharp cut now and then.'},
+  hard:{shift:2.6,ai:1.75,bite:.04,coin:1.8,boost:.07,name:'Hard',note:'A genuine challenge: opponents beyond Legend level who track your runs, block passing lanes, time their through balls and almost never bite. Keepers sweep up behind. 1.8× coins.'},
+  extreme:{shift:4.2,ai:2.1,bite:0,coin:2.5,boost:.12,extreme:true,name:'Extreme',note:'For true gamer ballers only: +12 on every opponent, near-instant reactions, elite keepers, relentless pressing and slide tackles, and elite decisions: they cut out loose passes, counter in numbers, pick the open corner and never bite. 2.5× coins.'}};
 const LV=()=>NET.on?{shift:0,ai:1,bite:.3,coin:1,name:'Online'}:LEVELS[club.level]||LEVELS.normal;
 const DKEYS=['beginner','easy','normal','hard','legend'];
 // Hard can push an opponent past Legend: the numbers carry on from Normal → Hard → Legend, within sensible limits
@@ -886,7 +905,7 @@ function renderMenu(){
    $('cup').innerHTML=`<div class="cup-head"><b>${CUPS[c.tier]}</b><span>${tro?'\u{1F3C6} ×'+tro+' won':'Win three in a row to lift the trophy'}</span></div><div class="rounds">`+ROUNDS.map((r,i)=>{const o=OPPS[c.opps[i]],st=i<c.res.length?(c.res[i]?'won':'lost'):i===c.round&&c.alive?'now':'';
      return `<div class="rnd ${st}" style="--k:${o[1]}"><i>${r.toUpperCase()}</i><em>${esc(o[0])}</em>${st==='won'?'<b>WON</b>':st==='lost'?'<b>KNOCKED OUT</b>':st==='now'?'<b style="color:var(--sun)">NEXT</b>':''}</div>`}).join('')+`</div>`}
   $('club-name').value=club.name;{const el=$('coins');el.textContent=club.coins.toLocaleString();if(shownCoins!=null&&club.coins!==shownCoins){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}shownCoins=club.coins}
-  res();$('tt').textContent=club.tt;$('cp').textContent=club.cp.toLocaleString();$('legpill').textContent='Legacy Lv '+((club.leg||{}).lvl||0);
+  res();$('tt').textContent=club.tt;$('cp').textContent=club.cp.toLocaleString();$('legpill').textContent='Legacy Lv '+((club.leg||{}).lvl||0);ctkSync();$('ctkp').textContent=ctk();
   $('club-kit').innerHTML=[...KITS,...(cosOwned('kit_gold')?['#d4af37']:[])].map(c=>`<button type="button" style="background:${c}" aria-label="Kit colour" aria-pressed="${club.kit===c}" data-c="${c}"></button>`).join('');
   if(club.welcome){resultEl.hidden=false;resultEl.textContent=club.welcome;delete club.welcome;saveClub()}
   const q=sq();q.s=q.s.map(id=>id&&club.owned.includes(id)?id:null);
@@ -911,10 +930,10 @@ function renderMenu(){
   $('benchctl').innerHTML=`<span class="hint" style="margin:0">${benchList.length} players · best for the selected ${slots[selSlot]?slots[selSlot].r:''} spot first</span>`+(benchList.length>36?`<button class="ghost" data-benchall="1">${benchAll?'Show fewer':'Show all '+benchList.length}</button>`:'');
   $('bench').innerHTML=(benchAll?benchList:benchList.slice(0,36)).map(p=>{const at=q.s.indexOf(p.id);return cardHTML(p,{pickable:true,inteam:at>=0,badge:at>=0?slots[at].r[0]:'',
     extra:!p.isCustom?renameUI(p,'bench'):
-      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<400||(custom.budget||BUDGET)>=650?'disabled':''}>Train +8 pts · 400</button>`:''})}).join('');
+      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<coachCost(400)||(custom.budget||BUDGET)>=650?'disabled':''}>Train +8 pts · ${coachCost(400)}</button>`:''})}).join('');
   renderSquadExtras();
   // packs
-  $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const od=Object.entries(k.odds).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ');
+  $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const so=scoutOdds(k.odds),sc=depFx('scout')&&so!==k.odds,od=Object.entries(so).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ')+(sc?` (scouting +${depFx('scout')}%)`:'');
     return `<button class="packbtn t-${k.id==='premium'||k.id==='elite'?'special':k.id}" data-pack="${k.id}" ${!free&&club.coins<k.cost?'disabled':''}><b>${k.name}</b><span>${k.d}</span><span style="color:var(--tc)">Odds: ${od}</span><em>${free?`FREE${(club.free||{})[k.id]>1?' ×'+club.free[k.id]:''}`:k.cost.toLocaleString()+' coins'}</em></button>`}).join('');
   if(tab==='club')renderClub();
   const canFill=ownedPlayers().length>=4;
@@ -965,7 +984,7 @@ function lvlHTML(p){if(!club.owned.includes(p.id))return'';const L=lvlOf(p.id),x
 let levelUps=[];
 function grantXP(won){levelUps=[];club.xp=club.xp||{};
   for(const p of players){if(p.team!==0||p.keeper||!p.st.id)continue;const id=p.st.id,before=lvlOf(id);
-    const g=25+(p.goals||0)*40+(p.mT||0)*12+(p.mS||0)*8+(won?20:0);club.xp[id]=xpOf(id)+g;const after=lvlOf(id);
+    const g=Math.round((25+(p.goals||0)*40+(p.mT||0)*12+(p.mS||0)*8+(won?20:0))*(1+depFx('train')/100));club.xp[id]=xpOf(id)+g;const after=lvlOf(id);
     if(after>before)levelUps.push(`${(byId(id)||p.st).short} reached Lv ${after}`)}}
 /* ---------- Sticker album ---------- */
 const ALBUM_REWARD={bronze:3000,silver:5000,gold:10000,special:15000,icon:25000};
@@ -1003,7 +1022,7 @@ $('market').addEventListener('keydown',renameKey);
 $('bench').addEventListener('click',e=>{
   if(renameClick(e,'bench'))return;
   if(e.target.closest('[data-edit]')){openEditor();return}
-  const tr=e.target.closest('[data-train]');if(tr){if(club.coins>=400){const was=ovr(custom),gain=Math.min(8,650-(custom.budget||BUDGET));club.coins-=400;custom.budget=(custom.budget||BUDGET)+gain;autoSpend(custom,gain);const now=ovr(custom);try{localStorage.setItem('kickabout-custom',JSON.stringify(custom))}catch(e){}saveClub();S.skill(2);renderMenu();showUpgrade(was,now);openEditor()}return}
+  const tr=e.target.closest('[data-train]');if(tr){if(club.coins>=coachCost(400)){const was=ovr(custom),gain=Math.min(8,650-(custom.budget||BUDGET));club.coins-=coachCost(400);custom.budget=(custom.budget||BUDGET)+gain;autoSpend(custom,gain);const now=ovr(custom);try{localStorage.setItem('kickabout-custom',JSON.stringify(custom))}catch(e){}saveClub();S.skill(2);renderMenu();showUpgrade(was,now);openEditor()}return}
   const c=e.target.closest('.card[data-id]');if(c){lastSlotClick=-1;placePlayer(c.dataset.id)}});
 $('bench').addEventListener('keydown',e=>{if(renameKey(e))return;
   const c=e.target.closest('.card[data-id]');if(c&&e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();placePlayer(c.dataset.id)}});
@@ -1032,7 +1051,7 @@ function openPack(id){
   if(!free&&club.coins<k.cost)return;
   initAudio();if(ac&&ac.state==='suspended')ac.resume();
   if(gift)club.gift=false;else if(owed)club.free[id]--;else club.coins-=k.cost;
-  const cards=dealHardPick(rollTier(k.odds));
+  const cards=dealHardPick(rollTier(scoutOdds(k.odds)));
   const res=cards.map(p=>({p,dup:club.owned.includes(p.id)}));
   saveClub();
   const el=$('pack');el.hidden=false;$('pack-title').textContent=k.name;$('pack-note').textContent='';$('pack-done').hidden=true;
@@ -1188,17 +1207,54 @@ const ABIL={finisher:{name:'Elite Finisher',d:'+6 finishing, +4 shot power',fx:{
   engine:{name:'Engine',d:'+3 pace, defending and passing',fx:{pace:.03,tackle:.03,pass:.03}}};
 for(const p of PLAYERS)if(!p.ab&&(tier(p)==='icon'||tier(p)==='special')){const s=p.sk;p.ab=p.pos==='DEF'?'wall':p.pos==='MID'?'passer':s==='burst'||p.sp==='turbo'?'speed':s==='elastico'||s==='rainbow'?'dribbler':'finisher'}
 
+/* ===== club development: six departments, levels 1-5, coins plus Club Tokens ===== */
+// Club Tokens come from Club Legacy: exactly one for every level gained. Each department level costs coins and 1 token.
+const DEPCOST=[5000,10000,20000,35000],DEPMAX=5;
+const DEPTS=[
+  {k:'fan',n:'Fanbase',fx:[0,5,10,15,20],u:'% more match coins',d:'Bigger crowds and more supporters: extra coins from every match, on top of the mode multiplier.'},
+  {k:'coach',n:'Coaching Staff',fx:[0,5,10,15,20],u:'% off training costs',d:'Cheaper coin costs for stat upgrades, evolutions, keeper training, created-player training and special ability upgrades. Training Token costs never change.'},
+  {k:'train',n:'Training Facilities',fx:[0,5,10,15,25],u:'% more player XP',d:'Players level up faster from matches and training sessions (levels still stop at the maximum, and stats at each player’s potential).'},
+  {k:'stad',n:'Stadium Development',fx:[0,1,2,3,4],u:'% more match coins',d:'Bigger stands, brighter floodlights, a fuller and livelier crowd, and a small attendance bonus on match coins.'},
+  {k:'scout',n:'Scouting Department',fx:[0,2.5,5,7.5,10],u:'% better odds of the higher rarity',d:'In packs that can give two rarities, the chance of the higher one goes up by this much of itself (5% becomes 5.5% at the top level). Single-rarity packs are unchanged; Icons are never guaranteed.'},
+  {k:'comm',n:'Commercial Department',fx:[0,5,10,15,20],u:'% more objective coins',d:'More coins from daily and weekly challenges and achievements, a sponsor payment at the end of every league season (500 per level), and your club on the stadium boards at level 3.'}];
+const depLv=k=>clamp(((club.dept||{})[k])|0||1,1,DEPMAX);
+const depFx=k=>DEPTS.find(d=>d.k===k).fx[depLv(k)-1];
+const coachCost=c=>Math.round(c*(1-depFx('coach')/100));
+const ctk=()=>{club.ctk=club.ctk||0;return club.ctk};
+// existing clubs get one token for every Club Legacy level they already had (counted once, never twice)
+function ctkSync(){const L=(club.leg||{}).lvl||0;club.ctkEarned=club.ctkEarned||0;if(L>club.ctkEarned){club.ctk=ctk()+(L-club.ctkEarned);club.ctkEarned=L}}
+function depBuy(k){const D=DEPTS.find(d=>d.k===k);if(!D)return;const L=depLv(k);if(L>=DEPMAX){toast(`${D.n} is at the top level.`);return}
+  const c=DEPCOST[L-1];if(club.coins<c||ctk()<1){toast(`Needs ${c.toLocaleString()} coins and 1 Club Token.`);return}
+  club.coins-=c;club.ctk-=1;club.dept=club.dept||{};club.dept[k]=L+1;
+  if(k==='stad'&&typeof buildCrowd==='function'){buildCrowd();pitchCv=null;skyCv=null}if(k==='comm'&&L+1>=3){club.cosOwned=[...new Set([...(club.cosOwned||[]),'boards_club'])]}
+  toast(`${D.n} level ${L+1}: ${D.fx[L]}${D.u}`);S.goal();saveClub();renderMenu()}
+// scouting: a relative lift for the higher rarity in two-rarity packs, taken from the lower one
+function scoutOdds(odds){const s=depFx('scout')/100,ks=['bronze','silver','gold','special','icon'].filter(r=>(odds[r]||0)>0);if(!s||ks.length<2)return odds;
+  const o={...odds},hi=ks[ks.length-1],lo=ks[0],add=Math.min(o[lo],o[hi]*s);o[hi]=Math.round((o[hi]+add)*100)/100;o[lo]=Math.round((o[lo]-add)*100)/100;return o}
+
+function deptHTML(){ctkSync();const tk=ctk(),spent=DEPTS.reduce((a,D)=>a+depLv(D.k)-1,0);
+  const fmt=(D,v)=>D.k==='stad'?`${[60,70,80,90,100][DEPTS.find(x=>x.k==='stad').fx.indexOf(v)]}% crowd · +${v}% match coins`:`${D.k==='coach'?'−':'+'}${v}${D.u}`;
+  const rows=DEPTS.map(D=>{const L=depLv(D.k),max=L>=DEPMAX,c=max?0:DEPCOST[L-1],can=!max&&club.coins>=c&&tk>=1;
+    return `<div class="panel dept"><div class="dhead"><h4>${D.n}</h4><span class="ablv">${[1,2,3,4,5].map(i=>`<i class="${i<=L?'on':''}"></i>`).join('')}</span><b class="dlv">Level ${L}/${DEPMAX}</b></div>
+     <p class="hint" style="margin:2px 0 6px">${D.d}</p>
+     <p>Now: <b>${L===1&&!D.fx[0]&&D.k!=='stad'?'no bonus yet':fmt(D,D.fx[L-1])}</b>${max?'':` · next level: <b class="dnext">${fmt(D,D.fx[L])}</b>`}</p>
+     ${D.k==='comm'?`<p class="hint" style="margin:2px 0">Sponsor payment each league season: ${(500*(L-1)).toLocaleString()} coins${L<3?' · club advertising boards at level 3':' · club advertising boards unlocked'}</p>`:''}
+     ${max?'<b class="maxl">MAX LEVEL</b>':`<button class="btn ${can?'gold':''}" data-dep="${D.k}" ${can?'':'disabled'}>Upgrade · ${c.toLocaleString()} coins + 1 Club Token</button>`}</div>`}).join('');
+  return `<div class="panel"><h4>Club Development</h4><p><span class="ctk">${tk}</span> Club Token${tk===1?'':'s'} · ${(club.coins||0).toLocaleString()} coins · ${spent} of ${DEPTS.length*(DEPMAX-1)} department levels built</p>
+   <p class="hint">You earn exactly 1 Club Token every time your Club Legacy level goes up (${club.ctkEarned||0} earned so far). Club Tokens are separate from Training Tokens. Each department level costs ${DEPCOST.map(c=>c.toLocaleString()).join(' / ')} coins plus 1 Club Token.  Fanbase and Stadium bonuses apply to every match, online included, on top of the mode multiplier.</p>
+   <button class="btn" data-depcos="1">Cosmetic customisation →</button></div><div class="deptg">${rows}</div>`}
+
 /* ===== special ability development ===== */
 // Every card's special (X) has its own level, 1 to 10, bought with coins plus 2 Training Tokens a level. Levels cut the
 // cooldown in a straight line from the level-1 time to the level-10 time for that ability's tier.
-const ABTIER={through:[15,7],curler:[12,5],knuckle:[12,5],rocket:[12,5],bicycle:[12,5],slide:[12,5],turbo:[10,3.5],lob:[10,3.5],chip:[10,3.5]};
+const ABTIER={through:[25,7],curler:[20,5],knuckle:[20,5],rocket:[20,5],bicycle:[20,5],slide:[20,5],turbo:[10,3.5],lob:[10,3.5],chip:[10,3.5]};
 const ABCOST=[500,1000,1500,2500,3500,5000,7000,9500,13000],ABTT=2,ABMAX=10;
 const ablOf=id=>clamp(((club.abl||{})[id])|0||1,1,ABMAX);
 const cdSecs=(sp,L)=>{const T=ABTIER[sp];if(!T)return SPECIALS[sp]?SPECIALS[sp].cd/60:12;return Math.round((T[0]-(T[0]-T[1])*(clamp(L,1,ABMAX)-1)/9)*10)/10};
 // cooldown in game frames (60 a second) for a player on the pitch: his own ability level
 const spCdOf=p=>Math.round(cdSecs(p.st.sp,p.st.spLv||1)*60);
 function ablBuy(id){const p=byId(id);if(!p||!club.owned.includes(id))return;const L=ablOf(id);if(L>=ABMAX){toast('Already at MAX LEVEL.');return}
-  const c=ABCOST[L-1];if(club.coins<c||res().tt<ABTT){toast(`Needs ${c.toLocaleString()} coins and ${ABTT} Training Tokens.`);return}
+  const c=coachCost(ABCOST[L-1]);if(club.coins<c||res().tt<ABTT){toast(`Needs ${c.toLocaleString()} coins and ${ABTT} Training Tokens.`);return}
   club.coins-=c;club.tt-=ABTT;club.abl=club.abl||{};club.abl[id]=L+1;
   toast(`${p.short}: ${SPECIALS[p.sp].name} level ${L+1} · cooldown ${cdSecs(p.sp,L)}s → ${cdSecs(p.sp,L+1)}s`);S.skill(2);saveClub();renderMenu()}
 
@@ -1209,29 +1265,42 @@ const OVRCAP={bronze:80,silver:86,gold:93,special:96,icon:99};
 const upOf=id=>(club.up||{})[id]||{};
 const upSpent=id=>Object.values(upOf(id)).reduce((a,b)=>a+b,0);
 const upRoom=p=>Math.min(UPCAP[tier(p)],2+2*lvlOf(p.id));// levelling up through XP unlocks more room
-const upCost=p=>Math.round(UPBASE[tier(p)]*(1+.35*upSpent(p.id))/10)*10;
+const upCost=p=>coachCost(Math.round(UPBASE[tier(p)]*(1+.35*upSpent(p.id))/10)*10);
 // Evolutions: multi-stage boosts for a favourite player, each stage needs an on-pitch objective plus coins and Training Tokens
 const EVO={bronze:{boost:[3,2,2],coins:[400,800,1500],tt:[2,3,4]},silver:{boost:[2,2,2],coins:[800,1600,3000],tt:[2,4,6]},
   gold:{boost:[2,2,1],coins:[2000,4000,8000],tt:[3,5,8]},special:{boost:[1,1],coins:[6000,12000],tt:[5,10]},icon:{boost:[1],coins:[25000],tt:[15]}};
 const EVOGOAL={ATT:{k:'g',n:[2,4,6],w:'goals'},MID:{k:'p',n:[12,25,40],w:'passes'},DEF:{k:'t',n:[5,10,16],w:'tackles won'}};
 const evoOf=id=>(club.evo||{})[id]||{st:0,m:0,g:0,p:0,t:0};
 function evoNeed(p){const e=evoOf(p.id),E=EVO[tier(p)];if(e.st>=E.boost.length)return null;const G=EVOGOAL[natPos(p)];
-  return{stage:e.st,boost:E.boost[e.st],coins:E.coins[e.st],tt:E.tt[e.st],m:3+e.st*2,k:G.k,n:G.n[Math.min(e.st,G.n.length-1)],w:G.w,have:{m:e.m,v:e[G.k]||0}}}
-const evoBoost=p=>{const e=evoOf(p.id),E=EVO[tier(p)];let b=0;for(let i=0;i<e.st;i++)b+=E.boost[i];return b};
-// the stats a player actually takes onto the pitch: card stats plus everything you've invested in him
-function playStats(p){if(!p||!p.id)return p;const b={...p};b.spLv=ablOf(p.id);
-  const L=Math.min(3,Math.floor(lvlOf(p.id)/2));if(L)STATK.map(k=>k[0]).sort((x,y)=>p[y]-p[x]).slice(0,5).forEach(k=>b[k]+=.01*L);
-  const u=upOf(p.id);for(const k in u)if(k in b)b[k]+=u[k]*.01;
-  let ev=evoBoost(p);if(ev){const room=OVRCAP[tier(p)]-ovr({...b,isCustom:p.isCustom});ev=Math.max(0,Math.min(ev,room));for(const [k] of STATK)b[k]+=ev*.01}
+  return{stage:e.st,boost:E.boost[e.st],coins:coachCost(E.coins[e.st]),tt:E.tt[e.st],m:3+e.st*2,k:G.k,n:G.n[Math.min(e.st,G.n.length-1)],w:G.w,have:{m:e.m,v:e[G.k]||0}}}
+const evoBoostN=(p,st)=>{const E=EVO[tier(p)];let b=0;for(let i=0;i<Math.min(st,E.boost.length);i++)b+=E.boost[i];return b};
+const evoBoost=p=>evoBoostN(p,evoOf(p.id).st);
+// the stats a player takes onto the pitch for a given development state: level, upgrade points per stat, evolution stages
+function playStatsX(p,lv,u,est){const b={...p};
+  const L=Math.min(3,Math.floor(lv/2));if(L)STATK.map(k=>k[0]).sort((x,y)=>p[y]-p[x]).slice(0,5).forEach(k=>b[k]+=.01*L);
+  for(const k in u)if(k in b)b[k]+=u[k]*.01;
+  let ev=evoBoostN(p,est);if(ev){const room=OVRCAP[tier(p)]-ovr({...b,isCustom:p.isCustom});ev=Math.max(0,Math.min(ev,room));for(const [k] of STATK)b[k]+=ev*.01}
   const ab=ABIL[p.ab];if(ab)for(const k in ab.fx)b[k]+=ab.fx[k];
   for(const [k] of STATK)b[k]=Math.min(.99,b[k]);return b}
+// the stats a player actually takes onto the pitch: card stats plus everything you've invested in him
+function playStats(p){if(!p||!p.id)return p;const b=playStatsX(p,lvlOf(p.id),upOf(p.id),evoOf(p.id).st);b.spLv=ablOf(p.id);return b}
 const effOvr=p=>p?ovr(playStats(p)):0;
-// how good he could become with every upgrade and evolution done
-function potOvr(p){const b={...p},room=UPCAP[tier(p)];const ks=STATK.map(k=>k[0]).sort((x,y)=>p[y]-p[x]);let left=room;
-  for(const k of ks){const a=Math.min(STATMAX,left);b[k]=Math.min(.99,b[k]+a*.01+.03);left-=a;if(left<=0)break}
-  const E=EVO[tier(p)],ev=E.boost.reduce((a,c)=>a+c,0);for(const [k] of STATK)b[k]=Math.min(.99,b[k]+ev*.01);return Math.min(OVRCAP[tier(p)]+3,ovr(b))}
+const top5=b=>[b.pace,b.shot,b.fin,b.skill,b.pass,b.tackle,b.str].sort((x,y)=>y-x).slice(0,5).reduce((a,c)=>a+c,0);
+// the best he can ever reach: top level, every evolution, and the remaining upgrade points placed where they count most
+// (points already spent stay where they are). Returns the overall, the stats and the plan of points still to spend.
+function maxPlan(p){const lvMax=XPL.length-1,stMax=EVO[tier(p)].boost.length,u={...upOf(p.id)},cap=UPCAP[tier(p)],plan={};let left=cap-upSpent(p.id);
+  while(left>0){let best=null,bv=-1;for(const [k] of STATK){if((u[k]||0)>=STATMAX)continue;const t={...u,[k]:(u[k]||0)+1},b=playStatsX(p,lvMax,t,stMax),v=ovr(b)*10+top5(b);if(v>bv+1e-9){bv=v;best=k}}
+    if(!best)break;const now=playStatsX(p,lvMax,u,stMax),nx=playStatsX(p,lvMax,{...u,[best]:(u[best]||0)+1},stMax);if(top5(nx)<=top5(now)+1e-9)break;
+    u[best]=(u[best]||0)+1;plan[best]=(plan[best]||0)+1;left--}
+  const b=playStatsX(p,lvMax,u,stMax);return{ovr:Math.max(ovr(b),effOvr(p)),b,plan,left}}
+// the most one stat can reach on its own: top level, every evolution, and every free upgrade point put into that stat
+function statMax(p,k){const u={...upOf(p.id)},free=UPCAP[tier(p)]-upSpent(p.id);u[k]=Math.min(STATMAX,(u[k]||0)+free);return Math.round(playStatsX(p,XPL.length-1,u,EVO[tier(p)].boost.length)[k]*100)}
+// what the next +1 in one stat does right now
+function upPreview(p,k){const u=upOf(p.id),lv=lvlOf(p.id),st=evoOf(p.id).st,a=playStatsX(p,lv,u,st),b=playStatsX(p,lv,{...u,[k]:(u[k]||0)+1},st);
+  return{s0:Math.round(a[k]*100),s1:Math.round(b[k]*100),o0:ovr(a),o1:ovr(b)}}
+const potOvr=p=>maxPlan(p).ovr;
 // the club keeper: one shared goalkeeper whose Goalkeeping you can train up
-const GKMAX=8,gkCost=lv=>Math.round(600*Math.pow(1.6,lv)/50)*50;
+const GKMAX=8,gkCost=lv=>coachCost(Math.round(600*Math.pow(1.6,lv)/50)*50);
 const keeperStats=team=>team===0?{gkv:.98+(club.gkLv||0)*.013}:{};
 // chemistry: in position, a settled line-up, and a balanced mix of roles. Up to +3 on every stat at 100.
 function chemOf(q=sq()){const c=chemParts(q);return c?c.total:0}
@@ -1256,8 +1325,8 @@ const MULT={volta:1,classical:1.5,expanded:1.875},MULTN={volta:'Volta',classical
 const matchMul=()=>MULT[PITCH]||1;
 let earnNote='';
 // pay a match: base for the result plus per-goal coins, times the pitch multiplier and the difficulty, to the whole coin
-function matchPay(label,base,goalCoins,diffMul,extra=0){const m=matchMul(),raw=(base+goalCoins)*m*diffMul,coins=Math.round(raw)+extra;
-  earnNote=`${label} ${base}${goalCoins?` + goals ${goalCoins}`:''}${m!==1?` × ${MULTN[PITCH]} ${m}`:''}${diffMul!==1?` × difficulty ${+diffMul.toFixed(2)}`:''}${extra?` + prize ${extra.toLocaleString()}`:''} = ${coins.toLocaleString()} coins`;return coins}
+function matchPay(label,base,goalCoins,diffMul,extra=0){const m=matchMul(),cb=(1+depFx('fan')/100)*(1+depFx('stad')/100),raw=(base+goalCoins)*m*diffMul*cb,coins=Math.round(raw)+extra;
+  earnNote=`${label} ${base}${goalCoins?` + goals ${goalCoins}`:''}${m!==1?` × ${MULTN[PITCH]} ${m}`:''}${diffMul!==1?` × difficulty ${+diffMul.toFixed(2)}`:''}${cb!==1?` × club ${+cb.toFixed(3)}`:''}${extra?` + prize ${extra.toLocaleString()}`:''} = ${coins.toLocaleString()} coins`;return coins}
 const res=()=>{club.tt=club.tt||0;club.cp=club.cp||0;return club};
 function grant(r,why){if(!r)return'';const c=res(),bits=[];
   if(r.coins){c.coins+=r.coins;bits.push(`+${r.coins.toLocaleString()} coins`);if(r.coins>0)chProg('coins',r.coins)}
@@ -1309,6 +1378,7 @@ function seasonEnd(L){if(L.paid)return null;L.paid=true;const m=GM,T=lgTable(L),
   if(promo){coins+=Math.round(750*MM());out.push(`Promoted to ${DIVS[L.div+1].n}`);stat('promos_'+m,1);if(L.div+1===4)stat('legend_'+m,1)}
   if(releg)out.push(`Relegated to ${DIVS[L.div-1].n}`);
   if(me.l===0)stat('unbeaten',1);
+  const spon=500*(depLv('comm')-1);if(spon){coins+=spon;out.push(`Sponsor payment +${spon}`)}
   const got=grant({coins,cp,tt,xp:300+(11-pos)*60},'season');
   club.hist=club.hist||[];club.hist.unshift({m,season:L.season,div:L.div,pos,pts:me.pts,w:me.w,d:me.d,l:me.l,gf:me.gf,ga:me.ga,note:out.join(' · ')});club.hist=club.hist.slice(0,60);
   // a top-three finish earns a place in next season's World Club Championship
@@ -1373,15 +1443,16 @@ const weekKey=()=>{const d=new Date(),j=new Date(d.getFullYear(),0,1);return d.g
 function chState(){const c=club.chs=club.chs||{},day=today(),wk=weekKey();
   const deal=(pool,key,n)=>{let h=0;for(const ch of key)h=(h*31+ch.charCodeAt(0))>>>0;const a=pool.slice();const out=[];while(out.length<n&&a.length){h=(h*1103515245+12345)>>>0;out.push(a.splice(h%a.length,1)[0])}return out.map(x=>({id:x.id,v:0,claimed:false}))};
   if(c.day!==day){c.day=day;c.d=deal(DAILY,day,3)}if(c.wk!==wk){c.wk=wk;c.w=deal(WEEKLY,wk,3)}return c}
+const commBoost=r=>r.coins?{...r,coins:Math.round(r.coins*(1+depFx('comm')/100))}:r;
 function chProg(k,n){if(!n)return;const c=chState();for(const [list,pool] of [[c.d,DAILY],[c.w,WEEKLY]])for(const x of list){const d=pool.find(q=>q.id===x.id);if(d&&d.k===k&&!x.claimed)x.v=Math.min(d.v,x.v+n)}}
 function chClaim(which,id){const c=chState(),list=which==='d'?c.d:c.w,pool=which==='d'?DAILY:WEEKLY,x=list.find(q=>q.id===id),d=pool.find(q=>q.id===id);
-  if(!x||!d||x.claimed||x.v<d.v)return;x.claimed=true;toast(`${d.n}: `+grant(d.r));S.goal();saveClub();renderMenu()}
+  if(!x||!d||x.claimed||x.v<d.v)return;x.claimed=true;toast(`${d.n}: `+grant(commBoost(d.r)));S.goal();saveClub();renderMenu()}
 
 /* ===== Club Legacy: a level for your whole club, every match counts, even the losses ===== */
 const legNeed=l=>450+l*110;
 function legReward(l){const r={coins:300+l*40};if(l%3===0)r.tt=2;if(l%5===0)r.pack='gold';if(l%10===0){r.pack='premium';r.cp=100}if(l===15||l===35)r.pack='elite';if(l===25||l===50)r.pack='icon';if(l===20)r.cos='theme_dusk';return r}
-function legacyXP(x){const L=club.leg=club.leg||{xp:0,lvl:0};L.xp+=Math.round(x);
-  while(L.xp>=legNeed(L.lvl)){L.xp-=legNeed(L.lvl);L.lvl++;const got=grant(legReward(L.lvl));club.legLog=[`Club Legacy level ${L.lvl}: ${got}`,...(club.legLog||[])].slice(0,12);legacyUps.push(L.lvl)}}
+function legacyXP(x){ctkSync();const L=club.leg=club.leg||{xp:0,lvl:0};L.xp+=Math.round(x);
+  while(L.xp>=legNeed(L.lvl)){L.xp-=legNeed(L.lvl);L.lvl++;club.ctk=ctk()+1;club.ctkEarned=Math.max(club.ctkEarned||0,L.lvl);const got=grant(legReward(L.lvl))+' · +1 Club Token';club.legLog=[`Club Legacy level ${L.lvl}: ${got}`,...(club.legLog||[])].slice(0,12);legacyUps.push(L.lvl)}}
 let legacyUps=[];
 
 /* ===== achievements (claim once, they stay on your cabinet as badges) ===== */
@@ -1407,7 +1478,7 @@ const ACH=[
     ({id:'col'+n,n:`Collector · ${n}`,d:`Collect ${n} different footballers`,p:()=>[nOwned(),n],r}))];
 const achDone=a=>a.t?a.t():a.p()[0]>=a.p()[1];
 function achCheck(){club.achR=club.achR||{};let fresh=0;for(const a of ACH)if(!club.ach?.[a.id]&&achDone(a)&&!club.achR[a.id]){club.achR[a.id]=true;fresh++}return fresh}
-function achClaim(id){club.ach=club.ach||{};const a=ACH.find(x=>x.id===id);if(!a||club.ach[id]||!achDone(a))return;club.ach[id]=Date.now();toast(`Achievement: ${a.n}! `+grant(a.r));S.goal();saveClub();renderMenu()}
+function achClaim(id){club.ach=club.ach||{};const a=ACH.find(x=>x.id===id);if(!a||club.ach[id]||!achDone(a))return;club.ach[id]=Date.now();toast(`Achievement: ${a.n}! `+grant(commBoost(a.r)));S.goal();saveClub();renderMenu()}
 
 /* ===== exchanges: turn duplicates into something better (repeatable) ===== */
 const EXCH=[{id:'b2s',n:'Bronze Exchange',need:{bronze:5},coins:150,out:{pack:'silver'}},{id:'s2g',n:'Silver Exchange',need:{silver:4},coins:500,out:{pack:'gold'}},
@@ -1436,6 +1507,8 @@ function cosUse(id){const c=COS.find(x=>x.id===id);if(!c||!cosOwned(id))return;c
 // signing a player
 function careerSigned(p){stat('signed',1);achCheck()}
 // called once the coins are in: records, challenges, legacy, chemistry, evolution progress
+// Training Tokens = max(0, goals scored - goals conceded), once per completed match, in every mode (online too)
+function gdTokens(gf,ga){const n=Math.max(0,(gf|0)-(ga|0));if(n){res();club.tt+=n;earnNote+=` · +${n} Training Token${n>1?'s':''} (goal difference)`}saveClub()}
 function careerAfterMatch(){if(NET.on||SG)return;const gf=score[0],ga=score[1],pw=pen&&pen.winner!=null?pen.winner:null,won=gf>ga||pw===0,draw=gf===ga&&pw==null;
   stat('matches');if(won){stat('wins');stat(GM==='classical'?'cwins':'vwins')}stat('goals',gf);if(ga===0)stat('cleans');
   chProg('wins',won?1:0);chProg('goals',gf);chProg('passes',stats.passes||0);chProg('clean',ga===0?1:0);chProg('skills',stats.skills||0);chProg('tackles',stats.tackles||0);
@@ -1446,7 +1519,8 @@ function careerAfterMatch(){if(NET.on||SG)return;const gf=score[0],ga=score[1],p
   // evolution objectives count what each player did on the pitch
   club.evo=club.evo||{};for(const p of players){if(p.team!==0||p.keeper||!p.st.id)continue;const id=p.st.id;if(!club.owned.includes(id))continue;
     const e=club.evo[id]=club.evo[id]||{st:0,m:0,g:0,p:0,t:0};e.m++;e.g+=p.goals||0;e.p+=p.mP||0;e.t+=p.mT||0}
-  if(matchRatings&&matchRatings.motm.p.team===0&&won&&Math.random()<.35)grant({tt:1});
+  if(matchRatings&&matchRatings.motm.p.team===0&&won&&Math.random()<.35){grant({tt:1});earnNote+=' · +1 Training Token (man of the match bonus)'}
+  gdTokens(gf,ga);
   achCheck();saveClub()}
 
 /* ===== spending ===== */
@@ -1461,13 +1535,13 @@ function evoDo(id){const p=byId(id),N=p&&evoNeed(p);if(!N)return;if(N.have.m<N.m
   if(club.coins<N.coins||res().tt<N.tt){toast('Not enough coins or Training Tokens.');return}
   const before=effOvr(p);club.coins-=N.coins;club.tt-=N.tt;club.evo[id]={st:N.stage+1,m:0,g:0,p:0,t:0};stat('evos');if(!evoNeed(p))stat('evomax');
   toast(`${p.name} evolved! ${before} → ${effOvr(p)} OVR`);S.goal();confetti(tier(p));achCheck();saveClub();renderMenu()}
-function trainDo(id){const p=byId(id);if(!p||res().tt<2)return;club.tt-=2;club.xp=club.xp||{};const b=lvlOf(id);club.xp[id]=(club.xp[id]||0)+100;
-  toast(`Training session: ${p.short} +100 XP`+(lvlOf(id)>b?` · now Lv ${lvlOf(id)}`:''));S.skill(1);saveClub();renderMenu()}
+function trainDo(id){const p=byId(id);if(!p||res().tt<2)return;club.tt-=2;club.xp=club.xp||{};const b=lvlOf(id);const gx=Math.round(100*(1+depFx('train')/100));club.xp[id]=(club.xp[id]||0)+gx;
+  toast(`Training session: ${p.short} +${gx} XP`+(lvlOf(id)>b?` · now Lv ${lvlOf(id)}`:''));S.skill(1);saveClub();renderMenu()}
 function gkTrain(){const lv=club.gkLv||0;if(lv>=GKMAX)return;const c=gkCost(lv);if(club.coins<c){toast(`Needs ${c.toLocaleString()} coins.`);return}club.coins-=c;club.gkLv=lv+1;toast(`Keeper training: Goalkeeping now ${gkRating()}`);S.skill(1);saveClub();renderMenu()}
 const gkRating=()=>70+(club.gkLv||0)*3;
 
 /* ===== first run of the career: everyone gets a few more bodies so a 9-a-side line-up is possible ===== */
-function careerInit(){for(const m of ['volta','classical']){const L=(club.lg||{})[m];if(L&&!L.done&&L.fx.length===18&&L.round<9)L.fx=L.fx.slice(0,9)}
+function careerInit(){ctkSync();for(const m of ['volta','classical']){const L=(club.lg||{})[m];if(L&&!L.done&&L.fx.length===18&&L.round<9)L.fx=L.fx.slice(0,9)}
   if(club.v2)return;club.v2=1;const b=PLAYERS.filter(p=>p.rar==='bronze'&&!club.owned.includes(p.id)).sort(()=>Math.random()-.5);
   const pos={DEF:2,MID:3,ATT:2},add=[];for(const P0 of ['DEF','MID','ATT'])add.push(...b.filter(p=>p.pos===P0).slice(0,pos[P0]));
   const s=PLAYERS.filter(p=>p.rar==='silver'&&!club.owned.includes(p.id)).sort(()=>Math.random()-.5).slice(0,1);
@@ -1484,8 +1558,8 @@ function goText(){
 function renderModes(){const lv=m=>{const L=(club.lg||{})[m];return L?DIVS[L.div].n:'Amateur Division'},w=m=>{const W=(club.wcc||{})[m];return W&&!W.done&&W.alive?' · in the World Club Championship':''};
   $('modes').innerHTML=`<button class="modecard" data-gm="volta" aria-pressed="${GM==='volta'}"><div class="mh"><b>VOLTA</b><i>5v5</i></div><span>Fast-paced football in the cage · 2 min matches</span><em>1.0× coins</em><small>${lv('volta')}${w('volta')}</small></button>
    <button class="modecard cl" data-gm="classical" aria-pressed="${GM==='classical'}"><div class="mh"><b>CLASSICAL</b><i>9v9</i></div><span>Full-pitch tactical football</span><em>1.5× coins · Expanded pitch 1.875×</em><small>${lv('classical')}${w('classical')}</small></button>`+
-   (GM==='classical'?`<div class="pitchsel"><span class="lab">PITCH SIZE</span><div class="forms">${[['standard','Classical Standard','Large pitch · 3 min · 1.5× coins'],['expanded','Classical Expanded','Extra-large pitch · 3½ min · 1.875× coins · more room for long balls and counters']].map(([k,n,d])=>
-     `<button data-pitch="${k}" aria-pressed="${(club.cpitch||'standard')===k}" title="${d}"><b>${n}</b> · ${d}</button>`).join('')}</div></div>`:'')}
+   (GM==='classical'?(()=>{const v=club.cpitch==='expanded'?'expanded':'standard';return `<div class="pitchsw"><span class="lab">PITCH SIZE</span><div class="seg" data-v="${v}" role="radiogroup" aria-label="Pitch size"><i class="thumb"></i>${[['standard','STANDARD','Large pitch · 3 min · 1.5× coins'],['expanded','EXPANDED','Extra-large pitch · 3½ min · 1.875× coins (1.5 × 1.25) · more room for long balls and counters']].map(([k,n,d])=>
+     `<button data-pitch="${k}" role="radio" aria-checked="${v===k}" aria-pressed="${v===k}" title="${d}">${n}</button>`).join('')}</div>${v==='expanded'?'<span class="pbonus">+1.25× coins</span>':''}<small>${v==='expanded'?'3½ min · 1.875× total':'3 min · 1.5× coins'}</small></div>`})():'')}
 const kd=k=>`<span class="kitdot" style="background:${k}"></span>`;
 function renderLeague(){let L=lgOf();if(!L)L=newSeason(GM,0,1);const D=DIVS[L.div],T=lgTable(L);
   $('diff-note').textContent=`${LV().name}: ${LV().note} ${GM==='classical'?'Classical 9v9':'Volta 5v5'} · Season ${L.season} · ${D.n}. Top 3 go up${L.div===4?' (you’re at the top)':''}, bottom 3 go down${L.div===0?' (not from here)':''}. A top-3 finish also earns a World Club Championship place.`;
@@ -1542,14 +1616,14 @@ function chemHTML(){const c=chemParts()||{inPos:0,settled:0,mix:0,n:FORMS[sq().f
     <p><b>Quick wins:</b> press Auto-pick best, then play the same team for a few matches in a row.</p></details></div>`}
 $('sqhead').addEventListener('click',e=>{const b=e.target.closest('[data-sqgm]');if(b)setGM(b.dataset.sqgm)});
 $('tactics').addEventListener('click',e=>{const b=e.target.closest('[data-tac]');if(!b)return;tacSet()[b.dataset.tac]=+b.dataset.v;saveClub();renderMenu()});
-$('legpill').onclick=()=>{tab='club';ctab='legacy';renderMenu()};
+$('legpill').onclick=()=>{tab='club';ctab='legacy';renderMenu()};$('ctkp').onclick=()=>{tab='club';ctab='dept';renderMenu()};
 
 /* ----- the Club tab ----- */
-const CTABS=[['coll','Collection'],['upg','Development'],['abil','Special Abilities'],['packs','Packs'],['chal','Challenges'],['ach','Achievements'],['legacy','Club Legacy'],['exch','Exchanges'],['cos','Customise'],['cab','Trophy Cabinet'],['market','Transfer Market']];
+const CTABS=[['coll','Collection'],['upg','Development'],['abil','Special Abilities'],['dept','Club Development'],['packs','Packs'],['chal','Challenges'],['ach','Achievements'],['legacy','Club Legacy'],['exch','Exchanges'],['cos','Customise'],['cab','Trophy Cabinet'],['market','Transfer Market']];
 function renderClub(){achCheck();const cs=chState(),chDot=[...cs.d.map(x=>[x,DAILY]),...cs.w.map(x=>[x,WEEKLY])].some(([x,P0])=>!x.claimed&&x.v>=P0.find(q=>q.id===x.id).v),achDot=ACH.some(a=>!(club.ach||{})[a.id]&&achDone(a));
   $('ctabs').innerHTML=CTABS.map(([k,n])=>`<button data-ct="${k}" aria-selected="${ctab===k}">${n}${(k==='chal'&&chDot)||(k==='ach'&&achDot)?'<span class="dot"></span>':''}</button>`).join('');
   const B0=$('club-body');B0.innerHTML='';
-  if(ctab==='coll')renderCollection();else if(ctab==='upg')B0.innerHTML=devHTML();else if(ctab==='abil')B0.innerHTML=ablHTML();else if(ctab==='chal')B0.innerHTML=chalHTML();else if(ctab==='ach')B0.innerHTML=achHTML();
+  if(ctab==='coll')renderCollection();else if(ctab==='upg')B0.innerHTML=devHTML();else if(ctab==='abil')B0.innerHTML=ablHTML();else if(ctab==='dept')B0.innerHTML=deptHTML();else if(ctab==='chal')B0.innerHTML=chalHTML();else if(ctab==='ach')B0.innerHTML=achHTML();
   else if(ctab==='legacy')B0.innerHTML=legHTML();else if(ctab==='exch')B0.innerHTML=exchHTML();else if(ctab==='cos')B0.innerHTML=cosHTML();else if(ctab==='cab')B0.innerHTML=cabHTML();
   else if(ctab==='market')B0.innerHTML=`<div class="soon"><b>Transfer Market</b><p>Coming soon.</p><p class="hint">Buy the exact footballer you want for a fixed coin price, with search and a wishlist. Not open yet: keep saving those coins.</p></div>`}
 $('ctabs').addEventListener('click',e=>{const b=e.target.closest('[data-ct]');if(b){ctab=b.dataset.ct;renderMenu()}});
@@ -1582,21 +1656,27 @@ function devHTML(){const mine=ownedPlayers().filter(p=>!p.isCustom);if(!upId||!c
   const gk=`<div class="panel"><h4>Club goalkeeper · Goalkeeping ${gkRating()}</h4><p class="hint">Your keeper plays in every match in both modes. Training makes him react faster and reach further.</p>${(club.gkLv||0)>=GKMAX?'<p class="flash">Fully trained.</p>':`<button class="btn gold" data-gk="1" ${club.coins<gkCost(club.gkLv||0)?'disabled':''}>Train to ${gkRating()+3} · ${gkCost(club.gkLv||0).toLocaleString()} coins</button>`}</div>`;
   if(!p)return gk+'<p class="hint">Sign players from packs to develop them.</p>';
   const s=playStats(p),base=p,u=upOf(p.id),room=upRoom(p),spent=upSpent(p.id),cap=UPCAP[tier(p)],cost=upCost(p),L=lvlOf(p.id),N=evoNeed(p);
-  const rows=STATK.map(([k,l])=>{const b=Math.round(base[k]*100),v=Math.round(s[k]*100),fl=upFlash&&upFlash.id===p.id&&upFlash.k===k;
-    return `<div class="strow"><span>${l}</span><div class="bar"><i style="width:${b}%"></i><u style="left:${b}%;width:${Math.max(0,v-b)}%"></u></div><b>${fl?`<span class="flash">${upFlash.from}→</span>`:''}${v}</b><button data-up="${k}" ${spent>=room||(u[k]||0)>=STATMAX||v>=99||club.coins<cost?'disabled':''}>+1 · ${cost.toLocaleString()}</button></div>`}).join('');
+  const MP=maxPlan(p),now=effOvr(p),lvMax=XPL.length-1,lb=Math.min(3,Math.floor(L/2));
+  const rows=STATK.map(([k,l])=>{const b=Math.round(base[k]*100),v=Math.round(s[k]*100),mx=statMax(p,k),fl=upFlash&&upFlash.id===p.id&&upFlash.k===k,pv=upPreview(p,k),
+      lock=spent>=room||(u[k]||0)>=STATMAX||v>=99,why=v>=99?'stat at 99':(u[k]||0)>=STATMAX?`+${STATMAX} limit reached`:spent>=room?(room<cap?'level up to unlock':'no points left'):'';
+    return `<div class="strow dv"><span>${l}</span><div class="bar"><i style="width:${b}%"></i><u style="left:${b}%;width:${Math.max(0,v-b)}%"></u><s style="left:${v}%;width:${Math.max(0,mx-v)}%"></s></div><b>${fl?`<span class="flash">${upFlash.from}→</span>`:''}${v}</b><em title="Most this stat can reach">max ${mx}</em>
+      <button data-up="${k}" ${lock||club.coins<cost?'disabled':''} title="${lock?why:`${l} ${pv.s0} → ${pv.s1}, overall ${pv.o0} → ${pv.o1}`}">${lock?why:`${l} ${pv.s0} → ${pv.s1} · OVR ${pv.o0}${pv.o1!==pv.o0?` → <b>${pv.o1}</b>`:' (no change)'} · ${cost.toLocaleString()}`}</button></div>`}).join('');
+  const planTxt=Object.keys(MP.plan).length?Object.entries(MP.plan).map(([k,n])=>`${STATK.find(x=>x[0]===k)[1]} +${n}`).join(', '):'';
   const evo=N?`<div class="panel"><h4>Evolution · stage ${N.stage+1} of ${EVO[tier(p)].boost.length}</h4><p>+${N.boost} to every stat. Objective: play ${N.m} matches (${Math.min(N.have.m,N.m)}/${N.m}) and get ${N.n} ${N.w} (${Math.min(N.have.v,N.n)}/${N.n}) with him in your line-up.</p>
       <div class="prog"><i style="width:${Math.round(100*Math.min(1,(Math.min(1,N.have.m/N.m)+Math.min(1,N.have.v/N.n))/2))}%"></i></div>
-      <button class="btn gold" data-evo="1" ${N.have.m<N.m||N.have.v<N.n||club.coins<N.coins||club.tt<N.tt?'disabled':''}>Evolve · ${N.coins.toLocaleString()} coins + ${N.tt} Training Tokens</button><p class="hint">Evolutions stop at ${OVRCAP[tier(p)]} overall for ${TIERS[tier(p)].name} players.</p></div>`
+      <p>After this stage: OVR <b>${now} → ${ovr(playStatsX(p,L,u,N.stage+1))}</b></p><button class="btn gold" data-evo="1" ${N.have.m<N.m||N.have.v<N.n||club.coins<N.coins||club.tt<N.tt?'disabled':''}>Evolve · ${N.coins.toLocaleString()} coins + ${N.tt} Training Tokens</button><p class="hint">Evolutions stop at ${OVRCAP[tier(p)]} overall for ${TIERS[tier(p)].name} players.</p></div>`
     :`<div class="panel"><h4>Evolution</h4><p class="flash">Fully evolved.</p></div>`;
   return `<div class="row" style="justify-content:center">${pickList}</div><div class="upg"><div>${cardHTML(p,{})}</div><div style="display:grid;gap:8px">
-    <div class="panel t-${tier(p)}"><h4>Upgrades · ${spent}/${cap} points used</h4><p><span class="ovrbig">${effOvr(p)}</span> now · potential <b>${potOvr(p)}</b> · base card ${ovr(p)}</p>
+    <div class="panel t-${tier(p)}"><h4>Upgrades · ${spent}/${cap} points used</h4><div class="potrow"><div><span class="ovrbig">${now}</span><small>current OVR</small></div><div><span class="ovrbig pot">${MP.ovr}</span><small>max achievable</small></div><div><span class="ovrbig rem">+${MP.ovr-now}</span><small>remaining potential</small></div><div><span class="ovrbig">${ovr(p)}</span><small>base card</small></div></div>
+    <p class="hint" style="margin:4px 0">Still to come: ${cap-spent} upgrade point${cap-spent===1?'':'s'}${room<cap?` (${Math.max(0,room-spent)} usable now, the rest unlock as he levels up)`:''} · ${EVO[tier(p)].boost.length-evoOf(p.id).st} evolution stage${EVO[tier(p)].boost.length-evoOf(p.id).st===1?'':'s'} · level bonus +${lb} now, +3 at level 6${planTxt?` · best use of the points left: ${planTxt}`:''}. Max achievable counts all of that; chemistry adds up to +3 more in matches. ${TIERS[tier(p)].name} evolutions stop at ${OVRCAP[tier(p)]}.</p>
     ${upFlash&&upFlash.id===p.id?`<p class="flash">Upgraded: ${upFlash.o0} → ${upFlash.o1} OVR</p>`:''}
     <p class="hint">Level ${L} unlocks ${room} of ${cap} upgrade points${room<cap?' · play him or train him to level up for more':''}. Each stat can go up by ${STATMAX}. Each point costs a little more than the last.</p>${rows}</div>
-    <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +100 XP. Every two levels adds +1 to his five best stats (up to +3).</p><button class="btn" data-train2="1" ${club.tt<2?'disabled':''}>Train · 2 Training Tokens</button></div>
+    <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +${Math.round(100*(1+depFx('train')/100))} XP${depFx('train')?` (Training Facilities +${depFx('train')}%)`:''}. Every two levels adds +1 to his five best stats (up to +3).${L<lvMax?` Next level at ${XPL[L+1]} XP${L%2===1&&lb<3?`: five best stats +1, OVR ${now} → ${ovr(playStatsX(p,L+1,u,evoOf(p.id).st))}`:''}.`:' Top level reached.'}</p><button class="btn" data-train2="1" ${club.tt<2?'disabled':''}>Train · 2 Training Tokens</button></div>
     ${ablPanel(p)}${evo}${p.ab?`<div class="panel"><h4>Signature ability · ${ABIL[p.ab].name}</h4><p>${ABIL[p.ab].d}. Always on when he plays.</p></div>`:''}${gk}</div></div>`}
 $('club-body').addEventListener('change',e=>{if(e.target.id==='dev-pick'){upId=e.target.value;upFlash=null;renderMenu()}});
 $('club-body').addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
   if(d.up)upBuy(upId,d.up);else if(d.evo)evoDo(upId);else if(d.train2)trainDo(upId);else if(d.gk)gkTrain();
+  else if(d.dep)depBuy(d.dep);else if(d.depcos){ctab='cos';renderMenu()}
   else if(d.abl)ablBuy(d.abl);else if(d.ablall){ablAll=!ablAll;renderMenu()}else if(d.ablsort){ablSort=d.ablsort;renderMenu()}
   else if(d.chc)chClaim(d.chw,d.chc);else if(d.ach)achClaim(d.ach);else if(d.exch)exchDo(d.exch);else if(d.sell)sellDupes();else if(d.cosb)cosBuy(d.cosb);else if(d.cosu)cosUse(d.cosu);
   else if(d.badge){club.badge=d.badge;saveClub();renderMenu()}});
@@ -2786,7 +2866,7 @@ function wline(pts,lw,col,close=false){wpath(pts,close);const m=P(pts[0][0],pts[
 /* ---------- stadium ---------- */
 const crowd=[],CSKIN=['#f2cfae','#e8b88c','#c68d63','#8d5a3b','#5e3a24'],CLOTH=['#23272f','#2f3540','#3d4452','#555c68','#7a808a','#c9c4b8','#e8e4da','#3a2a24','#20304a','#4a2f2f'];
 const crowdCol=c=>c.c==='H'?KIT():c.c==='A'?OPP.kit:CLOTH[c.c];
-function buildCrowd(){crowd.length=0;const R=10,st=typeof cosOn==='function'?cosOn('stad'):'stad1',dens=st==='stad3'?1:st==='stad2'?.85:.6,keep=()=>Math.random()<dens;
+function buildCrowd(){crowd.length=0;const R=10,st=typeof cosOn==='function'?cosOn('stad'):'stad1',dens=Math.max(st==='stad3'?1:st==='stad2'?.85:.6,[.6,.7,.8,.9,1][depLv('stad')-1]),keep=()=>Math.random()<dens;
  for(let r=0;r<R;r++)for(let x=FX0-120;x<=FX1+120;x+=11)if(keep())crowd.push({x:x+rnd(-2,2),y:FY0-36-r*13,z:8+r*11,c:Math.random()<.32?(x<MIDX?'H':'A'):(Math.random()*CLOTH.length)|0,ph:rnd(0,6),sk:(Math.random()*5)|0});
  for(const side of [0,1])for(let r=0;r<R;r++)for(let y=FY0-20;y<=FY1+70;y+=11)if(keep())crowd.push({x:side?FX1+50+r*13:FX0-50-r*13,y:y+rnd(-2,2),z:8+r*11,c:Math.random()<.55?(side?'A':'H'):(Math.random()*CLOTH.length)|0,ph:rnd(0,6),sk:(Math.random()*5)|0})}
 buildCrowd();
@@ -2810,7 +2890,7 @@ function drawSkyLive(){
   const g=ctx.createLinearGradient(0,0,0,H*.6);g.addColorStop(0,'#05080f');g.addColorStop(.6,'#0e1a2b');g.addColorStop(1,'#1d2d3c');
   ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   // the glow the floodlights throw into the night air
-  const top=P(MIDX,FY0-170,170),hz=ctx.createRadialGradient(top.x,top.y,10,top.x,top.y,W*.7);hz.addColorStop(0,'rgba(190,210,230,.22)');hz.addColorStop(1,'rgba(190,210,230,0)');ctx.fillStyle=hz;ctx.fillRect(0,0,W,H);
+  const top=P(MIDX,FY0-170,170),hz=ctx.createRadialGradient(top.x,top.y,10,top.x,top.y,W*.7);hz.addColorStop(0,`rgba(190,210,230,${.22+.03*(depLv('stad')-1)})`);hz.addColorStop(1,'rgba(190,210,230,0)');ctx.fillStyle=hz;ctx.fillRect(0,0,W,H);
 }
 function drawStandsW(){
   const top=FY0-36-10*13,tz=8+10*11;
@@ -2835,7 +2915,7 @@ function drawStandsW(){
   ctx.globalAlpha=1;
   if(party){ctx.fillStyle='#fff';for(let i=0;i<22;i++){const c=crowd[(Math.random()*crowd.length)|0],q=P(c.x,c.y,c.z+4);ctx.globalAlpha=.6+Math.random()*.4;ctx.beginPath();ctx.arc(q.x,q.y,2.2*q.s,0,7);ctx.fill()}ctx.globalAlpha=1}
   // floodlight banks on the roof
-  for(const x of [FX0-60,FX0+300,FX1-300,FX1+60])lightBank(x,top-10,tz+52,46);
+  {const sl=depLv('stad'),xs=[FX0-60,FX0+300,FX1-300,FX1+60];if(sl>=3)xs.push(MIDX-150,MIDX+150);if(sl>=5)xs.push(MIDX);for(const x of xs)lightBank(x,top-10,tz+52,46+(sl-1)*3)}
 }
 const BOARDS=['#ff6f59','#ffd166','#8e8ff0','#7fe0b4'];
 function drawBoards(){
@@ -2910,7 +2990,7 @@ function buildPitchCache(){PERF.builds=(PERF.builds||0)+1;const DPR=cacheDPR(),f
     const c2=cv2.getContext('2d'),keep=cam,kc=ctx,kt=t;cam={...BROAD,x:MIDX};ctx=c2;t=0;cullM=PM;
     try{ctx.setTransform(DPR,0,0,DPR,(PM-u0)*DPR,0);
       {const g=ctx.createLinearGradient(0,0,0,H*.6);g.addColorStop(0,'#05080f');g.addColorStop(.6,'#0e1a2b');g.addColorStop(1,'#1d2d3c');ctx.fillStyle=g;ctx.fillRect(-PM,-10,W+2*PM,H+PV+10);
-       const top=P(MIDX,FY0-170,170),hz=ctx.createRadialGradient(top.x,top.y,10,top.x,top.y,W*.7);hz.addColorStop(0,'rgba(190,210,230,.22)');hz.addColorStop(1,'rgba(190,210,230,0)');ctx.fillStyle=hz;ctx.fillRect(-PM,-10,W+2*PM,H+PV+10)}
+       const top=P(MIDX,FY0-170,170),hz=ctx.createRadialGradient(top.x,top.y,10,top.x,top.y,W*.7);hz.addColorStop(0,`rgba(190,210,230,${.22+.03*(depLv('stad')-1)})`);hz.addColorStop(1,'rgba(190,210,230,0)');ctx.fillStyle=hz;ctx.fillRect(-PM,-10,W+2*PM,H+PV+10)}
       drawStandsW();drawPitchLive();drawBoards()}finally{ctx=kc;cam=keep;t=kt;cullM=0}
     tiles.push({cv:cv2,u0,w})}
   return tiles}
@@ -3311,7 +3391,7 @@ function showMenu(left=false){
 
 /* ---------- ball actions ---------- */
 let lastPoss=0,introT=0,weather='clear';const INTRO=240;
-function give(p){B.claimBy=null;{const wp=B.pass;if(wp&&wp.from&&wp.from.team===p.team&&wp.from!==p)wp.from.mP=(wp.from.mP||0)+1;if(B.shot&&p.keeper&&B.shot.team!==p.team)p.mSv=(p.mSv||0)+1}if(p.team===0&&!p.keeper&&lastPoss===1&&state==='play'){counterT=t;counterX=p.x}if(B.lobTo){B.lobTo.lobRun=null;B.lobTo=null}if(B.graceTo){B.graceTo.lobRun=null;B.graceTo=null;B.graceT=0}if(p.team===1)swT=Math.min(swT,4);if(lastPoss!==p.team&&!p.keeper&&state==='play'&&p.team===0){const near=outfield(1).sort((a,b)=>dist(a,p)-dist(b,p));near.forEach((q,i)=>q.caughtT=i?110:45)}
+function give(p){B.claimBy=null;if(lastPoss!==p.team&&state==='play')wonT[p.team]=t;if(B.pass&&B.pass.from&&B.pass.from.team!==p.team&&!p.keeper&&p.team===1&&state==='play')aiStat.icptWon++;{const wp=B.pass;if(wp&&wp.from&&wp.from.team===p.team&&wp.from!==p)wp.from.mP=(wp.from.mP||0)+1;if(B.shot&&p.keeper&&B.shot.team!==p.team)p.mSv=(p.mSv||0)+1}if(p.team===0&&!p.keeper&&lastPoss===1&&state==='play'){counterT=t;counterX=p.x}if(B.lobTo){B.lobTo.lobRun=null;B.lobTo=null}if(B.graceTo){B.graceTo.lobRun=null;B.graceTo=null;B.graceT=0}if(p.team===1)swT=Math.min(swT,4);if(lastPoss!==p.team&&!p.keeper&&state==='play'&&p.team===0){const near=outfield(1).sort((a,b)=>dist(a,p)-dist(b,p));near.forEach((q,i)=>q.caughtT=i?110:45)}
   lastPoss=p.team;if(B.owner!==p)p.beatRun=0;if(p.team===1){chain=0}
   const wasPass=B.pass;
   if(p.team===0&&!p.keeper){passChain=(wasPass&&wasPass.from&&wasPass.from.team===0)?passChain+1:0;if(wasPass&&wasPass.from&&wasPass.from.team===0&&wasPass.from!==p){stats.passes++;addHype(4);if(passChain===3)pop('BALL CHARGED!',p.x,p.y-56,C.coral,16,60);if(passChain>=2){const lab=passChain>=6?'TIKI-TAKA':passChain>=4?'SILKY':'NICE MOVE';style+=passChain*6;pop(`${lab}  ${passChain+1} PASSES`,p.x,p.y-34,passChain>=4?C.sun:C.mint,15+Math.min(8,passChain*1.5),70);S.skill(Math.min(3,passChain-1));if(passChain>=4)burst(p.x,p.y,10,[C.sun,C.mint,C.cream],3,.05,[3,5])}if(wasPass.through)addStyle(20,p.x,p.y,'THROUGH BALL');if(wasPass.wall)addStyle(25,p.x,p.y,'ONE-TWO')}if(!p.wallTo)ctrl=p;
@@ -3672,6 +3752,18 @@ function humanUpdate(p,dt){
 
 // Where a player should stand right now: their formation spot, slid up/down the pitch with the ball
 // and pulled a little towards the ball's side, with each role kept inside its own band.
+/* ---------- AI decision quality ----------
+   One number per side, 0..1, for how well the computer reads the game: Chill ~.15, Medium ~.42, Hard ~.72, Extreme ~.95
+   (nudged by division). It changes decisions, not stats: interceptions, marking the dangerous runner, blocking lanes,
+   spacing, runs into space, counters, through-ball timing and shot choice. Your own AI team-mates use a steady .6.
+   Online both sides use the same value, so it stays fair. */
+const wonT=[-999,-999],aiStat={icpt:0,icptWon:0,through:0,square:0,chip:0,corner:0,counter:0,sweeps:0};
+function aiIQ(team){if(pvp())return .55;if(team===0)return .6;const b={chill:.15,normal:.42,hard:.72,extreme:.95}[club.level]??.42;return clamp(b+(DF.read||0)*.35-.04,0,1)}
+const lastLine=(team,dir)=>{let v=-1e9;for(const q of outfield(team))v=Math.max(v,q.x*dir);return v};// deepest outfield player of `team`, measured along dir
+// the open spot near a target: tries a few nearby points and keeps the one furthest from the opposition
+function openSpot(p,tx,ty,att,r){let best={x:tx,y:ty},bv=-1;const opp=outfield(1-p.team);
+  for(const [dx,dy] of [[0,0],[0,-r],[0,r],[att*r*.8,-r*.5],[att*r*.8,r*.5]]){const x=clamp(tx+dx,FX0+40,FX1-40),y=clamp(ty+dy,FY0+25,FY1-25);let m=1e9;for(const q of opp)m=Math.min(m,Math.hypot(q.x-x,q.y-y));
+    const v=m-(dx||dy?6:0);if(v>bv){bv=v;best={x,y}}}return best}
 function homePos(p,attacking){
   const f=p.slot,bf=(B.x-FX0)/(FX1-FX0),prog=p.team===0?bf:1-bf;
   let fx=f.x+(prog-.45)*.5+(attacking?.08:-.06)+(tacOf(p.team).push-1)*(attacking?.16:.1);
@@ -3688,11 +3780,16 @@ function teamAI(team,dt){
   const hasBall=owner?owner.team===team:lastPoss===team&&B.pass&&B.pass.from.team===team;
   const theyHave=owner&&owner.team===opp;
   const chipIn=!owner&&B.lobTo&&B.lobTo.team!==team&&B.pass&&B.pass.chip;// they've chipped it: someone go and attack where it drops
-  let chaser=null,cover=null;
+  let chaser=null,cover=null;const IQ=aiIQ(team);for(const p of ai)p.icpt=null;
   if(!owner||(theyHave&&!owner.keeper)){
     const target=owner||(chipIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*8,y:B.y+B.vy*8});
     const cands=ai.filter(p=>p.stun<=0);
     if(B.pass&&!owner){const r=cands.find(p=>p===B.pass.to);if(r)chaser=r}
+    // their pass is rolling: the defender who can cut it out first goes for the interception point (better sides read it more often)
+    if(!chaser&&!owner&&B.pass&&B.pass.from&&B.pass.from.team===opp&&!B.lobTo&&B.z<12&&cands.length){const P0=B.pass;P0.read=P0.read||{};if(P0.read[team]==null)P0.read[team]=Math.random()<.3+.65*IQ;
+      if(P0.read[team]){const pts=ballPathPts(60,3),rcv=P0.to;let bp=null,bq=null,bm=1e9;
+        for(const q of pts){if(q.i<3)continue;const tr=rcv?runT(rcv,q.x,q.y,topSpeed(rcv),2):1e9;for(const c of cands){const tc=runT(c,q.x,q.y,topSpeed(c),4);if(tc<=q.i+2&&tc<tr-2&&tc<bm){bm=tc;bp=c;bq=q}}if(bp)break}
+        if(bp){chaser=bp;bp.icpt={x:bq.x,y:bq.y};if(team===1&&!P0.cnt){P0.cnt=1;aiStat.icpt++}}}}
     if(!chaser&&cands.length){chaser=cands.reduce((a,b)=>dist(a,target)<dist(b,target)?a:b);
       if(team===0&&ctrl&&dist(ctrl,target)<dist(chaser,target)+(theyHave?120:50))chaser=null}
     // a second defender drops goal-side of the ball to stop the carrier running straight through
@@ -3700,6 +3797,13 @@ function teamAI(team,dt){
       const cc=cands.filter(p=>p!==chaser);if(cc.length)cover=cc.reduce((a,b)=>dist(a,gs)<dist(b,gs)?a:b);if(cover)cover.coverPt=gs}
   }
   const attackers=outfield(opp).filter(q=>q!==owner);const taken=new Set();
+  // marking: the most dangerous free runners (closest to goal) are picked up first, each by the nearest free defender
+  const markOf=new Map();if(!hasBall){const free=ai.filter(p=>p!==chaser&&p!==cover&&p.stun<=0),R=(150+130*IQ)*PSC;
+    const homes=new Map(free.map(p=>[p,homePos(p,false)]));
+    for(const q of [...attackers].sort((a,b)=>Math.abs(a.x-ownGoal)-Math.abs(b.x-ownGoal))){let bd=null,bv=1e9;
+      for(const d of free){if(markOf.has(d))continue;const h=homes.get(d),v=Math.hypot(q.x-h.x,q.y-h.y)*.6+dist(d,q)*.4;if(Math.hypot(q.x-h.x,q.y-h.y)<R&&v<bv){bv=v;bd=d}}
+      if(bd)markOf.set(bd,q)}}
+  const counter=hasBall&&t-wonT[team]<150&&IQ>.2&&owner&&outfield(opp).filter(q=>(q.x-B.x)*att>0).length<=Math.floor(outfield(opp).length/2);
   for(const p of ai){
     p.sprint=false;
     if(p.stun>0){p.stun-=dt;p.vx*=.9;p.vy*=.9;continue}
@@ -3728,7 +3832,7 @@ function teamAI(team,dt){
     if(p===chaser&&team===1&&owner&&owner.team===0&&owner.x<MIDX-20-(DF.press-.5)*260){
       const a=Math.atan2(MY-owner.y,FX1-owner.x);steer(p,owner.x+Math.cos(a)*60,owner.y+Math.sin(a)*60,topSpeed(p)*.8,dt);continue}
     if(p===chaser){
-      let tgt=owner?{x:B.x+Math.cos(owner.dir)*10,y:B.y+Math.sin(owner.dir)*10}:chipIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*6,y:B.y+B.vy*6};
+      let tgt=owner?{x:B.x+Math.cos(owner.dir)*10,y:B.y+Math.sin(owner.dir)*10}:chipIn?{x:B.lobX,y:B.lobY}:p.icpt?p.icpt:{x:B.x+B.vx*6,y:B.y+B.vy*6};
       // you're strolling with it: they don't just trail you, they get round in front and win it
       const csp=owner?Math.hypot(owner.vx,owner.vy):9,slow=team===1&&owner&&owner.team===0&&!owner.keeper&&csp<topSpeed(p)*1.02,side=owner?Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir)):1;
       // caught you from behind: draw level on your shoulder (not tucked in behind), ready to slide or nick it
@@ -3739,35 +3843,60 @@ function teamAI(team,dt){
         p.spCd=spCdOf(p)*1.4;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
       if(team===1&&owner&&owner.team===0&&!owner.keeper&&p.tackleCd<=0&&dist(p,owner)>(slow?20:28)&&dist(p,owner)<(slow?75:60)&&side>(slow?-.55:.3)&&Math.random()<(LV().extreme?.006:DF.slide?.0035:.0016)*(slow?(side<.3?9:3.5):1)*dt){p.windup=slow?5:10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
       steer(p,tgt.x,tgt.y,topSpeed(p)*(trailing?1.16:slow?.92:team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
-      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai*(slow?3.5:1):.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
+      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai*(slow?3.5:1):.012)*dt*(!cover&&Math.abs(p.x-ownGoal)<(FX1-FX0)*.3?1-.55*IQ:1))){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
       continue;
     }
     if(p===cover){steer(p,p.coverPt.x,p.coverPt.y,topSpeed(p)*(team===1?.86:.95),dt);
       if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}continue}
+    let tx,ty,spd;
     if(hasBall){
-      const h=homePos(p,true);let tx=h.x,ty=h.y;
+      const h=homePos(p,true);tx=h.x;ty=h.y;
       if((p.slot.r==='ATT'||p.role==='att')&&owner)tx+=att*(30+Math.sin(t*.02+p.i)*30)+(p.role==='att'?att*40:0);
       // Classical: runners go beyond the ball and wide players hold the width, so there's always a pass on
       if(PITCH!=='volta'&&owner&&owner!==p){const ahead=(owner.x-p.x)*att;if(p.slot.r!=='DEF'&&ahead>-40)tx+=att*(70+Math.sin(t*.015+p.i*1.7)*50)*PSC*tacOf(team).push;
         if(p.slot.y<.22||p.slot.y>.78)ty=FY0+(FY1-FY0)*(p.slot.y<.5?.1:.9)}
+      // counter-attack: they've just won it and you're short at the back, so the forwards sprint into the space
+      if(counter&&p.slot.r!=='DEF'){tx+=att*110*PSC;p.sprint=true}
+      // around the box: one attacks the near post, one the far post, the rest the edge of the box for a cut-back
+      const tg=team===0?FX1:FX0;
+      if(owner&&owner!==p&&p.slot.r!=='DEF'&&Math.abs(owner.x-tg)<BOX*1.7){const runners=ai.filter(q=>q.slot.r!=='DEF'&&q!==owner).sort((a,b)=>Math.abs(a.x-tg)-Math.abs(b.x-tg)),k=runners.indexOf(p),bs=owner.y<MY?-1:1;
+        const spot=k===0?{x:tg-att*55*PSC,y:MY+bs*40}:k===1?{x:tg-att*70*PSC,y:MY-bs*55}:{x:tg-att*BOX*1.05,y:MY+(k%2?-1:1)*60};const w=.35+.55*IQ;tx+=(spot.x-tx)*w;ty+=(spot.y-ty)*w}
+      // find a pocket of space near the run instead of standing next to a defender (re-checked a few times a second)
+      if(owner&&owner!==p&&p.slot.r!=='DEF'){if((p.runT=(p.runT||0)-dt)<=0){p.runT=10+rnd(0,6);p.runPt=Math.random()<.25+.7*IQ?openSpot(p,tx,ty,att,55*PSC):null;p.runB={x:tx,y:ty}}
+        if(p.runPt){tx+=p.runPt.x-p.runB.x;ty+=p.runPt.y-p.runB.y}}
       if(owner&&dist({x:tx,y:ty},owner)<80){ty+=(ty<owner.y?-1:1)*60}
-      steer(p,clamp(tx,FX0+40,FX1-40),clamp(ty,FY0+25,FY1-25),topSpeed(p)*(p.turbo>0?1:.85),dt);
+      spd=topSpeed(p)*(p.turbo>0||p.sprint?1:.85);
     }else{
-      const h=homePos(p,false);
-      // mark the nearest free attacker who has wandered into this player's area, staying goal-side
-      let m=null,md=150*PSC;for(const q of attackers){if(taken.has(q))continue;const d=Math.hypot(q.x-h.x,q.y-h.y);if(d<md){md=d;m=q}}
-      if(m){taken.add(m);steer(p,m.x+(ownGoal-m.x)*.2,m.y+(MY-m.y)*.2,topSpeed(p)*(team===1?.76+.2*DF.press:1)*.95,dt)}
-      else steer(p,h.x,h.y,topSpeed(p)*.85,dt);
+      const h=homePos(p,false);let m=markOf.get(p);
+      if(!m&&IQ<.3){let md=150*PSC;for(const q of attackers){if(taken.has(q))continue;const d=Math.hypot(q.x-h.x,q.y-h.y);if(d<md){md=d;m=q}}}
+      if(m){taken.add(m);
+        // goal-side of the runner, reading where he's going, and leaning into the passing lane from the ball
+        const L=8*IQ,mx=m.x+m.vx*L,my=m.y+m.vy*L;let gx2=mx+(ownGoal-mx)*.2,gy2=my+(MY-my)*.2;
+        if(owner&&owner.team===opp){const l=.4*IQ,lx=mx+(owner.x-mx)*.28,ly=my+(owner.y-my)*.28;gx2+=(lx-gx2)*l;gy2+=(ly-gy2)*l}
+        // their through ball is on: track the run, don't watch the ball
+        if(B.pass&&B.pass.through&&B.pass.to===m&&B.pass.from&&B.pass.from.team===opp){gx2=m.x+(ownGoal-m.x)*.1;gy2=m.y;p.sprint=IQ>.3}
+        tx=gx2;ty=gy2;spd=topSpeed(p)*(team===1?.76+.2*DF.press:1)*.95*(p.sprint?1.12:1)}
+      else{tx=h.x;ty=h.y;spd=topSpeed(p)*.85}
     }
+    // spacing: don't bunch up on top of a team-mate (the ball-chaser and cover are left alone)
+    {const R=(46+30*IQ)*PSC;for(const q of own){if(q===p)continue;const dx=tx-q.x,dy=ty-q.y,d=Math.hypot(dx,dy);if(d<R&&d>.1){const f=(R-d)/R*R*.6;tx+=dx/d*f;ty+=dy/d*f}}}
+    steer(p,clamp(tx,FX0+40,FX1-40),clamp(ty,FY0+25,FY1-25),spd,dt);
   }
 }
 function carrierAI(p,dt){
   const gx=goalX(p.team),defs=outfield(1-p.team);
   let nd=null,ndd=1e9;for(const q of defs){const d=dist(q,p);if(d<ndd){ndd=d;nd=q}}
-  const dG=Math.hypot(p.x-gx,p.y-MY);p.dec-=dt;
+  const dG=Math.hypot(p.x-gx,p.y-MY);p.dec-=dt;const IQ=aiIQ(p.team),dir0=Math.sign(gx-p.x)||1;
   if(p.dec<=0){
-    p.dec=10+rnd(0,10);
-    if(dG<DF.range+40){const open=!laneBlocked(p,{x:gx,y:MY},18,p.team);const ch=(open?.7:.26)*DF.shoot*(dG<230?1.9:1)*(ndd<30?.7:1)*LV().ai;if(Math.random()<ch){aiShoot(p,dG);return}}
+    p.dec=(13-5*IQ)+rnd(0,9-4*IQ);
+    // a team-mate is running in behind (level with or past their last defender): slide him in
+    if(Math.random()<.2+.6*IQ){const ll=lastLine(1-p.team,dir0);let tm=null,tb=-1e9;
+      for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir0,run=m.vx*dir0,d=dist(p,m);if(fwd<30||run<1.2||d>520*PSC||m.x*dir0<ll-50)continue;
+        const lead={x:m.x+dir0*90,y:m.y+m.vy*20};if(laneBlocked(p,lead,22,p.team))continue;const sc=run+fwd/150-Math.abs(m.y-MY)/300;if(sc>tb){tb=sc;tm=m}}
+      if(tm&&Math.hypot(tm.x-gx,tm.y-MY)<dG+60){pass(p,tm,true);if(p.team===1)aiStat.through++;return}}
+    if(dG<DF.range+40){const open=!laneBlocked(p,{x:gx,y:MY},18,p.team);
+      // shooting lane blocked: a smarter side squares it to a team-mate with a clear sight of goal
+      if(!open&&Math.random()<.15+.6*IQ){let sm=null,sd=1e9;for(const m of outfield(p.team)){if(m===p)continue;const md=Math.hypot(m.x-gx,m.y-MY);if(md<dG+40&&md<sd&&openness(m)>40&&!laneBlocked(m,{x:gx,y:MY},18,p.team)&&!laneBlocked(p,m,20,p.team)){sd=md;sm=m}}if(sm){pass(p,sm);if(p.team===1)aiStat.square++;return}}const ch=(open?.7:.26)*DF.shoot*(dG<230?1.9:1)*(ndd<30?.7:1)*LV().ai;if(Math.random()<ch){aiShoot(p,dG);return}}
     if(Math.abs(p.x-gx)<120){const m=bestMate(p);if(m&&Math.random()<.5){pass(p,m);return}aiShoot(p,dG);return}// never dribble into the byline
     if(ndd<44){const m=bestMate(p);if(m&&Math.random()<.5*DF.press){pass(p,m);return}
 }
@@ -3802,8 +3931,13 @@ function carrierAI(p,dt){
   steer(p,tx,clamp(ty,FY0+60,FY1-60),topSpeed(p),dt);
 }
 // the opposition fires its ultimates too: shots from range, turbo into space, through balls
-function aiSpecial(p,dG,ndd){const sp=p.st.sp,def=SPECIALS[sp];if(!def)return false;
+function aiSpecial(p,dG,ndd){const sp=p.st.sp,def=SPECIALS[sp];if(!def)return false;const IQ=aiIQ(p.team),smart=Math.random()<IQ,gx0=goalX(p.team),dir=Math.sign(gx0-p.x)||1;
   if(['curler','rocket','knuckle','chip'].includes(sp)){if(dG>DF.range+170||Math.random()>.68)return false;
+    if(smart&&sp!=='chip'&&sp!=='curler'&&laneBlocked(p,{x:gx0,y:MY},18,p.team))return false;// smart sides save the strike for a clear sight of goal
+  }
+  if(smart&&sp==='turbo'&&outfield(1-p.team).some(q=>(q.x-p.x)*dir>0&&(q.x-p.x)*dir<170&&Math.abs(q.y-p.y)<70))return false;// no space to run into
+  if(smart&&sp==='through'&&!outfield(p.team).some(m=>m!==p&&m.vx*dir>1&&(m.x-p.x)*dir>20))return false;// nobody making the run
+  if(['curler','rocket','knuckle','chip'].includes(sp)){
     const k=keeperOf(1-p.team),gx=goalX(p.team),ty=sp==='chip'?MY+rnd(-18,18):(k.y>MY?GY0+12:GY1-12);
     p.spCd=spCdOf(p)*1.5;p.dir=Math.atan2(ty-B.y,gx-B.x);pop(def.name,p.x,p.y-34,C.coral,20,70);S.special();shoot(p,sp,.85,ty);return true}
   if(sp==='turbo'&&ndd>70&&Math.random()<.4){p.spCd=spCdOf(p)*1.5;p.turbo=150;pop('TURBO',p.x,p.y-34,C.coral,16);return false}
@@ -3815,10 +3949,13 @@ function aiSpecial(p,dG,ndd){const sp=p.st.sp,def=SPECIALS[sp];if(!def)return fa
   return false}
 function aiShoot(p,dG){
   const k=keeperOf(1-p.team),gx=goalX(p.team);
-  const ty=(k.y>MY?GY0+12:GY1-12)+rnd(-1,1)*DF.err*.75*(dG/200);
+  const IQ=aiIQ(p.team);let c=k.y>MY?GY0+12:GY1-12;
+  // the far corner from the keeper, unless a body is in the way and the other corner is clear
+  if(Math.random()<.2+.7*IQ){const o=c===GY0+12?GY1-12:GY0+12;if(laneBlocked(p,{x:gx,y:c},14,p.team)&&!laneBlocked(p,{x:gx,y:o},14,p.team))c=o}
+  const ty=c+rnd(-1,1)*DF.err*.75*(dG/200);
   const kOut=Math.abs(k.x-gx);
   let type='normal';const ch=rnd(.55,1);
-  const r=Math.random();if(dG<190&&kOut>36&&r<.3)type='chip';else if(dG<260&&r<.22)type='curler';
+  const r=Math.random();if(kOut>60&&dG<340&&r<.3+.6*IQ){type='chip';if(p.team===1)aiStat.chip++}else if(dG<190&&kOut>36&&r<.3)type='chip';else if(dG<260&&r<.22)type='curler';
   p.dir=Math.atan2(ty-B.y,gx-B.x);shoot(p,type,ch,ty);
 }
 
@@ -3833,6 +3970,75 @@ function keeperRead(k,react,type='normal'){
   const far=Math.abs(k.x-B.x),clean=B.shot&&B.shot.perfect;
   const sig=(3+spd*.45*(1.3-gk*.55)+far*.05)*(type==='curler'?(gk===1.02?1.25:1.7):type==='knuckle'?2.4:type==='rocket'?1.3:type==='volley'?1.7:type==='header'?1.3:1)*(clean?1.4:1);
   k.planErr=gaussN()*sig;k.planD0=Math.max(40,far);k.planY=py+k.planErr;k.react=Math.max(2,react);k.track=true;k.dv=0;k.diving=false}
+/* ---------- sweeper keeper ----------
+   When a through ball or loose ball runs in behind the defence, the keeper races the attackers to it. He reads the ball's
+   path, his own run against the nearest attacker and the nearest defender, and commits only when he expects to win it.
+   Outside the box he clears it (or plays it to a free team-mate); inside the box he gathers it. Better keepers (club keeper
+   training, or the difficulty for the opposition) read it better and bail out of lost causes; weaker ones misjudge more.
+   Same code runs on the host online, so it is identical for both players. */
+const kSkill=k=>clamp((kgk(k)-.8)/.6,0,1);
+const KSW_SPD=3.15;
+function ballPathPts(n,stp){const out=[];let x=B.x,y=B.y,z=B.z,vx=B.vx,vy=B.vy,vz=B.vz||0;const fg=B.curl?.992:hr('ice')?.994:weather==='rain'?.988:.984;
+  for(let i=0;i<=n;i++){if(i%stp===0)out.push({i,x,y,z});const fr=z>0?.996:fg;x+=vx;y+=vy;vx*=fr;vy*=fr;if(z>0||vz>0){vz-=.25;z+=vz;if(z<0){z=0;vz=Math.abs(vz)>1.2?-vz*.45:0}}
+    if(x<FX0-30||x>FX1+30||y<FY0-30||y>FY1+30)break}return out}
+// frames for a player to reach a point: run time plus a little to turn and get going
+const runT=(p,x,y,spd,lag)=>Math.hypot(x-p.x,y-p.y)/spd+lag;
+function sweepPlan(k){const gx=k.team===0?FX0:FX1,s=k.team===0?1:-1,sk=kSkill(k);
+  if(B.owner||B.shot||B.claimBy===k||(B.lockBy===k&&B.lockT>0))return null;
+  if(B.pass&&B.pass.from&&B.pass.from.team===k.team)return null;// his own side's pass: leave it
+  if(B.lobTo&&B.lobTo.team===k.team)return null;
+  const sp=Math.hypot(B.vx,B.vy);if(sp>1&&B.vx*s>.8)return null;// going away from his goal
+  const zoneX=BOX*(1.55+.55*sk),zoneY=BOXH*1.25;
+  if(Math.abs(B.x-gx)>zoneX+sp*70)return null;// too far away to matter yet
+  const opp=outfield(1-k.team),mates=outfield(k.team),pts=ballPathPts(110,3);
+  const rate=KSW_SPD*kgk(k)*(1+(PSC-1)*.15),lagK=7;
+  let firstAtt=1e9;
+  for(const q of pts){if(q.z>(B.lobTo?60:24)&&!(B.lobTo&&q===pts[pts.length-1]))continue;
+    const ax=(q.x-gx)*s;if(ax>zoneX||Math.abs(q.y-MY)>zoneY||ax<14)continue;
+    let tA=1e9;for(const o of opp){const boost=(B.lobTo===o||B.graceTo===o)&&B.lobThrough?1.5:1;tA=Math.min(tA,runT(o,q.x,q.y,topSpeed(o)*boost,3))}
+    let tD=1e9;for(const m of mates)tD=Math.min(tD,runT(m,q.x,q.y,topSpeed(m),5));
+    firstAtt=Math.min(firstAtt,tA);
+    const tK=runT(k,q.x,q.y,rate,lagK),arrive=Math.max(q.i,tK);
+    if(tK>q.i+10)continue;// can't be there in time for this point
+    // an attacker has to be chasing it, or it isn't a danger: a slow ball with nobody near is gathered normally
+    if(tA>Math.max(q.i,tK)+45)return null;
+    if(tD<tK-6&&tD<tA-4)return null;// a defender gets there first: let him deal with it
+    const tAp=tA*(k.swErr||1);// his read of the race (weaker keepers misjudge it more)
+    if(arrive<tAp-3)return{x:q.x,y:q.y,i:q.i,tK,tA,tD,inBox:ax<BOX-4&&Math.abs(q.y-MY)<BOXH}}
+  return null}
+function sweepClear(k){const gx=k.team===0?FX0:FX1,s=k.team===0?1:-1,sk=kSkill(k);
+  const inBox=Math.abs(B.x-gx)<BOX-4&&Math.abs(B.y-MY)<BOXH;
+  B.lobTo=null;B.graceTo=null;B.graceT=0;B.lobThrough=false;
+  if(inBox&&B.z<27){give(k);pop(pick(['CLAIMED','SWEPT UP','OFF HIS LINE']),k.x,k.y-30,C.cream,17);return}
+  const opp=outfield(1-k.team),near=opp.reduce((a,o)=>Math.min(a,dist(o,k)),1e9);
+  // a calm pass out to a free team-mate if nobody is on him, otherwise it goes long and wide
+  let m=null;if(near>70&&Math.random()<.45+.45*sk){let bs=-1e9;for(const q of outfield(k.team)){const fw=(q.x-k.x)*s,d=dist(q,k);if(fw<40||d<120||d>620*PSC)continue;
+      let open=1e9;for(const o of opp)open=Math.min(open,dist(o,q));if(open<55||laneBlocked(k,q,22,k.team))continue;const sc=open/60+fw/300;if(sc>bs){bs=sc;m=q}}}
+  if(m){give(k);pass(k,m);k.hold=0;pop('SWEEPER KEEPER',k.x,k.y-30,C.mint,16);return}
+  let a=Math.atan2((B.y<MY?-1:1)*rnd(.45,.9),s),spd=rnd(12.5,15)*Math.sqrt(PSC);
+  const scuff=Math.random()<.32*(1-sk);if(scuff){spd*=.55;a+=rnd(-.7,.7)}
+  kick(k,a,spd,scuff?1.5:rnd(4,5.5));S.pass();pop(scuff?'SCUFFED CLEARANCE':pick(['CLEARED','SWEPT AWAY','BIG HOOF']),k.x,k.y-30,scuff?C.coral:C.cream,16)}
+function sweeperTick(k,dt){const gx=k.team===0?FX0:FX1,sk=kSkill(k);
+  if(k.swCd>0)k.swCd-=dt;
+  if(k.sweep){const w=k.sweep;w.t+=dt;
+    // the race is lost or over: own side has it, they have it, or it's taking too long
+    if(B.owner||B.shot||w.t>170){k.sweep=null;k.swCd=50;return false}
+    if(dist(k,B)<17&&B.z<(B.lobTo?30:20)&&!(B.lockBy===k&&B.lockT>0)){k.sweep=null;k.swCd=40;sweepClear(k);return true}
+    if((w.re-=dt)<=0){w.re=4;const P0=sweepPlan(k);
+      if(P0){w.x+=(P0.x-w.x)*.5;w.y+=(P0.y-w.y)*.5;w.miss=0}
+      else{// he can't see a winning line any more: good keepers get back quickly, poor ones keep going a moment too long
+        w.miss=(w.miss||0)+1;if(w.miss>1+Math.round(5*(1-sk))){k.sweep=null;k.swCd=60;return false}}}
+    // run onto the ball's path, then straight at it once close
+    const tx=dist(k,B)<60?B.x+B.vx*4:w.x,ty=dist(k,B)<60?B.y+B.vy*4:w.y;
+    steer(k,tx,ty,KSW_SPD*kgk(k)*(1+(PSC-1)*.15),dt);k.diving=false;return true}
+  if(k.swCd>0||state!=='play'||kickT>0)return false;
+  if((k.swLook=(k.swLook||0)-dt)>0)return false;k.swLook=3;
+  const P0=sweepPlan(k);
+  if(!P0){k.swSeen=0;k.swErr=null;return false}
+  // first time he sees it he forms his read of the race; he needs to see it for a few frames (less for good keepers) before he goes
+  if(!k.swErr)k.swErr=1+rnd(-.8,1)*(.05+.42*(1-sk));
+  k.swSeen=(k.swSeen||0)+3;if(k.swSeen<3+Math.round(9*(1-sk)))return false;
+  k.sweep={x:P0.x,y:P0.y,t:0,re:4,p0:P0};k.wide=true;k.swSeen=0;k.swErr=null;k.sweeps=(k.sweeps||0)+1;aiStat.sweeps++;return true}
 function keeperUpdate(k,dt){
   if(noKeep()){const gx=k.team===0?FX0:FX1;k.x=gx+(k.team===0?-8:8);k.y=GY1+30;k.vx=k.vy=0;if(B.owner===k){B.owner=null;const m=outfield(k.team)[0];if(m)give(m)}return}
   const gx=k.team===0?FX0:FX1,s=k.team===0?1:-1,mine=k.team===0||pvp(),gk=kgk(k);
@@ -3841,9 +4047,11 @@ function keeperUpdate(k,dt){
     if(k.hold<=0){const m=bestMate(k)||pick(outfield(k.team));if(m)pass(k,m)}return}
   let shotIn=false;
   if(!B.owner&&B.vx*s<-2&&Math.abs(B.x-gx)<620&&!(B.lockBy===k&&B.lockT>0)){const tt=(gx-B.x)/B.vx,py=B.y+B.vy*tt;shotIn=py>GY0-34&&py<GY1+34}
+  // a pass from them rolling towards goal isn't a shot until it's close: it's a ball to race for (see the sweeper keeper)
+  if(shotIn&&!B.shot&&(k.sweep||(B.pass&&B.pass.from&&B.pass.from.team!==k.team&&Math.abs(B.x-gx)>BOX*.5)))shotIn=false;
   if(shotIn)k.shotHold=8;else if(k.track&&(k.shotHold||0)>0&&!B.owner&&B.vx*s<-.5){k.shotHold-=dt;shotIn=true}
   if(shotIn&&!k.track)keeperRead(k,mine?9:Math.round(DF.react*.6));// deflections and loose balls heading in
-  if(!shotIn){k.track=false;k.planY=null;k.dv=0}
+  if(!shotIn){k.track=false;k.planY=null;k.dv=0}else if(k.sweep){k.sweep=null;k.swCd=50}
   if(shotIn){
     if(k.react>0){k.react-=dt;k.vx*=.7;k.vy*=.7}
     else{// he keeps reading it as it comes: his early misjudgement shrinks the closer the ball gets
@@ -3854,12 +4062,13 @@ function keeperUpdate(k,dt){
   }else{
     k.diving=false;
     if(B.claimBy===k&&B.lobTo){steer(k,B.lobX,B.lobY,3.3*gk,dt);return}
+    if(!noKeep()&&sweeperTick(k,dt))return;
     const threat=B.owner&&B.owner.team!==k.team?Math.hypot(B.x-gx,B.y-MY):999;
     const out=14+(threat<220?(220-threat)/220*40*(mine?1:gk):0);
     let ty=clamp(MY+(B.y-MY)*.55,GY0+6,GY1-6);
     // their keeper watches your shooting stance and shades towards where you're aiming: switch corners late to beat him
     const sh=B.owner;if(!mine&&sh&&sh.team!==k.team&&sh.aimY!=null&&(sh===ctrl?charging:sh===ctrl2&&RS&&RS.charging))ty=clamp(ty+(sh.aimY-ty)*.3*gk,GY0+4,GY1-4);
-    steer(k,gx+s*out,ty,2.3,dt);
+    steer(k,gx+s*out,ty,k.wide?2.9:2.3,dt);
     if(!B.owner&&!B.lobTo&&!(B.graceT>0)&&B.lockBy!==k&&Math.abs(B.x-gx)<BOX&&Math.abs(B.y-MY)<130&&B.z<24&&Math.hypot(B.vx,B.vy)<(mine?6:4)&&dist(k,B)<(mine?150:120))steer(k,B.x,B.y,mine?3.4:2.8,dt);
   }
 }
@@ -4030,7 +4239,7 @@ function kickoff(team){koT=t;
   players.forEach(p=>{
     if(p.keeper){p.x=p.team?FX1-16:FX0+16;p.y=MY}
     else{const fx=Math.min(.44,p.slot.x*.8+.04);p.x=p.team===0?FX0+fx*(FX1-FX0):FX1-fx*(FX1-FX0);p.y=FY0+(FY1-FY0)*p.slot.y}
-    p.kx=p.x;p.ky=p.y;if(p.keeper){p.diving=false;p.dv=0;p.track=false;p.react=0;p.planY=null;p.shotHold=0;p.hold=0}
+    p.kx=p.x;p.ky=p.y;if(p.keeper){p.diving=false;p.dv=0;p.track=false;p.react=0;p.planY=null;p.shotHold=0;p.hold=0;p.sweep=null;p.wide=false;p.swCd=0;p.swSeen=0;p.swErr=null}
     p.vx=p.vy=0;p.stun=0;p.anim=null;p.rot=0;p.jump=0;p.arms=0;p.flip=1;p.lunge=0;p.slide=false;p.inter=false;p.aiSlide=0;p.aiLunge=0;p.turbo=0;p.push=null;p.fall=0;p.beatRun=0;p.lean=0;p.kneel=false;p.spinRot=false;p.dir=p.team?Math.PI:0;p.hold=0;p.stam=Math.min(100,p.stam+40)});
   const pickTaker=tm=>outfield(tm).reduce((a,b)=>b.slot.x>a.slot.x?b:a);
   const taker=pickTaker(team);taker.x=team===0?MIDX-12:MIDX+12;taker.y=MY;
@@ -4059,7 +4268,7 @@ function awardCoins(){awardCoins0();
   matchRatings=calcRatings();const m=matchRatings.motm;if(m.p.team===0){const b=Math.round(25*matchMul());earned+=b;club.coins+=b;earnNote+=` · man of the match +${b}`;saveClub()}
   careerAfterMatch()}
 function awardCoins0(){earned=0;shownEarned=0;earnNote='';
-  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=matchPay(score[0]>score[1]?'Online win':score[0]<score[1]?'Online defeat':'Online draw',r,score[0]*10,1);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;saveClub();return}
+  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=matchPay(score[0]>score[1]?'Online win':score[0]<score[1]?'Online defeat':'Online draw',r,score[0]*10,1);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;gdTokens(score[0],score[1]);saveClub();return}
   const pw=pen&&pen.winner!=null?pen.winner:null;
   const r=score[0]>score[1]?100:score[0]<score[1]?20:pw===0?80:pw===1?30:45;
   let bonus=0;const won=score[0]>score[1]||pw===0;
@@ -4132,7 +4341,7 @@ function update(dt){
     {const _t=performance.now();teamAI(0,dt);teamAI(1,dt);keeperUpdate(keeperOf(0),dt);keeperUpdate(keeperOf(1),dt);PS('ai',_t)}
     if(ctrl)autoSwitch(dt);if(NET.host&&ctrl2&&!netV2)autoSwitchT(dt,1);
     for(const p of players){p.x+=p.vx*dt;p.y+=p.vy*dt;
-      if(p.keeper){const gx=p.team===0?FX0:FX1;p.x=clamp(p.x,p.team?gx-BOX:gx-6,p.team?gx+6:gx+BOX);p.y=clamp(p.y,MY-170,MY+170)}
+      if(p.keeper){const gx=p.team===0?FX0:FX1;if(p.wide){const R=BOX*2.3;p.x=clamp(p.x,p.team?gx-R:gx-6,p.team?gx+6:gx+R);p.y=clamp(p.y,FY0+10,FY1-10);if(!p.sweep&&Math.abs(p.x-gx)<BOX-2&&Math.abs(p.y-MY)<168)p.wide=false}else{p.x=clamp(p.x,p.team?gx-BOX:gx-6,p.team?gx+6:gx+BOX);p.y=clamp(p.y,MY-170,MY+170)}}
       else{p.x=clamp(p.x,FX0+10,FX1-10);p.y=clamp(p.y,FY0+10,FY1-10)}
       if(p!==ctrl&&p!==ctrl2)faceVel(p,dt)}
     for(let i=0;i<players.length;i++)for(let j=i+1;j<players.length;j++){const a=players[i],b=players[j],d=dist(a,b);if(a.fall>0||b.fall>0||((a.ghost>0||b.ghost>0)&&a.team!==b.team))continue;
@@ -5304,7 +5513,7 @@ function toggleFull(){const st=document.querySelector('.stage'),fs=document.full
 $('fullscr').onclick=toggleFull;$('fullscr2').onclick=toggleFull;
 const fsLabel=()=>{const on=!!(document.fullscreenElement||document.webkitFullscreenElement);$('fullscr').textContent=on?'Exit full screen (V)':'Full screen (V)';$('fullscr2').textContent=on?'Exit full screen':'Full screen'};
 document.addEventListener('fullscreenchange',fsLabel);document.addEventListener('webkitfullscreenchange',fsLabel);
-window.__kick={errs:()=>loopErrs,dbg:{snapSize:()=>JSON.stringify(netSnapOf()).length,prep:()=>!!netPrep,allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p),look:p.look,skin:p.skin})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,MY,GY0,GY1}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({gm:{on:gMe.on,seq:gT.seq,ack:gT.ack,lob:gT.lob,wait:netGuestWait,rtt:netRtt,v2:netV2},RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+window.__kick={errs:()=>loopErrs,dbg:{aiStat:()=>aiStat,earnNote:()=>earnNote,cv:()=>({rollTier,ABTIER,sweepPlan,kSkill,byId,upOf,UPCAP,EVO,XPL,STATMAX,tier,depBuy,depLv,depFx,ctk,ctkSync,maxPlan,statMax,upPreview,playStatsX,scoutOdds,matchPay,gdTokens,legacyXP,upBuy,ablBuy,coachCost,upCost,effOvr,cdSecs,spCdOf,PACKS,legNeed,trainDo,evoDo,evoNeed,ovr}),snapSize:()=>JSON.stringify(netSnapOf()).length,prep:()=>!!netPrep,allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p),look:p.look,skin:p.skin})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,FY0,FY1,MY,MIDX,GY0,GY1,BOX,BOXH,PITCH}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({gm:{on:gMe.on,seq:gT.seq,ack:gT.ack,lob:gT.lob,wait:netGuestWait,rtt:netRtt,v2:netV2},RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 // Getting ready: a panel over the pitch while both laptops load, then the countdown
 function drawNetPrep(pr){const who=NET.host?(netGuest?netGuest.club:'your friend'):OPP.name;ctx.fillStyle='rgba(13,24,33,.78)';ctx.fillRect(0,0,W,H);
   ctx.fillStyle='rgba(20,48,63,.95)';rr(W/2-260,H/2-120,520,240,22);ctx.fill();

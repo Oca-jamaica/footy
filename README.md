@@ -12,6 +12,16 @@ and confirm they're ready, then a 3-2-1 countdown.
 Each mode has its own five-division league (Amateur, Division 3, 2, 1, Legendary: 10 clubs, 9 rounds (everyone plays everyone once), top 3 up, bottom 3 down)
 and its own World Club Championship (64-club knockout, earned with a top-3 finish). Coins, players, upgrades and cosmetics are shared.
 
+Difficulty: **Chill** (green), **Medium** (yellow), **Hard** (red), **Extreme** (fire). Higher levels make the computer
+read the game better as well as play better: they cut out passes, mark the most dangerous runner, block passing lanes,
+track runs, make runs into space, counter-attack, time through balls and pick the open corner. Keepers come off their
+line to sweep up through balls and loose balls behind the defence (better keepers judge it better).
+
+**Rewards:** every match pays Training Tokens for goal difference (`max(0, goals scored − goals conceded)`), with no
+multipliers or caps. Every Club Legacy level pays exactly 1 Club Token. Club Tokens build the six Club Development
+departments (Fanbase, Coaching Staff, Training Facilities, Stadium, Scouting, Commercial), levels 1–5, for
+5,000 / 10,000 / 20,000 / 35,000 coins plus 1 Club Token per level.
+
 **To play:** open `sunday-kickabout.html` in Chrome, Safari or Edge.
 
 ## Editing

@@ -191,6 +191,16 @@ canvas:focus-visible{box-shadow:inset 0 0 0 3px var(--sun)}
 .lvl{display:flex;gap:6px;align-items:center;padding-right:12px;margin-right:4px;border-right:1px solid var(--line)}.lvl span{font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--muted);margin-right:2px}
 .diff button,.lvl button{font-family:var(--body);font-weight:800;font-size:14px;border:1px solid var(--line);background:var(--ground-2);color:var(--muted);padding:6px 14px;border-radius:999px;cursor:pointer}
 .diff button[aria-pressed="true"],.lvl button[aria-pressed="true"]{background:var(--cream);color:var(--ground);border-color:var(--cream)}
+.lvl button[data-lv="chill"]{color:#86e3a8;border-color:rgba(62,207,122,.45)}.lvl button[data-lv="chill"][aria-pressed="true"]{background:linear-gradient(180deg,#5fe095,#2fbf6b);color:#062a16;border-color:#3ecf7a;box-shadow:0 0 0 3px rgba(62,207,122,.22),0 3px 10px rgba(62,207,122,.3)}
+.lvl button[data-lv="normal"]{color:#ffd978;border-color:rgba(255,209,102,.45)}.lvl button[data-lv="normal"][aria-pressed="true"]{background:linear-gradient(180deg,#ffe28f,#ffc93d);color:#2c2104;border-color:#ffd166;box-shadow:0 0 0 3px rgba(255,209,102,.22),0 3px 10px rgba(255,201,61,.3)}
+.lvl button[data-lv="hard"]{color:#ff8a8d;border-color:rgba(255,90,95,.5)}.lvl button[data-lv="hard"][aria-pressed="true"]{background:linear-gradient(180deg,#ff6b70,#e0353b);color:#fff;border-color:#ff5a5f;box-shadow:0 0 0 3px rgba(255,90,95,.22),0 3px 12px rgba(224,53,59,.4)}
+.lvl button[data-lv="extreme"]{position:relative;color:#ffb35c;border-color:rgba(255,120,40,.6)}
+.lvl button[data-lv="extreme"][aria-pressed="true"]{color:#fff;border-color:#ff7a1a;text-shadow:0 1px 2px rgba(120,20,0,.6);background:linear-gradient(120deg,#ff2d00,#ff6a00,#ffb000,#ff6a00,#ff2d00);background-size:300% 100%;animation:fire 2.4s linear infinite;box-shadow:0 0 0 3px rgba(255,106,0,.25),0 0 18px rgba(255,90,0,.55),0 -4px 14px rgba(255,170,0,.35)}
+@keyframes fire{to{background-position:300% 0}}
+@media (max-width:600px){.lvl{flex-wrap:wrap;justify-content:center;border-right:0;padding-right:0;margin-right:0}.seg button{min-width:86px;padding:6px 10px}}
+.lvl button .fl{display:none}.lvl button[data-lv="extreme"][aria-pressed="true"] .fl{display:block;position:absolute;left:8%;right:8%;top:-9px;height:12px;pointer-events:none;background:radial-gradient(6px 9px at 15% 100%,#ffd000 0,rgba(255,120,0,.85) 55%,transparent 75%),radial-gradient(7px 12px at 38% 100%,#fff2a0 0,rgba(255,90,0,.9) 55%,transparent 75%),radial-gradient(6px 10px at 62% 100%,#ffd000 0,rgba(255,60,0,.85) 55%,transparent 75%),radial-gradient(7px 12px at 85% 100%,#fff2a0 0,rgba(255,110,0,.85) 55%,transparent 75%);filter:blur(.6px);transform-origin:50% 100%;animation:flick .18s ease-in-out infinite alternate}
+@keyframes flick{from{transform:scaleY(.8) translateY(1px);opacity:.85}to{transform:scaleY(1.15);opacity:1}}
+@media (prefers-reduced-motion:reduce){.lvl button[data-lv="extreme"][aria-pressed="true"],.lvl button .fl{animation:none}}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 .go{font-family:var(--display);font-size:22px;border:0;border-radius:999px;padding:.45em 1.5em;background:var(--coral);color:#fff;cursor:pointer;box-shadow:0 5px 0 #b8432f}
 .go:disabled{opacity:.45;cursor:not-allowed}
@@ -243,8 +253,17 @@ kbd{font-family:var(--body);font-weight:800;font-size:12px;background:var(--grou
 /* ---------- career screens ---------- */
 .ablv{display:flex;gap:2px}.ablv i{display:block;width:9px;height:9px;border-radius:2px;background:#26313d}.ablv i.on{background:var(--sun)}
 .maxl{color:var(--mint);letter-spacing:.06em}
+.potrow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}.potrow>div{display:flex;flex-direction:column;align-items:center}.potrow small{font-size:11px;color:var(--muted)}.ovrbig.pot{color:var(--mint)}.ovrbig.rem{color:#ffb38a}
+.strow.dv{grid-template-columns:44px 1fr 40px 50px}.strow.dv button{grid-column:1/-1;justify-self:end;margin-bottom:3px}@media (min-width:760px){.strow.dv{grid-template-columns:44px 1fr 40px 50px minmax(220px,auto)}.strow.dv button{grid-column:auto;margin:0}}
+.strow.dv em{font-style:normal;font-size:11px;color:var(--muted);white-space:nowrap}.strow .bar s{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,rgba(127,224,180,.28) 0 3px,transparent 3px 6px);text-decoration:none}
+.res.ctkp{cursor:pointer;color:#ffb38a}.res.ctkp::before{content:"\25C6 ";font-size:12px}
+.deptg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin-top:8px}.dept .dhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.dept h4{margin:0}.dlv{margin-left:auto;font-family:var(--display);font-weight:400;color:var(--cream)}.dnext{color:var(--mint)}.ctk{font-family:var(--display);font-size:24px;color:#ffb38a}
 table.abt td{vertical-align:middle}table.abt td:nth-child(2),table.abt th:nth-child(2),table.abt td:nth-child(3),table.abt th:nth-child(3){text-align:left}
-.pitchsel{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}.pitchsel .forms button{font-size:13px}
+.pitchsw{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;justify-content:center}.pitchsw .lab{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--muted)}.pitchsw small{font-size:12px;color:var(--muted)}
+.seg{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;background:#0d2230;border:1px solid var(--line);border-radius:999px;padding:3px;box-shadow:inset 0 1px 3px rgba(0,0,0,.35)}
+.seg .thumb{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:999px;background:linear-gradient(180deg,#ffe08a,var(--sun));box-shadow:0 2px 8px rgba(255,209,102,.35);transition:transform .22s cubic-bezier(.3,.7,.4,1)}.seg[data-v="expanded"] .thumb{transform:translateX(100%)}
+.seg button{position:relative;z-index:1;font-family:var(--body);font-weight:800;font-size:12px;letter-spacing:.08em;min-width:104px;padding:6px 14px;border:0;background:transparent;color:var(--muted);border-radius:999px;cursor:pointer;transition:color .15s}.seg button[aria-pressed="true"]{color:#1d1a10}.seg button:hover[aria-pressed="false"]{color:var(--cream)}
+.pbonus{font-family:var(--display);font-size:15px;color:#1b2a12;background:linear-gradient(180deg,#b9f3a0,#7fe0b4);border-radius:999px;padding:2px 10px;box-shadow:0 0 12px rgba(127,224,180,.35);animation:pb .35s ease-out}@keyframes pb{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
 .res{font-family:var(--display);font-size:16px;border-radius:999px;padding:2px 10px;background:#12303e;color:var(--cream);border:1px solid var(--line);white-space:nowrap}
 .res.tt{color:var(--mint)}.res.cp{color:#9fd3ff}.res.leg{cursor:pointer;color:var(--sun);font-family:var(--display)}
 .res.tt::before{content:"\25B2 ";font-size:12px}.res.cp::before{content:"\2605 ";font-size:12px}
@@ -332,7 +351,7 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
     <div class="clubbar">
       <label for="club-name" style="display:flex;align-items:center;gap:6px">CLUB<input type="text" id="club-name" maxlength="14"></label>
       <div class="sw" id="club-kit" aria-label="Kit colour"></div>
-      <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button>
+      <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button><button class="res ctkp" id="ctkp" title="Club Tokens (Club Development)"></button>
     </div>
     <div class="tabs" role="tablist"><button role="tab" id="tab-team" aria-selected="true">Play</button><button role="tab" id="tab-squad" aria-selected="false">Squad</button><button role="tab" id="tab-club" aria-selected="false">Club</button><button role="tab" id="tab-online" aria-selected="false">Online</button></div>
     <p class="result" id="result" hidden></p>
@@ -342,10 +361,10 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
       <div class="modes" id="modes"></div>
       <div class="row">
         <div class="lvl" role="group" aria-label="Difficulty"><span>DIFFICULTY</span>
-          <button data-lv="chill" aria-pressed="false">Chill</button>
-          <button data-lv="normal" aria-pressed="false">Normal</button>
-          <button data-lv="hard" aria-pressed="false">Hard</button>
-          <button data-lv="extreme" aria-pressed="false" title="An extreme challenge">Extreme 🔥</button>
+          <button data-lv="chill" aria-pressed="false" title="Relaxed opponents, fewer coins">Chill</button>
+          <button data-lv="normal" aria-pressed="false" title="A fair game">Medium</button>
+          <button data-lv="hard" aria-pressed="false" title="A genuine challenge, 1.8× coins">Hard</button>
+          <button data-lv="extreme" aria-pressed="false" title="For true gamer ballers, 2.5× coins"><span class="fl" aria-hidden="true"></span>Extreme 🔥</button>
         </div>
         <div class="diff" id="comps" role="group" aria-label="Competition"></div>
         <button class="go" id="go">Kick off</button>

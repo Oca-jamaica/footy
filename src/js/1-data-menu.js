@@ -230,10 +230,10 @@ let diffKey='easy';// only the Sunday Cup is left besides the Grand Tournament
 let DF=DIFFS[diffKey];
 // Chill / Normal / Hard sit on top of whatever the opponent is: they shift the AI a level down or up, change how often
 // defenders bite on your cuts (overcommit), and scale the coins.
-const LEVELS={chill:{shift:-1,ai:.9,bite:.62,coin:.8,name:'Chill',note:'Opponents bite on your cuts a lot and press gently, but fewer coins.'},
-  normal:{shift:0,half:.8,ai:1.22,bite:.3,coin:1,name:'Normal',note:'A fair game. Defenders sometimes bite on a sharp cut.'},
-  hard:{shift:2.6,ai:1.75,bite:.04,coin:1.8,boost:.07,name:'Hard',note:'A genuine challenge: opponents beyond Legend level, stronger players, sharp keepers and they almost never bite. 1.8× coins.'},
-  extreme:{shift:4.2,ai:2.1,bite:0,coin:2.5,boost:.12,extreme:true,name:'Extreme',note:'For true gamer ballers only: +12 on every opponent, near-instant reactions, elite keepers, relentless pressing and slide tackles, and they never bite. 2.5× coins.'}};
+const LEVELS={chill:{shift:-1,ai:.9,bite:.62,coin:.8,name:'Chill',note:'Relaxed opponents: they bite on your cuts, press gently and rarely read your passes. Fewer coins.'},
+  normal:{shift:0,half:.8,ai:1.22,bite:.3,coin:1,name:'Medium',note:'A fair game. They mark your runners, sometimes cut out a pass, and still bite on a sharp cut now and then.'},
+  hard:{shift:2.6,ai:1.75,bite:.04,coin:1.8,boost:.07,name:'Hard',note:'A genuine challenge: opponents beyond Legend level who track your runs, block passing lanes, time their through balls and almost never bite. Keepers sweep up behind. 1.8× coins.'},
+  extreme:{shift:4.2,ai:2.1,bite:0,coin:2.5,boost:.12,extreme:true,name:'Extreme',note:'For true gamer ballers only: +12 on every opponent, near-instant reactions, elite keepers, relentless pressing and slide tackles, and elite decisions: they cut out loose passes, counter in numbers, pick the open corner and never bite. 2.5× coins.'}};
 const LV=()=>NET.on?{shift:0,ai:1,bite:.3,coin:1,name:'Online'}:LEVELS[club.level]||LEVELS.normal;
 const DKEYS=['beginner','easy','normal','hard','legend'];
 // Hard can push an opponent past Legend: the numbers carry on from Normal → Hard → Legend, within sensible limits
@@ -393,7 +393,7 @@ function renderMenu(){
    $('cup').innerHTML=`<div class="cup-head"><b>${CUPS[c.tier]}</b><span>${tro?'\u{1F3C6} ×'+tro+' won':'Win three in a row to lift the trophy'}</span></div><div class="rounds">`+ROUNDS.map((r,i)=>{const o=OPPS[c.opps[i]],st=i<c.res.length?(c.res[i]?'won':'lost'):i===c.round&&c.alive?'now':'';
      return `<div class="rnd ${st}" style="--k:${o[1]}"><i>${r.toUpperCase()}</i><em>${esc(o[0])}</em>${st==='won'?'<b>WON</b>':st==='lost'?'<b>KNOCKED OUT</b>':st==='now'?'<b style="color:var(--sun)">NEXT</b>':''}</div>`}).join('')+`</div>`}
   $('club-name').value=club.name;{const el=$('coins');el.textContent=club.coins.toLocaleString();if(shownCoins!=null&&club.coins!==shownCoins){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}shownCoins=club.coins}
-  res();$('tt').textContent=club.tt;$('cp').textContent=club.cp.toLocaleString();$('legpill').textContent='Legacy Lv '+((club.leg||{}).lvl||0);
+  res();$('tt').textContent=club.tt;$('cp').textContent=club.cp.toLocaleString();$('legpill').textContent='Legacy Lv '+((club.leg||{}).lvl||0);ctkSync();$('ctkp').textContent=ctk();
   $('club-kit').innerHTML=[...KITS,...(cosOwned('kit_gold')?['#d4af37']:[])].map(c=>`<button type="button" style="background:${c}" aria-label="Kit colour" aria-pressed="${club.kit===c}" data-c="${c}"></button>`).join('');
   if(club.welcome){resultEl.hidden=false;resultEl.textContent=club.welcome;delete club.welcome;saveClub()}
   const q=sq();q.s=q.s.map(id=>id&&club.owned.includes(id)?id:null);
@@ -418,10 +418,10 @@ function renderMenu(){
   $('benchctl').innerHTML=`<span class="hint" style="margin:0">${benchList.length} players · best for the selected ${slots[selSlot]?slots[selSlot].r:''} spot first</span>`+(benchList.length>36?`<button class="ghost" data-benchall="1">${benchAll?'Show fewer':'Show all '+benchList.length}</button>`:'');
   $('bench').innerHTML=(benchAll?benchList:benchList.slice(0,36)).map(p=>{const at=q.s.indexOf(p.id);return cardHTML(p,{pickable:true,inteam:at>=0,badge:at>=0?slots[at].r[0]:'',
     extra:!p.isCustom?renameUI(p,'bench'):
-      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<400||(custom.budget||BUDGET)>=650?'disabled':''}>Train +8 pts · 400</button>`:''})}).join('');
+      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<coachCost(400)||(custom.budget||BUDGET)>=650?'disabled':''}>Train +8 pts · ${coachCost(400)}</button>`:''})}).join('');
   renderSquadExtras();
   // packs
-  $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const od=Object.entries(k.odds).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ');
+  $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const so=scoutOdds(k.odds),sc=depFx('scout')&&so!==k.odds,od=Object.entries(so).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ')+(sc?` (scouting +${depFx('scout')}%)`:'');
     return `<button class="packbtn t-${k.id==='premium'||k.id==='elite'?'special':k.id}" data-pack="${k.id}" ${!free&&club.coins<k.cost?'disabled':''}><b>${k.name}</b><span>${k.d}</span><span style="color:var(--tc)">Odds: ${od}</span><em>${free?`FREE${(club.free||{})[k.id]>1?' ×'+club.free[k.id]:''}`:k.cost.toLocaleString()+' coins'}</em></button>`}).join('');
   if(tab==='club')renderClub();
   const canFill=ownedPlayers().length>=4;
@@ -472,7 +472,7 @@ function lvlHTML(p){if(!club.owned.includes(p.id))return'';const L=lvlOf(p.id),x
 let levelUps=[];
 function grantXP(won){levelUps=[];club.xp=club.xp||{};
   for(const p of players){if(p.team!==0||p.keeper||!p.st.id)continue;const id=p.st.id,before=lvlOf(id);
-    const g=25+(p.goals||0)*40+(p.mT||0)*12+(p.mS||0)*8+(won?20:0);club.xp[id]=xpOf(id)+g;const after=lvlOf(id);
+    const g=Math.round((25+(p.goals||0)*40+(p.mT||0)*12+(p.mS||0)*8+(won?20:0))*(1+depFx('train')/100));club.xp[id]=xpOf(id)+g;const after=lvlOf(id);
     if(after>before)levelUps.push(`${(byId(id)||p.st).short} reached Lv ${after}`)}}
 /* ---------- Sticker album ---------- */
 const ALBUM_REWARD={bronze:3000,silver:5000,gold:10000,special:15000,icon:25000};
@@ -510,7 +510,7 @@ $('market').addEventListener('keydown',renameKey);
 $('bench').addEventListener('click',e=>{
   if(renameClick(e,'bench'))return;
   if(e.target.closest('[data-edit]')){openEditor();return}
-  const tr=e.target.closest('[data-train]');if(tr){if(club.coins>=400){const was=ovr(custom),gain=Math.min(8,650-(custom.budget||BUDGET));club.coins-=400;custom.budget=(custom.budget||BUDGET)+gain;autoSpend(custom,gain);const now=ovr(custom);try{localStorage.setItem('kickabout-custom',JSON.stringify(custom))}catch(e){}saveClub();S.skill(2);renderMenu();showUpgrade(was,now);openEditor()}return}
+  const tr=e.target.closest('[data-train]');if(tr){if(club.coins>=coachCost(400)){const was=ovr(custom),gain=Math.min(8,650-(custom.budget||BUDGET));club.coins-=coachCost(400);custom.budget=(custom.budget||BUDGET)+gain;autoSpend(custom,gain);const now=ovr(custom);try{localStorage.setItem('kickabout-custom',JSON.stringify(custom))}catch(e){}saveClub();S.skill(2);renderMenu();showUpgrade(was,now);openEditor()}return}
   const c=e.target.closest('.card[data-id]');if(c){lastSlotClick=-1;placePlayer(c.dataset.id)}});
 $('bench').addEventListener('keydown',e=>{if(renameKey(e))return;
   const c=e.target.closest('.card[data-id]');if(c&&e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();placePlayer(c.dataset.id)}});
@@ -539,7 +539,7 @@ function openPack(id){
   if(!free&&club.coins<k.cost)return;
   initAudio();if(ac&&ac.state==='suspended')ac.resume();
   if(gift)club.gift=false;else if(owed)club.free[id]--;else club.coins-=k.cost;
-  const cards=dealHardPick(rollTier(k.odds));
+  const cards=dealHardPick(rollTier(scoutOdds(k.odds)));
   const res=cards.map(p=>({p,dup:club.owned.includes(p.id)}));
   saveClub();
   const el=$('pack');el.hidden=false;$('pack-title').textContent=k.name;$('pack-note').textContent='';$('pack-done').hidden=true;
