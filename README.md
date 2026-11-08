@@ -6,13 +6,22 @@ A football game in a single HTML file, with two modes:
 - **Classical (9v9):** a bigger pitch, 9-a-side formations, more passing and shape. 1.5× coins. Two pitch sizes:
   Standard and Expanded (about 1.37× bigger each way, for long balls and build-up play).
 
-Online works in all three (Volta, Classical Standard, Classical Expanded): the host picks the match, both laptops load
-and confirm they're ready, then a 3-2-1 countdown.
+Online works in all three (Volta, Classical Standard, Classical Expanded). Both laptops need the same version of the
+game file. The host picks the match; the match only starts once the joining laptop has loaded it, its controls are
+reaching the host and it is receiving the match, then a 3-2-1 countdown. Each player controls their own team: the
+joining player's footballer runs on their own laptop, and whenever their team wins the ball the host hands that
+footballer to them (the host's AI never plays the ball for them). Messages go over every working route at once (direct
+WebRTC link, Claude room, public relays); the freshest route carries the match and a stalled one is dropped within a
+fraction of a second. If the connection really drops, both screens pause with a clear message and restart together
+after a short countdown.
 
 Each mode has its own five-division league (Amateur, Division 3, 2, 1, Legendary: 10 clubs, 9 rounds (everyone plays everyone once), top 3 up, bottom 3 down)
 and its own World Club Championship (64-club knockout, earned with a top-3 finish). Coins, players, upgrades and cosmetics are shared.
 
-Difficulty: **Chill** (green), **Medium** (yellow), **Hard** (red), **Extreme** (fire). Higher levels make the computer
+Difficulty: **Chill** (green), **Medium** (yellow), **Hard** (red), **Extreme** (fire). On the Classical pitches the computer plays
+as a team: one defender gets goal-side and times his tackle, a second covers, others block the obvious pass and track
+runners, the back line holds its shape, beaten players race back, and sliding tackles come when someone is through on
+goal, lining up a shot or getting away. Clubs have styles (possession, counter-attack, high pressing, direct, wide play). Higher levels make the computer
 read the game better as well as play better: they cut out passes, mark the most dangerous runner, block passing lanes,
 track runs, make runs into space, counter-attack, time through balls and pick the open corner. Keepers come off their
 line to sweep up through balls and loose balls behind the defence (better keepers judge it better).

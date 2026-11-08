@@ -92,6 +92,10 @@ const DEPTS=[
 const depLv=k=>clamp(((club.dept||{})[k])|0||1,1,DEPMAX);
 const depFx=k=>DEPTS.find(d=>d.k===k).fx[depLv(k)-1];
 const coachCost=c=>Math.round(c*(1-depFx('coach')/100));
+// every coin price for training shows the original, the Coaching Staff discount and what you actually pay
+// (the purchase deducts exactly the final number). Training Token costs never change.
+function priceTag(base){const f=coachCost(base);return f<base?`<s class="was">${base.toLocaleString()}</s> ${f.toLocaleString()}`:f.toLocaleString()}
+const coachLine=()=>depFx('coach')?`<p class="hint coachln">Coaching Staff level ${depLv('coach')}: −${depFx('coach')}% on every coin cost here, already taken off the prices shown. Training Token costs don’t change.</p>`:'';
 const ctk=()=>{club.ctk=club.ctk||0;return club.ctk};
 // existing clubs get one token for every Club Legacy level they already had (counted once, never twice)
 function ctkSync(){const L=(club.leg||{}).lvl||0;club.ctkEarned=club.ctkEarned||0;if(L>club.ctkEarned){club.ctk=ctk()+(L-club.ctkEarned);club.ctkEarned=L}}
@@ -137,14 +141,14 @@ const OVRCAP={bronze:80,silver:86,gold:93,special:96,icon:99};
 const upOf=id=>(club.up||{})[id]||{};
 const upSpent=id=>Object.values(upOf(id)).reduce((a,b)=>a+b,0);
 const upRoom=p=>Math.min(UPCAP[tier(p)],2+2*lvlOf(p.id));// levelling up through XP unlocks more room
-const upCost=p=>coachCost(Math.round(UPBASE[tier(p)]*(1+.35*upSpent(p.id))/10)*10);
+const upCostBase=p=>Math.round(UPBASE[tier(p)]*(1+.35*upSpent(p.id))/10)*10,upCost=p=>coachCost(upCostBase(p));
 // Evolutions: multi-stage boosts for a favourite player, each stage needs an on-pitch objective plus coins and Training Tokens
 const EVO={bronze:{boost:[3,2,2],coins:[400,800,1500],tt:[2,3,4]},silver:{boost:[2,2,2],coins:[800,1600,3000],tt:[2,4,6]},
   gold:{boost:[2,2,1],coins:[2000,4000,8000],tt:[3,5,8]},special:{boost:[1,1],coins:[6000,12000],tt:[5,10]},icon:{boost:[1],coins:[25000],tt:[15]}};
 const EVOGOAL={ATT:{k:'g',n:[2,4,6],w:'goals'},MID:{k:'p',n:[12,25,40],w:'passes'},DEF:{k:'t',n:[5,10,16],w:'tackles won'}};
 const evoOf=id=>(club.evo||{})[id]||{st:0,m:0,g:0,p:0,t:0};
 function evoNeed(p){const e=evoOf(p.id),E=EVO[tier(p)];if(e.st>=E.boost.length)return null;const G=EVOGOAL[natPos(p)];
-  return{stage:e.st,boost:E.boost[e.st],coins:coachCost(E.coins[e.st]),tt:E.tt[e.st],m:3+e.st*2,k:G.k,n:G.n[Math.min(e.st,G.n.length-1)],w:G.w,have:{m:e.m,v:e[G.k]||0}}}
+  return{stage:e.st,boost:E.boost[e.st],coins:coachCost(E.coins[e.st]),coins0:E.coins[e.st],tt:E.tt[e.st],m:3+e.st*2,k:G.k,n:G.n[Math.min(e.st,G.n.length-1)],w:G.w,have:{m:e.m,v:e[G.k]||0}}}
 const evoBoostN=(p,st)=>{const E=EVO[tier(p)];let b=0;for(let i=0;i<Math.min(st,E.boost.length);i++)b+=E.boost[i];return b};
 const evoBoost=p=>evoBoostN(p,evoOf(p.id).st);
 // the stats a player takes onto the pitch for a given development state: level, upgrade points per stat, evolution stages
@@ -172,7 +176,7 @@ function upPreview(p,k){const u=upOf(p.id),lv=lvlOf(p.id),st=evoOf(p.id).st,a=pl
   return{s0:Math.round(a[k]*100),s1:Math.round(b[k]*100),o0:ovr(a),o1:ovr(b)}}
 const potOvr=p=>maxPlan(p).ovr;
 // the club keeper: one shared goalkeeper whose Goalkeeping you can train up
-const GKMAX=8,gkCost=lv=>coachCost(Math.round(600*Math.pow(1.6,lv)/50)*50);
+const GKMAX=8,gkBase=lv=>Math.round(600*Math.pow(1.6,lv)/50)*50,gkCost=lv=>coachCost(gkBase(lv));
 const keeperStats=team=>team===0?{gkv:.98+(club.gkLv||0)*.013}:{};
 // chemistry: in position, a settled line-up, and a balanced mix of roles. Up to +3 on every stat at 100.
 function chemOf(q=sq()){const c=chemParts(q);return c?c.total:0}
@@ -527,24 +531,24 @@ document.addEventListener('click',e=>{const c=e.target.closest('[data-cmp]');if(
 /* development: upgrades, training, evolutions, the club keeper */
 function devHTML(){const mine=ownedPlayers().filter(p=>!p.isCustom);if(!upId||!club.owned.includes(upId))upId=(mine[0]||{}).id;const p=byId(upId);
   const pickList=`<select id="dev-pick" aria-label="Player">${mine.map(x=>`<option value="${x.id}" ${x.id===upId?'selected':''}>${esc(x.name)} · ${effOvr(x)} ${TIERS[tier(x)].name}</option>`).join('')}</select>`;
-  const gk=`<div class="panel"><h4>Club goalkeeper · Goalkeeping ${gkRating()}</h4><p class="hint">Your keeper plays in every match in both modes. Training makes him react faster and reach further.</p>${(club.gkLv||0)>=GKMAX?'<p class="flash">Fully trained.</p>':`<button class="btn gold" data-gk="1" ${club.coins<gkCost(club.gkLv||0)?'disabled':''}>Train to ${gkRating()+3} · ${gkCost(club.gkLv||0).toLocaleString()} coins</button>`}</div>`;
+  const gk=`<div class="panel"><h4>Club goalkeeper · Goalkeeping ${gkRating()}</h4><p class="hint">Your keeper plays in every match in both modes. Training makes him react faster and reach further.</p>${(club.gkLv||0)>=GKMAX?'<p class="flash">Fully trained.</p>':`<button class="btn gold" data-gk="1" ${club.coins<gkCost(club.gkLv||0)?'disabled':''}>Train to ${gkRating()+3} · ${priceTag(gkBase(club.gkLv||0))} coins</button>`}</div>`;
   if(!p)return gk+'<p class="hint">Sign players from packs to develop them.</p>';
   const s=playStats(p),base=p,u=upOf(p.id),room=upRoom(p),spent=upSpent(p.id),cap=UPCAP[tier(p)],cost=upCost(p),L=lvlOf(p.id),N=evoNeed(p);
   const MP=maxPlan(p),now=effOvr(p),lvMax=XPL.length-1,lb=Math.min(3,Math.floor(L/2));
   const rows=STATK.map(([k,l])=>{const b=Math.round(base[k]*100),v=Math.round(s[k]*100),mx=statMax(p,k),fl=upFlash&&upFlash.id===p.id&&upFlash.k===k,pv=upPreview(p,k),
       lock=spent>=room||(u[k]||0)>=STATMAX||v>=99,why=v>=99?'stat at 99':(u[k]||0)>=STATMAX?`+${STATMAX} limit reached`:spent>=room?(room<cap?'level up to unlock':'no points left'):'';
     return `<div class="strow dv"><span>${l}</span><div class="bar"><i style="width:${b}%"></i><u style="left:${b}%;width:${Math.max(0,v-b)}%"></u><s style="left:${v}%;width:${Math.max(0,mx-v)}%"></s></div><b>${fl?`<span class="flash">${upFlash.from}→</span>`:''}${v}</b><em title="Most this stat can reach">max ${mx}</em>
-      <button data-up="${k}" ${lock||club.coins<cost?'disabled':''} title="${lock?why:`${l} ${pv.s0} → ${pv.s1}, overall ${pv.o0} → ${pv.o1}`}">${lock?why:`${l} ${pv.s0} → ${pv.s1} · OVR ${pv.o0}${pv.o1!==pv.o0?` → <b>${pv.o1}</b>`:' (no change)'} · ${cost.toLocaleString()}`}</button></div>`}).join('');
+      <button data-up="${k}" ${lock||club.coins<cost?'disabled':''} title="${lock?why:`${l} ${pv.s0} → ${pv.s1}, overall ${pv.o0} → ${pv.o1}`}">${lock?why:`${l} ${pv.s0} → ${pv.s1} · OVR ${pv.o0}${pv.o1!==pv.o0?` → <b>${pv.o1}</b>`:' (no change)'} · ${priceTag(upCostBase(p))}`}</button></div>`}).join('');
   const planTxt=Object.keys(MP.plan).length?Object.entries(MP.plan).map(([k,n])=>`${STATK.find(x=>x[0]===k)[1]} +${n}`).join(', '):'';
   const evo=N?`<div class="panel"><h4>Evolution · stage ${N.stage+1} of ${EVO[tier(p)].boost.length}</h4><p>+${N.boost} to every stat. Objective: play ${N.m} matches (${Math.min(N.have.m,N.m)}/${N.m}) and get ${N.n} ${N.w} (${Math.min(N.have.v,N.n)}/${N.n}) with him in your line-up.</p>
       <div class="prog"><i style="width:${Math.round(100*Math.min(1,(Math.min(1,N.have.m/N.m)+Math.min(1,N.have.v/N.n))/2))}%"></i></div>
-      <p>After this stage: OVR <b>${now} → ${ovr(playStatsX(p,L,u,N.stage+1))}</b></p><button class="btn gold" data-evo="1" ${N.have.m<N.m||N.have.v<N.n||club.coins<N.coins||club.tt<N.tt?'disabled':''}>Evolve · ${N.coins.toLocaleString()} coins + ${N.tt} Training Tokens</button><p class="hint">Evolutions stop at ${OVRCAP[tier(p)]} overall for ${TIERS[tier(p)].name} players.</p></div>`
+      <p>After this stage: OVR <b>${now} → ${ovr(playStatsX(p,L,u,N.stage+1))}</b></p><button class="btn gold" data-evo="1" ${N.have.m<N.m||N.have.v<N.n||club.coins<N.coins||club.tt<N.tt?'disabled':''}>Evolve · ${priceTag(N.coins0)} coins + ${N.tt} Training Tokens</button><p class="hint">Evolutions stop at ${OVRCAP[tier(p)]} overall for ${TIERS[tier(p)].name} players.</p></div>`
     :`<div class="panel"><h4>Evolution</h4><p class="flash">Fully evolved.</p></div>`;
   return `<div class="row" style="justify-content:center">${pickList}</div><div class="upg"><div>${cardHTML(p,{})}</div><div style="display:grid;gap:8px">
     <div class="panel t-${tier(p)}"><h4>Upgrades · ${spent}/${cap} points used</h4><div class="potrow"><div><span class="ovrbig">${now}</span><small>current OVR</small></div><div><span class="ovrbig pot">${MP.ovr}</span><small>max achievable</small></div><div><span class="ovrbig rem">+${MP.ovr-now}</span><small>remaining potential</small></div><div><span class="ovrbig">${ovr(p)}</span><small>base card</small></div></div>
     <p class="hint" style="margin:4px 0">Still to come: ${cap-spent} upgrade point${cap-spent===1?'':'s'}${room<cap?` (${Math.max(0,room-spent)} usable now, the rest unlock as he levels up)`:''} · ${EVO[tier(p)].boost.length-evoOf(p.id).st} evolution stage${EVO[tier(p)].boost.length-evoOf(p.id).st===1?'':'s'} · level bonus +${lb} now, +3 at level 6${planTxt?` · best use of the points left: ${planTxt}`:''}. Max achievable counts all of that; chemistry adds up to +3 more in matches. ${TIERS[tier(p)].name} evolutions stop at ${OVRCAP[tier(p)]}.</p>
     ${upFlash&&upFlash.id===p.id?`<p class="flash">Upgraded: ${upFlash.o0} → ${upFlash.o1} OVR</p>`:''}
-    <p class="hint">Level ${L} unlocks ${room} of ${cap} upgrade points${room<cap?' · play him or train him to level up for more':''}. Each stat can go up by ${STATMAX}. Each point costs a little more than the last.</p>${rows}</div>
+    ${coachLine()}<p class="hint">Level ${L} unlocks ${room} of ${cap} upgrade points${room<cap?' · play him or train him to level up for more':''}. Each stat can go up by ${STATMAX}. Each point costs a little more than the last.</p>${rows}</div>
     <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +${Math.round(100*(1+depFx('train')/100))} XP${depFx('train')?` (Training Facilities +${depFx('train')}%)`:''}. Every two levels adds +1 to his five best stats (up to +3).${L<lvMax?` Next level at ${XPL[L+1]} XP${L%2===1&&lb<3?`: five best stats +1, OVR ${now} → ${ovr(playStatsX(p,L+1,u,evoOf(p.id).st))}`:''}.`:' Top level reached.'}</p><button class="btn" data-train2="1" ${club.tt<2?'disabled':''}>Train · 2 Training Tokens</button></div>
     ${ablPanel(p)}${evo}${p.ab?`<div class="panel"><h4>Signature ability · ${ABIL[p.ab].name}</h4><p>${ABIL[p.ab].d}. Always on when he plays.</p></div>`:''}${gk}</div></div>`}
 $('club-body').addEventListener('change',e=>{if(e.target.id==='dev-pick'){upId=e.target.value;upFlash=null;renderMenu()}});
@@ -572,20 +576,20 @@ function exchHTML(){const tot=Object.values(club.dupes||{}).reduce((a,b)=>a+b,0)
     return `<div class="ach ${ok?'done':''}"><b>${x.n}</b><span>Hand in: ${Object.entries(x.need).map(([r,n])=>`${n} ${TIERS[r].name} duplicate${n>1?'s':''} (${dupCount(r)})`).join(' + ')}${x.coins?` + ${x.coins.toLocaleString()} coins`:''}</span><span style="color:var(--sun)">You get: ${grantPreview(x.out)}</span><button class="btn gold" data-exch="${x.id}" ${ok?'':'disabled'}>Exchange</button></div>`}).join('')}</div>`}
 // one row per footballer: his special, level, cooldown now and next, the price, and the button
 let ablAll=false,ablSort='lvl';
-function ablRow(p){const sp=p.sp,L=ablOf(p.id),max=L>=ABMAX,now=cdSecs(sp,L),nx=max?now:cdSecs(sp,L+1),c=max?0:ABCOST[L-1],can=!max&&club.coins>=c&&(club.tt||0)>=ABTT;
+function ablRow(p){const sp=p.sp,L=ablOf(p.id),max=L>=ABMAX,now=cdSecs(sp,L),nx=max?now:cdSecs(sp,L+1),c0=max?0:ABCOST[L-1],c=coachCost(c0),can=!max&&club.coins>=c&&(club.tt||0)>=ABTT;
   return `<tr><td>${esc(p.name)} <span class="hint" style="font-size:11px">${effOvr(p)}</span></td><td><b style="color:var(--sun)">${SPECIALS[sp].name}</b></td>
     <td><div class="ablv">${[...Array(ABMAX)].map((_,i)=>`<i class="${i<L?'on':''}"></i>`).join('')}</div><span class="hint" style="font-size:11px">Level ${L}</span></td>
     <td>${now.toFixed(1)}s</td><td>${max?'—':nx.toFixed(1)+'s'}</td><td>${max?'—':'<span class="flash">−'+(now-nx).toFixed(1)+'s</span>'}</td>
-    <td>${max?'<b class="maxl">MAX LEVEL</b>':`<button class="btn ${can?'gold':''}" data-abl="${p.id}" ${can?'':'disabled'}>${c.toLocaleString()} coins + ${ABTT} TT</button>`}</td></tr>`}
-function ablPanel(p){const L=ablOf(p.id),max=L>=ABMAX,sp=p.sp,now=cdSecs(sp,L),nx=max?now:cdSecs(sp,L+1),c=max?0:ABCOST[L-1];
+    <td>${max?'<b class="maxl">MAX LEVEL</b>':`<button class="btn ${can?'gold':''}" data-abl="${p.id}" ${can?'':'disabled'}>${priceTag(c0)} coins + ${ABTT} TT</button>`}</td></tr>`}
+function ablPanel(p){const L=ablOf(p.id),max=L>=ABMAX,sp=p.sp,now=cdSecs(sp,L),nx=max?now:cdSecs(sp,L+1),c0=max?0:ABCOST[L-1],c=coachCost(c0),tot=ABCOST.reduce((a,b)=>a+b,0),totD=ABCOST.reduce((a,b)=>a+coachCost(b),0);
   return `<div class="panel"><h4>Special ability · ${SPECIALS[sp].name} · Level ${L}/${ABMAX}</h4><div class="ablv">${[...Array(ABMAX)].map((_,i)=>`<i class="${i<L?'on':''}"></i>`).join('')}</div>
     <p>Cooldown ${now.toFixed(1)}s${max?' · <b class="maxl">MAX LEVEL</b>':` → ${nx.toFixed(1)}s at level ${L+1} (−${(now-nx).toFixed(1)}s)`}</p>
-    ${max?'':`<button class="btn gold" data-abl="${p.id}" ${club.coins>=c&&(club.tt||0)>=ABTT?'':'disabled'}>Upgrade · ${c.toLocaleString()} coins + ${ABTT} Training Tokens</button>`}
-    <p class="hint">Only this footballer’s ${SPECIALS[sp].name} gets faster. Level 1 → 10 costs 43,500 coins and 18 Training Tokens in total.</p></div>`}
+    ${max?'':`<button class="btn gold" data-abl="${p.id}" ${club.coins>=c&&(club.tt||0)>=ABTT?'':'disabled'}>Upgrade · ${priceTag(c0)} coins + ${ABTT} Training Tokens</button>`}${max?'':coachLine()}
+    <p class="hint">Only this footballer’s ${SPECIALS[sp].name} gets faster. Level 1 → 10 costs ${tot.toLocaleString()} coins${totD<tot?` (${totD.toLocaleString()} with your Coaching Staff discount)`:''} and 18 Training Tokens in total.</p></div>`}
 function ablHTML(){const own=ownedPlayers().filter(p=>SPECIALS[p.sp]),sorts={lvl:(a,b)=>ablOf(b.id)-ablOf(a.id)||effOvr(b)-effOvr(a),ovr:(a,b)=>effOvr(b)-effOvr(a),name:(a,b)=>a.name.localeCompare(b.name),ab:(a,b)=>SPECIALS[a.sp].name.localeCompare(SPECIALS[b.sp].name)||effOvr(b)-effOvr(a)};
   const list=own.sort(sorts[ablSort]||sorts.lvl),shown=ablAll?list:list.slice(0,25);
   const tiers=[['Through Ball',ABTIER.through],['Curler, Knuckleball, Rocket, Bicycle Kick, Interceptor',ABTIER.curler],['Turbo, Chip Pass, Chip',ABTIER.turbo]];
-  return `<div class="panel"><h4>Special Ability Development</h4><p>You have <b>${club.coins.toLocaleString()}</b> coins and <b>${club.tt||0}</b> Training Tokens. Every level costs 2 Training Tokens; coins rise from 500 to 13,000.</p>
+  return `<div class="panel"><h4>Special Ability Development</h4><p>You have <b>${club.coins.toLocaleString()}</b> coins and <b>${club.tt||0}</b> Training Tokens. Every level costs 2 Training Tokens; coins rise from ${priceTag(500)} to ${priceTag(13000)}.</p>${coachLine()}
     <p class="hint">${tiers.map(([n,T])=>`${n}: ${T[0]}s at level 1 → ${T[1]}s at level 10`).join(' · ')}</p>
     <div class="subtabs" style="justify-content:flex-start;margin:6px 0">${[['lvl','Level'],['ovr','Rating'],['ab','Ability'],['name','Name']].map(([k,n])=>`<button data-ablsort="${k}" aria-pressed="${ablSort===k}">Sort: ${n}</button>`).join('')}</div>
     <div class="ltwrap"><table class="lt abt"><tr><th>Footballer</th><th>Ability</th><th>Level</th><th>Cooldown</th><th>Next</th><th>Saves</th><th></th></tr>${shown.map(ablRow).join('')}</table></div>

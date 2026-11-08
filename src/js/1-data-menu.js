@@ -418,7 +418,7 @@ function renderMenu(){
   $('benchctl').innerHTML=`<span class="hint" style="margin:0">${benchList.length} players · best for the selected ${slots[selSlot]?slots[selSlot].r:''} spot first</span>`+(benchList.length>36?`<button class="ghost" data-benchall="1">${benchAll?'Show fewer':'Show all '+benchList.length}</button>`:'');
   $('bench').innerHTML=(benchAll?benchList:benchList.slice(0,36)).map(p=>{const at=q.s.indexOf(p.id);return cardHTML(p,{pickable:true,inteam:at>=0,badge:at>=0?slots[at].r[0]:'',
     extra:!p.isCustom?renameUI(p,'bench'):
-      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<coachCost(400)||(custom.budget||BUDGET)>=650?'disabled':''}>Train +8 pts · ${coachCost(400)}</button>`:''})}).join('');
+      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<coachCost(400)||(custom.budget||BUDGET)>=650?'disabled':''}>Train +8 pts · ${priceTag(400)}</button>`:''})}).join('');
   renderSquadExtras();
   // packs
   $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const so=scoutOdds(k.odds),sc=depFx('scout')&&so!==k.odds,od=Object.entries(so).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ')+(sc?` (scouting +${depFx('scout')}%)`:'');
