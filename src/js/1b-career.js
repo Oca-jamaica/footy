@@ -57,7 +57,7 @@ function genPlayers(){
   const LK={},HC={k:0,d:1,b:2,r:3,g:4};for(const l of realLooks().split('\n')){const [n,sk,h,st,bd,ht]=l.split('|');LK[n]={skin:SKINS[+sk]||SKINS[1],hair:HAIRS[HC[h]??0],look:[st,0,+bd?1:0,+ht||1]}}
   const BASE={bronze:[0,340],silver:[340,240],gold:[580,230],special:[810,100],icon:[910,45]},D=realPlayers();
   for(const rar of ['bronze','silver','gold','special','icon']){let k=0;
-    for(const line of D[rar].split('\n')){const [real,cc,sc,rt]=line.split('|');if(!real||seen.has(real))continue;seen.add(real);
+    for(const line of D[rar].split('\n')){if(line[0]==='~'){k+=+line.slice(1);continue}const [real,cc,sc,rt]=line.split('|');if(!real||seen.has(real))continue;seen.add(real);
       const shape=SH[sc]||'b2b',pos=POS[shape],rating=clamp((+rt||60)-BASE_DROP-legDrop(+rt,rar==='icon'),43,98),v=statsFor(rating,shape),reg=P(REG);
       let name,g=0;do{name=P(reg[0])+' '+P(reg[1]);g++}while(used.has(name)&&g<40);if(used.has(name))name+=' Jr';used.add(name);
       const last=name.split(' ').slice(1).join(' '),id=k<BASE[rar][1]?'g'+(BASE[rar][0]+k):'gx'+rar[0]+k;k++;
@@ -111,11 +111,12 @@ function potOvr(p){const b={...p},room=UPCAP[tier(p)];const ks=STATK.map(k=>k[0]
 const GKMAX=8,gkCost=lv=>Math.round(600*Math.pow(1.6,lv)/50)*50;
 const keeperStats=team=>team===0?{gkv:.98+(club.gkLv||0)*.013}:{};
 // chemistry: in position, a settled line-up, and a balanced mix of roles. Up to +3 on every stat at 100.
-function chemOf(q=sq()){const slots=FORMS[q.f],ids=q.s;if(!ids.some(Boolean))return 0;
+function chemOf(q=sq()){const c=chemParts(q);return c?c.total:0}
+function chemParts(q=sq()){const slots=FORMS[q.f],ids=q.s;if(!ids.some(Boolean))return null;
   const inPos=ids.filter((id,i)=>id&&byId(id)&&natPos(byId(id))===slots[i].r).length/slots.length;
   const fam=(club.fam||{})[GM]||{},settled=ids.reduce((a,id)=>a+Math.min(8,id?fam[id]||0:0),0)/(8*slots.length);
   const shapes=new Set(ids.map(id=>id&&byId(id)).filter(Boolean).map(p=>p.pos||natPos(p))),mix=shapes.size>=3?1:shapes.size/3;
-  return Math.round(100*(inPos*.6+settled*.25+mix*.15))}
+  return{inPos,settled,mix,n:slots.length,shapes:[...shapes],total:Math.round(100*(inPos*.6+settled*.25+mix*.15))}}
 // tactics, per game mode: mentality, passing and pressing. 0 = low, 1 = balanced, 2 = high
 const TAC=[{k:'ment',l:'Mentality',o:['Defensive','Balanced','Attacking']},{k:'pass',l:'Passing',o:['Patient','Mixed','Direct']},{k:'press',l:'Pressing',o:['Sit back','Normal','High press']}];
 const tacSet=()=>{club.tac=club.tac||{};return club.tac[GM]=club.tac[GM]||{ment:1,pass:1,press:1}};
@@ -149,10 +150,11 @@ function mkTeams(div,n,taken){const D=DIVS[div],out=[];const names=new Set(taken
   const towns=new Set();while(out.length<n){const town=pick(TOWNS),name=town+' '+pick(SUFF);if(names.has(name)||towns.has(town))continue;names.add(name);towns.add(town);
     out.push({id:'t'+Math.random().toString(36).slice(2,8),name,kit:pick(KITPOOL.filter(k=>!kitClash(k,club.kit)))||'#8e8ff0',str:Math.round(rnd(D.s[0],D.s[1])*100)/100,form:pick(FORM_KEYS[GM]),
       tac:{push:pick([.85,1,1.15]),pass:pick([.8,1,1.25]),press:pick([.85,1,1.15])}})}return out}
-// round robin by the circle method, then the same again with home and away swapped: 18 rounds of 5 matches
+// round robin by the circle method: every club plays every other club once, 9 rounds of 5 matches (home and away alternate)
 function mkFixtures(ids){const n=ids.length,a=ids.slice(),rounds=[];
   for(let r=0;r<n-1;r++){const m=[];for(let i=0;i<n/2;i++){const h=a[i],w=a[n-1-i];m.push(r%2&&i===0?{h:w,a:h}:{h,a:w})}rounds.push(m);a.splice(1,0,a.pop())}
-  return[...rounds,...rounds.map(r=>r.map(f=>({h:f.a,a:f.h})))]}
+  return rounds}
+const cupSwap=(from,to)=>{club.cupBy=club.cupBy||{};club.cupBy[from]=club.cup;club.cup=club.cupBy[to]||null};
 const lgOf=(m=GM)=>{club.lg=club.lg||{};return club.lg[m]};
 function newSeason(m=GM,div=0,seasonNo=1){const g0=GM;GM=m;const teams=mkTeams(div,9);GM=g0;
   const ids=['me',...teams.map(t=>t.id)].sort(()=>Math.random()-.5);
@@ -246,7 +248,7 @@ function chClaim(which,id){const c=chState(),list=which==='d'?c.d:c.w,pool=which
   if(!x||!d||x.claimed||x.v<d.v)return;x.claimed=true;toast(`${d.n}: `+grant(d.r));S.goal();saveClub();renderMenu()}
 
 /* ===== Club Legacy: a level for your whole club, every match counts, even the losses ===== */
-const legNeed=l=>800+l*200;
+const legNeed=l=>450+l*110;
 function legReward(l){const r={coins:300+l*40};if(l%3===0)r.tt=2;if(l%5===0)r.pack='gold';if(l%10===0){r.pack='premium';r.cp=100}if(l===15||l===35)r.pack='elite';if(l===25||l===50)r.pack='icon';if(l===20)r.cos='theme_dusk';return r}
 function legacyXP(x){const L=club.leg=club.leg||{xp:0,lvl:0};L.xp+=Math.round(x);
   while(L.xp>=legNeed(L.lvl)){L.xp-=legNeed(L.lvl);L.lvl++;const got=grant(legReward(L.lvl));club.legLog=[`Club Legacy level ${L.lvl}: ${got}`,...(club.legLog||[])].slice(0,12);legacyUps.push(L.lvl)}}
@@ -308,7 +310,7 @@ function careerAfterMatch(){if(NET.on||SG)return;const gf=score[0],ga=score[1],p
   stat('matches');if(won){stat('wins');stat(GM==='classical'?'cwins':'vwins')}stat('goals',gf);if(ga===0)stat('cleans');
   chProg('wins',won?1:0);chProg('goals',gf);chProg('passes',stats.passes||0);chProg('clean',ga===0?1:0);chProg('skills',stats.skills||0);chProg('tackles',stats.tackles||0);
   if(GM==='classical'&&won)chProg('cwins',1);if(comp==='league'){chProg('lgplay',1);if(won)chProg('lgwins',1)}
-  legacyXP(40+(won?60:draw?20:0)+gf*10);
+  legacyXP(60+(won?80:draw?30:0)+gf*12);
   // the line-up that played gets more familiar with each other; players left out drift a little
   const q=sq(),fam=(club.fam=club.fam||{})[GM]=(club.fam||{})[GM]||{};for(const id in fam)if(!q.s.includes(id))fam[id]=Math.max(0,fam[id]-1);for(const id of q.s)if(id)fam[id]=(fam[id]||0)+1;
   // evolution objectives count what each player did on the pitch
@@ -335,7 +337,8 @@ function gkTrain(){const lv=club.gkLv||0;if(lv>=GKMAX)return;const c=gkCost(lv);
 const gkRating=()=>70+(club.gkLv||0)*3;
 
 /* ===== first run of the career: everyone gets a few more bodies so a 9-a-side line-up is possible ===== */
-function careerInit(){if(club.v2)return;club.v2=1;const b=PLAYERS.filter(p=>p.rar==='bronze'&&!club.owned.includes(p.id)).sort(()=>Math.random()-.5);
+function careerInit(){for(const m of ['volta','classical']){const L=(club.lg||{})[m];if(L&&!L.done&&L.fx.length===18&&L.round<9)L.fx=L.fx.slice(0,9)}
+  if(club.v2)return;club.v2=1;const b=PLAYERS.filter(p=>p.rar==='bronze'&&!club.owned.includes(p.id)).sort(()=>Math.random()-.5);
   const pos={DEF:2,MID:3,ATT:2},add=[];for(const P0 of ['DEF','MID','ATT'])add.push(...b.filter(p=>p.pos===P0).slice(0,pos[P0]));
   const s=PLAYERS.filter(p=>p.rar==='silver'&&!club.owned.includes(p.id)).sort(()=>Math.random()-.5).slice(0,1);
   for(const p of [...add,...s])club.owned.push(p.id);res();club.tt+=3;club.coins+=1000;
@@ -365,14 +368,14 @@ function renderLeague(){let L=lgOf();if(!L)L=newSeason(GM,0,1);const D=DIVS[L.di
     const show=L.fx.map((r,i)=>({r,i})).filter(({i})=>i>=L.round-3&&i<=L.round+3);
     body+=show.map(({r,i})=>`<div class="panel"><h4>Round ${i+1}${i===L.round&&!L.done?' · next':''}</h4><div class="fxl">`+r.map(f=>{const me=f.h==='me'||f.a==='me';
       return `<div class="fxr ${me?'me':''}"><i>${f.r?'FT':i===L.round?'NEXT':'—'}</i><span>${nm(f.h)}</span><span class="sc">${f.r?f.r.join('–'):'v'}</span><span class="a">${nm(f.a)}</span></div>`}).join('')+`</div></div>`).join('');
-    body+=`<p class="hint">Showing three rounds either side of now. All 18 rounds: every club plays every other club home and away.</p>`}
+    body+=`<p class="hint">Showing three rounds either side of now. All ${L.fx.length} rounds: every club plays every other club once.</p>`}
   else{const m=MM();body+=`<div class="panel"><h4>What this season pays (${GM==='classical'?'Classical, 1.5×':'Volta'})</h4>
     <p>Each match: win ${100*m} · draw ${40*m} · loss ${20*m} coins, plus ${10*m} per goal. Man of the match: +${Math.round(25*m)} coins (and sometimes a Training Token).</p>
     <p>League title bonus: ${(2000*m).toLocaleString()} coins. Promotion bonus: ${(750*m).toLocaleString()} coins.</p>
     <p>Finishing position in the ${D.n} (×${D.mul}): `+FINISH.map((c,i)=>`${ordinal(i+1)} ${Math.round(c*D.mul*m/10)*10}`).join(' · ')+`</p>
     <p>Club Points and Training Tokens for every finish, more near the top. A top-3 finish qualifies you for next season’s World Club Championship.</p></div>`+
     `<div class="panel"><h4>Club history</h4>${(club.hist||[]).filter(h=>h.m===GM).slice(0,8).map(h=>`<p>Season ${h.season} · ${DIVS[h.div].n}: ${ordinal(h.pos)}, ${h.pts} pts (${h.w}W ${h.d}D ${h.l}L) ${h.note?'· '+esc(h.note):''}</p>`).join('')||'<p class="hint">Your finished seasons will show here.</p>'}</div>`}
-  $('cup').innerHTML=`<div class="cup-head"><b>${D.n}</b><span>${GM==='classical'?'CLASSICAL':'VOLTA'} · Season ${L.season} · Round ${Math.min(18,L.round+1)} of 18</span></div>`+tabs+body}
+  $('cup').innerHTML=`<div class="cup-head"><b>${D.n}</b><span>${GM==='classical'?'CLASSICAL':'VOLTA'} · Season ${L.season} · Round ${Math.min(L.fx.length,L.round+1)} of ${L.fx.length}</span></div>`+tabs+body}
 function renderWcc(){const W=wccOf();
   if(!W){$('diff-note').textContent='Finish in the top three of your league to qualify. The championship is played during the following season.';
     $('cup').innerHTML=`<div class="cup-head"><b>World Club Championship</b><span>Not qualified yet</span></div><div class="panel"><p>64 of the world’s best clubs, straight knockout, played during the season after you qualify. Opponents are much stronger than league sides, and the final is against one of the top seeds.</p>
@@ -391,7 +394,20 @@ function renderSquadExtras(){
   $('sqhead').innerHTML=`<span class="hint" style="margin:0">Editing your</span>`+['volta','classical'].map(m=>`<button class="ghost" data-sqgm="${m}" aria-pressed="${GM===m}" style="${GM===m?'color:var(--sun);border-color:var(--sun)':''}">${m==='volta'?'Volta 5v5':'Classical 9v9'} line-up</button>`).join('');
   $('team-chemistry').textContent=chemOf();
   const T=tacSet();$('tactics').innerHTML=TAC.map(x=>`<div class="panel"><div class="lab">${x.l.toUpperCase()}</div><div class="forms">${x.o.map((o,i)=>`<button data-tac="${x.k}" data-v="${i}" aria-pressed="${T[x.k]===i}">${o}</button>`).join('')}</div></div>`).join('')+
-    `<div class="panel"><div class="lab">CHEMISTRY ${chemOf()}/100</div><p class="hint" style="margin:0">Players in their own position, a settled line-up that keeps playing together, and a mix of defenders, creators and finishers. At 100 every player gets +2 on every stat.</p></div>`}
+    chemHTML()}
+function chemHTML(){const c=chemParts()||{inPos:0,settled:0,mix:0,n:FORMS[sq().f].length,shapes:[],total:0},pct=v=>Math.round(v*100),bar=v=>`<div class="prog"><i style="width:${pct(v)}%"></i></div>`;
+  const boost=(c.total*.02).toFixed(1);
+  return `<div class="panel" style="grid-column:1/-1"><div class="lab">CHEMISTRY ${c.total}/100 · right now every player gets +${boost} on every stat</div>
+   <div class="twocol" style="gap:8px;margin-top:4px">
+    <div><b>In position · ${Math.round(c.inPos*c.n)}/${c.n}</b> <span class="hint" style="margin:0">(60% of chemistry)</span>${bar(c.inPos)}</div>
+    <div><b>Settled line-up · ${pct(c.settled)}%</b> <span class="hint" style="margin:0">(25%)</span>${bar(c.settled)}</div>
+    <div><b>Role mix · ${c.shapes.length}/3</b> <span class="hint" style="margin:0">(15%)</span>${bar(c.mix)}</div></div>
+   <details class="guide" style="margin-top:6px"><summary>How chemistry works and how to raise it</summary>
+    <p><b>What it does:</b> chemistry adds up to +2 to every stat of every outfield player (all seven: pace, shooting, finishing, dribbling, passing, defending and physical) for the whole match. At 50 chemistry it’s +1. It counts in league, cup, Championship and friendly matches, not online.</p>
+    <p><b>1. Play people in their own position (60%).</b> A defender in a DEF slot, a midfielder in MID, an attacker in ATT. Out-of-position players also lose up to 14% of their stats, so this matters twice. The pitch shows a red label on anyone out of position. <i>Auto-pick best</i> fills every slot with a natural fit.</p>
+    <p><b>2. Keep the same line-up (25%).</b> Each match a player starts adds one to his familiarity, up to 8 matches. Players you drop lose one per match. Rotating every game keeps this near zero; sticking with a settled side fills it in about eight matches. Volta and Classical each keep their own.</p>
+    <p><b>3. Mix the roles (15%).</b> Have at least one defender, one midfielder and one attacker on the pitch. A line-up with no midfielder loses this part.</p>
+    <p><b>Quick wins:</b> press Auto-pick best, then play the same team for a few matches in a row.</p></details></div>`}
 $('sqhead').addEventListener('click',e=>{const b=e.target.closest('[data-sqgm]');if(b)setGM(b.dataset.sqgm)});
 $('tactics').addEventListener('click',e=>{const b=e.target.closest('[data-tac]');if(!b)return;tacSet()[b.dataset.tac]=+b.dataset.v;saveClub();renderMenu()});
 $('legpill').onclick=()=>{tab='club';ctab='legacy';renderMenu()};

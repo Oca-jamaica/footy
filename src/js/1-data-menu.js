@@ -370,11 +370,11 @@ function renderTour(){
 
 const renameUI=(p,where)=>renaming===p.id&&renameIn===where?`<div class="rn"><input type="text" id="rn-input" maxlength="16" value="${esc(NAMES[p.id]||p.name)}" aria-label="Player name"><button class="buy" data-rn-save="${p.id}">Save</button>${NAMES[p.id]?`<button class="edit" data-rn-reset="${p.id}">Reset</button>`:''}</div>`:`<button class="edit" data-rename="${p.id}">Rename</button>`;
 let ctab='coll',lgView='table',benchAll=false,cmpIds=[],upId=null;const collF={q:'',r:'all',pos:'all',own:'owned',sort:'ovr',page:0};
-const COMPS={volta:['league','wcc','easy','tour','friendly','chal','skill'],classical:['league','wcc','friendly']};
+const COMPS={volta:['league','wcc','easy','tour','friendly','chal','skill'],classical:['league','wcc','easy','friendly']};
 const COMPN={league:'League',wcc:'World Club Championship',easy:'Sunday Cup',tour:'Grand Tournament',friendly:'Friendly',chal:'Challenges',skill:'Skill games'};
 const compKey=()=>comp==='cup'?'easy':comp;
 // switching game mode swaps the line-up, the league season and the competition you were looking at
-function setGM(g){if(g===GM)return;club.compBy=club.compBy||{};club.compBy[GM]=club.comp;GM=g;club.gm=g;club.comp=club.compBy[g]||'league';
+function setGM(g){if(g===GM)return;club.compBy=club.compBy||{};club.compBy[GM]=club.comp;cupSwap(GM,g);GM=g;club.gm=g;club.comp=club.compBy[g]||'league';
   if(!COMPS[g].includes(club.comp==='cup'?'easy':club.comp))club.comp='league';selSlot=0;saveClub();renderMenu()}
 function renderMenu(){
   careerInit();applyNames();

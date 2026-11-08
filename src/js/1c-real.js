@@ -2,7 +2,8 @@
 // Every generated card is inspired by a real player: name | country code | style | game rating.
 // Styles: f finisher, s speed, d dribbler, p power, m playmaker, b box-to-box, x ball-winner, c centre-back,
 // l full-back, a ball-playing centre-back, w wing-back. Ratings are this game's own scale, not anybody else's.
-// Keepers aren't here: every club plays its own goalkeeper.
+// Keepers aren't here: every club plays its own goalkeeper. A line "~n" marks n players cut from the game, so the
+// cards after it keep their ids (and nobody's saved club gets shuffled).
 function realPlayers(){return{
 icon:`Pelé|BRA|f|97
 Diego Maradona|ARG|d|97
@@ -205,7 +206,7 @@ Jack Grealish|ENG|d|82
 Raheem Sterling|ENG|s|80
 Dominic Solanke|ENG|f|81
 Ivan Toney|ENG|p|82
-Dominic Calvert-Lewin|ENG|p|78
+~1
 Jordan Henderson|ENG|b|79
 Kieran Trippier|ENG|l|80
 Luke Shaw|ENG|l|79
@@ -218,25 +219,22 @@ Trevoh Chalobah|ENG|c|80
 Mason Mount|ENG|m|80
 Callum Hudson-Odoi|ENG|s|79
 Jadon Sancho|ENG|d|79
-Joe Gomez|ENG|c|78
+~1
 Lewis Dunk|ENG|a|79
-Dan Burn|ENG|c|77
-Danny Welbeck|ENG|f|78
+~2
 Jacob Murphy|ENG|s|79
 Emile Smith Rowe|ENG|d|79
 Lewis Hall|ENG|w|80
 James Ward-Prowse|ENG|m|79
-Tyrick Mitchell|ENG|l|77
+~1
 Kyle Walker|ENG|l|82
 Chris Wood|NZL|p|80
 John McGinn|SCO|b|81
 Billy Gilmour|SCO|m|79
-Lewis Ferguson|SCO|b|78
+~1
 Brennan Johnson|WAL|s|80
 Harry Wilson|WAL|d|79
-Ethan Ampadu|WAL|x|76
-Nathan Collins|IRL|c|78
-Evan Ferguson|IRL|p|76
+~3
 Álvaro Morata|ESP|f|80
 Marc Cucurella|ESP|l|83
 Dean Huijsen|ESP|a|84
@@ -256,7 +254,7 @@ Samu Omorodion|ESP|p|79
 Iago Aspas|ESP|f|80
 Dani Ceballos|ESP|m|79
 Gavi|ESP|b|84
-Marc Casadó|ESP|x|78
+~1
 Alejandro Balde|ESP|w|82
 Eric García|ESP|a|80
 Ferran Torres|ESP|f|82
@@ -277,7 +275,7 @@ Francisco Trincão|POR|d|80
 Rafa Silva|POR|s|79
 Matheus Nunes|POR|b|80
 Nélson Semedo|POR|l|79
-Geovany Quenda|POR|s|76
+~1
 Christopher Nkunku|FRA|f|84
 Randal Kolo Muani|FRA|p|81
 Adrien Rabiot|FRA|b|83
@@ -295,8 +293,7 @@ Jean-Philippe Mateta|FRA|p|81
 Wesley Fofana|FRA|c|80
 Castello Lukeba|FRA|a|81
 Leny Yoro|FRA|c|79
-Alexandre Lacazette|FRA|f|78
-Jonathan Clauss|FRA|w|77
+~2
 Leon Goretzka|GER|b|82
 İlkay Gündoğan|GER|m|82
 Serge Gnabry|GER|s|82
@@ -313,7 +310,7 @@ Nick Woltemade|GER|p|81
 Felix Nmecha|GER|b|79
 Pascal Groß|GER|m|80
 Julian Brandt|GER|m|82
-Emre Can|GER|x|78
+~1
 Waldemar Anton|GER|c|79
 Thomas Müller|GER|f|83
 Federico Chiesa|ITA|s|79
@@ -329,10 +326,9 @@ Destiny Udogie|ITA|w|80
 Federico Gatti|ITA|c|79
 Alessandro Buongiorno|ITA|c|81
 Manuel Locatelli|ITA|m|81
-Bryan Cristante|ITA|b|78
-Ciro Immobile|ITA|f|77
+~2
 Samuele Ricci|ITA|m|79
-Francesco Acerbi|ITA|c|78
+~1
 Memphis Depay|NED|f|80
 Donyell Malen|NED|s|80
 Teun Koopmeiners|NED|b|82
@@ -343,9 +339,7 @@ Denzel Dumfries|NED|w|83
 Jurriën Timber|NED|l|82
 Joey Veerman|NED|m|79
 Jerdy Schouten|NED|x|79
-Marten de Roon|NED|x|78
-Lutsharel Geertruida|NED|l|78
-Quinten Timber|NED|b|78
+~3
 Cody Gakpo|NED|s|84
 Jeremie Frimpong|NED|w|84
 Romelu Lukaku|BEL|p|82
@@ -354,18 +348,16 @@ Amadou Onana|BEL|x|81
 Leandro Trossard|BEL|d|83
 Charles De Ketelaere|BEL|m|81
 Loïs Openda|BEL|s|81
-Arthur Theate|BEL|c|78
+~1
 Dodi Lukébakio|BEL|s|79
-Yannick Carrasco|BEL|d|77
+~1
 Mateo Kovačić|CRO|m|83
 Marcelo Brozović|CRO|m|80
 Ivan Perišić|CRO|w|79
 Andrej Kramarić|CRO|f|80
-Josip Šutalo|CRO|c|78
-Josip Stanišić|CRO|l|78
+~2
 Martin Baturina|CRO|m|79
-Nikola Vlašić|CRO|m|78
-Luka Sučić|CRO|m|77
+~2
 Lucas Paquetá|BRA|m|82
 Richarlison|BRA|p|79
 Gabriel Jesus|BRA|f|80
@@ -374,8 +366,7 @@ Estêvão|BRA|d|81
 João Pedro|BRA|f|83
 Matheus Cunha|BRA|f|84
 Bremer|BRA|c|83
-Philippe Coutinho|BRA|m|77
-Roberto Firmino|BRA|f|78
+~2
 André|BRA|x|80
 Joelinton|BRA|b|80
 Douglas Luiz|BRA|b|79
@@ -388,7 +379,7 @@ Giovani Lo Celso|ARG|m|79
 Nicolás González|ARG|s|79
 Ángel Di María|ARG|d|80
 Lisandro Martínez|ARG|a|82
-Nicolás Otamendi|ARG|c|78
+~1
 Nahuel Molina|ARG|l|79
 Alejandro Garnacho|ARG|s|81
 Thiago Almada|ARG|d|80
@@ -402,25 +393,24 @@ James Rodríguez|COL|m|79
 Jhon Durán|COL|p|79
 Daniel Muñoz|COL|l|80
 Davinson Sánchez|COL|c|79
-Jefferson Lerma|COL|x|78
+~1
 Richard Ríos|COL|b|79
 Jhon Lucumí|COL|c|80
 Piero Hincapié|ECU|a|82
 Willian Pacho|ECU|c|83
 Pervis Estupiñán|ECU|w|80
 Edson Álvarez|MEX|x|79
-Raúl Jiménez|MEX|p|78
+~1
 Santiago Giménez|MEX|f|80
-Hirving Lozano|MEX|s|77
+~1
 Weston McKennie|USA|b|79
-Tyler Adams|USA|x|78
+~1
 Antonee Robinson|USA|w|81
-Folarin Balogun|USA|f|78
-Hakim Ziyech|MAR|d|78
+~2
 Youssef En-Nesyri|MAR|p|80
 Brahim Díaz|MAR|d|81
 Noussair Mazraoui|MAR|l|80
-Sofyan Amrabat|MAR|x|78
+~1
 Nayef Aguerd|MAR|c|79
 Ismaël Bennacer|ALG|m|79
 Rayan Aït-Nouri|ALG|w|82
@@ -428,80 +418,59 @@ Amine Gouiri|ALG|f|79
 Yves Bissouma|MLI|x|79
 Franck Kessié|CIV|b|80
 Evan Ndicka|CIV|c|79
-Odilon Kossounou|CIV|c|78
+~1
 Amad Diallo|CIV|d|82
 Nicolas Jackson|SEN|f|80
 Ismaïla Sarr|SEN|s|80
 Iliman Ndiaye|SEN|d|81
 Pape Matar Sarr|SEN|b|80
 Kalidou Koulibaly|SEN|c|79
-Alex Iwobi|NGA|m|78
-Wilfred Ndidi|NGA|x|78
-Ola Aina|NGA|l|79
+~3
 Victor Boniface|NGA|p|80
-Calvin Bassey|NGA|c|77
+~1
 Thomas Partey|GHA|x|80
 André-Frank Zambo Anguissa|CMR|b|81
 Carlos Baleba|CMR|x|80
-Edmond Tapsoba|BFA|c|79
+~1
 Yoane Wissa|COD|f|81
-Pierre-Emerick Aubameyang|GAB|f|79
-Denis Bouanga|GAB|s|79
-Ellyes Skhiri|TUN|x|77
+~3
 Takefusa Kubo|JPN|d|83
 Kaoru Mitoma|JPN|d|83
-Wataru Endō|JPN|x|79
+~1
 Ritsu Dōan|JPN|s|80
-Daichi Kamada|JPN|m|79
-Takehiro Tomiyasu|JPN|c|76
+~2
 Lee Kang-in|KOR|m|81
-Hwang Hee-chan|KOR|s|77
-Mehdi Taremi|IRN|f|78
+~2
 Alexander Sørloth|NOR|p|82
-Jørgen Strand Larsen|NOR|p|79
+~1
 Dejan Kulusevski|SWE|d|82
 Anthony Elanga|SWE|s|80
-Hugo Larsson|SWE|b|78
-Christian Eriksen|DEN|m|78
+~2
 Rasmus Højlund|DEN|f|80
 Pierre-Emile Højbjerg|DEN|x|80
 Morten Hjulmand|DEN|x|80
-Joachim Andersen|DEN|c|79
-Patrick Dorgu|DEN|w|78
+~2
 Piotr Zieliński|POL|m|81
 Dan Ndoye|SUI|s|80
-Denis Zakaria|SUI|b|78
-David Alaba|AUT|a|79
+~1
 Marcel Sabitzer|AUT|b|80
 Konrad Laimer|AUT|b|81
-Christoph Baumgartner|AUT|m|79
-Kevin Danso|AUT|c|78
+~2
 Aleksandar Mitrović|SRB|p|80
 Sergej Milinković-Savić|SRB|b|80
 Nikola Milenković|SRB|c|80
 Ferdi Kadıoğlu|TUR|w|81
 Orkun Kökçü|TUR|m|81
-Kerem Aktürkoğlu|TUR|s|79
-Georges Mikautadze|GEO|f|79
+~2
 Artem Dovbyk|UKR|p|80
 Ilya Zabarnyi|UKR|c|80
-Oleksandr Zinchenko|UKR|w|77
-Georgiy Sudakov|UKR|m|78
+~2
 Milos Kerkez|HUN|w|81
 Stanislav Lobotka|SVK|m|81
 Dávid Hancko|SVK|a|80
-Milan Škriniar|SVK|c|79
+~1
 Patrik Schick|CZE|f|81
-Vangelis Pavlidis|GRE|f|80
-Amir Rrahmani|KOS|c|79
-Edon Zhegrova|KOS|d|79
-Vedat Muriqi|KOS|p|77
-Kristjan Asllani|ALB|m|77
-Leon Bailey|JAM|s|78
-Edin Džeko|BIH|p|77
-Radu Drăgușin|ROU|c|77
-Albert Guðmundsson|ISL|m|77
-Abdukodir Khusanov|UZB|c|77`,
+Vangelis Pavlidis|GRE|f|80`,
 silver:`Jack Harrison|ENG|s|74
 Dwight McNeil|ENG|d|74
 Callum Wilson|ENG|f|73
@@ -509,74 +478,66 @@ James Tarkowski|ENG|c|74
 Ben Chilwell|ENG|w|72
 Ruben Loftus-Cheek|ENG|b|74
 Ross Barkley|ENG|m|72
-Kalvin Phillips|ENG|x|71
-Tom Cairney|SCO|m|70
+~2
 Jarell Quansah|ENG|c|74
 Ben Davies|WAL|c|72
-Danny Ings|ENG|f|70
+~1
 Michael Keane|ENG|c|72
 Tyrone Mings|ENG|c|73
 Lewis Cook|ENG|m|73
 Jack Clarke|ENG|s|74
 Kiernan Dewsbury-Hall|ENG|b|74
-Harry Winks|ENG|m|70
+~1
 Jamie Gittens|ENG|s|74
 Rico Lewis|ENG|l|74
 Archie Gray|ENG|b|72
 Ethan Nwaneri|ENG|d|74
-Carney Chukwuemeka|ENG|b|69
+~1
 Liam Delap|ENG|p|74
 Jonathan Rowe|ENG|s|72
-Joe Willock|ENG|b|71
-Sean Longstaff|ENG|m|71
-Chris Smalling|ENG|c|69
+~3
 Harvey Barnes|ENG|s|74
-Bobby De Cordova-Reid|JAM|s|70
+~1
 Andreas Pereira|BRA|m|73
 Callum McGregor|SCO|m|73
 Daizen Maeda|JPN|s|74
 Reo Hatate|JPN|m|73
-Kyogo Furuhashi|JPN|f|71
+~1
 Nicolas Kühn|GER|s|73
-Ryan Christie|SCO|m|70
-Nathan Patterson|SCO|l|68
-Lawrence Shankland|SCO|f|68
+~3
 Brais Méndez|ESP|m|74
 Óscar Mingueza|ESP|l|73
 Iñigo Martínez|ESP|a|74
-Sergi Darder|ESP|m|71
+~1
 Javi Guerra|ESP|b|73
 Ander Barrenetxea|ESP|s|73
 Alberto Moleiro|ESP|d|73
 Gorka Guruzeta|ESP|f|72
 Ayoze Pérez|ESP|f|74
 Jorge de Frutos|ESP|s|72
-Bryan Gil|ESP|s|69
+~1
 Carlos Soler|ESP|m|74
 José Luis Gayà|ESP|l|73
-Hugo Duro|ESP|f|70
-Javi Puado|ESP|f|70
-Isi Palazón|ESP|d|71
+~3
 Sergio Canales|ESP|m|72
 Abde Ezzalzouli|MAR|s|74
 Samu Aghehowa|ESP|p|74
 Domenico Berardi|ITA|d|74
 Matteo Politano|ITA|s|74
-Stephan El Shaarawy|ITA|s|70
+~1
 Mattia Zaccagni|ITA|s|74
 Lorenzo Lucca|ITA|p|72
 Riccardo Orsolini|ITA|s|74
-Nicolò Zaniolo|ITA|d|71
+~1
 Gianluca Mancini|ITA|c|74
 Alessio Romagnoli|ITA|c|73
 Andrea Pinamonti|ITA|f|72
-Tommaso Baldanzi|ITA|d|71
-Daniel Maldini|ITA|d|70
+~2
 Francesco Pio Esposito|ITA|p|72
-Lorenzo Insigne|ITA|d|71
+~1
 Jonas Hofmann|GER|m|73
 Mario Götze|GER|m|73
-Julian Draxler|GER|m|69
+~1
 Timo Werner|GER|s|72
 Benjamin Henrichs|GER|l|72
 Robin Gosens|GER|w|74
@@ -584,298 +545,177 @@ Matthias Ginter|GER|c|73
 Kevin Schade|GER|s|73
 Jamie Leweling|GER|s|74
 Maximilian Beier|GER|s|74
-Youssoufa Moukoko|GER|f|68
-Grischa Prömel|GER|b|70
+~2
 Ermedin Demirović|BIH|f|74
 Marco Reus|GER|d|72
 Florian Thauvin|FRA|d|74
-Téji Savanier|FRA|m|70
-Gaëtan Laborde|FRA|p|70
+~2
 Terem Moffi|NGA|p|72
-Ludovic Ajorque|FRA|p|69
-Jonathan Bamba|CIV|s|70
+~2
 Benjamin André|FRA|x|72
 Valentin Rongier|FRA|m|72
 Elye Wahi|FRA|f|72
 Arnaud Kalimuendo|FRA|f|73
 Nordi Mukiele|FRA|l|73
-Anthony Martial|FRA|f|71
-Dimitri Payet|FRA|m|69
-Olivier Giroud|FRA|p|72
+~3
 Calvin Stengs|NED|m|73
-Steven Berghuis|NED|d|72
-Davy Klaassen|NED|m|70
+~2
 Kenneth Taylor|NED|b|73
 Mats Wieffer|NED|x|74
 Noa Lang|NED|d|74
 Crysencio Summerville|NED|s|74
 Ian Maatsen|NED|w|74
-Tyrell Malacia|NED|l|69
+~1
 Justin Kluivert|NED|s|74
-Luuk de Jong|NED|p|70
+~1
 Sven Botman|NED|a|74
 Brian Brobbey|NED|p|73
-Steven Bergwijn|NED|s|72
+~1
 Hans Vanaken|BEL|m|73
-Zeno Debast|BEL|c|72
-Maxim De Cuyper|BEL|w|72
-Arthur Vermeeren|BEL|m|72
-Michy Batshuayi|BEL|f|69
-Wout Faes|BEL|c|72
-Orel Mangala|BEL|x|72
+~6
 Malick Fofana|BEL|s|74
-Timothy Castagne|BEL|l|72
-André Silva|POR|f|70
+~2
 Ricardo Horta|POR|d|73
-Fábio Vieira|POR|m|72
+~1
 Raphaël Guerreiro|POR|w|74
-Renato Sanches|POR|b|69
-William Carvalho|POR|x|69
-Otávio|POR|m|72
-Pepê|BRA|s|72
+~4
 Malcom|BRA|s|74
-Hulk|BRA|p|70
-Everton Cebolinha|BRA|s|69
+~2
 Pedro|BRA|f|74
-Oscar|BRA|m|69
-Lucas Moura|BRA|s|70
-Renan Lodi|BRA|w|72
-Vitor Roque|BRA|f|72
+~4
 Luiz Henrique|BRA|s|74
 Yan Couto|BRA|w|73
 Igor Paixão|BRA|s|74
-Danilo|BRA|l|72
+~1
 Franco Mastantuono|ARG|d|74
 Nicolás Paz|ARG|m|74
 Leonardo Balerdi|ARG|c|74
 Marcos Senesi|ARG|c|73
-Gonzalo Montiel|ARG|l|72
-Nicolás Tagliafico|ARG|l|72
-Marcos Acuña|ARG|w|71
-Luciano Acosta|ARG|m|72
+~4
 Cucho Hernández|COL|f|74
 Hany Mukhtar|GER|m|73
-Christian Benteke|BEL|p|69
-Federico Bernardeschi|ITA|s|70
-Ryan Gauld|SCO|m|70
-Riqui Puig|ESP|m|72
-Evander|BRA|m|72
-Diego Rossi|URU|s|70
-Brenden Aaronson|USA|m|72
+~7
 Malik Tillman|USA|m|74
-Haji Wright|USA|f|72
-Gio Reyna|USA|m|72
+~2
 Tim Weah|USA|s|73
-Sergiño Dest|USA|w|72
-Ricardo Pepi|USA|f|72
+~2
 Chris Richards|USA|c|73
-Yunus Musah|USA|b|72
-Tajon Buchanan|CAN|s|72
+~2
 Stephen Eustáquio|CAN|m|73
 Jhon Arias|COL|d|74
-Luis Sinisterra|COL|s|72
+~1
 Mathías Olivera|URU|l|73
 Maximiliano Araújo|URU|w|73
-Facundo Pellistri|URU|s|71
-Alexis Sánchez|CHI|f|70
-Arturo Vidal|CHI|b|68
+~3
 Johan Vásquez|MEX|c|73
-Mohamed Elneny|EGY|x|66
-Trézéguet|EGY|s|70
-Emam Ashour|EGY|m|69
-Saïd Benrahma|ALG|d|71
-Kelechi Iheanacho|NGA|f|70
-Paul Onuachu|NGA|p|72
-Joe Aribo|NGA|m|70
-Frank Onyeka|NGA|b|70
+~8
 Samuel Chukwueze|NGA|s|74
-Moses Simon|NGA|s|72
-Tariq Lamptey|GHA|l|70
-Abdul Fatawu|GHA|s|72
-Jordan Ayew|GHA|f|71
-Mohammed Salisu|GHA|c|72
-Krépin Diatta|SEN|s|70
+~6
 Lamine Camara|SEN|m|74
-Idrissa Gueye|SEN|x|72
+~1
 Moussa Niakhaté|SEN|c|74
-Boulaye Dia|SEN|f|72
-Habib Diarra|SEN|b|72
-Pape Gueye|SEN|x|72
-Eric Maxim Choupo-Moting|CMR|p|69
-Naby Keïta|GUI|b|69
+~5
 Amadou Haidara|MLI|b|73
-El Bilal Touré|MLI|f|70
+~1
 Azzedine Ounahi|MAR|m|73
-Amine Harit|MAR|d|72
+~1
 Bilal El Khannouss|MAR|m|73
-Sébastien Haller|CIV|p|71
+~1
 Simon Adingra|CIV|s|73
 Ibrahim Sangaré|CIV|x|74
-Seko Fofana|CIV|b|72
-Wilfried Zaha|CIV|s|72
-Nicolas Pépé|CIV|s|72
-Vincent Aboubakar|CMR|f|70
+~4
 Hiroki Itō|JPN|a|74
-Yukinari Sugawara|JPN|l|72
+~1
 Takumi Minamino|JPN|m|74
-Kou Itakura|JPN|c|72
-Keito Nakamura|JPN|s|72
+~2
 Hidemasa Morita|JPN|m|73
 Ayase Ueda|JPN|f|73
-Junya Itō|JPN|s|72
+~1
 Hwang In-beom|KOR|m|74
-Cho Gue-sung|KOR|p|69
-Lee Jae-sung|KOR|m|69
-Akram Afif|QAT|s|72
-Salem Al-Dawsari|KSA|s|72
-Sardar Azmoun|IRN|f|71
-Eldor Shomurodov|UZB|f|72
+~6
 Antonio Nusa|NOR|s|74
-Oscar Bobb|NOR|d|72
+~1
 Sander Berge|NOR|b|73
-Kristoffer Ajer|NOR|c|71
+~1
 Victor Lindelöf|SWE|c|73
-Emil Forsberg|SWE|m|70
+~1
 Lucas Bergvall|SWE|b|73
 Mikkel Damsgaard|DEN|m|74
 Andreas Christensen|DEN|a|74
-Jonas Wind|DEN|f|72
+~1
 Jakub Kiwior|POL|a|73
-Nicola Zalewski|POL|w|72
+~1
 Sebastian Szymański|POL|m|73
-Jan Bednarek|POL|c|71
+~1
 Breel Embolo|SUI|p|73
-Remo Freuler|SUI|x|72
-Ricardo Rodríguez|SUI|l|70
-Marko Arnautović|AUT|p|72
+~3
 Nicolas Seiwald|AUT|x|73
-Dušan Tadić|SRB|d|72
+~1
 Strahinja Pavlović|SRB|c|74
-Lazar Samardžić|SRB|m|72
-Filip Kostić|SRB|w|70
+~2
 Merih Demiral|TUR|c|74
 Barış Alper Yılmaz|TUR|s|73
-Cengiz Ünder|TUR|s|70
-Mykhailo Mudryk|UKR|s|72
+~2
 Viktor Tsyhankov|UKR|d|73
-Roland Sallai|HUN|s|72
+~1
 Willi Orbán|HUN|c|73
-Ondrej Duda|SVK|m|70
-Adam Hložek|CZE|f|72
+~2
 Ladislav Krejčí|CZE|c|73
-Pavel Šulc|CZE|m|72
-Kostas Tsimikas|GRE|w|72
-Konstantinos Mavropanos|GRE|c|72
+~3
 Eljif Elmas|MKD|m|73
-Berat Djimsiti|ALB|c|72
-Armando Broja|ALB|f|70
-Hákon Arnar Haraldsson|ISL|m|74
-Duje Ćaleta-Car|CRO|c|71
-Lovro Majer|CRO|m|72
-Petar Sučić|CRO|m|72
-Michail Antonio|JAM|p|70
-Demarai Gray|JAM|s|69
-Rade Krunić|BIH|m|69
-Dennis Man|ROU|s|70
-Nicolae Stanciu|ROU|m|70
-Harry Souttar|AUS|c|70
-Jackson Irvine|AUS|b|70
-Xherdan Shaqiri|SUI|d|70
-Jordi Alba|ESP|w|72
-Carles Gil|ESP|m|68
-Denis Zakaria|SUI|b|72
-Abdou Diallo|SEN|c|68`,
-bronze:`Theo Walcott|ENG|s|58
-Andy Carroll|ENG|p|56
-Jordan Rhodes|SCO|f|55
-Tom Ince|ENG|d|58
-Ryan Fraser|SCO|s|58
-Joshua King|NOR|f|58
-Billy Sharp|ENG|f|52
+~2
+Hákon Arnar Haraldsson|ISL|m|74`,
+bronze:`~6
 Lyndon Dykes|SCO|p|60
 Kieffer Moore|WAL|p|62
 Joël Piroe|NED|f|64
 Josh Maja|NGA|f|62
 Sammie Szmodics|IRL|f|62
 Adam Armstrong|ENG|f|64
-Ellis Simms|ENG|f|58
-Josh Windass|ENG|m|58
-Jed Wallace|ENG|s|58
+~3
 Marcus Tavernier|ENG|d|64
 Matt Grimes|ENG|m|62
-Oli McBurnie|SCO|p|58
+~1
 Chuba Akpom|ENG|f|62
-Callum Robinson|IRL|f|55
-Isaac Hayden|ENG|x|57
+~2
 Ryan Manning|IRL|l|60
 Will Hughes|ENG|m|60
-Shane Duffy|IRL|c|57
-Rob Holding|ENG|c|57
-Calum Chambers|ENG|c|58
-Ainsley Maitland-Niles|ENG|w|59
+~4
 Reiss Nelson|ENG|s|62
-James McClean|IRL|w|54
+~1
 Josh Brownhill|ENG|b|64
-Ashley Barnes|ENG|p|54
+~1
 Jay Stansfield|ENG|f|62
-Wes Burns|WAL|s|55
-Joe Allen|WAL|m|56
-Aaron Ramsey|WAL|m|58
+~3
 Neco Williams|WAL|w|64
-Connor Roberts|WAL|l|59
-Chris Mepham|WAL|c|59
-Jordan James|WAL|b|58
-Jonny Evans|NIR|c|56
+~4
 Conor Bradley|NIR|l|64
-Isaac Price|NIR|m|58
-Shea Charles|NIR|x|58
-Daniel Ballard|NIR|c|56
-Trai Hume|NIR|l|56
-Paddy McNair|NIR|c|53
-Ashley Young|ENG|l|58
-Conor Coady|ENG|c|58
-Danny Rose|ENG|l|50
+~8
 Jesse Lingard|ENG|d|62
-Dele Alli|ENG|m|50
-Ravel Morrison|JAM|m|55
-Kristoffer Lund|USA|w|56
-Obed Vargas|USA|m|56
-Benjamin Cremaschi|USA|m|55
-Paxten Aaronson|USA|m|58
+~5
 Gianluca Busio|USA|b|60
 Johnny Cardoso|USA|x|64
-Luca de la Torre|USA|m|58
-Kellyn Acosta|USA|m|52
+~2
 Josh Sargent|USA|f|64
 Aidan Morris|USA|x|60
-Jack McGlynn|USA|m|56
+~1
 Patrick Agyemang|USA|f|60
-Brandon Vázquez|USA|f|57
-Tim Ream|USA|c|55
+~2
 Mark McKenzie|USA|c|60
 Auston Trusty|USA|c|60
 Joe Scally|USA|l|62
-John Tolkin|USA|l|56
-Jordan Morris|USA|s|58
-Jesús Ferreira|USA|f|58
-Miles Robinson|USA|c|58
-Walker Zimmerman|USA|c|57
-Darlington Nagbe|USA|m|54
-DeAndre Yedlin|USA|l|52
-Lucas Zelarayán|ARM|m|58
+~8
 Sebastián Driussi|ARG|f|64
-Ola Solbakken|NOR|s|58
+~1
 Kristian Thorstvedt|NOR|m|62
 Fredrik Aursnes|NOR|b|64
-Mohamed Elyounoussi|NOR|s|56
-Jens Petter Hauge|NOR|s|58
+~2
 Leo Østigård|NOR|c|62
 Marcus Holmgren Pedersen|NOR|l|60
-Patrick Berg|NOR|m|56
+~1
 Andreas Schjelderup|NOR|s|62
 Emil Holm|SWE|l|62
-Gustaf Nilsson|SWE|p|57
-Jesper Karlsson|SWE|s|59
+~2
 Mattias Svanberg|SWE|m|62
 Jens Cajuste|SWE|b|60
 Isak Hien|SWE|c|64
@@ -887,298 +727,104 @@ Andreas Skov Olsen|DEN|s|63
 Jesper Lindstrøm|DEN|d|62
 Mathias Jensen|DEN|m|62
 Christian Nørgaard|DEN|x|64
-Jannik Vestergaard|DEN|c|58
+~1
 Joakim Mæhle|DEN|w|62
-Thomas Delaney|DEN|x|53
-Martin Braithwaite|DEN|f|55
-Robert Skov|DEN|w|56
+~3
 Gustav Isaksen|DEN|s|64
 Victor Kristiansen|DEN|l|62
 Joel Pohjanpalo|FIN|f|62
-Teemu Pukki|FIN|f|56
-Glen Kamara|FIN|b|58
-Robin Lod|FIN|m|54
-Benjamin Källman|FIN|f|54
-Gylfi Sigurðsson|ISL|m|55
-Jóhann Berg Guðmundsson|ISL|s|54
-Jón Dagur Þorsteinsson|ISL|s|56
-Arnór Sigurðsson|ISL|m|56
-Willum Þór Willumsson|ISL|m|58
-Ísak Bergmann Jóhannesson|ISL|m|58
+~10
 Orri Óskarsson|ISL|f|62
-Andri Guðjohnsen|ISL|f|56
+~1
 Bruno Petković|CRO|p|60
 Mislav Oršić|CRO|s|60
-Marko Livaja|CRO|f|58
+~1
 Ante Budimir|CRO|p|64
-Nikola Moro|CRO|m|58
-Toni Fruk|CRO|m|56
-Igor Matanović|CRO|f|58
-Dejan Lovren|CRO|c|54
-Ivan Rakitić|CRO|m|58
+~5
 Mario Pašalić|CRO|m|64
-Franjo Ivanović|CRO|f|58
+~1
 Borna Sosa|CRO|w|60
-Nemanja Gudelj|SRB|x|58
+~1
 Saša Lukić|SRB|m|60
 Ivan Ilić|SRB|m|62
-Luka Jović|SRB|f|58
+~1
 Andrija Živković|SRB|s|60
-Veljko Birmančević|SRB|s|56
-Nemanja Radonjić|SRB|s|56
-Marko Grujić|SRB|b|58
-Filip Đuričić|SRB|m|54
-Leander Dendoncker|BEL|x|56
-Dennis Praet|BEL|m|56
-Thorgan Hazard|BEL|m|58
-Divock Origi|BEL|f|52
+~8
 Johan Bakayoko|BEL|s|64
-Axel Witsel|BEL|x|58
-Thomas Meunier|BEL|l|55
-Sam Lammers|NED|f|58
-Myron Boadu|NED|f|56
+~4
 Arnaut Danjuma|NED|s|60
-Owen Wijndal|NED|l|54
+~1
 Pascal Struijk|NED|c|60
-Daley Blind|NED|a|58
-Georginio Wijnaldum|NED|b|58
+~2
 Wout Weghorst|NED|p|60
-Vincent Janssen|NED|p|57
-Thom Haye|IDN|m|52
-Jay Idzes|IDN|c|54
-Mees Hilgers|IDN|c|54
-Calvin Verdonk|IDN|l|52
-Kevin Diks|IDN|l|56
-Ole Romeny|IDN|f|52
-Marselino Ferdinan|IDN|m|50
+~8
 Kaishu Sano|JPN|m|62
-Takuma Asano|JPN|s|58
-Koji Miyoshi|JPN|m|56
-Shuto Machino|JPN|f|57
-Yuito Suzuki|JPN|m|59
-Mao Hosoya|JPN|f|54
+~5
 Ao Tanaka|JPN|b|62
-Genki Haraguchi|JPN|m|50
+~1
 Koki Machida|JPN|c|60
-Yuki Soma|JPN|s|55
-Shogo Taniguchi|JPN|c|54
-Hwang Ui-jo|KOR|f|52
-Paik Seung-ho|KOR|m|52
-Seol Young-woo|KOR|l|56
+~5
 Oh Hyeon-gyu|KOR|f|60
-Jeong Woo-yeong|KOR|s|58
-Bae Jun-ho|KOR|m|58
-Yang Hyun-jun|KOR|s|56
-Saud Abdulhamid|KSA|l|56
-Mohamed Kanno|KSA|b|54
-Firas Al-Buraikan|KSA|f|56
-Hassan Tambakti|KSA|c|50
-Almoez Ali|QAT|f|58
-Hassan Al-Haydos|QAT|m|46
-Alireza Jahanbakhsh|IRN|s|54
-Saeid Ezatolahi|IRN|x|50
-Mohammad Mohebi|IRN|s|52
-Abbosbek Fayzullaev|UZB|m|58
-Oston Urunov|UZB|s|52
-Jaloliddin Masharipov|UZB|s|54
-Otabek Shukurov|UZB|m|50
-Ali Mabkhout|UAE|f|48
-Mohamed Abdelmonem|EGY|c|56
+~18
 Mostafa Mohamed|EGY|p|60
-Ahmed Sayed Zizo|EGY|d|56
-Ramadan Sobhi|EGY|s|52
-Youcef Belaïli|ALG|d|58
-Aïssa Mandi|ALG|c|56
+~4
 Ramy Bensebaini|ALG|w|62
 Houssem Aouar|ALG|m|60
 Mohamed Amoura|ALG|s|64
-Hicham Boudaoui|ALG|m|58
-Youcef Atal|ALG|l|56
-Ilias Chair|MAR|m|58
-Romain Saïss|MAR|c|50
-Soufiane Rahimi|MAR|s|56
+~5
 Ayoub El Kaabi|MAR|f|60
 Eliesse Ben Seghir|MAR|d|63
 Ismael Saibari|MAR|m|62
 Neil El Aynaoui|MAR|b|60
-Sofiane Boufal|MAR|d|54
-Achraf Dari|MAR|c|56
-Aïssa Laïdouni|TUN|b|54
-Montassar Talbi|TUN|c|54
-Ali Abdi|TUN|w|52
-Hannibal Mejbri|TUN|m|56
-Youssef Msakni|TUN|s|48
-Abdallah Sima|SEN|s|58
-Ismail Jakobs|SEN|w|54
-Bamba Dieng|SEN|f|56
-Cheikhou Kouyaté|SEN|x|50
-Jérémie Boga|CIV|s|58
-Serge Aurier|CIV|l|50
-Christian Kouamé|CIV|f|54
-Hamed Traorè|CIV|m|56
+~15
 Wilfried Singo|CIV|l|62
 Emmanuel Agbadou|CIV|c|60
-William Troost-Ekong|NGA|c|54
-Semi Ajayi|NGA|c|54
-Bright Osayi-Samuel|NGA|l|54
+~3
 Raphael Onyedika|NGA|x|60
-Fisayo Dele-Bashiru|NGA|b|58
-Cyriel Dessers|NGA|f|58
-Umar Sadiq|NGA|p|56
+~3
 Tolu Arokodare|NGA|p|60
 Akor Adams|NGA|f|60
-Ahmed Musa|NGA|s|46
+~1
 Taiwo Awoniyi|NGA|p|62
-Joseph Paintsil|GHA|s|56
-Osman Bukari|GHA|s|54
-Salis Abdul Samed|GHA|x|56
-Alidu Seidu|GHA|l|54
+~4
 Ernest Nuamah|GHA|s|60
 Kamaldeen Sulemana|GHA|s|62
-André Ayew|GHA|f|52
-Christopher Wooh|CMR|c|52
-Frank Magri|CMR|p|54
-Karl Toko Ekambi|CMR|f|56
-Georges-Kévin Nkoudou|CMR|s|52
-Mama Baldé|GNB|s|54
-Ilaix Moriba|GUI|b|58
-Amadou Diawara|GUI|x|52
-Mohamed Bayo|GUI|f|52
-Lassana Coulibaly|MLI|b|54
-Hamari Traoré|MLI|l|52
+~11
 Cheick Doucouré|MLI|x|60
-Nene Dorgeles|MLI|s|54
-Kevin Denkey|TOG|f|58
-Steve Mounié|BEN|p|50
-Jovane Cabral|CPV|s|50
-Logan Costa|CPV|c|54
-Musa Barrow|GAM|f|54
+~6
 Yankuba Minteh|GAM|s|64
 Adama Traoré|ESP|s|62
-Michael Olunga|KEN|f|54
-Fashion Sakala|ZAM|s|54
+~2
 Patson Daka|ZAM|f|62
-Percy Tau|RSA|s|56
-Teboho Mokoena|RSA|m|58
+~2
 Lyle Foster|RSA|f|60
-Themba Zwane|RSA|m|50
-Silas Katompa Mvumpa|COD|s|58
-Meschak Elia|COD|s|52
-Théo Bongonda|COD|s|54
-Gédéon Kalulu|COD|l|50
-Axel Tuanzebe|COD|c|54
+~6
 Aaron Wan-Bissaka|COD|l|64
-Noah Sadiki|COD|b|56
+~1
 Chancel Mbemba|COD|c|60
-Cédric Bakambu|COD|f|58
-Zito Luvumbo|ANG|s|52
-Mario Lemina|GAB|x|56
-Kevin Castaño|COL|x|56
+~4
 Yerson Mosquera|COL|c|60
-Rafael Santos Borré|COL|f|54
-Jorge Carrascal|COL|m|56
-Yáser Asprilla|COL|d|58
-Carlos Cuesta|COL|c|58
-Johan Mojica|COL|w|52
-Duván Zapata|COL|p|58
-Wilmar Barrios|COL|x|56
-Miguel Borja|COL|p|56
-Gonzalo Plata|ECU|s|58
-Jeremy Sarmiento|ECU|s|54
-Félix Torres|ECU|c|54
-Ángelo Preciado|ECU|l|52
+~12
 Kendry Páez|ECU|d|62
-Enner Valencia|ECU|f|56
+~1
 Joel Ordóñez|ECU|c|60
-Facundo Torres|URU|s|58
-Nicolás de la Cruz|URU|m|58
-Brian Rodríguez|URU|s|52
-Sebastián Cáceres|URU|c|54
+~4
 Lucas Torreira|URU|x|60
 Rodrigo Zalazar|URU|m|60
-Edinson Cavani|URU|p|56
-Agustín Canobbio|URU|s|52
+~2
 Miguel Almirón|PAR|s|60
 Julio Enciso|PAR|d|63
-Ramón Sosa|PAR|s|56
+~1
 Diego Gómez|PAR|b|60
-Antonio Sanabria|PAR|f|54
+~1
 Omar Alderete|PAR|c|60
-Gustavo Gómez|PAR|c|54
-Andrés Cubas|PAR|x|52
-Gianluca Lapadula|PER|f|50
-Renato Tapia|PER|x|50
-Luis Advíncula|PER|l|48
-André Carrillo|PER|s|46
-Salomón Rondón|VEN|p|54
-Yeferson Soteldo|VEN|d|54
+~8
 Yangel Herrera|VEN|b|60
-Jefferson Savarino|VEN|s|52
-Darwin Machís|VEN|s|48
-Erick Pulgar|CHI|x|54
-Guillermo Maripán|CHI|c|54
-Marcelino Núñez|CHI|m|54
-Darío Osorio|CHI|s|56
-Gabriel Suazo|CHI|l|52
-Ben Brereton Díaz|CHI|f|58
-Manfred Ugalde|CRC|f|54
-Jewison Bennette|CRC|s|50
-Joel Campbell|CRC|f|46
-Adalberto Carrasquilla|PAN|m|56
-Michael Murillo|PAN|l|52
-Ismael Díaz|PAN|s|48
-Luis Palma|HON|s|54
-Alberth Elis|HON|s|52
-Shamar Nicholson|JAM|f|52
-Ethan Pinnock|JAM|c|58
-Kasey Palmer|JAM|m|50
-Duckens Nazon|HAI|f|46
+~20
 Ismaël Koné|CAN|b|62
-Ali Ahmed|CAN|s|54
-Jacob Shaffelburg|CAN|s|54
+~2
 Moïse Bombito|CAN|c|62
-Derek Cornelius|CAN|c|54
-Richie Laryea|CAN|l|52
-Alistair Johnston|CAN|l|60
-Cyle Larin|CAN|f|58
-Promise David|CAN|f|54
-Jonathan Osorio|CAN|m|52
-Luis Chávez|MEX|m|54
-Orbelín Pineda|MEX|m|54
-César Montes|MEX|c|56
-Julián Quiñones|MEX|f|58
-Alexis Vega|MEX|s|52
-Roberto Alvarado|MEX|s|52
-Jorge Sánchez|MEX|l|50
-Jesús Gallardo|MEX|l|50
-Henry Martín|MEX|p|50
-César Huerta|MEX|s|56
-Diego Lainez|MEX|d|50
-Germán Berterame|MEX|f|56
-Mathew Leckie|AUS|s|52
-Riley McGree|AUS|m|56
-Ajdin Hrustić|AUS|m|52
-Martin Boyle|AUS|s|52
-Craig Goodwin|AUS|w|50
-Aziz Behich|AUS|l|48
-Mitchell Duke|AUS|p|48
-Eduardo Vargas|CHI|f|48
-Paolo Guerrero|PER|p|46
-Wu Lei|CHN|f|50
-Jonathan Rodríguez|URU|s|52
-Lukáš Provod|CZE|m|60
-Vladimír Coufal|CZE|l|60
-Giorgos Masouras|GRE|s|56
-Anastasios Bakasetas|GRE|m|54
-Milot Rashica|KOS|s|58
-Sead Kolašinac|BIH|c|58
-Teemu Pukki|FIN|f|56
-Răzvan Marin|ROU|m|58
-Patrick Wimmer|AUT|s|60
-András Schäfer|HUN|m|60
-Giorgi Kochorashvili|GEO|m|58
-Krzysztof Piątek|POL|f|58
-Fabian Rieder|SUI|m|60
+~41
 Mario Hermoso|ESP|a|62`}}
 // country codes used above, with the two-letter code that makes each flag
 function realCC(){return{ARG:['Argentina','AR'],POR:['Portugal','PT'],FRA:['France','FR'],BRA:['Brazil','BR'],NOR:['Norway','NO'],EGY:['Egypt','EG'],URU:['Uruguay','UY'],KOR:['South Korea','KR'],

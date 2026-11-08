@@ -1107,8 +1107,9 @@ function keeperUpdate(k,dt){
     if(k.hold<=0){const m=bestMate(k)||pick(outfield(k.team));if(m)pass(k,m)}return}
   let shotIn=false;
   if(!B.owner&&B.vx*s<-2&&Math.abs(B.x-gx)<620&&!(B.lockBy===k&&B.lockT>0)){const tt=(gx-B.x)/B.vx,py=B.y+B.vy*tt;shotIn=py>GY0-34&&py<GY1+34}
+  if(shotIn)k.shotHold=8;else if(k.track&&(k.shotHold||0)>0&&!B.owner&&B.vx*s<-.5){k.shotHold-=dt;shotIn=true}
   if(shotIn&&!k.track)keeperRead(k,mine?9:Math.round(DF.react*.6));// deflections and loose balls heading in
-  if(!shotIn){k.track=false;k.planY=null}
+  if(!shotIn){k.track=false;k.planY=null;k.dv=0}
   if(shotIn){
     if(k.react>0){k.react-=dt;k.vx*=.7;k.vy*=.7}
     else{// he keeps reading it as it comes: his early misjudgement shrinks the closer the ball gets
@@ -1205,13 +1206,14 @@ function ballUpdate(dt,live){
   if(B.x>FX1||B.x<FX0){
     const team=B.x>FX1?0:1;
     if(mouth&&B.z<BAR){
-      if(B.pass&&!B.shot){const k=keeperOf(team===0?1:0);B.x=B.x>FX1?FX1-4:FX0+4;give(k);k.x=B.x+(team===0?-10:10);k.y=clamp(B.y,GY0+8,GY1-8);k.hold=40;if(team===0)pop('passes don’t count',k.x,k.y-30,C.muted,15);return}
+      if(B.pass&&!B.shot){const k=keeperOf(team===0?1:0),s2=k.team===0?1:-1;k.diving=false;k.vx=k.vy=0;B.x=k.x+s2*10;B.y=k.y;B.vx=B.vy=B.z=B.vz=0;give(k);k.hold=40;if(team===0)pop('passes don’t count',k.x,k.y-30,C.muted,15);return}
       goalFor(team);return}
     const nearPost=Math.abs(B.y-GY0)<7||Math.abs(B.y-GY1)<7;
     if((mouth||nearPost)&&B.z<BAR+6){B.x=B.x>FX1?FX1-2:FX0+2;B.vx*=-.55;B.vy+=rnd(-2,2);S.post();pop(B.z>=BAR?'CROSSBAR!':'OFF THE POST!',B.x,B.y-30,C.sun,22);if(B.shot&&B.shot.team===0){addHype(10);style+=15;pop('SO CLOSE  +15',B.x,B.y-58,C.cream,15)}shake=Math.max(shake,RM?0:7);hitStop(7);slowmo(22,.35);S.ooh();if(B.shot)B.shot.wood=true;B.curl=0;B.knuckle=0;return}
     const k=keeperOf(B.x>FX1?1:0);if(B.shot)pop(B.z>=BAR?'OVER!':'WIDE',B.x>FX1?FX1-60:FX0+60,B.y-20,C.muted,18);
     if(B.shot&&B.shot.team===0)S.aww();
-    k.x=(k.team===0?FX0+24:FX1-24);k.y=MY;B.x=k.x;B.y=MY;B.vx=B.vy=B.z=B.vz=0;give(k);k.hold=60;
+    // goal kick: the keeper gathers it where he is (he used to jump to the six-yard box in one frame)
+    {const s2=k.team===0?1:-1;k.diving=false;k.vx=k.vy=0;k.dv=0;B.x=k.x+s2*10;B.y=k.y;B.vx=B.vy=B.z=B.vz=0;give(k);k.hold=60}
   }
 }
 
@@ -1294,7 +1296,7 @@ function kickoff(team){koT=t;
   players.forEach(p=>{
     if(p.keeper){p.x=p.team?FX1-16:FX0+16;p.y=MY}
     else{const fx=Math.min(.44,p.slot.x*.8+.04);p.x=p.team===0?FX0+fx*(FX1-FX0):FX1-fx*(FX1-FX0);p.y=FY0+(FY1-FY0)*p.slot.y}
-    p.kx=p.x;p.ky=p.y;
+    p.kx=p.x;p.ky=p.y;if(p.keeper){p.diving=false;p.dv=0;p.track=false;p.react=0;p.planY=null;p.shotHold=0;p.hold=0}
     p.vx=p.vy=0;p.stun=0;p.anim=null;p.rot=0;p.jump=0;p.arms=0;p.flip=1;p.lunge=0;p.slide=false;p.inter=false;p.aiSlide=0;p.aiLunge=0;p.turbo=0;p.push=null;p.fall=0;p.beatRun=0;p.lean=0;p.kneel=false;p.spinRot=false;p.dir=p.team?Math.PI:0;p.hold=0;p.stam=Math.min(100,p.stam+40)});
   const pickTaker=tm=>outfield(tm).reduce((a,b)=>b.slot.x>a.slot.x?b:a);
   const taker=pickTaker(team);taker.x=team===0?MIDX-12:MIDX+12;taker.y=MY;
@@ -1339,7 +1341,7 @@ function awardCoins0(){earned=0;shownEarned=0;
   if(comp==='league'){const L=lgOf(),D=DIVS[L.div],base=won?100:score[0]===score[1]?40:20;lgRecord(L,score[0],score[1]);
     earned=Math.round((base+score[0]*10)*MM()*LV().coin/5)*5;club.coins+=earned;club.played=(club.played||0)+1;
     const sm=L.done?L.summary:null;cupEvent=sm&&sm.pos===1?'champion':won?'advance':null;
-    eventText=sm?`SEASON OVER: ${ordinal(sm.pos)} in the ${D.n}. ${sm.lines.join(' · ')}`:`${D.n} · round ${L.round} of 18 · ${ordinal(lgTable(L).findIndex(r=>r.id==='me')+1)} in the table`;saveClub();return}
+    eventText=sm?`SEASON OVER: ${ordinal(sm.pos)} in the ${D.n}. ${sm.lines.join(' · ')}`:`${D.n} · round ${L.round} of ${L.fx.length} · ${ordinal(lgTable(L).findIndex(r=>r.id==='me')+1)} in the table`;saveClub();return}
   if(comp==='wcc'){const W=wccOf(),out=wccRecord(W,score[0],score[1],pw);const base=won?150:30;earned=Math.round((base+score[0]*10)*MM()*LV().coin/5)*5;
     if(out&&out.prize)earned+=out.prize;club.coins+=earned;club.played=(club.played||0)+1;
     if(out&&out.champ){stat('wcc_'+GM);club.trophies=club.trophies||{};club.trophies['wcc_'+GM]=(club.trophies['wcc_'+GM]||0)+1;grant({cp:300,tt:10,pack:'elite'});cupEvent='champion';eventText='WORLD CLUB CHAMPIONS! +'+out.prize.toLocaleString()+' coins, an Elite Pack and the trophy'}
@@ -1356,7 +1358,7 @@ function awardCoins0(){earned=0;shownEarned=0;
   if(club.cup&&!cupOver()){const c=club.cup;c.res.push(won);
     if(won){bonus=RBONUS[c.round];c.round++;if(c.round>=3){club.trophies=club.trophies||{};club.trophies[c.tier]=(club.trophies[c.tier]||0)+1;cupEvent='champion'}else cupEvent='advance'}
     else{c.alive=false;cupEvent='out'}}
-  earned=Math.round((r+bonus+score[0]*15+style/25)*DIFFS[diffKey].coin*LV().coin/5)*5;club.coins+=earned;club.played=(club.played||0)+1;saveClub()}
+  earned=Math.round((r+bonus+score[0]*15+style/25)*DIFFS[diffKey].coin*LV().coin*MM()/5)*5;club.coins+=earned;club.played=(club.played||0)+1;saveClub()}
 /* ---------- main update ---------- */
 // timers, animations and trails for one player, every frame
 function tickPlayer(p,dt){if(p.locked>0)p.locked-=dt;if(p.caughtT>0)p.caughtT-=dt;if(p.fall>0){p.fall-=dt;p.vx*=.9;p.vy*=.9}if(p.tackleCd>0)p.tackleCd-=dt;if(p.skillCd>0)p.skillCd-=dt;if(p.spCd>0)p.spCd-=dt;if(p.slideCd>0)p.slideCd-=dt;if(p.blungeCd>0)p.blungeCd-=dt;if(p.turbo>0)p.turbo-=dt;if(p.whiff>0)p.whiff-=dt;
