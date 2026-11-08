@@ -573,7 +573,7 @@ function startMatch(){
   else{if(cupOver()){newCup(diffKey);renderMenu();return}
   {const o=OPPS[club.cup.opps[club.cup.round]];OPP={name:o[0].toUpperCase(),kit:o[1],off:ROFF[club.cup.round]};cupEvent=null;eventText=null}}
   initAudio();if(ac&&ac.state==='suspended')ac.resume();
-  DF=levelDF(comp==='tour'?tourDF(OPP.club):comp==='league'?DIVS[lgOf().div].df:comp==='wcc'?(OPP.str>.9?'legend':'hard'):diffKey);setup();players.forEach(p=>{if(p.team===1)p.spCd=rnd(140,380)});hat=null;score=[0,0];mercy=false;clock=PITCH==='volta'?150:PITCH==='expanded'?210:180;style=0;shownStyle=0;hype=0;fire=0;streak=0;
+  DF=levelDF(comp==='tour'?tourDF(OPP.club):comp==='league'?DIVS[lgOf().div].df:comp==='wcc'?(OPP.str>.9?'legend':'hard'):diffKey);setup();players.forEach(p=>{if(p.team===1)p.spCd=rnd(140,380)});hat=null;score=[0,0];mercy=false;clock=PITCH==='volta'?120:PITCH==='expanded'?210:180;style=0;shownStyle=0;hype=0;fire=0;streak=0;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];
   menuEl.hidden=true;edEl.hidden=true;cv.focus();kickoff(0);modeStart();matchRatings=null;
   introT=SG||state!=='play'?0:INTRO;
@@ -589,6 +589,7 @@ function showMenu(left=false){
   if(comp==='skill'&&SG&&SG.msg&&!left)resultEl.textContent=`${SGAMES[SG.k].name}: ${SG.msg}${SG.best?' (new best!)':''} · +${earned} coins`;
   if(comp==='chal'&&eventText&&!left)resultEl.textContent=eventText+` · +${earned} coins`;
   if(levelUps.length&&!left){resultEl.textContent+=' · LEVEL UP: '+levelUps.join(', ');levelUps=[]}
+  if(earnNote&&!left)resultEl.textContent+=' · '+earnNote;
   renderRoster();goBtn.focus();
 }
 
@@ -813,14 +814,14 @@ function doStomp(p){if(B.owner&&B.owner.team===p.team)return false;const foes=ou
   pop('SHOCKWAVE',p.x,p.y-40,p.team===0?C.sun:C.coral,26,80);if(p.team===0){addStyle(15*foes.length,p.x,p.y);addHype(12)}return true}
 function doSpecial(p){
   const sp=p.st.sp,def=SPECIALS[sp];if(!def||p.spCd>0||p.stun>0)return;
-  if(['curler','rocket','knuckle','chip'].includes(sp)){if(!canStrike(p))return;p.spCd=def.cd;charging=false;S.special();pop(def.name,p.x,p.y-34,C.sun,22,80);
+  if(['curler','rocket','knuckle','chip'].includes(sp)){if(!canStrike(p))return;p.spCd=spCdOf(p);charging=false;S.special();pop(def.name,p.x,p.y-34,C.sun,22,80);
     // assisted: aim for the side of goal the keeper is leaving open (chips go over his head)
     const k=keeperOf(1-p.team),ty=sp==='chip'?MY+rnd(-18,18):(k.y>MY?GY0+12:GY1-12);
     p.dir=Math.atan2(ty-B.y,goalX(p.team)-B.x);shoot(p,sp,.85,ty);slowmo(16,.45);return}
   const fn={through:doThrough,lob:doLob,bicycle:doBicycle}[sp];
-  if(fn){if(fn(p)){p.spCd=def.cd;S.special()}return}
-  if(sp==='slide'){if((B.owner&&B.owner.team===p.team)||p.lunge>0||dist(p,B)>160)return;p.spCd=def.cd;p.lunge=18;p.inter=true;p.slide=false;S.special();ring(p.x,p.y,C.sun);return}
-  if(sp==='turbo'){p.spCd=def.cd;p.turbo=180;p.stam=100;S.special();pop('TURBO',p.x,p.y-34,C.mint,18);ring(p.x,p.y,C.mint)}
+  if(fn){if(fn(p)){p.spCd=spCdOf(p);S.special()}return}
+  if(sp==='slide'){if((B.owner&&B.owner.team===p.team)||p.lunge>0||dist(p,B)>160)return;p.spCd=spCdOf(p);p.lunge=18;p.inter=true;p.slide=false;S.special();ring(p.x,p.y,C.sun);return}
+  if(sp==='turbo'){p.spCd=spCdOf(p);p.turbo=180;p.stam=100;S.special();pop('TURBO',p.x,p.y-34,C.mint,18);ring(p.x,p.y,C.mint)}
 }
 // Auto-switch: when they have the ball you control whoever is best placed between the ball and your goal;
 // when it's loose you get whoever will reach it first. Q still works, and a manual pick is respected for a moment.
@@ -1019,7 +1020,7 @@ function teamAI(team,dt){
       if(trailing){const sd=Math.sign(Math.sin(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir)))||1,a=owner.dir+sd*Math.PI/2;tgt={x:owner.x+Math.cos(owner.dir)*14+Math.cos(a)*20,y:owner.y+Math.sin(owner.dir)*14+Math.sin(a)*20}}
       if(team===1&&p.st.sp==='stomp'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<95&&Math.random()<.02*dt&&doStomp(p)){p.spCd=SPECIALS.stomp.cd*1.7;continue}
       if(team===1&&p.st.sp==='slide'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<110&&dist(p,owner)>25&&notBehind(p,owner)&&Math.random()<.015*dt){
-        p.spCd=SPECIALS.slide.cd*1.15;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
+        p.spCd=spCdOf(p)*1.4;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
       if(team===1&&owner&&owner.team===0&&!owner.keeper&&p.tackleCd<=0&&dist(p,owner)>(slow?20:28)&&dist(p,owner)<(slow?75:60)&&side>(slow?-.55:.3)&&Math.random()<(LV().extreme?.006:DF.slide?.0035:.0016)*(slow?(side<.3?9:3.5):1)*dt){p.windup=slow?5:10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
       steer(p,tgt.x,tgt.y,topSpeed(p)*(trailing?1.16:slow?.92:team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
       if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai*(slow?3.5:1):.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
@@ -1088,13 +1089,13 @@ function carrierAI(p,dt){
 function aiSpecial(p,dG,ndd){const sp=p.st.sp,def=SPECIALS[sp];if(!def)return false;
   if(['curler','rocket','knuckle','chip'].includes(sp)){if(dG>DF.range+170||Math.random()>.68)return false;
     const k=keeperOf(1-p.team),gx=goalX(p.team),ty=sp==='chip'?MY+rnd(-18,18):(k.y>MY?GY0+12:GY1-12);
-    p.spCd=def.cd*1.5;p.dir=Math.atan2(ty-B.y,gx-B.x);pop(def.name,p.x,p.y-34,C.coral,20,70);S.special();shoot(p,sp,.85,ty);return true}
-  if(sp==='turbo'&&ndd>70&&Math.random()<.4){p.spCd=def.cd*1.5;p.turbo=150;pop('TURBO',p.x,p.y-34,C.coral,16);return false}
-  if(sp==='through'&&dG<620&&Math.random()<.35&&doThrough(p)){p.spCd=def.cd*1.5;return true}
-  if(sp==='lob'&&Math.random()<.3&&doLob(p)){p.spCd=def.cd*1.5;return true}
+    p.spCd=spCdOf(p)*1.5;p.dir=Math.atan2(ty-B.y,gx-B.x);pop(def.name,p.x,p.y-34,C.coral,20,70);S.special();shoot(p,sp,.85,ty);return true}
+  if(sp==='turbo'&&ndd>70&&Math.random()<.4){p.spCd=spCdOf(p)*1.5;p.turbo=150;pop('TURBO',p.x,p.y-34,C.coral,16);return false}
+  if(sp==='through'&&dG<620&&Math.random()<.35&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}
+  if(sp==='lob'&&Math.random()<.3&&doLob(p)){p.spCd=spCdOf(p)*1.5;return true}
   if(sp==='onetwo'&&ndd<90&&Math.random()<.5&&doOneTwo(p)){p.spCd=def.cd*1.5;return true}
   if(sp==='ghost'&&ndd<85&&Math.random()<.5&&doGhost(p)){p.spCd=def.cd*1.5;return false}
-  if(sp==='bicycle'&&bikeReady(p)&&Math.random()<.6&&doBicycle(p)){p.spCd=def.cd*1.5;return true}
+  if(sp==='bicycle'&&bikeReady(p)&&Math.random()<.6&&doBicycle(p)){p.spCd=spCdOf(p)*1.5;return true}
   return false}
 function aiShoot(p,dG){
   const k=keeperOf(1-p.team),gx=goalX(p.team);
@@ -1339,10 +1340,10 @@ function calcRatings(){const pw=pen&&pen.winner!=null?pen.winner:null,res=tm=>{c
   const motm=rows.reduce((a,b)=>b.v>a.v?b:a);return{rows,motm}}
 function awardCoins(){awardCoins0();
   if(SG||NET.on){matchRatings=null;return}
-  matchRatings=calcRatings();const m=matchRatings.motm;if(m.p.team===0){const b=Math.round(25*MM());earned+=b;club.coins+=b;saveClub()}
+  matchRatings=calcRatings();const m=matchRatings.motm;if(m.p.team===0){const b=Math.round(25*matchMul());earned+=b;club.coins+=b;earnNote+=` · man of the match +${b}`;saveClub()}
   careerAfterMatch()}
-function awardCoins0(){earned=0;shownEarned=0;
-  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=Math.round((r+score[0]*10)*(PITCH!=='volta'?1.5:1)/5)*5;club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;saveClub();return}
+function awardCoins0(){earned=0;shownEarned=0;earnNote='';
+  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=matchPay(score[0]>score[1]?'Online win':score[0]<score[1]?'Online defeat':'Online draw',r,score[0]*10,1);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;saveClub();return}
   const pw=pen&&pen.winner!=null?pen.winner:null;
   const r=score[0]>score[1]?100:score[0]<score[1]?20:pw===0?80:pw===1?30:45;
   let bonus=0;const won=score[0]>score[1]||pw===0;
@@ -1356,26 +1357,25 @@ function awardCoins0(){earned=0;shownEarned=0;
     if(ok){if(!ch.done[chalCur.id]){ch.done[chalCur.id]=true;bonus+=90}if(chalCur.id===dailyChal().id&&ch.daily!==today()){ch.daily=today();bonus+=150}}
     earned=bonus+(ok?20:0);club.coins+=earned;club.played=(club.played||0)+1;eventText=ok?`CHALLENGE COMPLETE · ${chalCur.name}`:`Challenge failed · ${chalCur.name}. Have another go!`;cupEvent=ok?'champion':'out';saveClub();return}
   if(comp==='league'){const L=lgOf(),D=DIVS[L.div],base=won?100:score[0]===score[1]?40:20;lgRecord(L,score[0],score[1]);
-    earned=Math.round((base+score[0]*10)*MM()*LV().coin/5)*5;club.coins+=earned;club.played=(club.played||0)+1;
+    earned=matchPay(won?'Win':score[0]===score[1]?'Draw':'Defeat',base,score[0]*10,LV().coin);club.coins+=earned;club.played=(club.played||0)+1;
     const sm=L.done?L.summary:null;cupEvent=sm&&sm.pos===1?'champion':won?'advance':null;
     eventText=sm?`SEASON OVER: ${ordinal(sm.pos)} in the ${D.n}. ${sm.lines.join(' · ')}`:`${D.n} · round ${L.round} of ${L.fx.length} · ${ordinal(lgTable(L).findIndex(r=>r.id==='me')+1)} in the table`;saveClub();return}
-  if(comp==='wcc'){const W=wccOf(),out=wccRecord(W,score[0],score[1],pw);const base=won?150:30;earned=Math.round((base+score[0]*10)*MM()*LV().coin/5)*5;
-    if(out&&out.prize)earned+=out.prize;club.coins+=earned;club.played=(club.played||0)+1;
+  if(comp==='wcc'){const W=wccOf(),out=wccRecord(W,score[0],score[1],pw);const base=won?150:30;earned=matchPay(won?'Win':'Defeat',base,score[0]*10,LV().coin,out&&out.prize||0);club.coins+=earned;club.played=(club.played||0)+1;
     if(out&&out.champ){stat('wcc_'+GM);club.trophies=club.trophies||{};club.trophies['wcc_'+GM]=(club.trophies['wcc_'+GM]||0)+1;grant({cp:300,tt:10,pack:'elite'});cupEvent='champion';eventText='WORLD CLUB CHAMPIONS! +'+out.prize.toLocaleString()+' coins, an Elite Pack and the trophy'}
     else if(out&&out.won){cupEvent='advance';eventText=`Through to the ${WROUNDS[W.round]}!`+(out.prize?` +${out.prize.toLocaleString()} prize`:'');grant({cp:20*W.round})}
     else{cupEvent='out';eventText=`Knocked out of the World Club Championship. ${wTeam(W,W.champ).name} won it.`}
     saveClub();return}
-  if(comp==='friendly'){earned=Math.round((r+score[0]*15+style/25)*.5*LV().coin*MM()/5)*5;club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText=levelUps.length?'LEVEL UP! '+levelUps.join(' · '):null;saveClub();return}
+  if(comp==='friendly'){earned=matchPay('Friendly',Math.round((r+style/25)*.5),Math.round(score[0]*7.5),LV().coin);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText=levelUps.length?'LEVEL UP! '+levelUps.join(' · '):null;saveClub();return}
   if(comp==='tour'&&club.tour&&!tourOver()){const T=club.tour,m=myMatch(),meA=m.a===ME;
     Object.assign(m,{sa:meA?score[0]:score[1],sb:meA?score[1]:score[0],pen:pw!==null,w:won?ME:(meA?m.b:m.a)});m.up=won&&clubRating(meA?m.b:m.a)>teamRating()+3;
     if(won){if(T.round===3){T.done=true;T.champ=ME;bonus=TPRIZE[4];club.trophies=club.trophies||{};club.trophies.tour=(club.trophies.tour||0)+1;cupEvent='champion';eventText='GRAND TOURNAMENT CHAMPIONS!'}
       else{simRound();T.round++;bonus=TPRIZE[T.round];cupEvent='advance';eventText=`Through to the ${TROUNDS[T.round]}! +${bonus} prize`}}
     else{T.alive=false;T.exitRound=T.round;playOutRest();cupEvent='out';eventText=`Knocked out in the ${TROUNDS[T.exitRound]}. ${clubName(T.champ)} went on to win it.`}
-    earned=Math.round((r+score[0]*15+style/25)*LV().coin/5)*5+bonus;club.coins+=earned;club.played=(club.played||0)+1;saveClub();return}
+    earned=matchPay(won?'Win':'Defeat',Math.round(r+style/25),score[0]*15,LV().coin,bonus);club.coins+=earned;club.played=(club.played||0)+1;saveClub();return}
   if(club.cup&&!cupOver()){const c=club.cup;c.res.push(won);
     if(won){bonus=RBONUS[c.round];c.round++;if(c.round>=3){club.trophies=club.trophies||{};club.trophies[c.tier]=(club.trophies[c.tier]||0)+1;cupEvent='champion'}else cupEvent='advance'}
     else{c.alive=false;cupEvent='out'}}
-  earned=Math.round((r+bonus+score[0]*15+style/25)*DIFFS[diffKey].coin*LV().coin*MM()/5)*5;club.coins+=earned;club.played=(club.played||0)+1;saveClub()}
+  earned=matchPay(won?'Win':score[0]===score[1]?'Draw':'Defeat',Math.round(r+style/25),score[0]*15,DIFFS[diffKey].coin*LV().coin,Math.round(bonus*DIFFS[diffKey].coin*LV().coin*MM()));club.coins+=earned;club.played=(club.played||0)+1;saveClub()}
 /* ---------- main update ---------- */
 // timers, animations and trails for one player, every frame
 function tickPlayer(p,dt){if(p.locked>0)p.locked-=dt;if(p.caughtT>0)p.caughtT-=dt;if(p.fall>0){p.fall-=dt;p.vx*=.9;p.vy*=.9}if(p.tackleCd>0)p.tackleCd-=dt;if(p.skillCd>0)p.skillCd-=dt;if(p.spCd>0)p.spCd-=dt;if(p.slideCd>0)p.slideCd-=dt;if(p.blungeCd>0)p.blungeCd-=dt;if(p.turbo>0)p.turbo-=dt;if(p.whiff>0)p.whiff-=dt;

@@ -79,6 +79,20 @@ const ABIL={finisher:{name:'Elite Finisher',d:'+6 finishing, +4 shot power',fx:{
   engine:{name:'Engine',d:'+3 pace, defending and passing',fx:{pace:.03,tackle:.03,pass:.03}}};
 for(const p of PLAYERS)if(!p.ab&&(tier(p)==='icon'||tier(p)==='special')){const s=p.sk;p.ab=p.pos==='DEF'?'wall':p.pos==='MID'?'passer':s==='burst'||p.sp==='turbo'?'speed':s==='elastico'||s==='rainbow'?'dribbler':'finisher'}
 
+/* ===== special ability development ===== */
+// Every card's special (X) has its own level, 1 to 10, bought with coins plus 2 Training Tokens a level. Levels cut the
+// cooldown in a straight line from the level-1 time to the level-10 time for that ability's tier.
+const ABTIER={through:[15,7],curler:[12,5],knuckle:[12,5],rocket:[12,5],bicycle:[12,5],slide:[12,5],turbo:[10,3.5],lob:[10,3.5],chip:[10,3.5]};
+const ABCOST=[500,1000,1500,2500,3500,5000,7000,9500,13000],ABTT=2,ABMAX=10;
+const ablOf=id=>clamp(((club.abl||{})[id])|0||1,1,ABMAX);
+const cdSecs=(sp,L)=>{const T=ABTIER[sp];if(!T)return SPECIALS[sp]?SPECIALS[sp].cd/60:12;return Math.round((T[0]-(T[0]-T[1])*(clamp(L,1,ABMAX)-1)/9)*10)/10};
+// cooldown in game frames (60 a second) for a player on the pitch: his own ability level
+const spCdOf=p=>Math.round(cdSecs(p.st.sp,p.st.spLv||1)*60);
+function ablBuy(id){const p=byId(id);if(!p||!club.owned.includes(id))return;const L=ablOf(id);if(L>=ABMAX){toast('Already at MAX LEVEL.');return}
+  const c=ABCOST[L-1];if(club.coins<c||res().tt<ABTT){toast(`Needs ${c.toLocaleString()} coins and ${ABTT} Training Tokens.`);return}
+  club.coins-=c;club.tt-=ABTT;club.abl=club.abl||{};club.abl[id]=L+1;
+  toast(`${p.short}: ${SPECIALS[p.sp].name} level ${L+1} · cooldown ${cdSecs(p.sp,L)}s → ${cdSecs(p.sp,L+1)}s`);S.skill(2);saveClub();renderMenu()}
+
 /* ===== upgrades, XP and evolutions ===== */
 const RAR=['bronze','silver','gold','special','icon'];
 const UPCAP={bronze:8,silver:10,gold:12,special:12,icon:14},UPBASE={bronze:100,silver:200,gold:400,special:800,icon:1300},STATMAX=5;
@@ -96,7 +110,7 @@ function evoNeed(p){const e=evoOf(p.id),E=EVO[tier(p)];if(e.st>=E.boost.length)r
   return{stage:e.st,boost:E.boost[e.st],coins:E.coins[e.st],tt:E.tt[e.st],m:3+e.st*2,k:G.k,n:G.n[Math.min(e.st,G.n.length-1)],w:G.w,have:{m:e.m,v:e[G.k]||0}}}
 const evoBoost=p=>{const e=evoOf(p.id),E=EVO[tier(p)];let b=0;for(let i=0;i<e.st;i++)b+=E.boost[i];return b};
 // the stats a player actually takes onto the pitch: card stats plus everything you've invested in him
-function playStats(p){if(!p||!p.id)return p;const b={...p};
+function playStats(p){if(!p||!p.id)return p;const b={...p};b.spLv=ablOf(p.id);
   const L=Math.min(3,Math.floor(lvlOf(p.id)/2));if(L)STATK.map(k=>k[0]).sort((x,y)=>p[y]-p[x]).slice(0,5).forEach(k=>b[k]+=.01*L);
   const u=upOf(p.id);for(const k in u)if(k in b)b[k]+=u[k]*.01;
   let ev=evoBoost(p);if(ev){const room=OVRCAP[tier(p)]-ovr({...b,isCustom:p.isCustom});ev=Math.max(0,Math.min(ev,room));for(const [k] of STATK)b[k]+=ev*.01}
@@ -127,7 +141,14 @@ function tacOf(team){if(team===1){const o=OPP.tac||{};return{push:o.push||1,pass
 /* ===== economy ===== */
 // Coins buy packs, upgrades, evolutions and keeper training. Training Tokens unlock advanced development (training
 // sessions and evolutions). Club Points come from seasons and tournaments and buy cosmetics and stadium upgrades.
-const MM=()=>GM==='classical'?1.5:1;// Classical pays 1.5x, always
+const MM=()=>GM==='classical'?1.5:1;// one-off league and championship prizes: Classical pays 1.5x
+// match rewards follow the pitch you played on: Expanded gets a further 1.25x on top of Classical's 1.5x
+const MULT={volta:1,classical:1.5,expanded:1.875},MULTN={volta:'Volta',classical:'Classical Standard',expanded:'Classical Expanded'};
+const matchMul=()=>MULT[PITCH]||1;
+let earnNote='';
+// pay a match: base for the result plus per-goal coins, times the pitch multiplier and the difficulty, to the whole coin
+function matchPay(label,base,goalCoins,diffMul,extra=0){const m=matchMul(),raw=(base+goalCoins)*m*diffMul,coins=Math.round(raw)+extra;
+  earnNote=`${label} ${base}${goalCoins?` + goals ${goalCoins}`:''}${m!==1?` × ${MULTN[PITCH]} ${m}`:''}${diffMul!==1?` × difficulty ${+diffMul.toFixed(2)}`:''}${extra?` + prize ${extra.toLocaleString()}`:''} = ${coins.toLocaleString()} coins`;return coins}
 const res=()=>{club.tt=club.tt||0;club.cp=club.cp||0;return club};
 function grant(r,why){if(!r)return'';const c=res(),bits=[];
   if(r.coins){c.coins+=r.coins;bits.push(`+${r.coins.toLocaleString()} coins`);if(r.coins>0)chProg('coins',r.coins)}
@@ -352,9 +373,9 @@ function goText(){
   if(comp==='wcc'){const W=wccOf();if(!W)return'Not qualified yet';if(W.done||!W.alive)return W.champ==='me'?'Champions!':'Knocked out';const x=wMy(W),o=wTeam(W,x.a==='me'?x.b:x.a);return`${WROUNDS[W.round]} vs ${o.name}`}
   return comp==='friendly'?'Play a friendly':comp==='chal'?`Try: ${CHALS.find(c=>c.id===chalId()).name}`:comp==='skill'?`Play ${SGAMES[sgId()].name}`:comp==='tour'?(tourOver()?'Enter a new tournament':`Play ${TROUNDS[club.tour.round].replace(/s$/,'').toLowerCase()} vs ${clubName(myMatch().a===ME?myMatch().b:myMatch().a)}`):cupOver()?(club.cup.alive?'Defend the trophy':'Enter the cup again'):`Play ${ROUNDS[club.cup.round].toLowerCase()} vs ${OPPS[club.cup.opps[club.cup.round]][0]}`}
 function renderModes(){const lv=m=>{const L=(club.lg||{})[m];return L?DIVS[L.div].n:'Amateur Division'},w=m=>{const W=(club.wcc||{})[m];return W&&!W.done&&W.alive?' · in the World Club Championship':''};
-  $('modes').innerHTML=`<button class="modecard" data-gm="volta" aria-pressed="${GM==='volta'}"><div class="mh"><b>VOLTA</b><i>5v5</i></div><span>Fast-paced football in the cage</span><em>1.0× coins</em><small>${lv('volta')}${w('volta')}</small></button>
-   <button class="modecard cl" data-gm="classical" aria-pressed="${GM==='classical'}"><div class="mh"><b>CLASSICAL</b><i>9v9</i></div><span>Full-pitch tactical football</span><em>1.5× coins on everything</em><small>${lv('classical')}${w('classical')}</small></button>`+
-   (GM==='classical'?`<div class="pitchsel"><span class="lab">PITCH SIZE</span><div class="forms">${[['standard','Classical Standard','Large pitch · 3 min matches'],['expanded','Classical Expanded','Extra-large pitch · 3½ min · more room for passing, long balls and counters']].map(([k,n,d])=>
+  $('modes').innerHTML=`<button class="modecard" data-gm="volta" aria-pressed="${GM==='volta'}"><div class="mh"><b>VOLTA</b><i>5v5</i></div><span>Fast-paced football in the cage · 2 min matches</span><em>1.0× coins</em><small>${lv('volta')}${w('volta')}</small></button>
+   <button class="modecard cl" data-gm="classical" aria-pressed="${GM==='classical'}"><div class="mh"><b>CLASSICAL</b><i>9v9</i></div><span>Full-pitch tactical football</span><em>1.5× coins · Expanded pitch 1.875×</em><small>${lv('classical')}${w('classical')}</small></button>`+
+   (GM==='classical'?`<div class="pitchsel"><span class="lab">PITCH SIZE</span><div class="forms">${[['standard','Classical Standard','Large pitch · 3 min · 1.5× coins'],['expanded','Classical Expanded','Extra-large pitch · 3½ min · 1.875× coins · more room for long balls and counters']].map(([k,n,d])=>
      `<button data-pitch="${k}" aria-pressed="${(club.cpitch||'standard')===k}" title="${d}"><b>${n}</b> · ${d}</button>`).join('')}</div></div>`:'')}
 const kd=k=>`<span class="kitdot" style="background:${k}"></span>`;
 function renderLeague(){let L=lgOf();if(!L)L=newSeason(GM,0,1);const D=DIVS[L.div],T=lgTable(L);
@@ -371,8 +392,8 @@ function renderLeague(){let L=lgOf();if(!L)L=newSeason(GM,0,1);const D=DIVS[L.di
     body+=show.map(({r,i})=>`<div class="panel"><h4>Round ${i+1}${i===L.round&&!L.done?' · next':''}</h4><div class="fxl">`+r.map(f=>{const me=f.h==='me'||f.a==='me';
       return `<div class="fxr ${me?'me':''}"><i>${f.r?'FT':i===L.round?'NEXT':'—'}</i><span>${nm(f.h)}</span><span class="sc">${f.r?f.r.join('–'):'v'}</span><span class="a">${nm(f.a)}</span></div>`}).join('')+`</div></div>`).join('');
     body+=`<p class="hint">Showing three rounds either side of now. All ${L.fx.length} rounds: every club plays every other club once.</p>`}
-  else{const m=MM();body+=`<div class="panel"><h4>What this season pays (${GM==='classical'?'Classical, 1.5×':'Volta'})</h4>
-    <p>Each match: win ${100*m} · draw ${40*m} · loss ${20*m} coins, plus ${10*m} per goal. Man of the match: +${Math.round(25*m)} coins (and sometimes a Training Token).</p>
+  else{const m=MM(),pm=GM==='classical'?(club.cpitch==='expanded'?1.875:1.5):1,pn=GM==='classical'?(club.cpitch==='expanded'?'Classical Expanded 1.875×':'Classical Standard 1.5×'):'Volta 1.0×';body+=`<div class="panel"><h4>What this season pays</h4>
+    <p>Each match (${pn}, before difficulty): win ${Math.round(100*pm)} · draw ${Math.round(40*pm)} · loss ${Math.round(20*pm)} coins, plus ${Math.round(10*pm)} per goal. Man of the match: +${Math.round(25*pm)} coins (and sometimes a Training Token).</p>
     <p>League title bonus: ${(2000*m).toLocaleString()} coins. Promotion bonus: ${(750*m).toLocaleString()} coins.</p>
     <p>Finishing position in the ${D.n} (×${D.mul}): `+FINISH.map((c,i)=>`${ordinal(i+1)} ${Math.round(c*D.mul*m/10)*10}`).join(' · ')+`</p>
     <p>Club Points and Training Tokens for every finish, more near the top. A top-3 finish qualifies you for next season’s World Club Championship.</p></div>`+
@@ -415,11 +436,11 @@ $('tactics').addEventListener('click',e=>{const b=e.target.closest('[data-tac]')
 $('legpill').onclick=()=>{tab='club';ctab='legacy';renderMenu()};
 
 /* ----- the Club tab ----- */
-const CTABS=[['coll','Collection'],['upg','Development'],['packs','Packs'],['chal','Challenges'],['ach','Achievements'],['legacy','Club Legacy'],['exch','Exchanges'],['cos','Customise'],['cab','Trophy Cabinet'],['market','Transfer Market']];
+const CTABS=[['coll','Collection'],['upg','Development'],['abil','Special Abilities'],['packs','Packs'],['chal','Challenges'],['ach','Achievements'],['legacy','Club Legacy'],['exch','Exchanges'],['cos','Customise'],['cab','Trophy Cabinet'],['market','Transfer Market']];
 function renderClub(){achCheck();const cs=chState(),chDot=[...cs.d.map(x=>[x,DAILY]),...cs.w.map(x=>[x,WEEKLY])].some(([x,P0])=>!x.claimed&&x.v>=P0.find(q=>q.id===x.id).v),achDot=ACH.some(a=>!(club.ach||{})[a.id]&&achDone(a));
   $('ctabs').innerHTML=CTABS.map(([k,n])=>`<button data-ct="${k}" aria-selected="${ctab===k}">${n}${(k==='chal'&&chDot)||(k==='ach'&&achDot)?'<span class="dot"></span>':''}</button>`).join('');
   const B0=$('club-body');B0.innerHTML='';
-  if(ctab==='coll')renderCollection();else if(ctab==='upg')B0.innerHTML=devHTML();else if(ctab==='chal')B0.innerHTML=chalHTML();else if(ctab==='ach')B0.innerHTML=achHTML();
+  if(ctab==='coll')renderCollection();else if(ctab==='upg')B0.innerHTML=devHTML();else if(ctab==='abil')B0.innerHTML=ablHTML();else if(ctab==='chal')B0.innerHTML=chalHTML();else if(ctab==='ach')B0.innerHTML=achHTML();
   else if(ctab==='legacy')B0.innerHTML=legHTML();else if(ctab==='exch')B0.innerHTML=exchHTML();else if(ctab==='cos')B0.innerHTML=cosHTML();else if(ctab==='cab')B0.innerHTML=cabHTML();
   else if(ctab==='market')B0.innerHTML=`<div class="soon"><b>Transfer Market</b><p>Coming soon.</p><p class="hint">Buy the exact footballer you want for a fixed coin price, with search and a wishlist. Not open yet: keep saving those coins.</p></div>`}
 $('ctabs').addEventListener('click',e=>{const b=e.target.closest('[data-ct]');if(b){ctab=b.dataset.ct;renderMenu()}});
@@ -463,10 +484,11 @@ function devHTML(){const mine=ownedPlayers().filter(p=>!p.isCustom);if(!upId||!c
     ${upFlash&&upFlash.id===p.id?`<p class="flash">Upgraded: ${upFlash.o0} → ${upFlash.o1} OVR</p>`:''}
     <p class="hint">Level ${L} unlocks ${room} of ${cap} upgrade points${room<cap?' · play him or train him to level up for more':''}. Each stat can go up by ${STATMAX}. Each point costs a little more than the last.</p>${rows}</div>
     <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +100 XP. Every two levels adds +1 to his five best stats (up to +3).</p><button class="btn" data-train2="1" ${club.tt<2?'disabled':''}>Train · 2 Training Tokens</button></div>
-    ${evo}${p.ab?`<div class="panel"><h4>Signature ability · ${ABIL[p.ab].name}</h4><p>${ABIL[p.ab].d}. Always on when he plays.</p></div>`:''}${gk}</div></div>`}
+    ${ablPanel(p)}${evo}${p.ab?`<div class="panel"><h4>Signature ability · ${ABIL[p.ab].name}</h4><p>${ABIL[p.ab].d}. Always on when he plays.</p></div>`:''}${gk}</div></div>`}
 $('club-body').addEventListener('change',e=>{if(e.target.id==='dev-pick'){upId=e.target.value;upFlash=null;renderMenu()}});
 $('club-body').addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
   if(d.up)upBuy(upId,d.up);else if(d.evo)evoDo(upId);else if(d.train2)trainDo(upId);else if(d.gk)gkTrain();
+  else if(d.abl)ablBuy(d.abl);else if(d.ablall){ablAll=!ablAll;renderMenu()}else if(d.ablsort){ablSort=d.ablsort;renderMenu()}
   else if(d.chc)chClaim(d.chw,d.chc);else if(d.ach)achClaim(d.ach);else if(d.exch)exchDo(d.exch);else if(d.sell)sellDupes();else if(d.cosb)cosBuy(d.cosb);else if(d.cosu)cosUse(d.cosu);
   else if(d.badge){club.badge=d.badge;saveClub();renderMenu()}});
 function chalHTML(){const c=chState(),row=(x,P0,w)=>{const d=P0.find(q=>q.id===x.id);if(!d)return'';const done=x.v>=d.v;
@@ -485,6 +507,26 @@ function exchHTML(){const tot=Object.values(club.dupes||{}).reduce((a,b)=>a+b,0)
   return `<div class="panel"><h4>Duplicates · ${tot}</h4><p>${RAR.map(r=>`${TIERS[r].name}: ${dupCount(r)}`).join(' · ')}</p>${tot?`<button class="btn" data-sell="1">Quick-sell all for ${val.toLocaleString()} coins</button>`:'<p class="hint">Duplicates from packs land here.</p>'}</div>
    <div class="achg" style="margin-top:8px">${EXCH.map(x=>{const ok=Object.entries(x.need).every(([r,n])=>dupCount(r)>=n)&&club.coins>=x.coins;
     return `<div class="ach ${ok?'done':''}"><b>${x.n}</b><span>Hand in: ${Object.entries(x.need).map(([r,n])=>`${n} ${TIERS[r].name} duplicate${n>1?'s':''} (${dupCount(r)})`).join(' + ')}${x.coins?` + ${x.coins.toLocaleString()} coins`:''}</span><span style="color:var(--sun)">You get: ${grantPreview(x.out)}</span><button class="btn gold" data-exch="${x.id}" ${ok?'':'disabled'}>Exchange</button></div>`}).join('')}</div>`}
+// one row per footballer: his special, level, cooldown now and next, the price, and the button
+let ablAll=false,ablSort='lvl';
+function ablRow(p){const sp=p.sp,L=ablOf(p.id),max=L>=ABMAX,now=cdSecs(sp,L),nx=max?now:cdSecs(sp,L+1),c=max?0:ABCOST[L-1],can=!max&&club.coins>=c&&(club.tt||0)>=ABTT;
+  return `<tr><td>${esc(p.name)} <span class="hint" style="font-size:11px">${effOvr(p)}</span></td><td><b style="color:var(--sun)">${SPECIALS[sp].name}</b></td>
+    <td><div class="ablv">${[...Array(ABMAX)].map((_,i)=>`<i class="${i<L?'on':''}"></i>`).join('')}</div><span class="hint" style="font-size:11px">Level ${L}</span></td>
+    <td>${now.toFixed(1)}s</td><td>${max?'—':nx.toFixed(1)+'s'}</td><td>${max?'—':'<span class="flash">−'+(now-nx).toFixed(1)+'s</span>'}</td>
+    <td>${max?'<b class="maxl">MAX LEVEL</b>':`<button class="btn ${can?'gold':''}" data-abl="${p.id}" ${can?'':'disabled'}>${c.toLocaleString()} coins + ${ABTT} TT</button>`}</td></tr>`}
+function ablPanel(p){const L=ablOf(p.id),max=L>=ABMAX,sp=p.sp,now=cdSecs(sp,L),nx=max?now:cdSecs(sp,L+1),c=max?0:ABCOST[L-1];
+  return `<div class="panel"><h4>Special ability · ${SPECIALS[sp].name} · Level ${L}/${ABMAX}</h4><div class="ablv">${[...Array(ABMAX)].map((_,i)=>`<i class="${i<L?'on':''}"></i>`).join('')}</div>
+    <p>Cooldown ${now.toFixed(1)}s${max?' · <b class="maxl">MAX LEVEL</b>':` → ${nx.toFixed(1)}s at level ${L+1} (−${(now-nx).toFixed(1)}s)`}</p>
+    ${max?'':`<button class="btn gold" data-abl="${p.id}" ${club.coins>=c&&(club.tt||0)>=ABTT?'':'disabled'}>Upgrade · ${c.toLocaleString()} coins + ${ABTT} Training Tokens</button>`}
+    <p class="hint">Only this footballer’s ${SPECIALS[sp].name} gets faster. Level 1 → 10 costs 43,500 coins and 18 Training Tokens in total.</p></div>`}
+function ablHTML(){const own=ownedPlayers().filter(p=>SPECIALS[p.sp]),sorts={lvl:(a,b)=>ablOf(b.id)-ablOf(a.id)||effOvr(b)-effOvr(a),ovr:(a,b)=>effOvr(b)-effOvr(a),name:(a,b)=>a.name.localeCompare(b.name),ab:(a,b)=>SPECIALS[a.sp].name.localeCompare(SPECIALS[b.sp].name)||effOvr(b)-effOvr(a)};
+  const list=own.sort(sorts[ablSort]||sorts.lvl),shown=ablAll?list:list.slice(0,25);
+  const tiers=[['Through Ball',ABTIER.through],['Curler, Knuckleball, Rocket, Bicycle Kick, Interceptor',ABTIER.curler],['Turbo, Chip Pass, Chip',ABTIER.turbo]];
+  return `<div class="panel"><h4>Special Ability Development</h4><p>You have <b>${club.coins.toLocaleString()}</b> coins and <b>${club.tt||0}</b> Training Tokens. Every level costs 2 Training Tokens; coins rise from 500 to 13,000.</p>
+    <p class="hint">${tiers.map(([n,T])=>`${n}: ${T[0]}s at level 1 → ${T[1]}s at level 10`).join(' · ')}</p>
+    <div class="subtabs" style="justify-content:flex-start;margin:6px 0">${[['lvl','Level'],['ovr','Rating'],['ab','Ability'],['name','Name']].map(([k,n])=>`<button data-ablsort="${k}" aria-pressed="${ablSort===k}">Sort: ${n}</button>`).join('')}</div>
+    <div class="ltwrap"><table class="lt abt"><tr><th>Footballer</th><th>Ability</th><th>Level</th><th>Cooldown</th><th>Next</th><th>Saves</th><th></th></tr>${shown.map(ablRow).join('')}</table></div>
+    ${list.length>25?`<button class="ghost" data-ablall="1" style="margin-top:6px">${ablAll?'Show fewer':'Show all '+list.length}</button>`:''}</div>`}
 const BADGES=['⚽','🦁','🦅','🐺','⭐','🔥','👑','⚡','🌊','🛡️','🐉','🌟'];
 function cosHTML(){const groups=[['pitch','Pitch'],['theme','Stadium lighting'],['stad','Stadium'],['boards','Advertising boards'],['kitx','Kit']];
   return `<div class="panel"><h4>Club Points: ${res().cp.toLocaleString()}</h4><p class="hint">Earned from league seasons and the World Club Championship. Cosmetic only: nothing here changes how matches play.</p>
