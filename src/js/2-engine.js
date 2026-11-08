@@ -1469,7 +1469,7 @@ function calcRatings(){const pw=pen&&pen.winner!=null?pen.winner:null,res=tm=>{c
   const motm=rows.reduce((a,b)=>b.v>a.v?b:a);return{rows,motm}}
 function awardCoins(){awardCoins0();
   if(SG||NET.on){matchRatings=null;return}
-  matchRatings=calcRatings();const m=matchRatings.motm;if(m.p.team===0){const b=Math.round(25*matchMul());earned+=b;club.coins+=b;earnNote+=` · man of the match +${b}`;saveClub()}
+  matchRatings=calcRatings();const m=matchRatings.motm;if(m.p.team===0){const b=Math.round(25*matchMul()*LV().coin);earned+=b;club.coins+=b;earnNote+=` · man of the match +${b}`;saveClub()}
   careerAfterMatch()}
 function awardCoins0(){earned=0;shownEarned=0;earnNote='';
   if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=matchPay(score[0]>score[1]?'Online win':score[0]<score[1]?'Online defeat':'Online draw',r,score[0]*10,1);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;gdTokens(score[0],score[1]);saveClub();return}
