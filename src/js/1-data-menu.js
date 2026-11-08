@@ -50,8 +50,8 @@ function statsFor(rating,shape){
 }
 // [id, name, short, shirt, tag, position, rating, shape, skill, ultimate, celebration, skin, hair colour, look, how they play]
 const ROWS=[
- ['rafa','Rafa Nuñez','NUÑEZ',10,'The Magician','ATT',93,'dribbler','Elastico','Curler',5,'#e8b88c','#4a2c1a',['short',0,1,.92],'Low centre of gravity, glued-on dribbling, curled finishes'],
- ['marco','Marco Vance','VANCE',7,'The Machine','ATT',92,'power','Step-over','Bicycle kick',1,'#d9a07a','#2a1d17',['quiff',0,0,1.06],'Powerhouse athlete with a ferocious shot'],
+ ['rafa','Rafa Nuñez','NUÑEZ',10,'The Magician','ATT',96,'dribbler','Elastico','Curler',5,'#e8b88c','#4a2c1a',['short',0,1,.92],'Low centre of gravity, glued-on dribbling, curled finishes'],
+ ['marco','Marco Vance','VANCE',7,'The Machine','ATT',95,'power','Step-over','Bicycle kick',1,'#d9a07a','#2a1d17',['quiff',0,0,1.06],'Powerhouse athlete with a ferocious shot'],
  ['kai','Kai Okafor','OKAFOR',10,'The Rocket','ATT',89,'speed','Knock','Turbo',0,'#6e432b','#111111',['bald',0,0,1],'Blistering pace, knocks it past and goes'],
  ['lucien','Lucien Varenne','VARENNE',14,'The Glider','ATT',87,'speed','Roulette','Turbo',2,'#7a4b30','#111111',['bald',0,0,1.07],'Elegant, long-striding, side-foots into corners'],
  ['tiago','Tiago Brisa','BRISA',11,'Samba Winger','ATT',90,'dribbler','Rainbow flick','Curler',3,'#a8724f','#1a1412',['mohawk','#e8cf7a',0,.98],'Flair winger who lives for tricks'],
@@ -98,8 +98,12 @@ const ROWS=[
  ['leon','Leon Fry','FRY',17,'Pub Winger','ATT',57,'speed','Step-over','Curler',3,'#c68d63','#111111',['quiff',0,0,1],'Thinks he’s a winger. Sometimes is'],
  ['gaz','Gaz Moss','MOSS',3,'Sunday Stopper','DEF',59,'cb','Dragback','Interceptor',5,'#e8b88c','#4a2c1a',['buzz',0,1,1.04],'Will put a foot in. Always'],
  ['wes','Wes Hollis','HOLLIS',12,'Keen Bean','MID',56,'b2b','Step-over','Turbo',0,'#f2cfae','#b5562b',['curly',0,0,.98],'Keen as mustard']];
-const PLAYERS0=ROWS.map(r=>{const v=statsFor(r[6]>=87?Math.min(98,r[6]+3):r[6],r[7]);return{id:r[0],name:r[1],short:r[2],num:r[3],tag:r[4],pos:r[5],pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],
-  sk:SKMAP[r[8]],sp:SPMAP[r[9]],celeb:r[10],skin:r[11],hair:r[12],look:r[13],plays:r[14]}});
+// the original cards, rated to match the real players behind them: Messi and Ronaldo top the whole game
+const ORATE={rafa:99,marco:98,kai:94,lucien:93,tiago:92,sverre:93,yusuf:91,diego:88,han:85,tyrese:81,callum:83,gary:79,dario:81,anderson:78,nico:90,dimi:96,kees:89,ilya:88,jordan:91,
+  pau:94,marc:94,davi:93,rui:87,omar:85,dylan:88,cal:88,jake:81,rory:80,femi:72,tomas:78,alessio:95,ade:90,rodrigo:91,joao:92,marcos:92,edinho:90,moussa:88,jack:83,shaun:89,toby:81,hamish:79,evan:76,pete:68,jens:84};
+const OICON=new Set(['rafa','marco','tiago','diego','lucien','dimi','pau','marc','davi','alessio','rodrigo','joao','marcos','edinho','shaun']);
+const PLAYERS0=ROWS.map(r=>{const rt=ORATE[r[0]]??r[6],v=statsFor(rt,r[7]);return{id:r[0],name:r[1],short:r[2],num:r[3],tag:r[4],pos:r[5],pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],
+  sk:SKMAP[r[8]],sp:SPMAP[r[9]],celeb:r[10],skin:r[11],hair:r[12],look:r[13],plays:r[14],...(OICON.has(r[0])?{rar:'icon'}:rt>=86?{rar:'special'}:{})}});
 // saves from older versions: carry over players whose inspiration survived, refund the rest
 const OLDMAP={lena:'marc',andre:'sverre',finn:'nico',baz:'alessio',ze:'lucien',bruno:'moussa',sami:'jordan',nia:'shaun',luca:'jake',theo:'diego',yuki:'han',kofi:'edinho',ama:'rui',jonny:'callum',pablo:'anderson',ivo:'hamish',max:'rory',ray:'evan',tom:'femi',sid:'toby',joe:'gary'};
 
@@ -169,7 +173,13 @@ const saveClub=()=>{try{localStorage.setItem('kickabout-club',JSON.stringify(clu
 // artifact's private per-person store; whichever save has more progress wins, so a fresh start never overwrites a real club.
 const progressOf=sv=>{const c=sv&&sv.club;if(!c||!Array.isArray(c.owned))return -1;return (c.played||0)*1000+c.owned.length*10+Object.keys(sv.names||{}).length};
 const snapshotSave=()=>JSON.parse(JSON.stringify({club,names:NAMES,custom,best,at:Date.now(),v:1}));
-function applyNames(){for(const p of PLAYERS){if(NAMES[p.id]){p.name=NAMES[p.id];p.short=NAMES[p.id].split(' ').pop().toUpperCase().slice(0,10)}else{p.name=p.name0;p.short=p.short0}}}
+const shortOf=(nm,country)=>{const t=nm.split(' ');if(t.length<2)return nm.toUpperCase().slice(0,12);if(['South Korea','China'].includes(country))return t[0].toUpperCase();
+  if(/^(Júnior|Jr|Neto|Filho)$/.test(t[t.length-1]))return t[0].toUpperCase().slice(0,12);const rest=t.slice(1).join(' ');return (rest.length<=12?rest:t[t.length-1]).toUpperCase().slice(0,12)};
+const realOn=()=>club.realNames!==false;
+function applyNames(){for(const p of PLAYERS){const ins=typeof inspOf==='function'?inspOf(p.id):['',''];
+  if(NAMES[p.id]){p.name=NAMES[p.id];p.short=NAMES[p.id].split(' ').pop().toUpperCase().slice(0,10)}
+  else if(realOn()&&ins[0]){p.name=ins[0];p.short=shortOf(ins[0],ins[1])}
+  else{p.name=p.name0;p.short=p.short0}}}
 function cloudPush(){if(!cloud)return;clearTimeout(cloudTm);cloudTm=setTimeout(async()=>{if(cloudBusy){cloudPush();return}cloudBusy=true;
   try{await cloud.set(snapshotSave())}catch(e){if(e&&e.code==='unavailable')setTimeout(cloudPush,4000)}cloudBusy=false},1500)}
 async function cloudInit(){try{
@@ -219,11 +229,15 @@ let DF=DIFFS[diffKey];
 // defenders bite on your cuts (overcommit), and scale the coins.
 const LEVELS={chill:{shift:-1,ai:.9,bite:.62,coin:.8,name:'Chill',note:'Opponents bite on your cuts a lot and press gently, but fewer coins.'},
   normal:{shift:0,half:.8,ai:1.22,bite:.3,coin:1,name:'Normal',note:'A fair game. Defenders sometimes bite on a sharp cut.'},
-  hard:{shift:1,ai:1.3,bite:.2,coin:1.3,name:'Hard',note:'Sharper opponents who rarely bite, and more coins.'}};
+  hard:{shift:2.6,ai:1.75,bite:.04,coin:1.8,boost:.07,name:'Hard',note:'A genuine challenge: opponents beyond Legend level, stronger players, sharp keepers and they almost never bite. 1.8× coins.'}};
 const LV=()=>NET.on?{shift:0,ai:1,bite:.3,coin:1,name:'Online'}:LEVELS[club.level]||LEVELS.normal;
 const DKEYS=['beginner','easy','normal','hard','legend'];
-const levelDF=k=>{const x=clamp(DKEYS.indexOf(k)+LV().shift+(LV().half||0),0,4),lo=DIFFS[DKEYS[Math.floor(x)]],hi=DIFFS[DKEYS[Math.ceil(x)]],f=x-Math.floor(x);
-  if(!f)return lo;const o={...lo};for(const key in lo)if(typeof lo[key]==='number')o[key]=lo[key]+(hi[key]-lo[key])*f;else o[key]=f>=.5?hi[key]:lo[key];return o};// Normal sits half a step up
+// Hard can push an opponent past Legend: the numbers carry on from Normal → Hard → Legend, within sensible limits
+const DFCAP={spd:[1.5,3.15],tackle:[0,.8],react:[5,40],dive:[1,3.7],shoot:[0,1.1],err:[3,40],press:[0,1.35],range:[100,345],read:[0,.34],gk:[.7,1.42]};
+const levelDF=k=>{const x=clamp(DKEYS.indexOf(k)+LV().shift+(LV().half||0),0,6);
+  if(x>4){const L=DIFFS.legend,Hd=DIFFS.hard,o={...L};for(const key in L)if(typeof L[key]==='number'&&key!=='coin'){const v=L[key]+(L[key]-Hd[key])*(x-4)*1.15,c=DFCAP[key];o[key]=c?clamp(v,c[0],c[1]):v}return o}
+  const lo=DIFFS[DKEYS[Math.floor(x)]],hi=DIFFS[DKEYS[Math.ceil(x)]],f=x-Math.floor(x);
+  if(!f)return lo;const o={...lo};for(const key in lo)if(typeof lo[key]==='number')o[key]=lo[key]+(hi[key]-lo[key])*f;else o[key]=f>=.5?hi[key]:lo[key];return o};
 const CELEBS=['KNEE SLIDE','SIUUU','ROBOT','AIRPLANE','BACKFLIP','CALM DOWN'];
 // announcer lines for named goals (also spoken aloud when sound is on)
 const ANN={'SCREAMER':['FROM ABSOLUTELY MILES!','HE HAS LEATHERED IT!'],'TOP BINS':['RIGHT IN THE TOP CORNER!','WHERE THE OWL SLEEPS!'],'CURLER':['BENT IT LIKE A BANANA!','WHAT A CURLER!'],
@@ -261,7 +275,10 @@ const INSP0={rafa:['Lionel Messi','Argentina'],marco:['Cristiano Ronaldo','Portu
   dylan:['Declan Rice','England'],cal:['Cole Palmer','England'],jake:['James Maddison','England'],rory:['Conor Gallagher','England'],femi:['Dele Alli','England'],tomas:['Tomáš Souček','Czech Republic'],
   alessio:['Paolo Maldini','Italy'],ade:['Virgil van Dijk','Netherlands'],rodrigo:['Sergio Ramos','Spain'],joao:['Roberto Carlos','Brazil'],marcos:['Cafu','Brazil'],edinho:['Dani Alves','Brazil'],
   moussa:['William Saliba','France'],jack:['John Stones','England'],shaun:['Ashley Cole','England'],toby:['Ben White','England'],hamish:['Harry Maguire','England'],evan:['Eric Dier','England'],
-  pete:['Phil Jones','England'],jens:['Micky van de Ven','Netherlands'],dave:['Original','England'],leon:['Original','England'],gaz:['Original','England'],wes:['Original','England']};
+  pete:['Phil Jones','England'],jens:['Micky van de Ven','Netherlands'],dave:['James Milner','England'],leon:['Theo Walcott','England'],gaz:['Ryan Shawcross','England'],wes:['James Garner','England']};
+for(const p of PLAYERS)if(p.insp)INSP0[p.id]=p.insp;
+// flags for every country a real player comes from
+for(const [code,[nm,iso]] of Object.entries(realCC()))if(!COUNTRIES[nm])COUNTRIES[nm]=[code,iso?String.fromCodePoint(...[...iso].map(c=>127397+c.charCodeAt(0))):''];
 const inspOf=id=>{const o=club.insp&&club.insp[id];const d=INSP0[id]||['',''];return o?[o[0]??d[0],o[1]??d[1]]:d};
 const natHTML=p=>{if(p.isCustom)return '';const c=inspOf(p.id)[1],k=COUNTRIES[c];return c?`<span class="nat" title="${esc(c)}">${k?k[1]+' '+k[0]:esc(c).slice(0,3).toUpperCase()}</span>`:''};
 function cardHTML(p,o={}){
@@ -355,7 +372,7 @@ const compKey=()=>comp==='cup'?'easy':comp;
 function setGM(g){if(g===GM)return;club.compBy=club.compBy||{};club.compBy[GM]=club.comp;GM=g;club.gm=g;club.comp=club.compBy[g]||'league';
   if(!COMPS[g].includes(club.comp==='cup'?'easy':club.comp))club.comp='league';selSlot=0;saveClub();renderMenu()}
 function renderMenu(){
-  careerInit();
+  careerInit();applyNames();
   for(const k of ['team','squad','club','online'])$('tab-'+k).setAttribute('aria-selected',tab===k);
   $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';
   $('sec-packs').hidden=!(tab==='club'&&ctab==='packs');$('sec-coll').hidden=!(tab==='club'&&ctab==='coll');

@@ -3,6 +3,10 @@
 // separately (club.lg.volta / club.lg.classical and club.wcc.volta / club.wcc.classical).
 
 /* ===== the player database ===== */
+function origInsp(){return['Lionel Messi','Cristiano Ronaldo','Kylian Mbappé','Thierry Henry','Neymar','Erling Haaland','Mohamed Salah','Luis Suárez','Son Heung-min','Marcus Rashford','Ollie Watkins','Jamie Vardy',
+  'Darwin Núñez','Antony','Lamine Yamal','Zinedine Zidane','Kevin De Bruyne','Luka Modrić','Jude Bellingham','Andrés Iniesta','Xavi','Kaká','Bruno Fernandes','N’Golo Kanté','Declan Rice','Cole Palmer',
+  'James Maddison','Conor Gallagher','Dele Alli','Tomáš Souček','Paolo Maldini','Virgil van Dijk','Sergio Ramos','Roberto Carlos','Cafu','Dani Alves','William Saliba','John Stones','Ashley Cole','Ben White',
+  'Harry Maguire','Eric Dier','Phil Jones','Micky van de Ven','James Milner','Theo Walcott','Ryan Shawcross','James Garner']}
 // About a thousand made-up footballers, generated from a fixed seed so everyone gets the same cards and saves stay valid.
 // Rarity bands: Bronze 45-64, Silver 65-74, Gold 75-89, Special 86-94, Icon 90-98.
 function genPlayers(){
@@ -45,17 +49,22 @@ function genPlayers(){
   const ABI={finisher:'finisher',power:'finisher',playmaker:'passer',dribbler:'dribbler',speed:'speed',cb:'wall',ballcb:'wall',destroyer:'wall',b2b:'engine',fb:'speed',wingback:'engine'};
   const STY=['short','quiff','bald','mohawk','bun','afro','balding','buzz','curly','dreads','long','tuft'];
   const SKS=Object.values(SKMAP),SPS=Object.values(SPMAP);
-  const used=new Set(ROWS.map(r=>r[1])),out=[];let n=0;
-  const make=(rar,lo,hi,skew,count)=>{for(let i=0;i<count;i++){
-    const reg=P(REG);let name,g=0;do{name=P(reg[0])+' '+P(reg[1]);g++}while(used.has(name)&&g<40);if(used.has(name))name+=' Jr';used.add(name);
-    const pos=R()<.36?'DEF':R()<.55?'MID':'ATT',shape=P(SHP[pos]),rating=Math.round(lo+Math.pow(R(),skew)*(hi-lo));
-    const v=statsFor(rating,shape),last=name.split(' ').slice(1).join(' ');
-    const p={id:'g'+(n++),name,short:last.toUpperCase().slice(0,10),num:pos==='DEF'?P([2,3,4,5,6,12,15,22]):pos==='MID'?P([6,8,10,14,16,18,20,23]):P([7,9,10,11,17,19,21,29]),
-      tag:rar==='special'?P(SPEC):rar==='icon'?P(ICT):P(TAG[shape]),pos,pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],sk:P(SKS),sp:P(SPS),celeb:(R()*6)|0,
-      skin:P(SKINS),hair:R()<.85?P(HAIRS.slice(0,5)):P(HAIRS),look:[P(STY),0,R()<.3?1:0,Math.round((.94+R()*.14)*100)/100],plays:PLAYS[shape],rar};
-    if(rar==='special'||rar==='icon')p.ab=ABI[shape];
-    out.push(p)}};
-  make('bronze',45,64,.8,340);make('silver',65,74,1,240);make('gold',75,89,1.6,230);make('special',86,94,1.3,100);make('icon',90,98,1.25,45);
+  // every card is backed by a real footballer (see 1c-real.js); the card itself keeps a made-up name you can swap
+  // for the real one. Ids sit in fixed blocks per rarity so cards in older saves keep their rarity.
+  const used=new Set(ROWS.map(r=>r[1])),out=[],CC=realCC(),seen=new Set(origInsp());
+  const SH={f:'finisher',s:'speed',d:'dribbler',p:'power',m:'playmaker',b:'b2b',x:'destroyer',c:'cb',l:'fb',a:'ballcb',w:'wingback'};
+  const POS={finisher:'ATT',speed:'ATT',dribbler:'ATT',power:'ATT',playmaker:'MID',b2b:'MID',destroyer:'MID',cb:'DEF',fb:'DEF',ballcb:'DEF',wingback:'DEF'};
+  const BASE={bronze:[0,340],silver:[340,240],gold:[580,230],special:[810,100],icon:[910,45]},D=realPlayers();
+  for(const rar of ['bronze','silver','gold','special','icon']){let k=0;
+    for(const line of D[rar].split('\n')){const [real,cc,sc,rt]=line.split('|');if(!real||seen.has(real))continue;seen.add(real);
+      const shape=SH[sc]||'b2b',pos=POS[shape],rating=clamp(+rt||60,45,98),v=statsFor(rating,shape),reg=P(REG);
+      let name,g=0;do{name=P(reg[0])+' '+P(reg[1]);g++}while(used.has(name)&&g<40);if(used.has(name))name+=' Jr';used.add(name);
+      const last=name.split(' ').slice(1).join(' '),id=k<BASE[rar][1]?'g'+(BASE[rar][0]+k):'gx'+rar[0]+k;k++;
+      const p={id,name,short:last.toUpperCase().slice(0,10),num:pos==='DEF'?P([2,3,4,5,6,12,15,22]):pos==='MID'?P([6,8,10,14,16,18,20,23]):P([7,9,10,11,17,19,21,29]),
+        tag:rar==='special'?P(SPEC):rar==='icon'?P(ICT):P(TAG[shape]),pos,pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],sk:P(SKS),sp:P(SPS),celeb:(R()*6)|0,
+        skin:P(SKINS),hair:R()<.85?P(HAIRS.slice(0,5)):P(HAIRS),look:[P(STY),0,R()<.3?1:0,Math.round((.94+R()*.14)*100)/100],plays:PLAYS[shape],rar,insp:[real,(CC[cc]||[cc])[0]]};
+      if(rar==='special'||rar==='icon')p.ab=ABI[shape];
+      out.push(p)}}
   return out}
 
 /* ===== signature abilities ===== */
@@ -66,7 +75,7 @@ const ABIL={finisher:{name:'Elite Finisher',d:'+6 finishing, +4 shot power',fx:{
   speed:{name:'Lightning Pace',d:'+6 pace, +2 finishing',fx:{pace:.06,fin:.02}},
   wall:{name:'Defensive Wall',d:'+8 defending, +4 strength',fx:{tackle:.08,str:.04}},
   engine:{name:'Engine',d:'+3 pace, defending and passing',fx:{pace:.03,tackle:.03,pass:.03}}};
-for(const p of PLAYERS)if(!p.ab&&tier(p)==='icon'){const s=p.sk;p.ab=p.pos==='DEF'?'wall':p.pos==='MID'?'passer':s==='burst'||p.sp==='turbo'?'speed':s==='elastico'||s==='rainbow'?'dribbler':'finisher'}
+for(const p of PLAYERS)if(!p.ab&&(tier(p)==='icon'||tier(p)==='special')){const s=p.sk;p.ab=p.pos==='DEF'?'wall':p.pos==='MID'?'passer':s==='burst'||p.sp==='turbo'?'speed':s==='elastico'||s==='rainbow'?'dribbler':'finisher'}
 
 /* ===== upgrades, XP and evolutions ===== */
 const RAR=['bronze','silver','gold','special','icon'];
@@ -403,7 +412,7 @@ function renderCollection(){const F=collF,own=new Set(club.owned);
     `<select id="cf-pos" aria-label="Position">${['all','ATT','MID','DEF'].map(v=>`<option value="${v}" ${F.pos===v?'selected':''}>${v==='all'?'All positions':v}</option>`).join('')}</select>`+
     `<select id="cf-sort" aria-label="Sort">${[['ovr','Rating'],['rar','Rarity'],['pos','Position'],['up','Upgrade level'],['name','Name']].map(([v,n])=>`<option value="${v}" ${F.sort===v?'selected':''}>Sort: ${n}</option>`).join('')}</select>`;
   const q=F.q.trim().toLowerCase();let list=[...PLAYERS,custom].filter(p=>(F.own==='all'||(F.own==='owned')===own.has(p.id))&&(F.r==='all'||tier(p)===F.r)&&(F.pos==='all'||natPos(p)===F.pos)&&(!q||p.name.toLowerCase().includes(q)));
-  const RI=r=>RAR.indexOf(r);const sorts={ovr:(a,b)=>effOvr(b)-effOvr(a),rar:(a,b)=>RI(tier(b))-RI(tier(a))||ovr(b)-ovr(a),pos:(a,b)=>natPos(a).localeCompare(natPos(b))||ovr(b)-ovr(a),up:(a,b)=>upSpent(b.id)+evoOf(b.id).st*5-upSpent(a.id)-evoOf(a.id).st*5||ovr(b)-ovr(a),name:(a,b)=>a.name.localeCompare(b.name)};
+  const RI=r=>RAR.indexOf(r);const sv=p=>own.has(p.id)?effOvr(p):ovr(p);const sorts={ovr:(a,b)=>sv(b)-sv(a),rar:(a,b)=>RI(tier(b))-RI(tier(a))||ovr(b)-ovr(a),pos:(a,b)=>natPos(a).localeCompare(natPos(b))||ovr(b)-ovr(a),up:(a,b)=>upSpent(b.id)+evoOf(b.id).st*5-upSpent(a.id)-evoOf(a.id).st*5||ovr(b)-ovr(a),name:(a,b)=>a.name.localeCompare(b.name)};
   list.sort(sorts[F.sort]||sorts.ovr);const per=24,pages=Math.max(1,Math.ceil(list.length/per));F.page=clamp(F.page,0,pages-1);
   $('market').innerHTML=list.slice(F.page*per,F.page*per+per).map(p=>{const o=own.has(p.id);
     const h=cardHTML(o?p:{...p,name:NAMES[p.id]||p.name},{nolv:!o,extra:o?`<div class="cact">${p.isCustom?'':`<button data-upg="${p.id}">Upgrade</button>`}<button data-cmp="${p.id}" aria-pressed="${cmpIds.includes(p.id)}">Compare</button>${(club.dupes||{})[p.id]?`<span class="hint" style="margin:0">+${club.dupes[p.id]} duplicate</span>`:''}</div>`+renameUI(p,'coll'):`<span class="owned" style="color:var(--muted)">Found in packs</span>`});

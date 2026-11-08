@@ -416,8 +416,9 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
         <textarea id="save-code" rows="3" placeholder="Paste a save code here" spellcheck="false" style="font:12px/1.3 monospace;width:100%;box-sizing:border-box;margin-top:8px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--ground-2);color:var(--cream)"></textarea>
         <div class="row" style="justify-content:flex-start;margin-top:6px"><button class="ghost" id="save-load">Load save</button></div>
       </details>
-      <details class="guide" id="whobox"><summary>Who’s who: the real players behind the cards</summary>
-        <p class="hint" style="margin:8px 0">Each of the original cards is a made-up player inspired by a real one (the newer cards are made up from scratch). The country is the real player’s, and shows on every card. Spot a mistake? Fix it here and save.</p>
+      <details class="guide" id="whobox"><summary>Who’s who: the real players behind every card</summary>
+        <p class="hint" style="margin:8px 0">Every card is backed by a real footballer, and their country shows on the card. With real names on, cards use the real player’s name (any name you set yourself still wins). Search any card, fix a name or country, and press Save.</p>
+        <div class="collctl" id="who-top" style="margin-bottom:8px"></div>
         <div class="who" id="who"></div>
         <div class="row" style="margin-top:8px"><button class="go" id="who-save" style="font-size:18px">Save</button><button class="ghost" id="who-reset">Put back the originals</button></div>
       </details>
@@ -531,8 +532,8 @@ function statsFor(rating,shape){
 }
 // [id, name, short, shirt, tag, position, rating, shape, skill, ultimate, celebration, skin, hair colour, look, how they play]
 const ROWS=[
- ['rafa','Rafa Nuñez','NUÑEZ',10,'The Magician','ATT',93,'dribbler','Elastico','Curler',5,'#e8b88c','#4a2c1a',['short',0,1,.92],'Low centre of gravity, glued-on dribbling, curled finishes'],
- ['marco','Marco Vance','VANCE',7,'The Machine','ATT',92,'power','Step-over','Bicycle kick',1,'#d9a07a','#2a1d17',['quiff',0,0,1.06],'Powerhouse athlete with a ferocious shot'],
+ ['rafa','Rafa Nuñez','NUÑEZ',10,'The Magician','ATT',96,'dribbler','Elastico','Curler',5,'#e8b88c','#4a2c1a',['short',0,1,.92],'Low centre of gravity, glued-on dribbling, curled finishes'],
+ ['marco','Marco Vance','VANCE',7,'The Machine','ATT',95,'power','Step-over','Bicycle kick',1,'#d9a07a','#2a1d17',['quiff',0,0,1.06],'Powerhouse athlete with a ferocious shot'],
  ['kai','Kai Okafor','OKAFOR',10,'The Rocket','ATT',89,'speed','Knock','Turbo',0,'#6e432b','#111111',['bald',0,0,1],'Blistering pace, knocks it past and goes'],
  ['lucien','Lucien Varenne','VARENNE',14,'The Glider','ATT',87,'speed','Roulette','Turbo',2,'#7a4b30','#111111',['bald',0,0,1.07],'Elegant, long-striding, side-foots into corners'],
  ['tiago','Tiago Brisa','BRISA',11,'Samba Winger','ATT',90,'dribbler','Rainbow flick','Curler',3,'#a8724f','#1a1412',['mohawk','#e8cf7a',0,.98],'Flair winger who lives for tricks'],
@@ -579,8 +580,12 @@ const ROWS=[
  ['leon','Leon Fry','FRY',17,'Pub Winger','ATT',57,'speed','Step-over','Curler',3,'#c68d63','#111111',['quiff',0,0,1],'Thinks he’s a winger. Sometimes is'],
  ['gaz','Gaz Moss','MOSS',3,'Sunday Stopper','DEF',59,'cb','Dragback','Interceptor',5,'#e8b88c','#4a2c1a',['buzz',0,1,1.04],'Will put a foot in. Always'],
  ['wes','Wes Hollis','HOLLIS',12,'Keen Bean','MID',56,'b2b','Step-over','Turbo',0,'#f2cfae','#b5562b',['curly',0,0,.98],'Keen as mustard']];
-const PLAYERS0=ROWS.map(r=>{const v=statsFor(r[6]>=87?Math.min(98,r[6]+3):r[6],r[7]);return{id:r[0],name:r[1],short:r[2],num:r[3],tag:r[4],pos:r[5],pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],
-  sk:SKMAP[r[8]],sp:SPMAP[r[9]],celeb:r[10],skin:r[11],hair:r[12],look:r[13],plays:r[14]}});
+// the original cards, rated to match the real players behind them: Messi and Ronaldo top the whole game
+const ORATE={rafa:99,marco:98,kai:94,lucien:93,tiago:92,sverre:93,yusuf:91,diego:88,han:85,tyrese:81,callum:83,gary:79,dario:81,anderson:78,nico:90,dimi:96,kees:89,ilya:88,jordan:91,
+  pau:94,marc:94,davi:93,rui:87,omar:85,dylan:88,cal:88,jake:81,rory:80,femi:72,tomas:78,alessio:95,ade:90,rodrigo:91,joao:92,marcos:92,edinho:90,moussa:88,jack:83,shaun:89,toby:81,hamish:79,evan:76,pete:68,jens:84};
+const OICON=new Set(['rafa','marco','tiago','diego','lucien','dimi','pau','marc','davi','alessio','rodrigo','joao','marcos','edinho','shaun']);
+const PLAYERS0=ROWS.map(r=>{const rt=ORATE[r[0]]??r[6],v=statsFor(rt,r[7]);return{id:r[0],name:r[1],short:r[2],num:r[3],tag:r[4],pos:r[5],pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],
+  sk:SKMAP[r[8]],sp:SPMAP[r[9]],celeb:r[10],skin:r[11],hair:r[12],look:r[13],plays:r[14],...(OICON.has(r[0])?{rar:'icon'}:rt>=86?{rar:'special'}:{})}});
 // saves from older versions: carry over players whose inspiration survived, refund the rest
 const OLDMAP={lena:'marc',andre:'sverre',finn:'nico',baz:'alessio',ze:'lucien',bruno:'moussa',sami:'jordan',nia:'shaun',luca:'jake',theo:'diego',yuki:'han',kofi:'edinho',ama:'rui',jonny:'callum',pablo:'anderson',ivo:'hamish',max:'rory',ray:'evan',tom:'femi',sid:'toby',joe:'gary'};
 
@@ -650,7 +655,13 @@ const saveClub=()=>{try{localStorage.setItem('kickabout-club',JSON.stringify(clu
 // artifact's private per-person store; whichever save has more progress wins, so a fresh start never overwrites a real club.
 const progressOf=sv=>{const c=sv&&sv.club;if(!c||!Array.isArray(c.owned))return -1;return (c.played||0)*1000+c.owned.length*10+Object.keys(sv.names||{}).length};
 const snapshotSave=()=>JSON.parse(JSON.stringify({club,names:NAMES,custom,best,at:Date.now(),v:1}));
-function applyNames(){for(const p of PLAYERS){if(NAMES[p.id]){p.name=NAMES[p.id];p.short=NAMES[p.id].split(' ').pop().toUpperCase().slice(0,10)}else{p.name=p.name0;p.short=p.short0}}}
+const shortOf=(nm,country)=>{const t=nm.split(' ');if(t.length<2)return nm.toUpperCase().slice(0,12);if(['South Korea','China'].includes(country))return t[0].toUpperCase();
+  if(/^(Júnior|Jr|Neto|Filho)$/.test(t[t.length-1]))return t[0].toUpperCase().slice(0,12);const rest=t.slice(1).join(' ');return (rest.length<=12?rest:t[t.length-1]).toUpperCase().slice(0,12)};
+const realOn=()=>club.realNames!==false;
+function applyNames(){for(const p of PLAYERS){const ins=typeof inspOf==='function'?inspOf(p.id):['',''];
+  if(NAMES[p.id]){p.name=NAMES[p.id];p.short=NAMES[p.id].split(' ').pop().toUpperCase().slice(0,10)}
+  else if(realOn()&&ins[0]){p.name=ins[0];p.short=shortOf(ins[0],ins[1])}
+  else{p.name=p.name0;p.short=p.short0}}}
 function cloudPush(){if(!cloud)return;clearTimeout(cloudTm);cloudTm=setTimeout(async()=>{if(cloudBusy){cloudPush();return}cloudBusy=true;
   try{await cloud.set(snapshotSave())}catch(e){if(e&&e.code==='unavailable')setTimeout(cloudPush,4000)}cloudBusy=false},1500)}
 async function cloudInit(){try{
@@ -700,11 +711,15 @@ let DF=DIFFS[diffKey];
 // defenders bite on your cuts (overcommit), and scale the coins.
 const LEVELS={chill:{shift:-1,ai:.9,bite:.62,coin:.8,name:'Chill',note:'Opponents bite on your cuts a lot and press gently, but fewer coins.'},
   normal:{shift:0,half:.8,ai:1.22,bite:.3,coin:1,name:'Normal',note:'A fair game. Defenders sometimes bite on a sharp cut.'},
-  hard:{shift:1,ai:1.3,bite:.2,coin:1.3,name:'Hard',note:'Sharper opponents who rarely bite, and more coins.'}};
+  hard:{shift:2.6,ai:1.75,bite:.04,coin:1.8,boost:.07,name:'Hard',note:'A genuine challenge: opponents beyond Legend level, stronger players, sharp keepers and they almost never bite. 1.8× coins.'}};
 const LV=()=>NET.on?{shift:0,ai:1,bite:.3,coin:1,name:'Online'}:LEVELS[club.level]||LEVELS.normal;
 const DKEYS=['beginner','easy','normal','hard','legend'];
-const levelDF=k=>{const x=clamp(DKEYS.indexOf(k)+LV().shift+(LV().half||0),0,4),lo=DIFFS[DKEYS[Math.floor(x)]],hi=DIFFS[DKEYS[Math.ceil(x)]],f=x-Math.floor(x);
-  if(!f)return lo;const o={...lo};for(const key in lo)if(typeof lo[key]==='number')o[key]=lo[key]+(hi[key]-lo[key])*f;else o[key]=f>=.5?hi[key]:lo[key];return o};// Normal sits half a step up
+// Hard can push an opponent past Legend: the numbers carry on from Normal → Hard → Legend, within sensible limits
+const DFCAP={spd:[1.5,3.15],tackle:[0,.8],react:[5,40],dive:[1,3.7],shoot:[0,1.1],err:[3,40],press:[0,1.35],range:[100,345],read:[0,.34],gk:[.7,1.42]};
+const levelDF=k=>{const x=clamp(DKEYS.indexOf(k)+LV().shift+(LV().half||0),0,6);
+  if(x>4){const L=DIFFS.legend,Hd=DIFFS.hard,o={...L};for(const key in L)if(typeof L[key]==='number'&&key!=='coin'){const v=L[key]+(L[key]-Hd[key])*(x-4)*1.15,c=DFCAP[key];o[key]=c?clamp(v,c[0],c[1]):v}return o}
+  const lo=DIFFS[DKEYS[Math.floor(x)]],hi=DIFFS[DKEYS[Math.ceil(x)]],f=x-Math.floor(x);
+  if(!f)return lo;const o={...lo};for(const key in lo)if(typeof lo[key]==='number')o[key]=lo[key]+(hi[key]-lo[key])*f;else o[key]=f>=.5?hi[key]:lo[key];return o};
 const CELEBS=['KNEE SLIDE','SIUUU','ROBOT','AIRPLANE','BACKFLIP','CALM DOWN'];
 // announcer lines for named goals (also spoken aloud when sound is on)
 const ANN={'SCREAMER':['FROM ABSOLUTELY MILES!','HE HAS LEATHERED IT!'],'TOP BINS':['RIGHT IN THE TOP CORNER!','WHERE THE OWL SLEEPS!'],'CURLER':['BENT IT LIKE A BANANA!','WHAT A CURLER!'],
@@ -742,7 +757,10 @@ const INSP0={rafa:['Lionel Messi','Argentina'],marco:['Cristiano Ronaldo','Portu
   dylan:['Declan Rice','England'],cal:['Cole Palmer','England'],jake:['James Maddison','England'],rory:['Conor Gallagher','England'],femi:['Dele Alli','England'],tomas:['Tomáš Souček','Czech Republic'],
   alessio:['Paolo Maldini','Italy'],ade:['Virgil van Dijk','Netherlands'],rodrigo:['Sergio Ramos','Spain'],joao:['Roberto Carlos','Brazil'],marcos:['Cafu','Brazil'],edinho:['Dani Alves','Brazil'],
   moussa:['William Saliba','France'],jack:['John Stones','England'],shaun:['Ashley Cole','England'],toby:['Ben White','England'],hamish:['Harry Maguire','England'],evan:['Eric Dier','England'],
-  pete:['Phil Jones','England'],jens:['Micky van de Ven','Netherlands'],dave:['Original','England'],leon:['Original','England'],gaz:['Original','England'],wes:['Original','England']};
+  pete:['Phil Jones','England'],jens:['Micky van de Ven','Netherlands'],dave:['James Milner','England'],leon:['Theo Walcott','England'],gaz:['Ryan Shawcross','England'],wes:['James Garner','England']};
+for(const p of PLAYERS)if(p.insp)INSP0[p.id]=p.insp;
+// flags for every country a real player comes from
+for(const [code,[nm,iso]] of Object.entries(realCC()))if(!COUNTRIES[nm])COUNTRIES[nm]=[code,iso?String.fromCodePoint(...[...iso].map(c=>127397+c.charCodeAt(0))):''];
 const inspOf=id=>{const o=club.insp&&club.insp[id];const d=INSP0[id]||['',''];return o?[o[0]??d[0],o[1]??d[1]]:d};
 const natHTML=p=>{if(p.isCustom)return '';const c=inspOf(p.id)[1],k=COUNTRIES[c];return c?`<span class="nat" title="${esc(c)}">${k?k[1]+' '+k[0]:esc(c).slice(0,3).toUpperCase()}</span>`:''};
 function cardHTML(p,o={}){
@@ -836,7 +854,7 @@ const compKey=()=>comp==='cup'?'easy':comp;
 function setGM(g){if(g===GM)return;club.compBy=club.compBy||{};club.compBy[GM]=club.comp;GM=g;club.gm=g;club.comp=club.compBy[g]||'league';
   if(!COMPS[g].includes(club.comp==='cup'?'easy':club.comp))club.comp='league';selSlot=0;saveClub();renderMenu()}
 function renderMenu(){
-  careerInit();
+  careerInit();applyNames();
   for(const k of ['team','squad','club','online'])$('tab-'+k).setAttribute('aria-selected',tab===k);
   $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';
   $('sec-packs').hidden=!(tab==='club'&&ctab==='packs');$('sec-coll').hidden=!(tab==='club'&&ctab==='coll');
@@ -1078,6 +1096,10 @@ $('c-save').onclick=()=>{
 // separately (club.lg.volta / club.lg.classical and club.wcc.volta / club.wcc.classical).
 
 /* ===== the player database ===== */
+function origInsp(){return['Lionel Messi','Cristiano Ronaldo','Kylian Mbappé','Thierry Henry','Neymar','Erling Haaland','Mohamed Salah','Luis Suárez','Son Heung-min','Marcus Rashford','Ollie Watkins','Jamie Vardy',
+  'Darwin Núñez','Antony','Lamine Yamal','Zinedine Zidane','Kevin De Bruyne','Luka Modrić','Jude Bellingham','Andrés Iniesta','Xavi','Kaká','Bruno Fernandes','N’Golo Kanté','Declan Rice','Cole Palmer',
+  'James Maddison','Conor Gallagher','Dele Alli','Tomáš Souček','Paolo Maldini','Virgil van Dijk','Sergio Ramos','Roberto Carlos','Cafu','Dani Alves','William Saliba','John Stones','Ashley Cole','Ben White',
+  'Harry Maguire','Eric Dier','Phil Jones','Micky van de Ven','James Milner','Theo Walcott','Ryan Shawcross','James Garner']}
 // About a thousand made-up footballers, generated from a fixed seed so everyone gets the same cards and saves stay valid.
 // Rarity bands: Bronze 45-64, Silver 65-74, Gold 75-89, Special 86-94, Icon 90-98.
 function genPlayers(){
@@ -1120,17 +1142,22 @@ function genPlayers(){
   const ABI={finisher:'finisher',power:'finisher',playmaker:'passer',dribbler:'dribbler',speed:'speed',cb:'wall',ballcb:'wall',destroyer:'wall',b2b:'engine',fb:'speed',wingback:'engine'};
   const STY=['short','quiff','bald','mohawk','bun','afro','balding','buzz','curly','dreads','long','tuft'];
   const SKS=Object.values(SKMAP),SPS=Object.values(SPMAP);
-  const used=new Set(ROWS.map(r=>r[1])),out=[];let n=0;
-  const make=(rar,lo,hi,skew,count)=>{for(let i=0;i<count;i++){
-    const reg=P(REG);let name,g=0;do{name=P(reg[0])+' '+P(reg[1]);g++}while(used.has(name)&&g<40);if(used.has(name))name+=' Jr';used.add(name);
-    const pos=R()<.36?'DEF':R()<.55?'MID':'ATT',shape=P(SHP[pos]),rating=Math.round(lo+Math.pow(R(),skew)*(hi-lo));
-    const v=statsFor(rating,shape),last=name.split(' ').slice(1).join(' ');
-    const p={id:'g'+(n++),name,short:last.toUpperCase().slice(0,10),num:pos==='DEF'?P([2,3,4,5,6,12,15,22]):pos==='MID'?P([6,8,10,14,16,18,20,23]):P([7,9,10,11,17,19,21,29]),
-      tag:rar==='special'?P(SPEC):rar==='icon'?P(ICT):P(TAG[shape]),pos,pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],sk:P(SKS),sp:P(SPS),celeb:(R()*6)|0,
-      skin:P(SKINS),hair:R()<.85?P(HAIRS.slice(0,5)):P(HAIRS),look:[P(STY),0,R()<.3?1:0,Math.round((.94+R()*.14)*100)/100],plays:PLAYS[shape],rar};
-    if(rar==='special'||rar==='icon')p.ab=ABI[shape];
-    out.push(p)}};
-  make('bronze',45,64,.8,340);make('silver',65,74,1,240);make('gold',75,89,1.6,230);make('special',86,94,1.3,100);make('icon',90,98,1.25,45);
+  // every card is backed by a real footballer (see 1c-real.js); the card itself keeps a made-up name you can swap
+  // for the real one. Ids sit in fixed blocks per rarity so cards in older saves keep their rarity.
+  const used=new Set(ROWS.map(r=>r[1])),out=[],CC=realCC(),seen=new Set(origInsp());
+  const SH={f:'finisher',s:'speed',d:'dribbler',p:'power',m:'playmaker',b:'b2b',x:'destroyer',c:'cb',l:'fb',a:'ballcb',w:'wingback'};
+  const POS={finisher:'ATT',speed:'ATT',dribbler:'ATT',power:'ATT',playmaker:'MID',b2b:'MID',destroyer:'MID',cb:'DEF',fb:'DEF',ballcb:'DEF',wingback:'DEF'};
+  const BASE={bronze:[0,340],silver:[340,240],gold:[580,230],special:[810,100],icon:[910,45]},D=realPlayers();
+  for(const rar of ['bronze','silver','gold','special','icon']){let k=0;
+    for(const line of D[rar].split('\n')){const [real,cc,sc,rt]=line.split('|');if(!real||seen.has(real))continue;seen.add(real);
+      const shape=SH[sc]||'b2b',pos=POS[shape],rating=clamp(+rt||60,45,98),v=statsFor(rating,shape),reg=P(REG);
+      let name,g=0;do{name=P(reg[0])+' '+P(reg[1]);g++}while(used.has(name)&&g<40);if(used.has(name))name+=' Jr';used.add(name);
+      const last=name.split(' ').slice(1).join(' '),id=k<BASE[rar][1]?'g'+(BASE[rar][0]+k):'gx'+rar[0]+k;k++;
+      const p={id,name,short:last.toUpperCase().slice(0,10),num:pos==='DEF'?P([2,3,4,5,6,12,15,22]):pos==='MID'?P([6,8,10,14,16,18,20,23]):P([7,9,10,11,17,19,21,29]),
+        tag:rar==='special'?P(SPEC):rar==='icon'?P(ICT):P(TAG[shape]),pos,pace:v[0],shot:v[1],fin:v[2],skill:v[3],pass:v[4],tackle:v[5],str:v[6],sk:P(SKS),sp:P(SPS),celeb:(R()*6)|0,
+        skin:P(SKINS),hair:R()<.85?P(HAIRS.slice(0,5)):P(HAIRS),look:[P(STY),0,R()<.3?1:0,Math.round((.94+R()*.14)*100)/100],plays:PLAYS[shape],rar,insp:[real,(CC[cc]||[cc])[0]]};
+      if(rar==='special'||rar==='icon')p.ab=ABI[shape];
+      out.push(p)}}
   return out}
 
 /* ===== signature abilities ===== */
@@ -1141,7 +1168,7 @@ const ABIL={finisher:{name:'Elite Finisher',d:'+6 finishing, +4 shot power',fx:{
   speed:{name:'Lightning Pace',d:'+6 pace, +2 finishing',fx:{pace:.06,fin:.02}},
   wall:{name:'Defensive Wall',d:'+8 defending, +4 strength',fx:{tackle:.08,str:.04}},
   engine:{name:'Engine',d:'+3 pace, defending and passing',fx:{pace:.03,tackle:.03,pass:.03}}};
-for(const p of PLAYERS)if(!p.ab&&tier(p)==='icon'){const s=p.sk;p.ab=p.pos==='DEF'?'wall':p.pos==='MID'?'passer':s==='burst'||p.sp==='turbo'?'speed':s==='elastico'||s==='rainbow'?'dribbler':'finisher'}
+for(const p of PLAYERS)if(!p.ab&&(tier(p)==='icon'||tier(p)==='special')){const s=p.sk;p.ab=p.pos==='DEF'?'wall':p.pos==='MID'?'passer':s==='burst'||p.sp==='turbo'?'speed':s==='elastico'||s==='rainbow'?'dribbler':'finisher'}
 
 /* ===== upgrades, XP and evolutions ===== */
 const RAR=['bronze','silver','gold','special','icon'];
@@ -1478,7 +1505,7 @@ function renderCollection(){const F=collF,own=new Set(club.owned);
     `<select id="cf-pos" aria-label="Position">${['all','ATT','MID','DEF'].map(v=>`<option value="${v}" ${F.pos===v?'selected':''}>${v==='all'?'All positions':v}</option>`).join('')}</select>`+
     `<select id="cf-sort" aria-label="Sort">${[['ovr','Rating'],['rar','Rarity'],['pos','Position'],['up','Upgrade level'],['name','Name']].map(([v,n])=>`<option value="${v}" ${F.sort===v?'selected':''}>Sort: ${n}</option>`).join('')}</select>`;
   const q=F.q.trim().toLowerCase();let list=[...PLAYERS,custom].filter(p=>(F.own==='all'||(F.own==='owned')===own.has(p.id))&&(F.r==='all'||tier(p)===F.r)&&(F.pos==='all'||natPos(p)===F.pos)&&(!q||p.name.toLowerCase().includes(q)));
-  const RI=r=>RAR.indexOf(r);const sorts={ovr:(a,b)=>effOvr(b)-effOvr(a),rar:(a,b)=>RI(tier(b))-RI(tier(a))||ovr(b)-ovr(a),pos:(a,b)=>natPos(a).localeCompare(natPos(b))||ovr(b)-ovr(a),up:(a,b)=>upSpent(b.id)+evoOf(b.id).st*5-upSpent(a.id)-evoOf(a.id).st*5||ovr(b)-ovr(a),name:(a,b)=>a.name.localeCompare(b.name)};
+  const RI=r=>RAR.indexOf(r);const sv=p=>own.has(p.id)?effOvr(p):ovr(p);const sorts={ovr:(a,b)=>sv(b)-sv(a),rar:(a,b)=>RI(tier(b))-RI(tier(a))||ovr(b)-ovr(a),pos:(a,b)=>natPos(a).localeCompare(natPos(b))||ovr(b)-ovr(a),up:(a,b)=>upSpent(b.id)+evoOf(b.id).st*5-upSpent(a.id)-evoOf(a.id).st*5||ovr(b)-ovr(a),name:(a,b)=>a.name.localeCompare(b.name)};
   list.sort(sorts[F.sort]||sorts.ovr);const per=24,pages=Math.max(1,Math.ceil(list.length/per));F.page=clamp(F.page,0,pages-1);
   $('market').innerHTML=list.slice(F.page*per,F.page*per+per).map(p=>{const o=own.has(p.id);
     const h=cardHTML(o?p:{...p,name:NAMES[p.id]||p.name},{nolv:!o,extra:o?`<div class="cact">${p.isCustom?'':`<button data-upg="${p.id}">Upgrade</button>`}<button data-cmp="${p.id}" aria-pressed="${cmpIds.includes(p.id)}">Compare</button>${(club.dupes||{})[p.id]?`<span class="hint" style="margin:0">+${club.dupes[p.id]} duplicate</span>`:''}</div>`+renameUI(p,'coll'):`<span class="owned" style="color:var(--muted)">Found in packs</span>`});
@@ -1546,6 +1573,1200 @@ function cabHTML(){const T=club.trophies||{},items=[];for(const m of ['volta','c
    <div class="panel" style="margin-top:8px"><h4>Club history</h4><p>${stv('matches')} matches · ${stv('wins')} wins · ${stv('goals')} goals · ${stv('cleans')} clean sheets · ${stv('titles')} league titles · ${stv('promos_volta')+stv('promos_classical')} promotions</p>
    ${(club.hist||[]).slice(0,20).map(h=>`<p class="hint" style="margin:2px 0">${h.m==='volta'?'Volta':'Classical'} season ${h.season} · ${DIVS[h.div].n}: ${ordinal(h.pos)} with ${h.pts} pts${h.note?' · '+esc(h.note):''}</p>`).join('')}</div>`}
 
+/* ---------- the real footballers behind the cards ---------- */
+// Every generated card is inspired by a real player: name | country code | style | game rating.
+// Styles: f finisher, s speed, d dribbler, p power, m playmaker, b box-to-box, x ball-winner, c centre-back,
+// l full-back, a ball-playing centre-back, w wing-back. Ratings are this game's own scale, not anybody else's.
+// Keepers aren't here: every club plays its own goalkeeper.
+function realPlayers(){return{
+icon:`Pelé|BRA|f|97
+Diego Maradona|ARG|d|97
+Johan Cruyff|NED|d|96
+Ronaldo Nazário|BRA|f|96
+Franz Beckenbauer|GER|a|95
+Alfredo Di Stéfano|ARG|f|95
+Ronaldinho|BRA|d|95
+Eusébio|POR|f|94
+Ferenc Puskás|HUN|f|94
+Gerd Müller|GER|f|94
+Marco van Basten|NED|f|94
+Michel Platini|FRA|m|94
+George Best|NIR|d|93
+Bobby Charlton|ENG|m|93
+Zico|BRA|m|93
+Romário|BRA|f|93
+Garrincha|BRA|d|93
+Roberto Baggio|ITA|d|93
+Franco Baresi|ITA|c|93
+Lothar Matthäus|GER|b|93
+Ruud Gullit|NED|b|92
+Frank Rijkaard|NED|x|91
+Dennis Bergkamp|NED|d|92
+Andrea Pirlo|ITA|m|92
+Francesco Totti|ITA|m|92
+Alessandro Del Piero|ITA|d|92
+Fabio Cannavaro|ITA|c|92
+Steven Gerrard|ENG|b|92
+Frank Lampard|ENG|b|91
+Paul Scholes|ENG|m|91
+Wayne Rooney|ENG|p|92
+Alan Shearer|ENG|p|91
+Patrick Vieira|FRA|b|91
+Roy Keane|IRL|x|91
+Rio Ferdinand|ENG|a|91
+John Terry|ENG|c|91
+Carles Puyol|ESP|c|91
+Raúl|ESP|f|92
+Fernando Torres|ESP|s|90
+David Villa|ESP|f|90
+Didier Drogba|CIV|p|92
+Samuel Eto'o|CMR|f|92
+George Weah|LBR|s|92
+Andriy Shevchenko|UKR|f|92
+Hristo Stoichkov|BUL|d|91
+Pavel Nedvěd|CZE|b|91
+Luís Figo|POR|d|92
+Rui Costa|POR|m|90
+Clarence Seedorf|NED|b|91
+Michael Laudrup|DEN|m|91
+Zlatan Ibrahimović|SWE|p|93
+Wesley Sneijder|NED|m|90
+Arjen Robben|NED|d|92
+Xabi Alonso|ESP|m|91
+Philipp Lahm|GER|l|91
+Bastian Schweinsteiger|GER|b|91
+Miroslav Klose|GER|f|91
+Gabriel Batistuta|ARG|p|92
+Juan Román Riquelme|ARG|m|91
+Javier Zanetti|ARG|l|90
+Kenny Dalglish|SCO|f|92
+Eric Cantona|FRA|f|91
+Jürgen Klinsmann|GER|f|90
+Lilian Thuram|FRA|c|91
+Marcel Desailly|FRA|c|90
+Nemanja Vidić|SRB|c|90
+Sócrates|BRA|m|92
+Bobby Moore|ENG|c|92
+Gary Lineker|ENG|f|90
+Gheorghe Hagi|ROU|m|91
+Ryan Giggs|WAL|s|91
+David Beckham|ENG|m|91
+Sergio Agüero|ARG|f|92
+Robin van Persie|NED|f|91
+Gareth Bale|WAL|s|91
+Eden Hazard|BEL|d|91
+Mesut Özil|GER|m|90
+Toni Kroos|GER|m|92
+Sergio Busquets|ESP|x|90
+Gerard Piqué|ESP|a|90
+Franck Ribéry|FRA|d|90
+Marcelo|BRA|w|90
+Karim Benzema|FRA|f|92
+Thiago Silva|BRA|c|90
+Mats Hummels|GER|a|90`,
+special:`Vinícius Júnior|BRA|d|93
+Harry Kane|ENG|f|93
+Rodri|ESP|m|92
+Ousmane Dembélé|FRA|s|92
+Robert Lewandowski|POL|f|90
+Bukayo Saka|ENG|s|90
+Florian Wirtz|GER|d|90
+Jamal Musiala|GER|d|90
+Lautaro Martínez|ARG|f|90
+Martin Ødegaard|NOR|m|89
+Pedri|ESP|m|90
+Phil Foden|ENG|d|89
+Raphinha|BRA|s|90
+Federico Valverde|URU|b|90
+Achraf Hakimi|MAR|w|89
+Alexander Isak|SWE|f|89
+Victor Osimhen|NGA|p|88
+Khvicha Kvaratskhelia|GEO|d|89
+Rúben Dias|POR|c|89
+Antonio Rüdiger|GER|c|88
+Alessandro Bastoni|ITA|a|88
+Joshua Kimmich|GER|m|89
+Bernardo Silva|POR|m|88
+Bruno Guimarães|BRA|b|88
+Alexis Mac Allister|ARG|m|88
+Vitinha|POR|m|89
+João Neves|POR|b|87
+Nicolò Barella|ITA|b|88
+Hakan Çalhanoğlu|TUR|m|87
+Frenkie de Jong|NED|m|87
+Aurélien Tchouaméni|FRA|x|87
+Eduardo Camavinga|FRA|b|87
+Rafael Leão|POR|s|88
+Michael Olise|FRA|d|89
+Leroy Sané|GER|s|87
+Julián Álvarez|ARG|f|88
+Antoine Griezmann|FRA|m|88
+Paulo Dybala|ARG|d|87
+Sadio Mané|SEN|s|87
+Marcus Thuram|FRA|p|87
+Viktor Gyökeres|SWE|p|88
+Nico Williams|ESP|s|88
+Dani Olmo|ESP|d|87
+Álex Grimaldo|ESP|w|87
+Theo Hernández|FRA|w|88
+Trent Alexander-Arnold|ENG|w|88
+Joško Gvardiol|CRO|a|88
+Marquinhos|BRA|c|88
+Gabriel Magalhães|BRA|c|88
+Kim Min-jae|KOR|c|87
+Ronald Araújo|URU|c|87
+Jules Koundé|FRA|l|87
+Pau Cubarsí|ESP|a|87
+Éder Militão|BRA|c|87
+Nuno Mendes|POR|w|88
+Alphonso Davies|CAN|w|87
+Federico Dimarco|ITA|w|87
+Bradley Barcola|FRA|s|87
+Désiré Doué|FRA|d|87
+Arda Güler|TUR|d|87
+Xavi Simons|NED|d|87
+Luis Díaz|COL|s|88
+Dominik Szoboszlai|HUN|b|87
+Ryan Gravenberch|NED|b|87
+Moisés Caicedo|ECU|x|88
+Enzo Fernández|ARG|m|87
+Rodrygo|BRA|s|87
+Serhou Guirassy|GUI|p|88
+Ademola Lookman|NGA|s|87
+Omar Marmoush|EGY|s|87
+Granit Xhaka|SUI|m|86
+Mikel Oyarzabal|ESP|f|86
+Cristian Romero|ARG|c|87
+Ibrahima Konaté|FRA|c|87
+Martín Zubimendi|ESP|x|87
+Tijjani Reijnders|NED|b|87
+Kai Havertz|GER|f|86
+Mohammed Kudus|GHA|d|86
+Kenan Yıldız|TUR|d|86
+Bryan Mbeumo|CMR|s|86
+Scott McTominay|SCO|b|87
+Christian Pulisic|USA|d|87
+Jonathan Tah|GER|c|86
+Benjamin Šeško|SLO|p|86
+Hugo Ekitiké|FRA|f|86
+Riyad Mahrez|ALG|d|86
+Mateo Retegui|ITA|f|86
+Dušan Vlahović|SRB|p|86
+Jonathan David|CAN|f|86
+Manuel Akanji|SUI|c|86
+Kingsley Coman|FRA|s|86
+Dani Carvajal|ESP|l|86
+Rayan Cherki|FRA|d|86
+Sandro Tonali|ITA|m|86
+Andrew Robertson|SCO|l|86
+Mikel Merino|ESP|b|86
+Fabián Ruiz|ESP|m|86
+Jérémy Doku|BEL|d|86
+Reece James|ENG|w|86
+Antoine Semenyo|GHA|s|86`,
+gold:`Jarrod Bowen|ENG|s|84
+Eberechi Eze|ENG|d|85
+Anthony Gordon|ENG|s|84
+Marc Guéhi|ENG|c|84
+Ezri Konsa|ENG|c|82
+Levi Colwill|ENG|a|83
+Kobbie Mainoo|ENG|b|82
+Adam Wharton|ENG|m|82
+Curtis Jones|ENG|b|81
+Elliot Anderson|ENG|b|83
+Morgan Gibbs-White|ENG|m|83
+Morgan Rogers|ENG|d|84
+Jack Grealish|ENG|d|82
+Raheem Sterling|ENG|s|80
+Dominic Solanke|ENG|f|81
+Ivan Toney|ENG|p|82
+Dominic Calvert-Lewin|ENG|p|78
+Jordan Henderson|ENG|b|79
+Kieran Trippier|ENG|l|80
+Luke Shaw|ENG|l|79
+Tino Livramento|ENG|l|80
+Myles Lewis-Skelly|ENG|w|80
+Noni Madueke|ENG|s|81
+Jarrad Branthwaite|ENG|c|81
+Fikayo Tomori|ENG|c|81
+Trevoh Chalobah|ENG|c|80
+Mason Mount|ENG|m|80
+Callum Hudson-Odoi|ENG|s|79
+Jadon Sancho|ENG|d|79
+Joe Gomez|ENG|c|78
+Lewis Dunk|ENG|a|79
+Dan Burn|ENG|c|77
+Danny Welbeck|ENG|f|78
+Jacob Murphy|ENG|s|79
+Emile Smith Rowe|ENG|d|79
+Lewis Hall|ENG|w|80
+James Ward-Prowse|ENG|m|79
+Tyrick Mitchell|ENG|l|77
+Kyle Walker|ENG|l|82
+Chris Wood|NZL|p|80
+John McGinn|SCO|b|81
+Billy Gilmour|SCO|m|79
+Lewis Ferguson|SCO|b|78
+Brennan Johnson|WAL|s|80
+Harry Wilson|WAL|d|79
+Ethan Ampadu|WAL|x|76
+Nathan Collins|IRL|c|78
+Evan Ferguson|IRL|p|76
+Álvaro Morata|ESP|f|80
+Marc Cucurella|ESP|l|83
+Dean Huijsen|ESP|a|84
+Pedro Porro|ESP|w|82
+Robin Le Normand|ESP|c|81
+Aymeric Laporte|ESP|a|81
+Fermín López|ESP|d|82
+Álex Baena|ESP|d|83
+Yeremy Pino|ESP|s|79
+Oihan Sancet|ESP|m|80
+Isco|ESP|m|81
+Marcos Llorente|ESP|b|82
+Koke|ESP|m|80
+Gerard Moreno|ESP|f|80
+Pablo Barrios|ESP|b|81
+Samu Omorodion|ESP|p|79
+Iago Aspas|ESP|f|80
+Dani Ceballos|ESP|m|79
+Gavi|ESP|b|84
+Marc Casadó|ESP|x|78
+Alejandro Balde|ESP|w|82
+Eric García|ESP|a|80
+Ferran Torres|ESP|f|82
+Nico González|ESP|b|79
+Iñaki Williams|GHA|s|80
+Rodrigo De Paul|ARG|b|82
+João Félix|POR|d|81
+Diogo Dalot|POR|l|81
+Rúben Neves|POR|m|82
+João Cancelo|POR|w|84
+João Palhinha|POR|x|83
+Gonçalo Ramos|POR|f|81
+Pedro Neto|POR|s|82
+Francisco Conceição|POR|d|81
+Gonçalo Inácio|POR|a|82
+António Silva|POR|c|80
+Francisco Trincão|POR|d|80
+Rafa Silva|POR|s|79
+Matheus Nunes|POR|b|80
+Nélson Semedo|POR|l|79
+Geovany Quenda|POR|s|76
+Christopher Nkunku|FRA|f|84
+Randal Kolo Muani|FRA|p|81
+Adrien Rabiot|FRA|b|83
+Manu Koné|FRA|b|82
+Warren Zaïre-Emery|FRA|b|82
+Youssouf Fofana|FRA|x|81
+Benjamin Pavard|FRA|c|82
+Lucas Hernández|FRA|c|81
+Ferland Mendy|FRA|l|81
+Malo Gusto|FRA|w|80
+Lucas Digne|FRA|l|79
+Matteo Guendouzi|FRA|b|80
+Maghnes Akliouche|FRA|d|80
+Jean-Philippe Mateta|FRA|p|81
+Wesley Fofana|FRA|c|80
+Castello Lukeba|FRA|a|81
+Leny Yoro|FRA|c|79
+Alexandre Lacazette|FRA|f|78
+Jonathan Clauss|FRA|w|77
+Leon Goretzka|GER|b|82
+İlkay Gündoğan|GER|m|82
+Serge Gnabry|GER|s|82
+Niclas Füllkrug|GER|p|79
+Deniz Undav|GER|f|81
+Nico Schlotterbeck|GER|a|83
+David Raum|GER|w|81
+Maximilian Mittelstädt|GER|l|79
+Robert Andrich|GER|x|80
+Aleksandar Pavlović|GER|m|82
+Angelo Stiller|GER|m|81
+Karim Adeyemi|GER|s|81
+Nick Woltemade|GER|p|81
+Felix Nmecha|GER|b|79
+Pascal Groß|GER|m|80
+Julian Brandt|GER|m|82
+Emre Can|GER|x|78
+Waldemar Anton|GER|c|79
+Thomas Müller|GER|f|83
+Federico Chiesa|ITA|s|79
+Davide Frattesi|ITA|b|80
+Lorenzo Pellegrini|ITA|m|79
+Giacomo Raspadori|ITA|f|79
+Moise Kean|ITA|p|83
+Gianluca Scamacca|ITA|p|79
+Riccardo Calafiori|ITA|a|81
+Giovanni Di Lorenzo|ITA|l|82
+Andrea Cambiaso|ITA|w|81
+Destiny Udogie|ITA|w|80
+Federico Gatti|ITA|c|79
+Alessandro Buongiorno|ITA|c|81
+Manuel Locatelli|ITA|m|81
+Bryan Cristante|ITA|b|78
+Ciro Immobile|ITA|f|77
+Samuele Ricci|ITA|m|79
+Francesco Acerbi|ITA|c|78
+Memphis Depay|NED|f|80
+Donyell Malen|NED|s|80
+Teun Koopmeiners|NED|b|82
+Matthijs de Ligt|NED|c|82
+Nathan Aké|NED|a|82
+Stefan de Vrij|NED|c|79
+Denzel Dumfries|NED|w|83
+Jurriën Timber|NED|l|82
+Joey Veerman|NED|m|79
+Jerdy Schouten|NED|x|79
+Marten de Roon|NED|x|78
+Lutsharel Geertruida|NED|l|78
+Quinten Timber|NED|b|78
+Cody Gakpo|NED|s|84
+Jeremie Frimpong|NED|w|84
+Romelu Lukaku|BEL|p|82
+Youri Tielemans|BEL|m|81
+Amadou Onana|BEL|x|81
+Leandro Trossard|BEL|d|83
+Charles De Ketelaere|BEL|m|81
+Loïs Openda|BEL|s|81
+Arthur Theate|BEL|c|78
+Dodi Lukébakio|BEL|s|79
+Yannick Carrasco|BEL|d|77
+Mateo Kovačić|CRO|m|83
+Marcelo Brozović|CRO|m|80
+Ivan Perišić|CRO|w|79
+Andrej Kramarić|CRO|f|80
+Josip Šutalo|CRO|c|78
+Josip Stanišić|CRO|l|78
+Martin Baturina|CRO|m|79
+Nikola Vlašić|CRO|m|78
+Luka Sučić|CRO|m|77
+Lucas Paquetá|BRA|m|82
+Richarlison|BRA|p|79
+Gabriel Jesus|BRA|f|80
+Savinho|BRA|d|81
+Estêvão|BRA|d|81
+João Pedro|BRA|f|83
+Matheus Cunha|BRA|f|84
+Bremer|BRA|c|83
+Philippe Coutinho|BRA|m|77
+Roberto Firmino|BRA|f|78
+André|BRA|x|80
+Joelinton|BRA|b|80
+Douglas Luiz|BRA|b|79
+Gerson|BRA|b|79
+Fabinho|BRA|x|79
+Gabriel Martinelli|BRA|s|84
+Casemiro|BRA|x|82
+Leandro Paredes|ARG|m|79
+Giovani Lo Celso|ARG|m|79
+Nicolás González|ARG|s|79
+Ángel Di María|ARG|d|80
+Lisandro Martínez|ARG|a|82
+Nicolás Otamendi|ARG|c|78
+Nahuel Molina|ARG|l|79
+Alejandro Garnacho|ARG|s|81
+Thiago Almada|ARG|d|80
+Exequiel Palacios|ARG|b|80
+Ángel Correa|ARG|s|79
+Manuel Ugarte|URU|x|80
+Rodrigo Bentancur|URU|b|81
+Giorgian de Arrascaeta|URU|m|81
+José María Giménez|URU|c|80
+James Rodríguez|COL|m|79
+Jhon Durán|COL|p|79
+Daniel Muñoz|COL|l|80
+Davinson Sánchez|COL|c|79
+Jefferson Lerma|COL|x|78
+Richard Ríos|COL|b|79
+Jhon Lucumí|COL|c|80
+Piero Hincapié|ECU|a|82
+Willian Pacho|ECU|c|83
+Pervis Estupiñán|ECU|w|80
+Edson Álvarez|MEX|x|79
+Raúl Jiménez|MEX|p|78
+Santiago Giménez|MEX|f|80
+Hirving Lozano|MEX|s|77
+Weston McKennie|USA|b|79
+Tyler Adams|USA|x|78
+Antonee Robinson|USA|w|81
+Folarin Balogun|USA|f|78
+Hakim Ziyech|MAR|d|78
+Youssef En-Nesyri|MAR|p|80
+Brahim Díaz|MAR|d|81
+Noussair Mazraoui|MAR|l|80
+Sofyan Amrabat|MAR|x|78
+Nayef Aguerd|MAR|c|79
+Ismaël Bennacer|ALG|m|79
+Rayan Aït-Nouri|ALG|w|82
+Amine Gouiri|ALG|f|79
+Yves Bissouma|MLI|x|79
+Franck Kessié|CIV|b|80
+Evan Ndicka|CIV|c|79
+Odilon Kossounou|CIV|c|78
+Amad Diallo|CIV|d|82
+Nicolas Jackson|SEN|f|80
+Ismaïla Sarr|SEN|s|80
+Iliman Ndiaye|SEN|d|81
+Pape Matar Sarr|SEN|b|80
+Kalidou Koulibaly|SEN|c|79
+Alex Iwobi|NGA|m|78
+Wilfred Ndidi|NGA|x|78
+Ola Aina|NGA|l|79
+Victor Boniface|NGA|p|80
+Calvin Bassey|NGA|c|77
+Thomas Partey|GHA|x|80
+André-Frank Zambo Anguissa|CMR|b|81
+Carlos Baleba|CMR|x|80
+Edmond Tapsoba|BFA|c|79
+Yoane Wissa|COD|f|81
+Pierre-Emerick Aubameyang|GAB|f|79
+Denis Bouanga|GAB|s|79
+Ellyes Skhiri|TUN|x|77
+Takefusa Kubo|JPN|d|83
+Kaoru Mitoma|JPN|d|83
+Wataru Endō|JPN|x|79
+Ritsu Dōan|JPN|s|80
+Daichi Kamada|JPN|m|79
+Takehiro Tomiyasu|JPN|c|76
+Lee Kang-in|KOR|m|81
+Hwang Hee-chan|KOR|s|77
+Mehdi Taremi|IRN|f|78
+Alexander Sørloth|NOR|p|82
+Jørgen Strand Larsen|NOR|p|79
+Dejan Kulusevski|SWE|d|82
+Anthony Elanga|SWE|s|80
+Hugo Larsson|SWE|b|78
+Christian Eriksen|DEN|m|78
+Rasmus Højlund|DEN|f|80
+Pierre-Emile Højbjerg|DEN|x|80
+Morten Hjulmand|DEN|x|80
+Joachim Andersen|DEN|c|79
+Patrick Dorgu|DEN|w|78
+Piotr Zieliński|POL|m|81
+Dan Ndoye|SUI|s|80
+Denis Zakaria|SUI|b|78
+David Alaba|AUT|a|79
+Marcel Sabitzer|AUT|b|80
+Konrad Laimer|AUT|b|81
+Christoph Baumgartner|AUT|m|79
+Kevin Danso|AUT|c|78
+Aleksandar Mitrović|SRB|p|80
+Sergej Milinković-Savić|SRB|b|80
+Nikola Milenković|SRB|c|80
+Ferdi Kadıoğlu|TUR|w|81
+Orkun Kökçü|TUR|m|81
+Kerem Aktürkoğlu|TUR|s|79
+Georges Mikautadze|GEO|f|79
+Artem Dovbyk|UKR|p|80
+Ilya Zabarnyi|UKR|c|80
+Oleksandr Zinchenko|UKR|w|77
+Georgiy Sudakov|UKR|m|78
+Milos Kerkez|HUN|w|81
+Stanislav Lobotka|SVK|m|81
+Dávid Hancko|SVK|a|80
+Milan Škriniar|SVK|c|79
+Patrik Schick|CZE|f|81
+Vangelis Pavlidis|GRE|f|80
+Amir Rrahmani|KOS|c|79
+Edon Zhegrova|KOS|d|79
+Vedat Muriqi|KOS|p|77
+Kristjan Asllani|ALB|m|77
+Leon Bailey|JAM|s|78
+Edin Džeko|BIH|p|77
+Radu Drăgușin|ROU|c|77
+Albert Guðmundsson|ISL|m|77
+Abdukodir Khusanov|UZB|c|77`,
+silver:`Jack Harrison|ENG|s|74
+Dwight McNeil|ENG|d|74
+Callum Wilson|ENG|f|73
+James Tarkowski|ENG|c|74
+Ben Chilwell|ENG|w|72
+Ruben Loftus-Cheek|ENG|b|74
+Ross Barkley|ENG|m|72
+Kalvin Phillips|ENG|x|71
+Tom Cairney|SCO|m|70
+Jarell Quansah|ENG|c|74
+Ben Davies|WAL|c|72
+Danny Ings|ENG|f|70
+Michael Keane|ENG|c|72
+Tyrone Mings|ENG|c|73
+Lewis Cook|ENG|m|73
+Jack Clarke|ENG|s|74
+Kiernan Dewsbury-Hall|ENG|b|74
+Harry Winks|ENG|m|70
+Jamie Gittens|ENG|s|74
+Rico Lewis|ENG|l|74
+Archie Gray|ENG|b|72
+Ethan Nwaneri|ENG|d|74
+Carney Chukwuemeka|ENG|b|69
+Liam Delap|ENG|p|74
+Jonathan Rowe|ENG|s|72
+Joe Willock|ENG|b|71
+Sean Longstaff|ENG|m|71
+Chris Smalling|ENG|c|69
+Harvey Barnes|ENG|s|74
+Bobby De Cordova-Reid|JAM|s|70
+Andreas Pereira|BRA|m|73
+Callum McGregor|SCO|m|73
+Daizen Maeda|JPN|s|74
+Reo Hatate|JPN|m|73
+Kyogo Furuhashi|JPN|f|71
+Nicolas Kühn|GER|s|73
+Ryan Christie|SCO|m|70
+Nathan Patterson|SCO|l|68
+Lawrence Shankland|SCO|f|68
+Brais Méndez|ESP|m|74
+Óscar Mingueza|ESP|l|73
+Iñigo Martínez|ESP|a|74
+Sergi Darder|ESP|m|71
+Javi Guerra|ESP|b|73
+Ander Barrenetxea|ESP|s|73
+Alberto Moleiro|ESP|d|73
+Gorka Guruzeta|ESP|f|72
+Ayoze Pérez|ESP|f|74
+Jorge de Frutos|ESP|s|72
+Bryan Gil|ESP|s|69
+Carlos Soler|ESP|m|74
+José Luis Gayà|ESP|l|73
+Hugo Duro|ESP|f|70
+Javi Puado|ESP|f|70
+Isi Palazón|ESP|d|71
+Sergio Canales|ESP|m|72
+Abde Ezzalzouli|MAR|s|74
+Samu Aghehowa|ESP|p|74
+Domenico Berardi|ITA|d|74
+Matteo Politano|ITA|s|74
+Stephan El Shaarawy|ITA|s|70
+Mattia Zaccagni|ITA|s|74
+Lorenzo Lucca|ITA|p|72
+Riccardo Orsolini|ITA|s|74
+Nicolò Zaniolo|ITA|d|71
+Gianluca Mancini|ITA|c|74
+Alessio Romagnoli|ITA|c|73
+Andrea Pinamonti|ITA|f|72
+Tommaso Baldanzi|ITA|d|71
+Daniel Maldini|ITA|d|70
+Francesco Pio Esposito|ITA|p|72
+Lorenzo Insigne|ITA|d|71
+Jonas Hofmann|GER|m|73
+Mario Götze|GER|m|73
+Julian Draxler|GER|m|69
+Timo Werner|GER|s|72
+Benjamin Henrichs|GER|l|72
+Robin Gosens|GER|w|74
+Matthias Ginter|GER|c|73
+Kevin Schade|GER|s|73
+Jamie Leweling|GER|s|74
+Maximilian Beier|GER|s|74
+Youssoufa Moukoko|GER|f|68
+Grischa Prömel|GER|b|70
+Ermedin Demirović|BIH|f|74
+Marco Reus|GER|d|72
+Florian Thauvin|FRA|d|74
+Téji Savanier|FRA|m|70
+Gaëtan Laborde|FRA|p|70
+Terem Moffi|NGA|p|72
+Ludovic Ajorque|FRA|p|69
+Jonathan Bamba|CIV|s|70
+Benjamin André|FRA|x|72
+Valentin Rongier|FRA|m|72
+Elye Wahi|FRA|f|72
+Arnaud Kalimuendo|FRA|f|73
+Nordi Mukiele|FRA|l|73
+Anthony Martial|FRA|f|71
+Dimitri Payet|FRA|m|69
+Olivier Giroud|FRA|p|72
+Calvin Stengs|NED|m|73
+Steven Berghuis|NED|d|72
+Davy Klaassen|NED|m|70
+Kenneth Taylor|NED|b|73
+Mats Wieffer|NED|x|74
+Noa Lang|NED|d|74
+Crysencio Summerville|NED|s|74
+Ian Maatsen|NED|w|74
+Tyrell Malacia|NED|l|69
+Justin Kluivert|NED|s|74
+Luuk de Jong|NED|p|70
+Sven Botman|NED|a|74
+Brian Brobbey|NED|p|73
+Steven Bergwijn|NED|s|72
+Hans Vanaken|BEL|m|73
+Zeno Debast|BEL|c|72
+Maxim De Cuyper|BEL|w|72
+Arthur Vermeeren|BEL|m|72
+Michy Batshuayi|BEL|f|69
+Wout Faes|BEL|c|72
+Orel Mangala|BEL|x|72
+Malick Fofana|BEL|s|74
+Timothy Castagne|BEL|l|72
+André Silva|POR|f|70
+Ricardo Horta|POR|d|73
+Fábio Vieira|POR|m|72
+Raphaël Guerreiro|POR|w|74
+Renato Sanches|POR|b|69
+William Carvalho|POR|x|69
+Otávio|POR|m|72
+Pepê|BRA|s|72
+Malcom|BRA|s|74
+Hulk|BRA|p|70
+Everton Cebolinha|BRA|s|69
+Pedro|BRA|f|74
+Oscar|BRA|m|69
+Lucas Moura|BRA|s|70
+Renan Lodi|BRA|w|72
+Vitor Roque|BRA|f|72
+Luiz Henrique|BRA|s|74
+Yan Couto|BRA|w|73
+Igor Paixão|BRA|s|74
+Danilo|BRA|l|72
+Franco Mastantuono|ARG|d|74
+Nicolás Paz|ARG|m|74
+Leonardo Balerdi|ARG|c|74
+Marcos Senesi|ARG|c|73
+Gonzalo Montiel|ARG|l|72
+Nicolás Tagliafico|ARG|l|72
+Marcos Acuña|ARG|w|71
+Luciano Acosta|ARG|m|72
+Cucho Hernández|COL|f|74
+Hany Mukhtar|GER|m|73
+Christian Benteke|BEL|p|69
+Federico Bernardeschi|ITA|s|70
+Ryan Gauld|SCO|m|70
+Riqui Puig|ESP|m|72
+Evander|BRA|m|72
+Diego Rossi|URU|s|70
+Brenden Aaronson|USA|m|72
+Malik Tillman|USA|m|74
+Haji Wright|USA|f|72
+Gio Reyna|USA|m|72
+Tim Weah|USA|s|73
+Sergiño Dest|USA|w|72
+Ricardo Pepi|USA|f|72
+Chris Richards|USA|c|73
+Yunus Musah|USA|b|72
+Tajon Buchanan|CAN|s|72
+Stephen Eustáquio|CAN|m|73
+Jhon Arias|COL|d|74
+Luis Sinisterra|COL|s|72
+Mathías Olivera|URU|l|73
+Maximiliano Araújo|URU|w|73
+Facundo Pellistri|URU|s|71
+Alexis Sánchez|CHI|f|70
+Arturo Vidal|CHI|b|68
+Johan Vásquez|MEX|c|73
+Mohamed Elneny|EGY|x|66
+Trézéguet|EGY|s|70
+Emam Ashour|EGY|m|69
+Saïd Benrahma|ALG|d|71
+Kelechi Iheanacho|NGA|f|70
+Paul Onuachu|NGA|p|72
+Joe Aribo|NGA|m|70
+Frank Onyeka|NGA|b|70
+Samuel Chukwueze|NGA|s|74
+Moses Simon|NGA|s|72
+Tariq Lamptey|GHA|l|70
+Abdul Fatawu|GHA|s|72
+Jordan Ayew|GHA|f|71
+Mohammed Salisu|GHA|c|72
+Krépin Diatta|SEN|s|70
+Lamine Camara|SEN|m|74
+Idrissa Gueye|SEN|x|72
+Moussa Niakhaté|SEN|c|74
+Boulaye Dia|SEN|f|72
+Habib Diarra|SEN|b|72
+Pape Gueye|SEN|x|72
+Eric Maxim Choupo-Moting|CMR|p|69
+Naby Keïta|GUI|b|69
+Amadou Haidara|MLI|b|73
+El Bilal Touré|MLI|f|70
+Azzedine Ounahi|MAR|m|73
+Amine Harit|MAR|d|72
+Bilal El Khannouss|MAR|m|73
+Sébastien Haller|CIV|p|71
+Simon Adingra|CIV|s|73
+Ibrahim Sangaré|CIV|x|74
+Seko Fofana|CIV|b|72
+Wilfried Zaha|CIV|s|72
+Nicolas Pépé|CIV|s|72
+Vincent Aboubakar|CMR|f|70
+Hiroki Itō|JPN|a|74
+Yukinari Sugawara|JPN|l|72
+Takumi Minamino|JPN|m|74
+Kou Itakura|JPN|c|72
+Keito Nakamura|JPN|s|72
+Hidemasa Morita|JPN|m|73
+Ayase Ueda|JPN|f|73
+Junya Itō|JPN|s|72
+Hwang In-beom|KOR|m|74
+Cho Gue-sung|KOR|p|69
+Lee Jae-sung|KOR|m|69
+Akram Afif|QAT|s|72
+Salem Al-Dawsari|KSA|s|72
+Sardar Azmoun|IRN|f|71
+Eldor Shomurodov|UZB|f|72
+Antonio Nusa|NOR|s|74
+Oscar Bobb|NOR|d|72
+Sander Berge|NOR|b|73
+Kristoffer Ajer|NOR|c|71
+Victor Lindelöf|SWE|c|73
+Emil Forsberg|SWE|m|70
+Lucas Bergvall|SWE|b|73
+Mikkel Damsgaard|DEN|m|74
+Andreas Christensen|DEN|a|74
+Jonas Wind|DEN|f|72
+Jakub Kiwior|POL|a|73
+Nicola Zalewski|POL|w|72
+Sebastian Szymański|POL|m|73
+Jan Bednarek|POL|c|71
+Breel Embolo|SUI|p|73
+Remo Freuler|SUI|x|72
+Ricardo Rodríguez|SUI|l|70
+Marko Arnautović|AUT|p|72
+Nicolas Seiwald|AUT|x|73
+Dušan Tadić|SRB|d|72
+Strahinja Pavlović|SRB|c|74
+Lazar Samardžić|SRB|m|72
+Filip Kostić|SRB|w|70
+Merih Demiral|TUR|c|74
+Barış Alper Yılmaz|TUR|s|73
+Cengiz Ünder|TUR|s|70
+Mykhailo Mudryk|UKR|s|72
+Viktor Tsyhankov|UKR|d|73
+Roland Sallai|HUN|s|72
+Willi Orbán|HUN|c|73
+Ondrej Duda|SVK|m|70
+Adam Hložek|CZE|f|72
+Ladislav Krejčí|CZE|c|73
+Pavel Šulc|CZE|m|72
+Kostas Tsimikas|GRE|w|72
+Konstantinos Mavropanos|GRE|c|72
+Eljif Elmas|MKD|m|73
+Berat Djimsiti|ALB|c|72
+Armando Broja|ALB|f|70
+Hákon Arnar Haraldsson|ISL|m|74
+Duje Ćaleta-Car|CRO|c|71
+Lovro Majer|CRO|m|72
+Petar Sučić|CRO|m|72
+Michail Antonio|JAM|p|70
+Demarai Gray|JAM|s|69
+Rade Krunić|BIH|m|69
+Dennis Man|ROU|s|70
+Nicolae Stanciu|ROU|m|70
+Harry Souttar|AUS|c|70
+Jackson Irvine|AUS|b|70
+Xherdan Shaqiri|SUI|d|70
+Jordi Alba|ESP|w|72
+Carles Gil|ESP|m|68
+Denis Zakaria|SUI|b|72
+Abdou Diallo|SEN|c|68`,
+bronze:`Theo Walcott|ENG|s|58
+Andy Carroll|ENG|p|56
+Jordan Rhodes|SCO|f|55
+Tom Ince|ENG|d|58
+Ryan Fraser|SCO|s|58
+Joshua King|NOR|f|58
+Billy Sharp|ENG|f|52
+Lyndon Dykes|SCO|p|60
+Kieffer Moore|WAL|p|62
+Joël Piroe|NED|f|64
+Josh Maja|NGA|f|62
+Sammie Szmodics|IRL|f|62
+Adam Armstrong|ENG|f|64
+Ellis Simms|ENG|f|58
+Josh Windass|ENG|m|58
+Jed Wallace|ENG|s|58
+Marcus Tavernier|ENG|d|64
+Matt Grimes|ENG|m|62
+Oli McBurnie|SCO|p|58
+Chuba Akpom|ENG|f|62
+Callum Robinson|IRL|f|55
+Isaac Hayden|ENG|x|57
+Ryan Manning|IRL|l|60
+Will Hughes|ENG|m|60
+Shane Duffy|IRL|c|57
+Rob Holding|ENG|c|57
+Calum Chambers|ENG|c|58
+Ainsley Maitland-Niles|ENG|w|59
+Reiss Nelson|ENG|s|62
+James McClean|IRL|w|54
+Josh Brownhill|ENG|b|64
+Ashley Barnes|ENG|p|54
+Jay Stansfield|ENG|f|62
+Wes Burns|WAL|s|55
+Joe Allen|WAL|m|56
+Aaron Ramsey|WAL|m|58
+Neco Williams|WAL|w|64
+Connor Roberts|WAL|l|59
+Chris Mepham|WAL|c|59
+Jordan James|WAL|b|58
+Jonny Evans|NIR|c|56
+Conor Bradley|NIR|l|64
+Isaac Price|NIR|m|58
+Shea Charles|NIR|x|58
+Daniel Ballard|NIR|c|56
+Trai Hume|NIR|l|56
+Paddy McNair|NIR|c|53
+Ashley Young|ENG|l|58
+Conor Coady|ENG|c|58
+Danny Rose|ENG|l|50
+Jesse Lingard|ENG|d|62
+Dele Alli|ENG|m|50
+Ravel Morrison|JAM|m|55
+Kristoffer Lund|USA|w|56
+Obed Vargas|USA|m|56
+Benjamin Cremaschi|USA|m|55
+Paxten Aaronson|USA|m|58
+Gianluca Busio|USA|b|60
+Johnny Cardoso|USA|x|64
+Luca de la Torre|USA|m|58
+Kellyn Acosta|USA|m|52
+Josh Sargent|USA|f|64
+Aidan Morris|USA|x|60
+Jack McGlynn|USA|m|56
+Patrick Agyemang|USA|f|60
+Brandon Vázquez|USA|f|57
+Tim Ream|USA|c|55
+Mark McKenzie|USA|c|60
+Auston Trusty|USA|c|60
+Joe Scally|USA|l|62
+John Tolkin|USA|l|56
+Jordan Morris|USA|s|58
+Jesús Ferreira|USA|f|58
+Miles Robinson|USA|c|58
+Walker Zimmerman|USA|c|57
+Darlington Nagbe|USA|m|54
+DeAndre Yedlin|USA|l|52
+Lucas Zelarayán|ARM|m|58
+Sebastián Driussi|ARG|f|64
+Ola Solbakken|NOR|s|58
+Kristian Thorstvedt|NOR|m|62
+Fredrik Aursnes|NOR|b|64
+Mohamed Elyounoussi|NOR|s|56
+Jens Petter Hauge|NOR|s|58
+Leo Østigård|NOR|c|62
+Marcus Holmgren Pedersen|NOR|l|60
+Patrick Berg|NOR|m|56
+Andreas Schjelderup|NOR|s|62
+Emil Holm|SWE|l|62
+Gustaf Nilsson|SWE|p|57
+Jesper Karlsson|SWE|s|59
+Mattias Svanberg|SWE|m|62
+Jens Cajuste|SWE|b|60
+Isak Hien|SWE|c|64
+Yasin Ayari|SWE|m|60
+Roony Bardghji|SWE|d|62
+Kasper Dolberg|DEN|f|64
+Yussuf Poulsen|DEN|p|60
+Andreas Skov Olsen|DEN|s|63
+Jesper Lindstrøm|DEN|d|62
+Mathias Jensen|DEN|m|62
+Christian Nørgaard|DEN|x|64
+Jannik Vestergaard|DEN|c|58
+Joakim Mæhle|DEN|w|62
+Thomas Delaney|DEN|x|53
+Martin Braithwaite|DEN|f|55
+Robert Skov|DEN|w|56
+Gustav Isaksen|DEN|s|64
+Victor Kristiansen|DEN|l|62
+Joel Pohjanpalo|FIN|f|62
+Teemu Pukki|FIN|f|56
+Glen Kamara|FIN|b|58
+Robin Lod|FIN|m|54
+Benjamin Källman|FIN|f|54
+Gylfi Sigurðsson|ISL|m|55
+Jóhann Berg Guðmundsson|ISL|s|54
+Jón Dagur Þorsteinsson|ISL|s|56
+Arnór Sigurðsson|ISL|m|56
+Willum Þór Willumsson|ISL|m|58
+Ísak Bergmann Jóhannesson|ISL|m|58
+Orri Óskarsson|ISL|f|62
+Andri Guðjohnsen|ISL|f|56
+Bruno Petković|CRO|p|60
+Mislav Oršić|CRO|s|60
+Marko Livaja|CRO|f|58
+Ante Budimir|CRO|p|64
+Nikola Moro|CRO|m|58
+Toni Fruk|CRO|m|56
+Igor Matanović|CRO|f|58
+Dejan Lovren|CRO|c|54
+Ivan Rakitić|CRO|m|58
+Mario Pašalić|CRO|m|64
+Franjo Ivanović|CRO|f|58
+Borna Sosa|CRO|w|60
+Nemanja Gudelj|SRB|x|58
+Saša Lukić|SRB|m|60
+Ivan Ilić|SRB|m|62
+Luka Jović|SRB|f|58
+Andrija Živković|SRB|s|60
+Veljko Birmančević|SRB|s|56
+Nemanja Radonjić|SRB|s|56
+Marko Grujić|SRB|b|58
+Filip Đuričić|SRB|m|54
+Leander Dendoncker|BEL|x|56
+Dennis Praet|BEL|m|56
+Thorgan Hazard|BEL|m|58
+Divock Origi|BEL|f|52
+Johan Bakayoko|BEL|s|64
+Axel Witsel|BEL|x|58
+Thomas Meunier|BEL|l|55
+Sam Lammers|NED|f|58
+Myron Boadu|NED|f|56
+Arnaut Danjuma|NED|s|60
+Owen Wijndal|NED|l|54
+Pascal Struijk|NED|c|60
+Daley Blind|NED|a|58
+Georginio Wijnaldum|NED|b|58
+Wout Weghorst|NED|p|60
+Vincent Janssen|NED|p|57
+Thom Haye|IDN|m|52
+Jay Idzes|IDN|c|54
+Mees Hilgers|IDN|c|54
+Calvin Verdonk|IDN|l|52
+Kevin Diks|IDN|l|56
+Ole Romeny|IDN|f|52
+Marselino Ferdinan|IDN|m|50
+Kaishu Sano|JPN|m|62
+Takuma Asano|JPN|s|58
+Koji Miyoshi|JPN|m|56
+Shuto Machino|JPN|f|57
+Yuito Suzuki|JPN|m|59
+Mao Hosoya|JPN|f|54
+Ao Tanaka|JPN|b|62
+Genki Haraguchi|JPN|m|50
+Koki Machida|JPN|c|60
+Yuki Soma|JPN|s|55
+Shogo Taniguchi|JPN|c|54
+Hwang Ui-jo|KOR|f|52
+Paik Seung-ho|KOR|m|52
+Seol Young-woo|KOR|l|56
+Oh Hyeon-gyu|KOR|f|60
+Jeong Woo-yeong|KOR|s|58
+Bae Jun-ho|KOR|m|58
+Yang Hyun-jun|KOR|s|56
+Saud Abdulhamid|KSA|l|56
+Mohamed Kanno|KSA|b|54
+Firas Al-Buraikan|KSA|f|56
+Hassan Tambakti|KSA|c|50
+Almoez Ali|QAT|f|58
+Hassan Al-Haydos|QAT|m|46
+Alireza Jahanbakhsh|IRN|s|54
+Saeid Ezatolahi|IRN|x|50
+Mohammad Mohebi|IRN|s|52
+Abbosbek Fayzullaev|UZB|m|58
+Oston Urunov|UZB|s|52
+Jaloliddin Masharipov|UZB|s|54
+Otabek Shukurov|UZB|m|50
+Ali Mabkhout|UAE|f|48
+Mohamed Abdelmonem|EGY|c|56
+Mostafa Mohamed|EGY|p|60
+Ahmed Sayed Zizo|EGY|d|56
+Ramadan Sobhi|EGY|s|52
+Youcef Belaïli|ALG|d|58
+Aïssa Mandi|ALG|c|56
+Ramy Bensebaini|ALG|w|62
+Houssem Aouar|ALG|m|60
+Mohamed Amoura|ALG|s|64
+Hicham Boudaoui|ALG|m|58
+Youcef Atal|ALG|l|56
+Ilias Chair|MAR|m|58
+Romain Saïss|MAR|c|50
+Soufiane Rahimi|MAR|s|56
+Ayoub El Kaabi|MAR|f|60
+Eliesse Ben Seghir|MAR|d|63
+Ismael Saibari|MAR|m|62
+Neil El Aynaoui|MAR|b|60
+Sofiane Boufal|MAR|d|54
+Achraf Dari|MAR|c|56
+Aïssa Laïdouni|TUN|b|54
+Montassar Talbi|TUN|c|54
+Ali Abdi|TUN|w|52
+Hannibal Mejbri|TUN|m|56
+Youssef Msakni|TUN|s|48
+Abdallah Sima|SEN|s|58
+Ismail Jakobs|SEN|w|54
+Bamba Dieng|SEN|f|56
+Cheikhou Kouyaté|SEN|x|50
+Jérémie Boga|CIV|s|58
+Serge Aurier|CIV|l|50
+Christian Kouamé|CIV|f|54
+Hamed Traorè|CIV|m|56
+Wilfried Singo|CIV|l|62
+Emmanuel Agbadou|CIV|c|60
+William Troost-Ekong|NGA|c|54
+Semi Ajayi|NGA|c|54
+Bright Osayi-Samuel|NGA|l|54
+Raphael Onyedika|NGA|x|60
+Fisayo Dele-Bashiru|NGA|b|58
+Cyriel Dessers|NGA|f|58
+Umar Sadiq|NGA|p|56
+Tolu Arokodare|NGA|p|60
+Akor Adams|NGA|f|60
+Ahmed Musa|NGA|s|46
+Taiwo Awoniyi|NGA|p|62
+Joseph Paintsil|GHA|s|56
+Osman Bukari|GHA|s|54
+Salis Abdul Samed|GHA|x|56
+Alidu Seidu|GHA|l|54
+Ernest Nuamah|GHA|s|60
+Kamaldeen Sulemana|GHA|s|62
+André Ayew|GHA|f|52
+Christopher Wooh|CMR|c|52
+Frank Magri|CMR|p|54
+Karl Toko Ekambi|CMR|f|56
+Georges-Kévin Nkoudou|CMR|s|52
+Mama Baldé|GNB|s|54
+Ilaix Moriba|GUI|b|58
+Amadou Diawara|GUI|x|52
+Mohamed Bayo|GUI|f|52
+Lassana Coulibaly|MLI|b|54
+Hamari Traoré|MLI|l|52
+Cheick Doucouré|MLI|x|60
+Nene Dorgeles|MLI|s|54
+Kevin Denkey|TOG|f|58
+Steve Mounié|BEN|p|50
+Jovane Cabral|CPV|s|50
+Logan Costa|CPV|c|54
+Musa Barrow|GAM|f|54
+Yankuba Minteh|GAM|s|64
+Adama Traoré|ESP|s|62
+Michael Olunga|KEN|f|54
+Fashion Sakala|ZAM|s|54
+Patson Daka|ZAM|f|62
+Percy Tau|RSA|s|56
+Teboho Mokoena|RSA|m|58
+Lyle Foster|RSA|f|60
+Themba Zwane|RSA|m|50
+Silas Katompa Mvumpa|COD|s|58
+Meschak Elia|COD|s|52
+Théo Bongonda|COD|s|54
+Gédéon Kalulu|COD|l|50
+Axel Tuanzebe|COD|c|54
+Aaron Wan-Bissaka|COD|l|64
+Noah Sadiki|COD|b|56
+Chancel Mbemba|COD|c|60
+Cédric Bakambu|COD|f|58
+Zito Luvumbo|ANG|s|52
+Mario Lemina|GAB|x|56
+Kevin Castaño|COL|x|56
+Yerson Mosquera|COL|c|60
+Rafael Santos Borré|COL|f|54
+Jorge Carrascal|COL|m|56
+Yáser Asprilla|COL|d|58
+Carlos Cuesta|COL|c|58
+Johan Mojica|COL|w|52
+Duván Zapata|COL|p|58
+Wilmar Barrios|COL|x|56
+Miguel Borja|COL|p|56
+Gonzalo Plata|ECU|s|58
+Jeremy Sarmiento|ECU|s|54
+Félix Torres|ECU|c|54
+Ángelo Preciado|ECU|l|52
+Kendry Páez|ECU|d|62
+Enner Valencia|ECU|f|56
+Joel Ordóñez|ECU|c|60
+Facundo Torres|URU|s|58
+Nicolás de la Cruz|URU|m|58
+Brian Rodríguez|URU|s|52
+Sebastián Cáceres|URU|c|54
+Lucas Torreira|URU|x|60
+Rodrigo Zalazar|URU|m|60
+Edinson Cavani|URU|p|56
+Agustín Canobbio|URU|s|52
+Miguel Almirón|PAR|s|60
+Julio Enciso|PAR|d|63
+Ramón Sosa|PAR|s|56
+Diego Gómez|PAR|b|60
+Antonio Sanabria|PAR|f|54
+Omar Alderete|PAR|c|60
+Gustavo Gómez|PAR|c|54
+Andrés Cubas|PAR|x|52
+Gianluca Lapadula|PER|f|50
+Renato Tapia|PER|x|50
+Luis Advíncula|PER|l|48
+André Carrillo|PER|s|46
+Salomón Rondón|VEN|p|54
+Yeferson Soteldo|VEN|d|54
+Yangel Herrera|VEN|b|60
+Jefferson Savarino|VEN|s|52
+Darwin Machís|VEN|s|48
+Erick Pulgar|CHI|x|54
+Guillermo Maripán|CHI|c|54
+Marcelino Núñez|CHI|m|54
+Darío Osorio|CHI|s|56
+Gabriel Suazo|CHI|l|52
+Ben Brereton Díaz|CHI|f|58
+Manfred Ugalde|CRC|f|54
+Jewison Bennette|CRC|s|50
+Joel Campbell|CRC|f|46
+Adalberto Carrasquilla|PAN|m|56
+Michael Murillo|PAN|l|52
+Ismael Díaz|PAN|s|48
+Luis Palma|HON|s|54
+Alberth Elis|HON|s|52
+Shamar Nicholson|JAM|f|52
+Ethan Pinnock|JAM|c|58
+Kasey Palmer|JAM|m|50
+Duckens Nazon|HAI|f|46
+Ismaël Koné|CAN|b|62
+Ali Ahmed|CAN|s|54
+Jacob Shaffelburg|CAN|s|54
+Moïse Bombito|CAN|c|62
+Derek Cornelius|CAN|c|54
+Richie Laryea|CAN|l|52
+Alistair Johnston|CAN|l|60
+Cyle Larin|CAN|f|58
+Promise David|CAN|f|54
+Jonathan Osorio|CAN|m|52
+Luis Chávez|MEX|m|54
+Orbelín Pineda|MEX|m|54
+César Montes|MEX|c|56
+Julián Quiñones|MEX|f|58
+Alexis Vega|MEX|s|52
+Roberto Alvarado|MEX|s|52
+Jorge Sánchez|MEX|l|50
+Jesús Gallardo|MEX|l|50
+Henry Martín|MEX|p|50
+César Huerta|MEX|s|56
+Diego Lainez|MEX|d|50
+Germán Berterame|MEX|f|56
+Mathew Leckie|AUS|s|52
+Riley McGree|AUS|m|56
+Ajdin Hrustić|AUS|m|52
+Martin Boyle|AUS|s|52
+Craig Goodwin|AUS|w|50
+Aziz Behich|AUS|l|48
+Mitchell Duke|AUS|p|48
+Eduardo Vargas|CHI|f|48
+Paolo Guerrero|PER|p|46
+Wu Lei|CHN|f|50
+Jonathan Rodríguez|URU|s|52
+Lukáš Provod|CZE|m|60
+Vladimír Coufal|CZE|l|60
+Giorgos Masouras|GRE|s|56
+Anastasios Bakasetas|GRE|m|54
+Milot Rashica|KOS|s|58
+Sead Kolašinac|BIH|c|58
+Teemu Pukki|FIN|f|56
+Răzvan Marin|ROU|m|58
+Patrick Wimmer|AUT|s|60
+András Schäfer|HUN|m|60
+Giorgi Kochorashvili|GEO|m|58
+Krzysztof Piątek|POL|f|58
+Fabian Rieder|SUI|m|60
+Mario Hermoso|ESP|a|62`}}
+// country codes used above, with the two-letter code that makes each flag
+function realCC(){return{ARG:['Argentina','AR'],POR:['Portugal','PT'],FRA:['France','FR'],BRA:['Brazil','BR'],NOR:['Norway','NO'],EGY:['Egypt','EG'],URU:['Uruguay','UY'],KOR:['South Korea','KR'],
+  ENG:['England'],SCO:['Scotland'],WAL:['Wales'],ESP:['Spain','ES'],BEL:['Belgium','BE'],CRO:['Croatia','HR'],GER:['Germany','DE'],IRL:['Ireland','IE'],CZE:['Czech Republic','CZ'],ITA:['Italy','IT'],
+  SEN:['Senegal','SN'],NED:['Netherlands','NL'],NGA:['Nigeria','NG'],GHA:['Ghana','GH'],CIV:['Ivory Coast','CI'],CMR:['Cameroon','CM'],MAR:['Morocco','MA'],JPN:['Japan','JP'],USA:['USA','US'],COL:['Colombia','CO'],
+  DEN:['Denmark','DK'],SWE:['Sweden','SE'],POL:['Poland','PL'],SUI:['Switzerland','CH'],AUT:['Austria','AT'],SRB:['Serbia','RS'],ALG:['Algeria','DZ'],CAN:['Canada','CA'],MEX:['Mexico','MX'],TUR:['Turkey','TR'],
+  GEO:['Georgia','GE'],UKR:['Ukraine','UA'],AUS:['Australia','AU'],BFA:['Burkina Faso','BF'],FIN:['Finland','FI'],RUS:['Russia','RU'],HUN:['Hungary','HU'],NIR:['Northern Ireland','GB'],BUL:['Bulgaria','BG'],
+  LBR:['Liberia','LR'],ROU:['Romania','RO'],NZL:['New Zealand','NZ'],ECU:['Ecuador','EC'],CHI:['Chile','CL'],PAR:['Paraguay','PY'],PER:['Peru','PE'],VEN:['Venezuela','VE'],SVK:['Slovakia','SK'],SLO:['Slovenia','SI'],
+  GRE:['Greece','GR'],ISL:['Iceland','IS'],BIH:['Bosnia and Herzegovina','BA'],ALB:['Albania','AL'],KOS:['Kosovo','XK'],MKD:['North Macedonia','MK'],MLI:['Mali','ML'],GUI:['Guinea','GN'],GAB:['Gabon','GA'],
+  COD:['DR Congo','CD'],TUN:['Tunisia','TN'],RSA:['South Africa','ZA'],JAM:['Jamaica','JM'],CRC:['Costa Rica','CR'],PAN:['Panama','PA'],HON:['Honduras','HN'],HAI:['Haiti','HT'],IRN:['Iran','IR'],KSA:['Saudi Arabia','SA'],
+  QAT:['Qatar','QA'],UAE:['UAE','AE'],CHN:['China','CN'],UZB:['Uzbekistan','UZ'],ARM:['Armenia','AM'],ZAM:['Zambia','ZM'],ANG:['Angola','AO'],CPV:['Cape Verde','CV'],GAM:['Gambia','GM'],TOG:['Togo','TG'],
+  BEN:['Benin','BJ'],KEN:['Kenya','KE'],GNB:['Guinea-Bissau','GW'],IDN:['Indonesia','ID']}}
+
 function mk(team,i,st,kit,kx,ky,keeper=false){return{team,i,st,kit,kx,ky,keeper,x:kx,y:ky,vx:0,vy:0,dir:team?Math.PI:0,stun:0,stam:100,tackleCd:0,skillCd:0,spCd:0,anim:null,animT:0,animMax:1,rot:0,jump:0,arms:0,flip:1,lunge:0,slide:false,turbo:0,hold:0,react:0,dec:0,sprint:false,recvT:-99,track:false,burstT:-99,burstNear:false,slideCd:0,aiSlide:0,inter:false}}
 const KIT=()=>{if(NET.guest){const p=players.find(q=>q.team===0&&!q.keeper);if(p)return p.kit}return mode==='club'?club.kit:C.coral};
 const TEAMNAME=()=>mode==='club'?(club.name||'My Club').toUpperCase():'SUNDAY XI';
@@ -1576,6 +2797,8 @@ function setup(){oppSeed=(Math.random()*OPPNAMES.length)|0;
   const SHP={DEF:['cb','fb','ballcb','wingback'],MID:['b2b','playmaker','destroyer'],ATT:['finisher','speed','dribbler','power']};
   oslots.forEach((sl,i)=>{let st={...o};if(OPP.str!=null){const r=Math.round(clamp(OPP.str*100+rnd(-4,4),35,98)),v=statsFor(r,pick(SHP[sl.r]));STATK.forEach(([k],j)=>st[k]=v[j])}
     const p=mk(1,n+1+i,{...st,sk:OSK[(sh+i*2)%7],sp:sl.r==='DEF'?pick(['slide','lob','turbo']):OSP[(sh+i*3)%7],look:LOOKS[(i+oppSeed)%LOOKS.length],num:NUMS[i],short:OPPNAMES[(oppSeed+i*7)%OPPNAMES.length],name:OPPNAMES[(oppSeed+i*7)%OPPNAMES.length],skin:looks[(i+oppSeed)%looks.length][0],hair:looks[(i+oppSeed)%looks.length][1]},OPP.kit,0,0);p.slot=sl;players.push(p)})}
+  // Hard: every opponent is genuinely better than their card
+  if(LV().boost&&!NET.on)for(const p of players)if(p.team===1){p.st={...p.st};for(const [k] of STATK)p.st[k]=Math.min(.99,(+p.st[k]||.6)+LV().boost)}
   players.push(mk(1,2*n+1,{...gk,...keeperStats(1),num:1,skin:'#f2c9a0',hair:'#d9a441'},C.sun,FX1-16,MY,true));
 }
 setup();
@@ -2547,11 +3770,11 @@ function teamAI(team,dt){
         p.spCd=SPECIALS.slide.cd*1.15;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
       if(team===1&&DF.slide&&owner&&owner.team===0&&p.tackleCd<=0&&dist(p,owner)>30&&dist(p,owner)<60&&Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir))>.3&&Math.random()<.0035*dt){p.windup=10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
       steer(p,tgt.x,tgt.y,topSpeed(p)*(team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
-      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4][LV().shift+1];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
+      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
       continue;
     }
     if(p===cover){steer(p,p.coverPt.x,p.coverPt.y,topSpeed(p)*(team===1?.86:.95),dt);
-      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4][LV().shift+1];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}continue}
+      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}continue}
     if(hasBall){
       const h=homePos(p,true);let tx=h.x,ty=h.y;
       if((p.slot.r==='ATT'||p.role==='att')&&owner)tx+=att*(30+Math.sin(t*.02+p.i)*30)+(p.role==='att'?att*40:0);
@@ -4011,13 +5234,21 @@ $('save-load').onclick=()=>{const raw=($('save-code').value||'').trim().replace(
   try{localStorage.setItem('kickabout-club',JSON.stringify(club));localStorage.setItem('kickabout-names',JSON.stringify(NAMES));localStorage.setItem('kickabout-custom',JSON.stringify(custom));localStorage.setItem('kickabout-best3',best)}catch(e){}
   cloudPush();setup();$('save-code').value='';$('save-note').style.color='';$('save-note').textContent='';renderMenu();S.goal&&S.goal();toast(`Save loaded: ${club.name||'your club'}, ${club.owned.length} players, ${club.coins.toLocaleString()} coins.`)};
 /* who's who */
-function whoRender(){const list=PLAYERS.filter(p=>!p.rar).sort((a,b)=>ovr(b)-ovr(a)),opts=Object.keys(COUNTRIES).sort();
-  $('who').innerHTML=`<div class="wr wh"><span>CARD</span><span>INSPIRED BY</span><span>COUNTRY</span></div>`+list.map(p=>{const [nm,c]=inspOf(p.id);
-    return `<div class="wr"><span><b>${esc(p.name)}</b>${p.name!==p.name0?`<small>card: ${esc(p.name0)}</small>`:''}<small>${ovr(p)} · ${natPos(p)}</small></span><input type="text" maxlength="30" data-wi="${esc(p.id)}" value="${esc(nm)}" aria-label="Inspired by"><select data-wc="${esc(p.id)}" aria-label="Country">${(opts.includes(c)?opts:[c,...opts]).map(o=>`<option${o===c?' selected':''}>${esc(o)}</option>`).join('')}</select></div>`}).join('')}
+// Who's who: every card's real player and country. Search any card, fix a name, and switch real names on or off.
+let whoQ='';
+function whoRender(){const opts=Object.keys(COUNTRIES).sort(),q=whoQ.trim().toLowerCase();
+  const list=[...PLAYERS].filter(p=>!q||p.name.toLowerCase().includes(q)||p.name0.toLowerCase().includes(q)||inspOf(p.id)[0].toLowerCase().includes(q))
+    .sort((a,b)=>(club.owned.includes(b.id)-club.owned.includes(a.id))||ovr(b)-ovr(a)).slice(0,60);
+  $('who-top').innerHTML=`<button class="go" id="who-real" style="font-size:16px">${realOn()?'Real names: ON':'Real names: OFF'}</button><input id="who-q" placeholder="Search a card or real player" value="${esc(whoQ)}" aria-label="Search"><span class="hint" style="margin:0">${q?'Matching cards':'Your players first'} · showing ${list.length} of ${PLAYERS.length}</span>`;
+  $('who').innerHTML=`<div class="wr wh"><span>CARD</span><span>REAL PLAYER</span><span>COUNTRY</span></div>`+list.map(p=>{const [nm,c]=inspOf(p.id);
+    return `<div class="wr"><span><b>${esc(p.name0)}</b><small>${ovr(p)} · ${natPos(p)} · ${TIERS[tier(p)].name}${club.owned.includes(p.id)?' · yours':''}</small></span><input type="text" maxlength="30" data-wi="${esc(p.id)}" value="${esc(nm)}" aria-label="Real player"><select data-wc="${esc(p.id)}" aria-label="Country">${(opts.includes(c)?opts:[c,...opts]).map(o=>`<option${o===c?' selected':''}>${esc(o)}</option>`).join('')}</select></div>`}).join('')}
 $('whobox').addEventListener('toggle',()=>{if($('whobox').open)whoRender()});
-$('who-save').onclick=()=>{const ins={};for(const i of $('who').querySelectorAll('input[data-wi]')){const id=i.dataset.wi,sel=$('who').querySelector(`select[data-wc="${CSS.escape(id)}"]`),v=i.value.trim().slice(0,30),c=sel?sel.value:'',d=INSP0[id]||['',''];
-    if(v!==d[0]||c!==d[1])ins[id]=[v,c]}club.insp=ins;saveClub();renderMenu();whoRender();toast('Who’s who saved.')};
-$('who-reset').onclick=()=>{club.insp={};saveClub();renderMenu();whoRender();toast('Back to the original list.')};
+$('whobox').addEventListener('click',e=>{if(e.target.id==='who-real'){club.realNames=!realOn();saveClub();applyNames();renderMenu();whoRender();toast(realOn()?'Every card now shows its real player’s name.':'Cards show their own made-up names again.')}});
+$('whobox').addEventListener('keydown',e=>{if(e.target.id==='who-q'&&e.key==='Enter'){whoQ=e.target.value;whoRender();const i=$('who-q');i.focus();i.setSelectionRange(i.value.length,i.value.length)}});
+$('whobox').addEventListener('change',e=>{if(e.target.id==='who-q'){whoQ=e.target.value;whoRender()}});
+$('who-save').onclick=()=>{const ins={...(club.insp||{})};for(const i of $('who').querySelectorAll('input[data-wi]')){const id=i.dataset.wi,sel=$('who').querySelector(`select[data-wc="${CSS.escape(id)}"]`),v=i.value.trim().slice(0,30),c=sel?sel.value:'',d=INSP0[id]||['',''];
+    if(v!==d[0]||c!==d[1])ins[id]=[v,c];else delete ins[id]}club.insp=ins;saveClub();applyNames();renderMenu();whoRender();toast('Who’s who saved.')};
+$('who-reset').onclick=()=>{club.insp={};saveClub();applyNames();renderMenu();whoRender();toast('Back to the original list.')};
 /* rename lots of players at once */
 function bulkRender(){const list=PLAYERS.filter(p=>club.owned.includes(p.id)).sort((a,b)=>ovr(b)-ovr(a));
   $('bulk').innerHTML=list.map(p=>`<label><span>${esc(p.name0)} · ${ovr(p)}</span><input type="text" maxlength="16" data-bn="${esc(p.id)}" value="${esc(NAMES[p.id]||'')}" placeholder="${esc(p.name0)}"></label>`).join('')}

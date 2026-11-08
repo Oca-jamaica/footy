@@ -28,6 +28,8 @@ function setup(){oppSeed=(Math.random()*OPPNAMES.length)|0;
   const SHP={DEF:['cb','fb','ballcb','wingback'],MID:['b2b','playmaker','destroyer'],ATT:['finisher','speed','dribbler','power']};
   oslots.forEach((sl,i)=>{let st={...o};if(OPP.str!=null){const r=Math.round(clamp(OPP.str*100+rnd(-4,4),35,98)),v=statsFor(r,pick(SHP[sl.r]));STATK.forEach(([k],j)=>st[k]=v[j])}
     const p=mk(1,n+1+i,{...st,sk:OSK[(sh+i*2)%7],sp:sl.r==='DEF'?pick(['slide','lob','turbo']):OSP[(sh+i*3)%7],look:LOOKS[(i+oppSeed)%LOOKS.length],num:NUMS[i],short:OPPNAMES[(oppSeed+i*7)%OPPNAMES.length],name:OPPNAMES[(oppSeed+i*7)%OPPNAMES.length],skin:looks[(i+oppSeed)%looks.length][0],hair:looks[(i+oppSeed)%looks.length][1]},OPP.kit,0,0);p.slot=sl;players.push(p)})}
+  // Hard: every opponent is genuinely better than their card
+  if(LV().boost&&!NET.on)for(const p of players)if(p.team===1){p.st={...p.st};for(const [k] of STATK)p.st[k]=Math.min(.99,(+p.st[k]||.6)+LV().boost)}
   players.push(mk(1,2*n+1,{...gk,...keeperStats(1),num:1,skin:'#f2c9a0',hair:'#d9a441'},C.sun,FX1-16,MY,true));
 }
 setup();
@@ -999,11 +1001,11 @@ function teamAI(team,dt){
         p.spCd=SPECIALS.slide.cd*1.15;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
       if(team===1&&DF.slide&&owner&&owner.team===0&&p.tackleCd<=0&&dist(p,owner)>30&&dist(p,owner)<60&&Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir))>.3&&Math.random()<.0035*dt){p.windup=10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
       steer(p,tgt.x,tgt.y,topSpeed(p)*(team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
-      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4][LV().shift+1];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
+      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
       continue;
     }
     if(p===cover){steer(p,p.coverPt.x,p.coverPt.y,topSpeed(p)*(team===1?.86:.95),dt);
-      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4][LV().shift+1];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}continue}
+      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}continue}
     if(hasBall){
       const h=homePos(p,true);let tx=h.x,ty=h.y;
       if((p.slot.r==='ATT'||p.role==='att')&&owner)tx+=att*(30+Math.sin(t*.02+p.i)*30)+(p.role==='att'?att*40:0);

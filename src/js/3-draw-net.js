@@ -649,13 +649,21 @@ $('save-load').onclick=()=>{const raw=($('save-code').value||'').trim().replace(
   try{localStorage.setItem('kickabout-club',JSON.stringify(club));localStorage.setItem('kickabout-names',JSON.stringify(NAMES));localStorage.setItem('kickabout-custom',JSON.stringify(custom));localStorage.setItem('kickabout-best3',best)}catch(e){}
   cloudPush();setup();$('save-code').value='';$('save-note').style.color='';$('save-note').textContent='';renderMenu();S.goal&&S.goal();toast(`Save loaded: ${club.name||'your club'}, ${club.owned.length} players, ${club.coins.toLocaleString()} coins.`)};
 /* who's who */
-function whoRender(){const list=PLAYERS.filter(p=>!p.rar).sort((a,b)=>ovr(b)-ovr(a)),opts=Object.keys(COUNTRIES).sort();
-  $('who').innerHTML=`<div class="wr wh"><span>CARD</span><span>INSPIRED BY</span><span>COUNTRY</span></div>`+list.map(p=>{const [nm,c]=inspOf(p.id);
-    return `<div class="wr"><span><b>${esc(p.name)}</b>${p.name!==p.name0?`<small>card: ${esc(p.name0)}</small>`:''}<small>${ovr(p)} · ${natPos(p)}</small></span><input type="text" maxlength="30" data-wi="${esc(p.id)}" value="${esc(nm)}" aria-label="Inspired by"><select data-wc="${esc(p.id)}" aria-label="Country">${(opts.includes(c)?opts:[c,...opts]).map(o=>`<option${o===c?' selected':''}>${esc(o)}</option>`).join('')}</select></div>`}).join('')}
+// Who's who: every card's real player and country. Search any card, fix a name, and switch real names on or off.
+let whoQ='';
+function whoRender(){const opts=Object.keys(COUNTRIES).sort(),q=whoQ.trim().toLowerCase();
+  const list=[...PLAYERS].filter(p=>!q||p.name.toLowerCase().includes(q)||p.name0.toLowerCase().includes(q)||inspOf(p.id)[0].toLowerCase().includes(q))
+    .sort((a,b)=>(club.owned.includes(b.id)-club.owned.includes(a.id))||ovr(b)-ovr(a)).slice(0,60);
+  $('who-top').innerHTML=`<button class="go" id="who-real" style="font-size:16px">${realOn()?'Real names: ON':'Real names: OFF'}</button><input id="who-q" placeholder="Search a card or real player" value="${esc(whoQ)}" aria-label="Search"><span class="hint" style="margin:0">${q?'Matching cards':'Your players first'} · showing ${list.length} of ${PLAYERS.length}</span>`;
+  $('who').innerHTML=`<div class="wr wh"><span>CARD</span><span>REAL PLAYER</span><span>COUNTRY</span></div>`+list.map(p=>{const [nm,c]=inspOf(p.id);
+    return `<div class="wr"><span><b>${esc(p.name0)}</b><small>${ovr(p)} · ${natPos(p)} · ${TIERS[tier(p)].name}${club.owned.includes(p.id)?' · yours':''}</small></span><input type="text" maxlength="30" data-wi="${esc(p.id)}" value="${esc(nm)}" aria-label="Real player"><select data-wc="${esc(p.id)}" aria-label="Country">${(opts.includes(c)?opts:[c,...opts]).map(o=>`<option${o===c?' selected':''}>${esc(o)}</option>`).join('')}</select></div>`}).join('')}
 $('whobox').addEventListener('toggle',()=>{if($('whobox').open)whoRender()});
-$('who-save').onclick=()=>{const ins={};for(const i of $('who').querySelectorAll('input[data-wi]')){const id=i.dataset.wi,sel=$('who').querySelector(`select[data-wc="${CSS.escape(id)}"]`),v=i.value.trim().slice(0,30),c=sel?sel.value:'',d=INSP0[id]||['',''];
-    if(v!==d[0]||c!==d[1])ins[id]=[v,c]}club.insp=ins;saveClub();renderMenu();whoRender();toast('Who’s who saved.')};
-$('who-reset').onclick=()=>{club.insp={};saveClub();renderMenu();whoRender();toast('Back to the original list.')};
+$('whobox').addEventListener('click',e=>{if(e.target.id==='who-real'){club.realNames=!realOn();saveClub();applyNames();renderMenu();whoRender();toast(realOn()?'Every card now shows its real player’s name.':'Cards show their own made-up names again.')}});
+$('whobox').addEventListener('keydown',e=>{if(e.target.id==='who-q'&&e.key==='Enter'){whoQ=e.target.value;whoRender();const i=$('who-q');i.focus();i.setSelectionRange(i.value.length,i.value.length)}});
+$('whobox').addEventListener('change',e=>{if(e.target.id==='who-q'){whoQ=e.target.value;whoRender()}});
+$('who-save').onclick=()=>{const ins={...(club.insp||{})};for(const i of $('who').querySelectorAll('input[data-wi]')){const id=i.dataset.wi,sel=$('who').querySelector(`select[data-wc="${CSS.escape(id)}"]`),v=i.value.trim().slice(0,30),c=sel?sel.value:'',d=INSP0[id]||['',''];
+    if(v!==d[0]||c!==d[1])ins[id]=[v,c];else delete ins[id]}club.insp=ins;saveClub();applyNames();renderMenu();whoRender();toast('Who’s who saved.')};
+$('who-reset').onclick=()=>{club.insp={};saveClub();applyNames();renderMenu();whoRender();toast('Back to the original list.')};
 /* rename lots of players at once */
 function bulkRender(){const list=PLAYERS.filter(p=>club.owned.includes(p.id)).sort((a,b)=>ovr(b)-ovr(a));
   $('bulk').innerHTML=list.map(p=>`<label><span>${esc(p.name0)} · ${ovr(p)}</span><input type="text" maxlength="16" data-bn="${esc(p.id)}" value="${esc(NAMES[p.id]||'')}" placeholder="${esc(p.name0)}"></label>`).join('')}
