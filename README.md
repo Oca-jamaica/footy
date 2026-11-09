@@ -40,8 +40,8 @@ and pitch; Ranked by similar rating, widening the longer you wait; never an AI).
 (Bronze → Silver → Gold → Platinum → Diamond → Champion → Legendary); after that wins earn Ranked Points and losses cost
 them, by Elo, so beating a stronger player is worth more. Volta and Classical are ranked separately. Seasons are calendar
 months: rewards for your best rank, then points move part of the way back to the middle. Leaving a Ranked match counts
-as a loss. Friendly pays normal online coins (a quarter after 8 a day). Leaderboards: Global clubs and Ranked (ordered by
-results only), with a read-only View Squad.
+as a loss. Friendly pays normal online coins (a quarter after 8 a day). Leaderboard tab (next to Online): every club is on it automatically and kept up to date; Global clubs and Ranked
+(ordered by results only), with a read-only View Squad.
 
 **What needs a server:** matchmaking and the leaderboards run over the same free public relays as online play, with no
 server of our own. Each club's rating lives in its own save, and leaderboard profiles are retained messages on public

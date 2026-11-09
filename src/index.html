@@ -58,6 +58,7 @@ canvas:focus-visible{box-shadow:inset 0 0 0 3px var(--sun)}
 .tabs{display:flex;gap:4px;background:#12303e;border-radius:999px;padding:4px}
 .tabs button{font-family:var(--display);font-size:16px;border:0;border-radius:999px;padding:6px 18px;background:transparent;color:var(--muted);cursor:pointer}
 .tabs button[aria-selected="true"]{background:var(--coral);color:#fff}
+@media (max-width:560px){.tabs{flex-wrap:wrap;justify-content:center;border-radius:18px}.tabs button{padding:6px 11px;font-size:14px}}
 .online{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;width:100%}
 .ocard{background:#12303e;border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:10px;justify-items:start}
 .ocard h3{margin:0;font-family:var(--display);font-size:22px;color:var(--cream)}
@@ -388,7 +389,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
       <div class="sw" id="club-kit" aria-label="Kit colour"></div>
       <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button><button class="res ctkp" id="ctkp" title="Club Tokens (Club Development)"></button><button class="res helpb" id="helpbtn3" title="How everything works">? Help</button>
     </div>
-    <div class="tabs" role="tablist"><button role="tab" id="tab-team" aria-selected="true">Play</button><button role="tab" id="tab-squad" aria-selected="false">Squad</button><button role="tab" id="tab-club" aria-selected="false">Club</button><button role="tab" id="tab-online" aria-selected="false">Online</button></div>
+    <div class="tabs" role="tablist"><button role="tab" id="tab-team" aria-selected="true">Play</button><button role="tab" id="tab-squad" aria-selected="false">Squad</button><button role="tab" id="tab-club" aria-selected="false">Club</button><button role="tab" id="tab-online" aria-selected="false">Online</button><button role="tab" id="tab-board" aria-selected="false">Leaderboard</button></div>
     <p class="result" id="result" hidden></p>
     <p class="toast" id="toast" aria-live="polite"></p>
     <section id="sec-team" style="width:100%;display:grid;gap:12px;justify-items:center">
@@ -456,8 +457,8 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
       <p class="hint">You each play with your own team and line-up (your Volta line-up for Volta, your Classical line-up for Classical), and you both see yourself attacking left to right. After Kick off both laptops load the match and confirm they’re ready before a 3-2-1 countdown. No penalties: a draw is a draw. Coins: 60 for a win, 30 for a draw, 15 for a loss (Classical 1.5×).</p>
       </div>
       <p class="toast" id="net-status" aria-live="polite"></p>
-      <div id="ol-board" class="panel"></div>
     </section>
+    <section id="sec-board" hidden style="width:100%"><div id="ol-board" class="panel"></div></section>
     <section id="sec-coll" hidden style="width:100%">
       <h3 class="sec-title">Collection <span class="hint" id="collect-count"></span></h3>
       <details class="guide" id="savebox"><summary>Move your save to another copy of the game</summary>

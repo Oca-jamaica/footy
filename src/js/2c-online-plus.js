@@ -161,7 +161,14 @@ async function regPublish(){if(!club.reg)return;const cl=await regConnect(),s=JS
   for(const c of cl){const go=()=>{try{c.publish(REG+club.reg.id,s,{qos:0,retain:true})}catch(e){}};if(c.connected)go();else c.once('connect',go)}}
 function regPublishSoon(){clearTimeout(regTimer);regTimer=setTimeout(regPublish,1500)}
 async function regLoad(){regLoading=true;renderBoards();await regConnect();setTimeout(()=>{regLoading=false;renderBoards()},2500)}
-function regJoin(){if(!club.reg){club.reg={id:Array.from({length:12},()=>'abcdefghjkmnpqrstuvwxyz23456789'[(Math.random()*31)|0]).join(''),at:Date.now()};saveClub()}regPublish();toast('Your club is on the leaderboard.');regLoad()}
+// Every club is on the leaderboard automatically: it gets a random public id the first time the game opens, and its
+// public profile is published then and again whenever anything on it changes (name, badge, line-ups, ratings, ranks).
+function regEnsure(){if(!club.reg){club.reg={id:Array.from({length:12},()=>'abcdefghjkmnpqrstuvwxyz23456789'[(Math.random()*31)|0]).join(''),at:Date.now()};saveClub()}}
+let regKey='',regLoadedAt=0;
+function regAuto(){regEnsure();const p=regProfile();delete p.t;const k=JSON.stringify(p);if(k!==regKey){regKey=k;regPublish()}}
+function regBoot(){regEnsure();setTimeout(regAuto,2500);setInterval(regAuto,20000)}
+// opening the Leaderboard tab fetches the latest board (again if it's more than half a minute old)
+function regOpenBoard(){regAuto();if(!regLoadedAt||performance.now()-regLoadedAt>30000){regLoadedAt=performance.now();regLoad()}else renderBoards()}
 function renderBoards(){const el=$('ol-board');if(!el)return;const me=club.reg&&club.reg.id;const list=[...regBoard.values()];if(me&&!regBoard.has(me)&&club.reg)list.push(regInFromMine());
   const fam=lbFam,wr=p=>{const t=p.rk[fam],n=t.w+t.d+t.l;return n>=10?t.w/n:-1};
   const sorts={rp:(a,b)=>(b.rk[fam].pd-a.rk[fam].pd)||b.rk[fam].rp-a.rk[fam].rp,rank:(a,b)=>b.rk[fam].ix-a.rk[fam].ix||b.rk[fam].rp-a.rk[fam].rp,ovr:(a,b)=>b.sq[fam].r-a.sq[fam].r,wins:(a,b)=>(b.rk.volta.w+b.rk.classical.w)-(a.rk.volta.w+a.rk.classical.w),wr:(a,b)=>wr(b)-wr(a)};
@@ -169,8 +176,8 @@ function renderBoards(){const el=$('ol-board');if(!el)return;const me=club.reg&&
   el.innerHTML=`<div class="lbhead"><h3>Leaderboards</h3><div class="subtabs">${[['clubs','Global clubs'],['ranked','Ranked']].map(([k,n])=>`<button data-lbt="${k}" aria-pressed="${lbTab===k}">${n}</button>`).join('')}</div>
     <div class="subtabs">${[['volta','Volta'],['classical','Classical']].map(([k,n])=>`<button data-lbf="${k}" aria-pressed="${lbFam===k}">${n}</button>`).join('')}</div>
     ${lbTab==='clubs'?`<select id="lb-sort" aria-label="Sort">${[['ovr','Team rating'],['rp','Ranked Points'],['rank','Online rank'],['wins','Total ranked wins'],['wr','Win % (10+ matches)']].map(([k,n])=>`<option value="${k}" ${lbSort===k?'selected':''}>Sort: ${n}</option>`).join('')}</select>`:''}
-    <button class="btn" data-lbload="1">Refresh</button>${club.reg?'':'<button class="btn gold" data-lbjoin="1">Put my club on the leaderboard</button>'}</div>
-    <p class="hint">${lbTab==='ranked'?'Ordered by competitive results only (Ranked Points), never by squad strength.':'Every club that has joined the leaderboard, whatever its rank.'} Shared through public relays: profiles are checked, but this isn't a secure server, so treat it as a friendly board rather than an official ranking.${regLoading?' Loading…':''}</p>
+    <button class="btn" data-lbload="1">Refresh</button></div>
+    <p class="hint">${lbTab==='ranked'?'Ordered by competitive results only (Ranked Points), never by squad strength.':'Every club playing Sunday Kickabout, whatever its rank. Yours is added automatically and kept up to date.'} Shared through public relays: profiles are checked, but this isn't a secure server, so treat it as a friendly board rather than an official ranking.${regLoading?' Loading…':''}</p>
     <div class="ltwrap"><table class="lt lbt"><tr><th>#</th><th>Club</th><th>Team</th><th>Rank</th><th>RP</th><th>W-D-L</th><th>Played</th><th></th></tr>
     ${rows.slice(0,100).map((p,i)=>{const t=p.rk[fam];return `<tr class="${p.id===me?'me':''}"><td>${i+1}</td><td><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}</td><td>${p.sq[fam].r||'–'}</td><td>${t.pd?rankBadgeHTML(t.ix,24,false)+' '+RANKS[t.ix].n:`<span class="hint">Unranked ${t.pl}/10</span>`}</td><td>${t.pd?t.rp.toLocaleString():'–'}</td><td>${t.w}-${t.d}-${t.l}</td><td>${p.pl}</td><td><button class="btn" data-vsq="${p.id}">View squad</button></td></tr>`}).join('')||`<tr><td colspan="8" class="hint">${regLoading?'Loading…':'No clubs yet. Press Refresh, or put your club on the board.'}</td></tr>`}</table></div>`}
 function regInFromMine(){const raw=regProfile();regIn(raw);const p=regBoard.get(raw.id);return p}
@@ -178,7 +185,7 @@ function viewSquad(id){const p=regBoard.get(id);if(!p)return;const box=$('sqview
   box.innerHTML=`<div class="sqbox" role="dialog" aria-label="Squad"><button class="ghost sqx" data-sqx="1">Close</button><h3><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}</h3>
     <p class="hint">Read-only. Volta ${p.rk.volta.pd?RANKS[p.rk.volta.ix].n+' '+p.rk.volta.rp+' RP':'unranked'} · Classical ${p.rk.classical.pd?RANKS[p.rk.classical.ix].n+' '+p.rk.classical.rp+' RP':'unranked'}</p>${lin(p.sq.volta,'Volta')}${lin(p.sq.classical,'Classical')}</div>`;box.hidden=false}
 document.addEventListener('click',e=>{const t=e.target.closest('#ol-board button,#sqview [data-sqx]');if(!t)return;const d=t.dataset;
-  if(d.lbt){lbTab=d.lbt;renderBoards()}else if(d.lbf){lbFam=d.lbf;renderBoards()}else if(d.lbload)regLoad();else if(d.lbjoin)regJoin();else if(d.vsq)viewSquad(d.vsq);else if(d.sqx)$('sqview').hidden=true});
+  if(d.lbt){lbTab=d.lbt;renderBoards()}else if(d.lbf){lbFam=d.lbf;renderBoards()}else if(d.lbload){regLoadedAt=performance.now();regLoad()}else if(d.vsq)viewSquad(d.vsq);else if(d.sqx)$('sqview').hidden=true});
 document.addEventListener('change',e=>{if(e.target.id==='lb-sort'){lbSort=e.target.value;renderBoards()}});
 $('sqview').addEventListener('click',e=>{if(e.target.id==='sqview')$('sqview').hidden=true});
 

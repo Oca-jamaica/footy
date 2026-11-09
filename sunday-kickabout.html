@@ -75,6 +75,7 @@ canvas:focus-visible{box-shadow:inset 0 0 0 3px var(--sun)}
 .tabs{display:flex;gap:4px;background:#12303e;border-radius:999px;padding:4px}
 .tabs button{font-family:var(--display);font-size:16px;border:0;border-radius:999px;padding:6px 18px;background:transparent;color:var(--muted);cursor:pointer}
 .tabs button[aria-selected="true"]{background:var(--coral);color:#fff}
+@media (max-width:560px){.tabs{flex-wrap:wrap;justify-content:center;border-radius:18px}.tabs button{padding:6px 11px;font-size:14px}}
 .online{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;width:100%}
 .ocard{background:#12303e;border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:10px;justify-items:start}
 .ocard h3{margin:0;font-family:var(--display);font-size:22px;color:var(--cream)}
@@ -405,7 +406,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
       <div class="sw" id="club-kit" aria-label="Kit colour"></div>
       <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button><button class="res ctkp" id="ctkp" title="Club Tokens (Club Development)"></button><button class="res helpb" id="helpbtn3" title="How everything works">? Help</button>
     </div>
-    <div class="tabs" role="tablist"><button role="tab" id="tab-team" aria-selected="true">Play</button><button role="tab" id="tab-squad" aria-selected="false">Squad</button><button role="tab" id="tab-club" aria-selected="false">Club</button><button role="tab" id="tab-online" aria-selected="false">Online</button></div>
+    <div class="tabs" role="tablist"><button role="tab" id="tab-team" aria-selected="true">Play</button><button role="tab" id="tab-squad" aria-selected="false">Squad</button><button role="tab" id="tab-club" aria-selected="false">Club</button><button role="tab" id="tab-online" aria-selected="false">Online</button><button role="tab" id="tab-board" aria-selected="false">Leaderboard</button></div>
     <p class="result" id="result" hidden></p>
     <p class="toast" id="toast" aria-live="polite"></p>
     <section id="sec-team" style="width:100%;display:grid;gap:12px;justify-items:center">
@@ -473,8 +474,8 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
       <p class="hint">You each play with your own team and line-up (your Volta line-up for Volta, your Classical line-up for Classical), and you both see yourself attacking left to right. After Kick off both laptops load the match and confirm they’re ready before a 3-2-1 countdown. No penalties: a draw is a draw. Coins: 60 for a win, 30 for a draw, 15 for a loss (Classical 1.5×).</p>
       </div>
       <p class="toast" id="net-status" aria-live="polite"></p>
-      <div id="ol-board" class="panel"></div>
     </section>
+    <section id="sec-board" hidden style="width:100%"><div id="ol-board" class="panel"></div></section>
     <section id="sec-coll" hidden style="width:100%">
       <h3 class="sec-title">Collection <span class="hint" id="collect-count"></span></h3>
       <details class="guide" id="savebox"><summary>Move your save to another copy of the game</summary>
@@ -933,8 +934,8 @@ function setGM(g){if(g===GM)return;club.compBy=club.compBy||{};club.compBy[GM]=c
   if(!COMPS[g].includes(club.comp==='cup'?'easy':club.comp))club.comp='league';selSlot=0;saveClub();renderMenu()}
 function renderMenu(){
   careerInit();applyNames();
-  for(const k of ['team','squad','club','online'])$('tab-'+k).setAttribute('aria-selected',tab===k);
-  $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';if(tab==='online')renderOnlinePlus();
+  for(const k of ['team','squad','club','online','board'])$('tab-'+k).setAttribute('aria-selected',tab===k);
+  $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';$('sec-board').hidden=tab!=='board';if(tab==='online')renderOnlinePlus();if(tab==='board')regOpenBoard();
   $('sec-packs').hidden=!(tab==='club'&&ctab==='packs');$('sec-coll').hidden=!(tab==='club'&&ctab==='coll');
   comp=club.comp||'league';if(!COMPS[GM].includes(compKey())){comp=club.comp='league'}
   document.querySelectorAll('.lvl button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lv===(club.level||'normal')?'true':'false'));
@@ -1077,7 +1078,7 @@ $('packs').addEventListener('click',e=>{const b=e.target.closest('[data-pack]');
 $('sqtabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.best){autoPick();toast('Picked your best line-up for this formation.')}
   else{if(GM==='classical')club.cactive=+b.dataset.sq;else club.active=+b.dataset.sq;selSlot=Math.max(0,sq().s.indexOf(null))}saveClub();renderMenu()});
-for(const k of ['team','squad','club','online'])$('tab-'+k).onclick=()=>{tab=k;resultEl.hidden=true;toast('');renderMenu()};
+for(const k of ['team','squad','club','online','board'])$('tab-'+k).onclick=()=>{tab=k;resultEl.hidden=true;toast('');renderMenu()};
 function rollTier(odds){let r=Math.random()*100;for(const k of ['icon','special','gold','silver','bronze']){r-=odds[k]||0;if(r<0)return k}return Object.keys(odds).find(k=>odds[k]>0)||'bronze'}
 // A pack is one tier, one card per position, ratings close together and new cards first, so every pick is a real dilemma.
 function dealHardPick(t){
@@ -5098,7 +5099,14 @@ async function regPublish(){if(!club.reg)return;const cl=await regConnect(),s=JS
   for(const c of cl){const go=()=>{try{c.publish(REG+club.reg.id,s,{qos:0,retain:true})}catch(e){}};if(c.connected)go();else c.once('connect',go)}}
 function regPublishSoon(){clearTimeout(regTimer);regTimer=setTimeout(regPublish,1500)}
 async function regLoad(){regLoading=true;renderBoards();await regConnect();setTimeout(()=>{regLoading=false;renderBoards()},2500)}
-function regJoin(){if(!club.reg){club.reg={id:Array.from({length:12},()=>'abcdefghjkmnpqrstuvwxyz23456789'[(Math.random()*31)|0]).join(''),at:Date.now()};saveClub()}regPublish();toast('Your club is on the leaderboard.');regLoad()}
+// Every club is on the leaderboard automatically: it gets a random public id the first time the game opens, and its
+// public profile is published then and again whenever anything on it changes (name, badge, line-ups, ratings, ranks).
+function regEnsure(){if(!club.reg){club.reg={id:Array.from({length:12},()=>'abcdefghjkmnpqrstuvwxyz23456789'[(Math.random()*31)|0]).join(''),at:Date.now()};saveClub()}}
+let regKey='',regLoadedAt=0;
+function regAuto(){regEnsure();const p=regProfile();delete p.t;const k=JSON.stringify(p);if(k!==regKey){regKey=k;regPublish()}}
+function regBoot(){regEnsure();setTimeout(regAuto,2500);setInterval(regAuto,20000)}
+// opening the Leaderboard tab fetches the latest board (again if it's more than half a minute old)
+function regOpenBoard(){regAuto();if(!regLoadedAt||performance.now()-regLoadedAt>30000){regLoadedAt=performance.now();regLoad()}else renderBoards()}
 function renderBoards(){const el=$('ol-board');if(!el)return;const me=club.reg&&club.reg.id;const list=[...regBoard.values()];if(me&&!regBoard.has(me)&&club.reg)list.push(regInFromMine());
   const fam=lbFam,wr=p=>{const t=p.rk[fam],n=t.w+t.d+t.l;return n>=10?t.w/n:-1};
   const sorts={rp:(a,b)=>(b.rk[fam].pd-a.rk[fam].pd)||b.rk[fam].rp-a.rk[fam].rp,rank:(a,b)=>b.rk[fam].ix-a.rk[fam].ix||b.rk[fam].rp-a.rk[fam].rp,ovr:(a,b)=>b.sq[fam].r-a.sq[fam].r,wins:(a,b)=>(b.rk.volta.w+b.rk.classical.w)-(a.rk.volta.w+a.rk.classical.w),wr:(a,b)=>wr(b)-wr(a)};
@@ -5106,8 +5114,8 @@ function renderBoards(){const el=$('ol-board');if(!el)return;const me=club.reg&&
   el.innerHTML=`<div class="lbhead"><h3>Leaderboards</h3><div class="subtabs">${[['clubs','Global clubs'],['ranked','Ranked']].map(([k,n])=>`<button data-lbt="${k}" aria-pressed="${lbTab===k}">${n}</button>`).join('')}</div>
     <div class="subtabs">${[['volta','Volta'],['classical','Classical']].map(([k,n])=>`<button data-lbf="${k}" aria-pressed="${lbFam===k}">${n}</button>`).join('')}</div>
     ${lbTab==='clubs'?`<select id="lb-sort" aria-label="Sort">${[['ovr','Team rating'],['rp','Ranked Points'],['rank','Online rank'],['wins','Total ranked wins'],['wr','Win % (10+ matches)']].map(([k,n])=>`<option value="${k}" ${lbSort===k?'selected':''}>Sort: ${n}</option>`).join('')}</select>`:''}
-    <button class="btn" data-lbload="1">Refresh</button>${club.reg?'':'<button class="btn gold" data-lbjoin="1">Put my club on the leaderboard</button>'}</div>
-    <p class="hint">${lbTab==='ranked'?'Ordered by competitive results only (Ranked Points), never by squad strength.':'Every club that has joined the leaderboard, whatever its rank.'} Shared through public relays: profiles are checked, but this isn't a secure server, so treat it as a friendly board rather than an official ranking.${regLoading?' Loading…':''}</p>
+    <button class="btn" data-lbload="1">Refresh</button></div>
+    <p class="hint">${lbTab==='ranked'?'Ordered by competitive results only (Ranked Points), never by squad strength.':'Every club playing Sunday Kickabout, whatever its rank. Yours is added automatically and kept up to date.'} Shared through public relays: profiles are checked, but this isn't a secure server, so treat it as a friendly board rather than an official ranking.${regLoading?' Loading…':''}</p>
     <div class="ltwrap"><table class="lt lbt"><tr><th>#</th><th>Club</th><th>Team</th><th>Rank</th><th>RP</th><th>W-D-L</th><th>Played</th><th></th></tr>
     ${rows.slice(0,100).map((p,i)=>{const t=p.rk[fam];return `<tr class="${p.id===me?'me':''}"><td>${i+1}</td><td><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}</td><td>${p.sq[fam].r||'–'}</td><td>${t.pd?rankBadgeHTML(t.ix,24,false)+' '+RANKS[t.ix].n:`<span class="hint">Unranked ${t.pl}/10</span>`}</td><td>${t.pd?t.rp.toLocaleString():'–'}</td><td>${t.w}-${t.d}-${t.l}</td><td>${p.pl}</td><td><button class="btn" data-vsq="${p.id}">View squad</button></td></tr>`}).join('')||`<tr><td colspan="8" class="hint">${regLoading?'Loading…':'No clubs yet. Press Refresh, or put your club on the board.'}</td></tr>`}</table></div>`}
 function regInFromMine(){const raw=regProfile();regIn(raw);const p=regBoard.get(raw.id);return p}
@@ -5115,7 +5123,7 @@ function viewSquad(id){const p=regBoard.get(id);if(!p)return;const box=$('sqview
   box.innerHTML=`<div class="sqbox" role="dialog" aria-label="Squad"><button class="ghost sqx" data-sqx="1">Close</button><h3><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}</h3>
     <p class="hint">Read-only. Volta ${p.rk.volta.pd?RANKS[p.rk.volta.ix].n+' '+p.rk.volta.rp+' RP':'unranked'} · Classical ${p.rk.classical.pd?RANKS[p.rk.classical.ix].n+' '+p.rk.classical.rp+' RP':'unranked'}</p>${lin(p.sq.volta,'Volta')}${lin(p.sq.classical,'Classical')}</div>`;box.hidden=false}
 document.addEventListener('click',e=>{const t=e.target.closest('#ol-board button,#sqview [data-sqx]');if(!t)return;const d=t.dataset;
-  if(d.lbt){lbTab=d.lbt;renderBoards()}else if(d.lbf){lbFam=d.lbf;renderBoards()}else if(d.lbload)regLoad();else if(d.lbjoin)regJoin();else if(d.vsq)viewSquad(d.vsq);else if(d.sqx)$('sqview').hidden=true});
+  if(d.lbt){lbTab=d.lbt;renderBoards()}else if(d.lbf){lbFam=d.lbf;renderBoards()}else if(d.lbload){regLoadedAt=performance.now();regLoad()}else if(d.vsq)viewSquad(d.vsq);else if(d.sqx)$('sqview').hidden=true});
 document.addEventListener('change',e=>{if(e.target.id==='lb-sort'){lbSort=e.target.value;renderBoards()}});
 $('sqview').addEventListener('click',e=>{if(e.target.id==='sqview')$('sqview').hidden=true});
 
@@ -6011,7 +6019,7 @@ $('bulk-save').onclick=()=>{let n=0;
   applyNames();try{localStorage.setItem('kickabout-names',JSON.stringify(NAMES))}catch(e){}cloudPush();$('bulk-paste').value='';
   renderMenu();bulkRender();toast(n?`Saved ${n} name${n>1?'s':''}.`:'No names changed.')};
 $('bulk-clear').onclick=()=>{if(!Object.keys(NAMES).length){toast('Everyone already has their card name.');return}NAMES={};applyNames();try{localStorage.setItem('kickabout-names','{}')}catch(e){}cloudPush();renderMenu();bulkRender();toast('All names reset.')};
-renderMenu();cloudInit();tutBoot();if(club.reg)setTimeout(regPublish,3000);
+renderMenu();cloudInit();tutBoot();regBoot();
 let last=performance.now();
 function hitStop(f){if(!RM&&!NET.on)hitT=Math.max(hitT,f)}
 // Every frame starts from a clean drawing state, and one bad frame can never stop the game: errors are caught and the

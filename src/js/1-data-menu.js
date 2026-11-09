@@ -382,8 +382,8 @@ function setGM(g){if(g===GM)return;club.compBy=club.compBy||{};club.compBy[GM]=c
   if(!COMPS[g].includes(club.comp==='cup'?'easy':club.comp))club.comp='league';selSlot=0;saveClub();renderMenu()}
 function renderMenu(){
   careerInit();applyNames();
-  for(const k of ['team','squad','club','online'])$('tab-'+k).setAttribute('aria-selected',tab===k);
-  $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';if(tab==='online')renderOnlinePlus();
+  for(const k of ['team','squad','club','online','board'])$('tab-'+k).setAttribute('aria-selected',tab===k);
+  $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';$('sec-board').hidden=tab!=='board';if(tab==='online')renderOnlinePlus();if(tab==='board')regOpenBoard();
   $('sec-packs').hidden=!(tab==='club'&&ctab==='packs');$('sec-coll').hidden=!(tab==='club'&&ctab==='coll');
   comp=club.comp||'league';if(!COMPS[GM].includes(compKey())){comp=club.comp='league'}
   document.querySelectorAll('.lvl button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lv===(club.level||'normal')?'true':'false'));
@@ -526,7 +526,7 @@ $('packs').addEventListener('click',e=>{const b=e.target.closest('[data-pack]');
 $('sqtabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.best){autoPick();toast('Picked your best line-up for this formation.')}
   else{if(GM==='classical')club.cactive=+b.dataset.sq;else club.active=+b.dataset.sq;selSlot=Math.max(0,sq().s.indexOf(null))}saveClub();renderMenu()});
-for(const k of ['team','squad','club','online'])$('tab-'+k).onclick=()=>{tab=k;resultEl.hidden=true;toast('');renderMenu()};
+for(const k of ['team','squad','club','online','board'])$('tab-'+k).onclick=()=>{tab=k;resultEl.hidden=true;toast('');renderMenu()};
 function rollTier(odds){let r=Math.random()*100;for(const k of ['icon','special','gold','silver','bronze']){r-=odds[k]||0;if(r<0)return k}return Object.keys(odds).find(k=>odds[k]>0)||'bronze'}
 // A pack is one tier, one card per position, ratings close together and new cards first, so every pick is a real dilemma.
 function dealHardPick(t){

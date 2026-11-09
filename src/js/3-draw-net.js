@@ -833,7 +833,7 @@ $('bulk-save').onclick=()=>{let n=0;
   applyNames();try{localStorage.setItem('kickabout-names',JSON.stringify(NAMES))}catch(e){}cloudPush();$('bulk-paste').value='';
   renderMenu();bulkRender();toast(n?`Saved ${n} name${n>1?'s':''}.`:'No names changed.')};
 $('bulk-clear').onclick=()=>{if(!Object.keys(NAMES).length){toast('Everyone already has their card name.');return}NAMES={};applyNames();try{localStorage.setItem('kickabout-names','{}')}catch(e){}cloudPush();renderMenu();bulkRender();toast('All names reset.')};
-renderMenu();cloudInit();tutBoot();if(club.reg)setTimeout(regPublish,3000);
+renderMenu();cloudInit();tutBoot();regBoot();
 let last=performance.now();
 function hitStop(f){if(!RM&&!NET.on)hitT=Math.max(hitT,f)}
 // Every frame starts from a clean drawing state, and one bad frame can never stop the game: errors are caught and the
