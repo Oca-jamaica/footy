@@ -115,6 +115,8 @@ function profRender(){const box=$('prof'),first=!club.mgr,ago=a=>{const s=Math.r
     <div class="pfrow"><button class="btn gold pfgo" data-pf="go">${first?'Let’s play':'Save'}</button></div>
     <div class="psaves"><p><b>Saved on this device:</b> <span class="pfok">On</span> · automatic, in this browser. Clearing the browser’s data, a private window, or another browser or device won’t have it, so on its own it can’t always be recovered.</p>
       <p><b>Saved to your account:</b> ${cloudLine}</p></div>
+    ${ops.on&&!first?`<div class="psaves"><p><b>Share live status with the game’s developer:</b> <span class="${opsShare()?'pfok':'pfoff'}">${opsShare()?'On':'Off'}</span> <button class="btn" data-pf="share">${opsShare()?'Turn off':'Turn on'}</button></p>
+      <p class="hint">Sends your nickname, club, what you’re doing (menus, a match, an online game and its score) and the game version, encrypted so only the developer can read it. It helps them see how many people are playing and fix problems. Never your email, password or location. <button class="btn" data-ops="prob">Report a problem</button></p></div>`:''}
     <details class="pacct" ${first&&!acct?'':'open'}><summary><h4>SAVE YOUR ACCOUNT <small>(optional)</small></h4></summary>${found}
     <p class="hint">Email is optional: you can play everything without it. Add an email and password to keep a locked copy of your progress online, which can help you recover it or carry on on another device. Your email is never shown to anyone.</p>
     ${acct&&!acct.hold?`<p>Logged in as <b>${esc(acct.e)}</b></p><div class="pfrow"><button class="btn" data-pf="sync">Save now</button><button class="btn" data-pf="out">Log out</button></div>`
@@ -136,6 +138,7 @@ $('prof').addEventListener('click',async e=>{const b=e.target.closest('[data-pf]
     const wasFirst=!club.mgr;club.mgr=n;pidEnsure();const cn=($('pf-club').value||'').trim().slice(0,14);if(cn)club.name=cn;acctMsgSet('');saveClub();renderMenu();regAuto();
     if(!acct||!acct.hold){$('prof').hidden=true;if(wasFirst&&club.tut&&!club.tut.done)setTimeout(tutShow,400)}else profRender();return}
   if(k==='x'){$('prof').hidden=true;return}
+  if(k==='share'){club.opsShare=!opsShare();saveClub();if(opsShare())opsHB(true);profRender();return}
   if(k==='create'||k==='login'){b.disabled=true;try{await acctLogin(k==='create')}catch(err){acctMsgSet('Something went wrong; nothing was changed.',true)}b.disabled=false;acctPill();return}
   if(k==='sync'){const ok=await acctPushNow();acctMsgSet(ok?'Saved.':'Couldn’t reach the relays; it will keep trying.',!ok);return}
   if(k==='out'){acct=null;acctFound=null;acctSave();acctMsgSet('Logged out. Your progress stays on this device.');acctPill();profRender();return}

@@ -445,7 +445,7 @@ async function netJoin(code,role){const my=++netJoinId;
   if(nroom){try{await nroom.leave()}catch(e){}nroom=null}
   netRoutes={};const room=multiRoom([]);nroom=room;
   netCode=code;netRole=role;netSeenEv=0;netSeenPop=0;netSeenSfx=0;netGotMatch=0;netDoneMatch=0;gIn.seq=0;gIn.ack=0;gIn.list.length=0;netSqKey='';netJoinAt=performance.now();netLogAdd('joining room as '+role);
-  room.presence({role,v:1,pv:NETPV,club:(club.name||'My Club').slice(0,16),mg:club.mgr||'',kit:club.kit,...(role==='guest'?{sq:netMyTeam(false),csq:netMyTeam(true),cu:netCustom(),ev:[],k:[0,0]}:{m:0,nm:club.netMode||'volta'})});
+  room.presence({role,v:1,pv:NETPV,club:(club.name||'My Club').slice(0,16),mg:club.mgr||'',rid:club.reg&&club.reg.id||'',kit:club.kit,...(role==='guest'?{sq:netMyTeam(false),csq:netMyTeam(true),cu:netCustom(),ev:[],k:[0,0]}:{m:0,nm:club.netMode||'volta'})});
   room.onPeers(()=>netLobby());
   const live=()=>my===netJoinId&&nroom===room;
   const R=await netRoom();
@@ -459,12 +459,16 @@ async function netJoin(code,role){const my=++netJoinId;
   RELAYS().forEach((u,i)=>attempt('relay'+i,'relay',()=>mqttRoom(code,u)));
   return true}
 let netJoinAt=0,netSnapN=0;
-const netRouteText=()=>{const ok=[...new Set(Object.keys(netRoutes).filter(k=>netRoutes[k]==='ok').map(k=>ROUTE_NAME[k.replace(/\d+$/,'')]))];return ok.length?' (connected via '+ok.join(' + ')+')':' (still connecting…)'};
+const netRouteText=()=>{const ok=[...new Set(Object.keys(netRoutes).filter(k=>netRoutes[k]==='ok').map(k=>ROUTE_NAME[k.replace(/\d+$/,'')]))];return ok.length?' (connected via '+ok.join(' + ')+')':netDown()?' ⚠ '+NET_DOWN:' (still connecting…)'};
+// none of the online services answered: tell the player plainly instead of "connecting…" for ever (it keeps retrying)
+const NET_DOWN='Can’t reach the online services right now. Check your internet connection: some networks (school or work Wi-Fi, firewalls) block them. Still trying… Single-player works as normal.';
+const netDown=()=>(navigator.onLine===false||performance.now()-netJoinAt>12000)&&!Object.values(netRoutes).includes('ok');
+setInterval(()=>{if(nroom&&netRole&&!NET.on&&netDown())netStatus((netRole==='host'&&netCode?'Your code is '+netCode+'. ':'')+NET_DOWN,true)},3000);
 const newCode=()=>{const L='ABCDEFGHJKMNPQRSTUVWXYZ';return Array.from({length:4},()=>L[(Math.random()*L.length)|0]).join('')};
-async function netHost(){initAudio();if(netRole==='host'&&nroom){$('net-code').textContent=netCode;return}netCode=newCode();
+async function netHost(){{const ob=opsBlock();if(ob){netStatus(ob,true);toast(ob);return}}initAudio();if(netRole==='host'&&nroom){$('net-code').textContent=netCode;return}netCode=newCode();
   $('net-code').textContent='';netStatus('Opening a room…');$('net-host').disabled=true;const ok=await netJoin(netCode,'host');$('net-host').disabled=false;if(!ok)return;
   $('net-code').textContent=netCode;netStatus('Tell your friend this code. Waiting for them to join…');netLobby()}
-async function netJoinClick(){initAudio();const code=($('net-in').value||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,4);
+async function netJoinClick(){{const ob=opsBlock();if(ob){netStatus(ob,true);toast(ob);return}}initAudio();const code=($('net-in').value||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,4);
   if(code.length!==4){netStatus('Type the 4-letter code from the host.',true);return}
   netStatus('Joining '+code+'…');$('net-join').disabled=true;const ok=await netJoin(code,'guest');$('net-join').disabled=false;if(!ok)return;netStatus('In room '+code+'. Waiting for the host…');netLobby()}
 const NETOLD='is using a different version of Sunday Kickabout. You both need the same game file: send them this copy (or download theirs) and try again.';
@@ -480,7 +484,7 @@ function netStart(){const g=netPeer('guest');if(!g){netStatus('Your friend isn�
   const P=g.presence,sqd=(big?P.csq:P.sq)||{};netGuest={club:String(P.club||'Friend').slice(0,16),mg:nameOk(String(P.mg||'')),kit:typeof P.kit==='string'&&/^#[0-9a-f]{6}$/i.test(P.kit)?P.kit:'#4fb3ff',
     s:[...(Array.isArray(sqd.s)?sqd.s:[]),...E8()].slice(0,ns).map(x=>x==null?'':String(x)),f:FORM_KEYS[big?'classical':'volta'].includes(sqd.f)?sqd.f:FORM_KEYS[big?'classical':'volta'][0],att:sqd.att,cap:sqd.cap,al:Array.isArray(sqd.al)?sqd.al.map(x=>clamp(x|0||1,1,10)):[],st:Array.isArray(sqd.st)?sqd.st.slice(0,ns).map(a=>Array.isArray(a)?a.slice(0,7).map(Number):null):[],nm:Array.isArray(sqd.nm)?sqd.nm.map(x=>String(x||'').slice(0,16)):[],sh:Array.isArray(sqd.sh)?sqd.sh.map(x=>String(x||'').slice(0,10)):[],cu:P.cu&&typeof P.cu==='object'?P.cu:null};
   let kit=netGuest.kit;if(kitClash(kit,club.kit))kit=KITS.find(k=>!kitClash(k,club.kit)&&k!=='#2f2f3a')||'#4fb3ff';
-  OPP={name:netGuest.club.toUpperCase(),mg:netGuest.mg||'',kit,off:0};cupEvent=null;eventText=null;comp='online';
+  OPP={name:netGuest.club.toUpperCase(),mg:netGuest.mg||'',kit,off:0};cupEvent=null;eventText=null;comp='online';opsOpp(P);
   NET.on=true;NET.host=true;NET.guest=false;netMatch=(Date.now()%100000)+1;matchSerial++;ttCalc=null;
   initAudio();if(ac&&ac.state==='suspended')ac.resume();DF=levelDF('normal');setPitch(pk);{const g0=GM;GM=big?'classical':'volta';setup();GM=g0}hat=null;score=[0,0];mercy=false;clock=pk==='volta'?120:pk==='expanded'?210:180;style=0;shownStyle=0;hype=0;fire=0;streak=0;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];RS={x:0,y:0,charging:false,charge:0};netSeenEv=netSeenEvOf(g);RME=null;netTk=0;netFe=0;netImp=0;netCim=null;netPre=null;netGuestAt=performance.now();netWaiting=false;netResumeAt=0;netGuestBlind=false;
@@ -698,7 +702,7 @@ function guestBuild(h){const R=h.presence.r;if(!Array.isArray(R)||R.length<4)ret
     st.spLv=clamp(+r[14]|0||1,1,10);
     const sv=r[13]&&typeof r[13]==='object'?r[13]:{};for(const [k] of STATK){const v=+sv[k];st[k]=Number.isFinite(v)?clamp(v,.1,STATCAP):Number.isFinite(+st[k])?+st[k]:.6}
     const kit=typeof r[2]==='string'&&/^#[0-9a-f]{6}$/i.test(r[2])?r[2]:'#999999',p=mk(1-(+r[0]?1:0),j,st,kit,0,0,!!r[1]);p.slot={x:.3,y:.5,r:'MID'};return p});
-  const hk=players.find(p=>p.team===1&&!p.keeper);OPP={name:String(h.presence.club||'Host').toUpperCase().slice(0,16),mg:nameOk(String(h.presence.mg||'')),kit:hk?hk.kit:'#8e8ff0',off:0};
+  const hk=players.find(p=>p.team===1&&!p.keeper);OPP={name:String(h.presence.club||'Host').toUpperCase().slice(0,16),mg:nameOk(String(h.presence.mg||'')),kit:hk?hk.kit:'#8e8ff0',off:0};opsOpp(h.presence);
   return true}
 function guestBegin(h){matchSerial++;ttCalc=null;setPitch(['volta','classical','expanded'].includes(h.presence.pk)?h.presence.pk:'volta');if(!guestBuild(h))return;netRdyAt=performance.now()+400;netRdySent=0;NET.on=true;NET.guest=true;NET.host=false;comp='online';netLock=false;netGotMatch=h.presence.m;netGState='';
   netSeenPop=Infinity;netSeenSfx=Infinity;score=[0,0];clock=120;style=0;shownStyle=0;hype=0;fire=0;streak=0;hat=null;mercy=false;pen=null;cupEvent=null;eventText=null;
@@ -925,7 +929,7 @@ $('bulk-save').onclick=()=>{let n=0;
   applyNames();try{localStorage.setItem('kickabout-names',JSON.stringify(NAMES))}catch(e){}cloudPush();$('bulk-paste').value='';
   renderMenu();bulkRender();toast(n?`Saved ${n} name${n>1?'s':''}.`:'No names changed.')};
 $('bulk-clear').onclick=()=>{if(!Object.keys(NAMES).length){toast('Everyone already has their card name.');return}NAMES={};applyNames();try{localStorage.setItem('kickabout-names','{}')}catch(e){}cloudPush();renderMenu();bulkRender();toast('All names reset.')};
-renderMenu();cloudInit();profBoot();tutBoot();regBoot();
+renderMenu();cloudInit();profBoot();tutBoot();regBoot();opsBoot();
 let last=performance.now();
 function hitStop(f){if(!RM&&!NET.on)hitT=Math.max(hitT,f)}
 // Every frame starts from a clean drawing state, and one bad frame can never stop the game: errors are caught and the

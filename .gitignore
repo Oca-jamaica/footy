@@ -1,2 +1,6 @@
 node_modules/
 *.png
+server/secrets/
+server/data/
+server/node_modules/
+*.pem

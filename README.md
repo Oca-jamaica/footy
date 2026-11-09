@@ -43,12 +43,15 @@ departments (Fanbase, Coaching Staff, Training Facilities, Stadium, Scouting, Co
 5,000 / 10,000 / 20,000 / 35,000 coins plus 1 Club Token per level.
 
 
-**Through Ball (special):** aimed into the space ahead of the team-mate furthest up the pitch (towards the goal his side
-attacks), never an opponent, the keeper, anyone on the floor, or anyone offside; if nobody's eligible it isn't played and
-the cooldown isn't spent. It travels at 0.20× its previous speed as an ordinary loose ball that defenders and keepers can
-cut out. Measured: it now travels about 50–80 px (it used to cover 570–630 px and reach the runner every time), so the
-passer's side usually just collects it again. That's the requested multiplier, kept as asked; `THROUGH_SPEED` in
-`src/js/2-engine.js` is the one number to change. Cooldowns are unchanged (25 s at level 1 to 7 s at level 10).
+**Through Ball (special):** the original Through Ball: the same choice of runner (the best-placed team-mate going
+forward, scored on how far up the pitch he is, his run and how open he is), the same offside check, the same lofted arc
+and the same landing spot just ahead of him. The only change is the flight: it spends five times as long in the air
+(about 5½ s instead of about 1 s) on exactly the same path, and still lands where it always did (measured: same peak, same
+landing point, never short). While it's high nobody can touch it and slide tackles at it don't count; defenders read
+where it will come down, get there if they can, and contest it as it drops (the winner depends on who is closer and on
+tackling); a slide only works once the ball is low enough, and keepers deal with it as before. Cooldowns are unchanged:
+25 s at level 1 down to 7 s at level 10, 10 levels, same coin prices, 2 Training Tokens per level. `THROUGH_SLOW` in
+`src/js/2-engine.js` is the slow-down factor.
 
 **Computer's attack (Classical pitches):** the ball carrier weighs shooting, passing (to feet, into a runner's stride,
 across goal, switches, long balls, crosses), dribbling into the most open lane, taking a man on, or keeping it, by how
@@ -56,7 +59,28 @@ likely each is to lead to a goal, with a little randomness. Shots are judged by 
 angle, keeper position, bodies in the way, pressure, the shooter's finishing and power), so long shots only happen when
 they're a genuine chance, mostly by good finishers. Off the ball, forwards stay onside on the shoulder of the last
 defender, attack the near post, penalty spot and edge of the box rather than the keeper's area, and time runs in
-behind. Volta keeps its previous attacking play. Keepers on both sides react 10% later to shots than before.
+behind. Volta keeps its previous attacking play. Keepers on both sides react 10% later to shots than before. On
+**Extreme** only, the computer's keeper is about 5–10% weaker (slightly slower to react, slightly less sure at full
+stretch and in one-on-ones, and a little more likely to spill a hard shot); measured on a fixed set of shots, about 3
+more goals in every 100 than before, and still clearly harder than Hard.
+
+**Chill and Medium** are much easier than before, by how the computer plays, never by slowing your footballers: on
+Chill it presses less and later, keeps its distance, rarely tackles or slides, gets caught out by passes, passes and
+shoots less accurately, makes slower and messier decisions and its keeper is less sharp; Medium does the same to a
+lesser degree. Hard and Extreme are unchanged. `tools/difficulty.cjs` plays a casual test player against every mode and
+level and checks the results against the targets in `tools/difficulty-targets.json` (for example: on Chill the computer
+scores at most 1.4 goals a match and on average doesn't outscore you; each level is harder than the one below).
+
+**Ratings past 99:** there's no 99 cap any more. Each footballer can be developed up to his own maximum potential
+(for example Messi 106, Ronaldo 105, Pelé 104), shown on cards and screens as three digits, with **MAX POTENTIAL
+REACHED** once there's nothing left to gain. Costs are unchanged, ratings over 99 really do play better (online too:
+the other laptop gets your developed stats, checked against what's achievable), and existing saves carry on as they were.
+
+**Scouting** (Club Development) now raises the chance of a top-rated footballer *within* the rarity a pack gives, never
+the rarity itself: the chance of a card from the top quarter of that rarity's ratings goes up by 0 / 2.5 / 5 / 7.5 / 10%
+of itself at levels 1–5 (the rest of the rarity shares the remainder, so every pack's odds still add up to 100%). Pack
+rarity odds, guaranteed rarities and Icon chances are exactly as printed, and every card is a real database player at
+its real rating. `tools/scouting.cjs` checks all of this by simulation.
 
 **Online modes:** Ranked, Friendly and Host / Join. Ranked and Friendly find a real opponent automatically (same match type
 and pitch; Ranked by similar rating, widening the longer you wait; never an AI). Ten placement matches set your first rank
@@ -88,7 +112,20 @@ publish a fake profile or edit their own save, and a relay may forget retained p
 needs a small backend (a database plus an authoritative match-result service: e.g. a managed database like Supabase or
 Firebase with server-side functions, or a small Node server) and a paid TURN relay for the strictest networks.
 
-**To play:** open `sunday-kickabout.html` in Chrome, Safari or Edge.
+**To play:** open `Sunday-Kickabout-Shareable.html` (or `sunday-kickabout.html`, the same file) in Chrome, Safari,
+Edge or Firefox. It's the complete game in one file: send it to friends and they can play offline straight away and
+online against each other over the internet. If the online services can't be reached (no internet, or a network that
+blocks them) the game says so after about 12 seconds and keeps trying; single-player always works.
+
+**Developer dashboard** (`server/`, see `server/README.md`): a private web page you run yourself that shows who is
+playing right now (from real heartbeats), online matches with live scores, matchmaking queues, private lobbies, clubs and
+recent results, and lets you post announcements, pause online play for maintenance, handle player reports, problem
+reports and appeals, suspend clubs from online play and correct a player's coins or Training Tokens. Every action needs
+a confirmation and a reason and goes in a tamper-evident audit log; accounts have roles (viewer, moderator, admin),
+passwords are stored as scrypt hashes, and an authenticator app can be required. The game file contains only the
+dashboard's two **public** keys: the game obeys only control messages signed with the dashboard's private key, and
+encrypts what it sends so only the dashboard can read it. No password, secret or admin feature is in the game file.
+Players can switch live status off in their profile.
 
 ## Editing
 
@@ -102,13 +139,17 @@ The game is split up so it's easier to work on:
 - `src/js/2c-online-plus.js` – Ranked/Friendly matchmaking, ranks, leaderboards, help and tutorial
 - `src/js/2d-online-juice.js` – online-only impact effects (both laptops)
 - `src/js/2e-account.js` – your name and the optional email login
+- `src/js/2f-ops.js` – the game's side of the developer dashboard (signed control messages, encrypted live status, reports)
 - `src/js/3-draw-net.js` – HUD, screens, online play, main loop
+- `server/` – the private developer dashboard (not part of the game file)
 - `vendor/` – PeerJS 1.5.4 and MQTT.js 5.10.1 (unchanged npm builds, used for online play)
 
-After editing, rebuild the single file:
+After editing, rebuild the single file (it writes `sunday-kickabout.html` and `Sunday-Kickabout-Shareable.html`, with
+the dashboard's public keys from `server/public-keys.json`):
 
 ```bash
 node build.mjs
 ```
 
-`tools/smoke.cjs` is a quick headless check (needs Playwright): `node tools/smoke.cjs <screenshot-folder>`.
+Checks (need Playwright): `node tools/smoke.cjs <screenshot-folder>` (quick headless run), `node tools/difficulty.cjs`
+(difficulty targets), `node tools/scouting.cjs` (scouting odds).

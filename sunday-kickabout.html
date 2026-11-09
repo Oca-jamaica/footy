@@ -397,6 +397,8 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
 .pbox{max-width:560px;display:flex;flex-direction:column;gap:8px}.pfl{display:flex;flex-direction:column;gap:4px;font-weight:800;font-size:13px;color:var(--muted)}.pfl input{font-size:17px}
 .pfrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.pfgo{font-size:15px;padding:6px 18px}.pacct{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}.pacct h4{margin:0 0 6px;color:var(--sun)}.pacct h4 small{color:var(--muted);font-weight:600}
 .pfin{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pfin input{font-family:var(--body);font-weight:700;font-size:15px;background:var(--ground-2);color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+#opsbar{width:100%;display:grid;gap:6px}.opsann{margin:0;padding:7px 12px;border-radius:12px;background:#0f2a37;border:1px solid var(--line);font-size:14px;text-align:left}.opsann.warn{border-color:var(--sun);color:var(--sun)}.opsann button{float:right;padding:0 8px;font-size:12px}
+.opsline{margin-top:8px}#opsdlg textarea,#opsdlg select{font:inherit;font-size:15px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--ground);color:var(--cream)}
 .psaves{margin-top:6px;padding:8px 10px;border-radius:12px;background:#0f2a37;font-size:13px}.psaves p{margin:3px 0}.pfok{color:var(--mint);font-weight:800}.pfoff{color:var(--muted);font-weight:800}.pfwarn{color:var(--sun);font-weight:800}
 .pacct>summary{cursor:pointer;list-style:none}.pacct>summary::-webkit-details-marker{display:none}.pacct>summary h4{display:inline}.pacct>summary h4::after{content:" \25BE";color:var(--muted)}
 .pfound{border:1px solid var(--sun);border-radius:12px;padding:10px;margin-bottom:8px;background:#12303e}.pfound p{margin:4px 0}
@@ -411,6 +413,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
   <div id="vig" hidden></div>
   <div class="menu" id="menu"><div class="menu-inner">
     <h1>Sunday Kickabout</h1>
+    <div id="opsbar" hidden></div>
     <div class="clubbar">
       <button class="res mgr" id="mgrpill" title="Your profile"></button><label for="club-name" style="display:flex;align-items:center;gap:6px">CLUB<input type="text" id="club-name" maxlength="14"></label>
       <div class="sw" id="club-kit" aria-label="Kit colour"></div>
@@ -559,7 +562,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
   <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span><span><button class="mute helpb" id="helpbtn" title="How everything works">HELP</button></span>
 </div>
 
-<div id="prof" class="ovl" hidden></div><div id="sqview" class="ovl" hidden></div><div id="rkreveal" class="ovl" hidden></div><div id="help" class="ovl" hidden></div><div id="tut" class="tutbar" hidden></div>
+<div id="prof" class="ovl" hidden></div><div id="sqview" class="ovl" hidden></div><div id="opsdlg" class="ovl" hidden></div><div id="rkreveal" class="ovl" hidden></div><div id="help" class="ovl" hidden></div><div id="tut" class="tutbar" hidden></div>
 <script>(()=>{
 const cv=document.getElementById('pitch'),ctx0=cv.getContext('2d');let ctx=ctx0;
 const W=1000,H=620,DPR=Math.min(2,window.devicePixelRatio||1);
@@ -4672,7 +4675,7 @@ function awardCoins(){awardCoins0();
   matchRatings=calcRatings();const m=matchRatings.motm;if(m.p.team===0){const b=Math.round(25*matchMul()*LV().coin);earned+=b;club.coins+=b;earnNote+=` · man of the match +${b}`;saveClub()}
   careerAfterMatch()}
 function awardCoins0(){earned=0;shownEarned=0;earnNote='';
-  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=matchPay(score[0]>score[1]?'Online win':score[0]<score[1]?'Online defeat':'Online draw',r,score[0]*10,1);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;gdTokens(score[0],score[1]);onlineResult();saveClub();return}
+  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=matchPay(score[0]>score[1]?'Online win':score[0]<score[1]?'Online defeat':'Online draw',r,score[0]*10,1);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;gdTokens(score[0],score[1]);onlineResult();opsResult();saveClub();return}
   const pw=pen&&pen.winner!=null?pen.winner:null;
   const r=score[0]>score[1]?100:score[0]<score[1]?20:pw===0?80:pw===1?30:45;
   let bonus=0;const won=score[0]>score[1]||pw===0;
@@ -5252,6 +5255,7 @@ function renderOnlinePlus(){const el=$('ol-plus');if(!el)return;const R=rkState(
   el.innerHTML=`<div class="olmodes">${card('ranked','Ranked','Climb the ranks','🏆')}${card('friendly','Friendly','Find an opponent','🤝')}${card('host','Host / Join','Private matches','🔑')}</div>
     <div class="olfmt"><span class="lab">MATCH</span>${Object.entries(NETMODES).map(([k,n])=>`<button data-nm="${k}" aria-pressed="${fmt===k}">${n}</button>`).join('')}</div>${body}
     ${mm.on?`<div class="mmsearch"><div class="mmspin"></div><div><b>Searching for ${mm.kind==='ranked'?'a Ranked':'a Friendly'} opponent…</b><p class="hint" id="mm-info">${mmInfo()}</p></div><button class="ghost" data-mmcancel="1">Cancel</button></div>`:''}
+    ${opsOnlineHTML()}
     ${R.lastSeason&&R.lastSeason.got&&R.lastSeason.got.length?`<p class="flash">Season ${R.lastSeason.id} rewards: ${esc(R.lastSeason.got.join(' · '))}</p>`:''}`;
   $('ol-host').hidden=olMode!=='host';animateRings();renderBoards()}
 document.addEventListener('click',e=>{const t=e.target.closest('#ol-plus [data-olm],#ol-plus [data-mm],#ol-plus [data-mmcancel],#ol-plus [data-nm]');if(!t)return;const d=t.dataset;
@@ -5270,6 +5274,8 @@ let netKind='private',netMM=null;
 const mmTopic=()=>`sundaykickabout/mm${NETPV}/${mm.kind}-${mm.fmt}`;
 function mmWindow(){const s=(performance.now()-mm.t0)/1000;return mm.kind==='ranked'?Math.round(Math.min(800,90+18*s)):99999}
 function mmInfo(){if(!mm.on)return'';const s=Math.round((performance.now()-mm.t0)/1000),n=[...mm.seen.values()].filter(x=>performance.now()-x.at<3000).length;
+  // can't reach any relay: say so plainly (it keeps retrying in the background)
+  if(!mm.cl.some(c=>c.connected)&&(s>=12||navigator.onLine===false))return `${NETMODES[mm.fmt]} · ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} · ⚠ ${NET_DOWN}`;
   return `${NETMODES[mm.fmt]} · ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} · ${mm.cl.filter(c=>c.connected).length?'connected to matchmaking':'connecting to matchmaking…'}${mm.kind==='ranked'?` · rating range ±${mmWindow()}`:''} · ${n} other${n===1?'':'s'} searching${mm.offer?' · opponent found, connecting…':''}`}
 async function mmConnect(){if(mm.cl.length)return;const M=await loadMqtt();if(!M){netStatus('Matchmaking needs the internet (the relay library didn’t load).',true);return}
   for(const u0 of RELAYS()){const U=typeof u0==='string'?{url:u0}:u0;let c;try{c=M.connect(U.url,{clientId:'skmm_'+Math.random().toString(36).slice(2,10),keepalive:20,connectTimeout:8000,reconnectPeriod:3000,clean:true,...(U.username?{username:U.username,password:U.password}:{})})}catch(e){continue}
@@ -5277,22 +5283,23 @@ async function mmConnect(){if(mm.cl.length)return;const M=await loadMqtt();if(!M
 const mmSubbed=c=>{c.__topic=mmTopic()};
 function mmPub(sub,obj){const s=JSON.stringify(obj);for(const c of mm.cl)if(c.connected)try{c.publish(mmTopic()+sub,s,{qos:0})}catch(e){}}
 function mmMsg(tp,d){if(!mm.on||!d||typeof d!=='object')return;const parts=tp.split('/'),kind=parts[parts.length-2];
+  if(opsHidden(d.rg))return;// a suspended club (the developer's signed list) isn't matched
   if(kind==='q'){const id=String(d.id||'');if(!/^[a-z0-9]{8,16}$/.test(id)||id===mm.id||+d.pv!==NETPV)return;mm.seen.set(id,{id,r:clamp(+d.r||MMR0,0,4000),n:String(d.n||'').slice(0,16),mg:nameOk(String(d.mg||'')),at:performance.now(),busy:!!d.busy})}
   else if(kind==='o'){const from=String(d.from||'');if(!/^[a-z0-9]{8,16}$/.test(from))return;
     if(d.acc){if(mm.offer&&mm.offer.to===from&&d.code===mm.offer.code)mmGo('host',mm.offer)}// they accepted our offer
     else if(!mm.offer&&from<mm.id&&typeof d.code==='string'&&/^[A-Z]{6}$/.test(d.code)){const ok=mm.kind!=='ranked'||Math.abs(clamp(+d.r||MMR0,0,4000)-mmRating())<=mmWindow()+60;
-      if(ok){const o={to:from,code:d.code,r:clamp(+d.r||MMR0,0,4000),n:String(d.n||'').slice(0,16),mg:nameOk(String(d.mg||''))},acc={from:mm.id,acc:1,code:d.code,r:mmRating(),n:club.name,mg:club.mgr||''};
+      if(ok){const o={to:from,code:d.code,r:clamp(+d.r||MMR0,0,4000),n:String(d.n||'').slice(0,16),mg:nameOk(String(d.mg||''))},acc={from:mm.id,acc:1,code:d.code,r:mmRating(),n:club.name,mg:club.mgr||'',rg:club.reg&&club.reg.id||''};
         // say yes a few times (messages can be lost), keeping the matchmaking connection open a moment so they actually go
         mmPub('/o/'+from,acc);const pub=mm.cl.slice(),tp=mmTopic()+'/o/'+from;for(const ms of [400,900,1500])setTimeout(()=>{for(const c of pub)if(c.connected)try{c.publish(tp,JSON.stringify(acc),{qos:0})}catch(e){}},ms);mmGo('guest',o)}}}}
 const mmRating=()=>rkState().fam[famOf(mm.fmt)].mmr;
 function mmTick(){if(!mm.on)return;const now=performance.now();for(const [k,v] of mm.seen)if(now-v.at>4000)mm.seen.delete(k);
-  mmPub('/q/'+mm.id,{id:mm.id,r:mmRating(),n:(club.name||'Club').slice(0,16),mg:club.mgr||'',pv:NETPV,busy:!!mm.offer});
+  mmPub('/q/'+mm.id,{id:mm.id,r:mmRating(),n:(club.name||'Club').slice(0,16),mg:club.mgr||'',pv:NETPV,busy:!!mm.offer,rg:club.reg&&club.reg.id||''});
   if(mm.offer&&now-mm.offer.at>4000)mm.offer=null;// no answer: try someone else
   if(!mm.offer){const W=mmWindow(),me=mmRating();let best=null;for(const v of mm.seen.values()){if(v.busy||v.id<mm.id)continue;const d=Math.abs(v.r-me);if(d<=W&&(!best||d<Math.abs(best.r-me)))best=v}
     // the lower id makes the offer, with a fresh 6-letter room code
-    if(best){const code=Array.from({length:6},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[(Math.random()*23)|0]).join('');mm.offer={to:best.id,code,r:best.r,n:best.n,mg:best.mg,at:now};mmPub('/o/'+best.id,{from:mm.id,code,r:me,n:club.name,mg:club.mgr||''})}}
+    if(best){const code=Array.from({length:6},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[(Math.random()*23)|0]).join('');mm.offer={to:best.id,code,r:best.r,n:best.n,mg:best.mg,at:now};mmPub('/o/'+best.id,{from:mm.id,code,r:me,n:club.name,mg:club.mgr||'',rg:club.reg&&club.reg.id||''})}}
   const i=$('mm-info');if(i)i.textContent=mmInfo()}
-async function mmStart(kind){if(mm.on||NET.on)return;if(nroom)await netLeave();initAudio();
+async function mmStart(kind){if(mm.on||NET.on)return;{const ob=opsBlock();if(ob){toast(ob);netStatus(ob,true);renderOnlinePlus();return}}if(nroom)await netLeave();initAudio();
   mm.on=true;mm.kind=kind;mm.fmt=NETMODES[club.netMode]?club.netMode:'volta';mm.id=Math.random().toString(36).slice(2,12).padEnd(10,'0');mm.t0=performance.now();mm.seen.clear();mm.offer=null;
   netLogAdd('searching '+kind+' '+mm.fmt);renderOnlinePlus();await mmConnect();for(const c of mm.cl)if(c.connected){c.subscribe([mmTopic()+'/q/+',mmTopic()+'/o/'+mm.id],{qos:0})}
   clearInterval(mm.timer);mm.timer=setInterval(mmTick,1000);mmTick()}
@@ -5332,7 +5339,7 @@ function regProfile(){const R=rkState(),g0=GM;const lin=(cl)=>{GM=cl?'classical'
 let regCl=[],regTimer=null,regBoard=new Map(),regLoading=false;
 async function regConnect(){if(regCl.length)return regCl;const M=await loadMqtt();if(!M)return[];
   for(const u0 of RELAYS()){const U=typeof u0==='string'?{url:u0}:u0;let c;try{c=M.connect(U.url,{clientId:'skreg_'+Math.random().toString(36).slice(2,10),keepalive:30,connectTimeout:8000,reconnectPeriod:5000,clean:true,...(U.username?{username:U.username,password:U.password}:{})})}catch(e){continue}
-    c.on('message',(tp,buf)=>{if(tp.startsWith(ACCT_T)||tp.startsWith(ACCT_T2)){acctMsg(tp,buf);return}try{regIn(JSON.parse(new TextDecoder().decode(buf)))}catch(e){}});c.on('connect',()=>c.subscribe(REG+'+',{qos:0}));c.on('error',()=>{});regCl.push(c)}return regCl}
+    c.on('message',(tp,buf)=>{if(tp.startsWith(ACCT_T)||tp.startsWith(ACCT_T2)){acctMsg(tp,buf);return}if(tp===OPS_CTL){opsCtl(buf);return}try{regIn(JSON.parse(new TextDecoder().decode(buf)))}catch(e){}});c.on('connect',()=>c.subscribe(ops.on?[REG+'+',OPS_CTL]:REG+'+',{qos:0}));c.on('error',()=>{});regCl.push(c)}return regCl}
 // only well-formed, believable profiles get onto the board
 function regIn(d){if(!d||d.v!==1||!/^[a-z0-9]{10,16}$/.test(String(d.id)))return;const num=(x,a,b)=>Number.isFinite(+x)?clamp(+x,a,b):a;
   const fam=f=>{const r=d.rk&&d.rk[f]||{};const rp=num(r.rp,0,5000),pd=r.pd?1:0;return{rp:pd?rp:0,pl:num(r.pl,0,10),pd,ix:pd?rankIx(rp):-1,w:num(r.w,0,1e5)|0,d:num(r.d,0,1e5)|0,l:num(r.l,0,1e5)|0}};
@@ -5351,7 +5358,7 @@ function regAuto(){regEnsure();const p=regProfile();delete p.t;const k=JSON.stri
 function regBoot(){regEnsure();setTimeout(regAuto,2500);setInterval(regAuto,20000)}
 // opening the Leaderboard tab fetches the latest board (again if it's more than half a minute old)
 function regOpenBoard(){regAuto();if(!regLoadedAt||performance.now()-regLoadedAt>30000){regLoadedAt=performance.now();regLoad()}else renderBoards()}
-function renderBoards(){const el=$('ol-board');if(!el)return;const me=club.reg&&club.reg.id;const list=[...regBoard.values()];if(me&&!regBoard.has(me)&&club.reg)list.push(regInFromMine());
+function renderBoards(){const el=$('ol-board');if(!el)return;const me=club.reg&&club.reg.id;const list=[...regBoard.values()].filter(p=>!opsHidden(p.id));if(me&&!regBoard.has(me)&&club.reg)list.push(regInFromMine());
   const fam=lbFam,wr=p=>{const t=p.rk[fam],n=t.w+t.d+t.l;return n>=10?t.w/n:-1};
   const sorts={rp:(a,b)=>(b.rk[fam].pd-a.rk[fam].pd)||b.rk[fam].rp-a.rk[fam].rp,rank:(a,b)=>b.rk[fam].ix-a.rk[fam].ix||b.rk[fam].rp-a.rk[fam].rp,ovr:(a,b)=>b.sq[fam].r-a.sq[fam].r,wins:(a,b)=>(b.rk.volta.w+b.rk.classical.w)-(a.rk.volta.w+a.rk.classical.w),wr:(a,b)=>wr(b)-wr(a)};
   let rows=lbTab==='ranked'?list.filter(p=>p.rk[fam].pd):list;rows.sort(lbTab==='ranked'?sorts.rp:(sorts[lbSort]||sorts.ovr));if(lbSort==='wr'&&lbTab==='clubs')rows=rows.filter(p=>wr(p)>=0);
@@ -5359,6 +5366,7 @@ function renderBoards(){const el=$('ol-board');if(!el)return;const me=club.reg&&
     <div class="subtabs">${[['volta','Volta'],['classical','Classical']].map(([k,n])=>`<button data-lbf="${k}" aria-pressed="${lbFam===k}">${n}</button>`).join('')}</div>
     ${lbTab==='clubs'?`<select id="lb-sort" aria-label="Sort">${[['ovr','Team rating'],['rp','Ranked Points'],['rank','Online rank'],['wins','Total ranked wins'],['wr','Win % (10+ matches)']].map(([k,n])=>`<option value="${k}" ${lbSort===k?'selected':''}>Sort: ${n}</option>`).join('')}</select>`:''}
     <button class="btn" data-lbload="1">Refresh</button></div>
+    ${!regLoading&&regLoadedAt&&!regCl.some(c=>c.connected)?`<p class="opsann warn">⚠ ${NET_DOWN} The board will fill in once it connects.</p>`:''}
     <p class="hint">${lbTab==='ranked'?'Ordered by competitive results only (Ranked Points), never by squad strength.':'Every club playing Sunday Kickabout, whatever its rank. Yours is added automatically and kept up to date.'} Shared through public relays: profiles are checked, but this isn't a secure server, so treat it as a friendly board rather than an official ranking.${regLoading?' Loading…':''}</p>
     <div class="ltwrap"><table class="lt lbt"><tr><th>#</th><th>Club</th><th>Team</th><th>Rank</th><th>RP</th><th>W-D-L</th><th>Played</th><th></th></tr>
     ${rows.slice(0,100).map((p,i)=>{const t=p.rk[fam];return `<tr class="${p.id===me?'me':''}"><td>${i+1}</td><td><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}${p.mg?`<small class="lbmg">${esc(p.mg)}</small>`:''}</td><td>${p.sq[fam].r||'–'}</td><td>${t.pd?rankBadgeHTML(t.ix,24,false)+' '+RANKS[t.ix].n:`<span class="hint">Unranked ${t.pl}/10</span>`}</td><td>${t.pd?t.rp.toLocaleString():'–'}</td><td>${t.w}-${t.d}-${t.l}</td><td>${p.pl}</td><td><button class="btn" data-vsq="${p.id}">View squad</button></td></tr>`}).join('')||`<tr><td colspan="8" class="hint">${regLoading?'Loading…':'No clubs yet. Press Refresh, or put your club on the board.'}</td></tr>`}</table></div>`}
@@ -5366,6 +5374,7 @@ function regInFromMine(){const raw=regProfile();regIn(raw);const p=regBoard.get(
 function viewSquad(id){const p=regBoard.get(id);if(!p)return;const box=$('sqview');const lin=(s,t)=>`<h4>${t} · ${esc(s.f||'')} · team ${s.r||'–'}</h4><div class="sqv">${s.p.map(x=>`<div class="sqc t-${x[3]}"><b>${x[2]}</b><span>${esc(x[0])}</span><small>${esc(x[1])} · ${TIERS[x[3]].name}</small><small>${x[4]?esc(x[4])+' Lv '+x[5]:''}${x[6]?' · player Lv '+x[6]:''}</small></div>`).join('')||'<p class="hint">No line-up shared.</p>'}</div>`;
   box.innerHTML=`<div class="sqbox" role="dialog" aria-label="Squad"><button class="ghost sqx" data-sqx="1">Close</button><h3><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}</h3>
     <p class="sqmg">Manager: <b>${p.mg?esc(p.mg):'not given'}</b></p>
+    ${ops.on&&p.id!==(club.reg&&club.reg.id)?`<p class="hint">Something wrong with this club? <button class="btn" data-opsrep="${esc(p.id)}">Report</button></p>`:''}
     <p class="hint">Read-only. Volta ${p.rk.volta.pd?RANKS[p.rk.volta.ix].n+' '+p.rk.volta.rp+' RP':'unranked'} · Classical ${p.rk.classical.pd?RANKS[p.rk.classical.ix].n+' '+p.rk.classical.rp+' RP':'unranked'}</p>${lin(p.sq.volta,'Volta')}${lin(p.sq.classical,'Classical')}</div>`;box.hidden=false}
 document.addEventListener('click',e=>{const t=e.target.closest('#ol-board button,#sqview [data-sqx]');if(!t)return;const d=t.dataset;
   if(d.lbt){lbTab=d.lbt;renderBoards()}else if(d.lbf){lbFam=d.lbf;renderBoards()}else if(d.lbload){regLoadedAt=performance.now();regLoad()}else if(d.vsq)viewSquad(d.vsq);else if(d.sqx)$('sqview').hidden=true});
@@ -5382,13 +5391,13 @@ $('rkreveal').addEventListener('click',e=>{if(e.target.closest('[data-rkok]'))$(
 const HELP=[
  ['Getting started','<p>Sunday Kickabout is arcade football. Build a club, collect footballers from packs, develop them, and win leagues, cups and online matches.</p><p>Start on the <b>Play</b> tab: pick Volta (5v5) or Classical (9v9), a difficulty and a competition, then press the big orange button.</p>'],
  ['Basic controls','<div class="hkeys"><p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</p><p><kbd>Shift</kbd> pass · without the ball: steal</p><p>Hold <kbd>Space</kbd> to shoot (longer = harder), <kbd>W</kbd>/<kbd>S</kbd> while holding to aim</p><p><kbd>F</kbd> cross · <kbd>C</kbd> slide tackle · <kbd>R</kbd> burst / lunge</p><p><kbd>E</kbd> skill move · <kbd>X</kbd> special ability · <kbd>Q</kbd> switch player</p><p><kbd>Esc</kbd> pause · <kbd>V</kbd> full screen · <kbd>N</kbd> connection details online</p></div><p>Control switches to whoever receives the ball, and to the best-placed defender when you defend.</p>'],
- ['Special abilities','<p>Every footballer has a special on <kbd>X</kbd>: Through Ball, Curler, Knuckleball, Rocket, Bicycle Kick, Interceptor, Turbo, Chip Pass or Chip. After using it, it recharges (the ring on the HUD).</p><p>Each footballer\'s special has 10 levels (Club → Special Abilities). Every level costs coins plus 2 Training Tokens and shortens the cooldown: Through Ball 25 s → 7 s, the shots and Interceptor 20 s → 5 s, Turbo and the chips 10 s → 3.5 s.</p><p><b>Through Ball</b> plays the ball into space just ahead of your best runner. Offside counts: if he’s beyond their second-last player (and ahead of the ball, in their half) when it’s played, the flag goes up and they get a free kick.</p>'],
+ ['Special abilities','<p>Every footballer has a special on <kbd>X</kbd>: Through Ball, Curler, Knuckleball, Rocket, Bicycle Kick, Interceptor, Turbo, Chip Pass or Chip. After using it, it recharges (the ring on the HUD).</p><p>Each footballer\'s special has 10 levels (Club → Special Abilities). Every level costs coins plus 2 Training Tokens and shortens the cooldown: Through Ball 25 s → 7 s, the shots and Interceptor 20 s → 5 s, Turbo and the chips 10 s → 3.5 s.</p><p><b>Through Ball</b> floats the ball over the defence into the space just ahead of your best runner. It hangs in the air for a few seconds: while it’s high nobody can reach it and sliding at it does nothing, but defenders can read where it will land and contest it there, so time your run. Offside counts: if he’s beyond their second-last player (and ahead of the ball, in their half) when it’s played, the flag goes up and they get a free kick.</p>'],
  ['Player collection','<p>Open packs in Club → Packs. Each pack shows three footballers of one rarity and you sign one. Rarities: Bronze, Silver, Gold, Special and Icon (the very best). Odds are printed on every pack. Duplicates can be exchanged.</p>'],
- ['Player development','<p>Club → Development. Footballers gain XP from matches (or training with Training Tokens: the cost per 100 XP rises from 2 to 20 tokens as they level up). Levels unlock upgrade points (+1 to a stat for coins) and every two levels add +1 to their five best stats. Evolutions add more. The screen shows the current and maximum achievable OVR and exactly what each upgrade does.</p><p>Your Player (the footballer you create) trains +8 points at a time; prices climb to 75,000 coins for the last session.</p>'],
- ['Club development','<p>Club → Club Development: six departments, levels 1 to 5, paid with coins plus Club Tokens (one per Club Legacy level).</p><p>Fanbase: more match coins. Coaching Staff: up to 20% off every coin cost for training and abilities. Training Facilities: more XP. Stadium: bigger crowd and a small coin bonus. Scouting: better pack odds. Commercial: more objective coins and sponsor money.</p>'],
- ['Game modes','<p><b>Volta 5v5</b>: fast football in a cage, 2 minutes, 1× coins.</p><p><b>Classical Standard 9v9</b>: full pitch, 3 minutes, 1.5× coins. <b>Classical Expanded</b>: a bigger pitch, 3½ minutes, 1.875× coins. The green bubble shows the coin multiplier for your mode, pitch and difficulty.</p>'],
+ ['Player development','<p>Club → Development. Footballers gain XP from matches (or training with Training Tokens: the cost per 100 XP rises from 2 to 20 tokens as they level up). Levels unlock upgrade points (+1 to a stat for coins) and every two levels add +1 to their five best stats. Evolutions add more. The screen shows the current and maximum achievable OVR and exactly what each upgrade does.</p><p>There’s no 99 cap: the very best footballers can be developed past 99, up to their own maximum potential (Messi, for example, can reach 106). When a footballer has nothing left to gain, his card says <b>MAX POTENTIAL REACHED</b>.</p><p>Your Player (the footballer you create) trains +8 points at a time; prices climb to 75,000 coins for the last session.</p>'],
+ ['Club development','<p>Club → Club Development: six departments, levels 1 to 5, paid with coins plus Club Tokens (one per Club Legacy level).</p><p>Fanbase: more match coins. Coaching Staff: up to 20% off every coin cost for training and abilities. Training Facilities: more XP. Stadium: bigger crowd and a small coin bonus. Scouting: a better chance of a top-rated footballer within each pack’s rarity (+2.5% per level after the first, up to +10%); it never changes the chance of a rarer card. Commercial: more objective coins and sponsor money.</p>'],
+ ['Game modes','<p><b>Volta 5v5</b>: fast football in a cage, 2 minutes, 1× coins.</p><p><b>Classical Standard 9v9</b>: full pitch, 3 minutes, 1.5× coins. <b>Classical Expanded</b>: a bigger pitch, 3½ minutes, 1.875× coins. The green bubble shows the coin multiplier for your mode, pitch and difficulty.</p><p><b>Difficulty</b>: <b>Chill</b> is relaxed (opponents press less, tackle rarely and miss more), <b>Medium</b> is a fair game that’s still on your side, <b>Hard</b> is a genuine challenge and <b>Extreme</b> is for experts. Harder levels pay more coins.</p>'],
  ['Leagues and tournaments','<p>Volta and Classical each have five divisions (Amateur → Legendary). Ten clubs, nine rounds, top three promoted, bottom three relegated. A top-three finish earns a World Club Championship place (64-club knockout). There are also the Sunday Cup, the Grand Tournament, friendlies, challenges and skill games.</p>'],
- ['Online multiplayer','<p><b>Ranked</b>: matched with a real person of similar rating. Ten placement matches give your first rank (Bronze → Silver → Gold → Platinum → Diamond → Champion → Legendary), then wins earn RP and losses cost RP. Volta and Classical are ranked separately. Seasons last a month; rewards come from your best rank.</p><p><b>Friendly</b>: matched with anyone choosing Friendly, no RP. <b>Host / Join</b>: a private match with a 4-letter code.</p><p>Both players control their own team; the host\'s laptop runs the match. You both need the same version of the game.</p>'],
+ ['Online multiplayer','<p><b>Ranked</b>: matched with a real person of similar rating. Ten placement matches give your first rank (Bronze → Silver → Gold → Platinum → Diamond → Champion → Legendary), then wins earn RP and losses cost RP. Volta and Classical are ranked separately. Seasons last a month; rewards come from your best rank.</p><p><b>Friendly</b>: matched with anyone choosing Friendly, no RP. <b>Host / Join</b>: a private match with a 4-letter code.</p><p>Both players control their own team; the host\'s laptop runs the match. You both need the same version of the game.</p><p>If the game can’t reach the online services (no internet, or a school or work network that blocks them) it says so instead of waiting for ever, and keeps trying. Everything offline still works.</p>'],
  ['Nickname and saving','<p>A nickname is all you need to play (tap it at the top of the menu to change it). It is shown next to your club on the leaderboard, in View Squad, in matchmaking and to your opponent online.</p><p><b>Saved on this device</b>: always, automatically, in this browser. Clearing the browser\'s data, a private window, or another browser or device won\'t have it.</p><p><b>SAVE YOUR ACCOUNT</b> (optional): add an email and password to keep a locked copy of your progress online, then log in with the same two on another device to carry on. It saves by itself after every change and each save is read back before it counts. Your progress is locked on your device with your password, and your email and password never leave the device or appear anywhere public. There is no password reset, so keep the password safe; the save code under Club works as a backup.</p>'],
  ['Rewards','<p>Coins for every match (more for wins, goals, harder difficulty and bigger pitches). Training Tokens for half your winning margin, rounded down (win 2-0 or 3-1: 1 token; 4-0: 2; 1-0 or a draw: none). Club Legacy XP from every match, with a reward at every level, plus a Club Token. Challenges, achievements, league seasons, cups and Ranked promotions pay out too.</p>']];
 let helpPg=0;
@@ -5626,6 +5635,8 @@ function profRender(){const box=$('prof'),first=!club.mgr,ago=a=>{const s=Math.r
     <div class="pfrow"><button class="btn gold pfgo" data-pf="go">${first?'Let’s play':'Save'}</button></div>
     <div class="psaves"><p><b>Saved on this device:</b> <span class="pfok">On</span> · automatic, in this browser. Clearing the browser’s data, a private window, or another browser or device won’t have it, so on its own it can’t always be recovered.</p>
       <p><b>Saved to your account:</b> ${cloudLine}</p></div>
+    ${ops.on&&!first?`<div class="psaves"><p><b>Share live status with the game’s developer:</b> <span class="${opsShare()?'pfok':'pfoff'}">${opsShare()?'On':'Off'}</span> <button class="btn" data-pf="share">${opsShare()?'Turn off':'Turn on'}</button></p>
+      <p class="hint">Sends your nickname, club, what you’re doing (menus, a match, an online game and its score) and the game version, encrypted so only the developer can read it. It helps them see how many people are playing and fix problems. Never your email, password or location. <button class="btn" data-ops="prob">Report a problem</button></p></div>`:''}
     <details class="pacct" ${first&&!acct?'':'open'}><summary><h4>SAVE YOUR ACCOUNT <small>(optional)</small></h4></summary>${found}
     <p class="hint">Email is optional: you can play everything without it. Add an email and password to keep a locked copy of your progress online, which can help you recover it or carry on on another device. Your email is never shown to anyone.</p>
     ${acct&&!acct.hold?`<p>Logged in as <b>${esc(acct.e)}</b></p><div class="pfrow"><button class="btn" data-pf="sync">Save now</button><button class="btn" data-pf="out">Log out</button></div>`
@@ -5647,6 +5658,7 @@ $('prof').addEventListener('click',async e=>{const b=e.target.closest('[data-pf]
     const wasFirst=!club.mgr;club.mgr=n;pidEnsure();const cn=($('pf-club').value||'').trim().slice(0,14);if(cn)club.name=cn;acctMsgSet('');saveClub();renderMenu();regAuto();
     if(!acct||!acct.hold){$('prof').hidden=true;if(wasFirst&&club.tut&&!club.tut.done)setTimeout(tutShow,400)}else profRender();return}
   if(k==='x'){$('prof').hidden=true;return}
+  if(k==='share'){club.opsShare=!opsShare();saveClub();if(opsShare())opsHB(true);profRender();return}
   if(k==='create'||k==='login'){b.disabled=true;try{await acctLogin(k==='create')}catch(err){acctMsgSet('Something went wrong; nothing was changed.',true)}b.disabled=false;acctPill();return}
   if(k==='sync'){const ok=await acctPushNow();acctMsgSet(ok?'Saved.':'Couldn’t reach the relays; it will keep trying.',!ok);return}
   if(k==='out'){acct=null;acctFound=null;acctSave();acctMsgSet('Logged out. Your progress stays on this device.');acctPill();profRender();return}
@@ -5657,6 +5669,137 @@ $('mgrpill').onclick=profOpen;
 function profBoot(){if(club.mgr)pidEnsure();acctPill();if(!club.mgr)setTimeout(profOpen,300);acctBoot()}
 // the club name follows the nickname until you choose one yourself
 $('prof').addEventListener('input',e=>{if(e.target.id==='pf-club')e.target.dataset.touched='1';if(e.target.id==='pf-name'&&!club.mgr){const c=$('pf-club');if(c&&!c.dataset.touched&&/^(Sunday XI|.*FC)$/.test(c.value)){const n=nickCheck(e.target.value);c.value=n.ok?(n.ok+' FC').slice(0,14):'Sunday XI'}}});
+
+// ---------- link to the developer's dashboard (optional) ----------
+/* The build puts the dashboard server's two PUBLIC keys here (from server/public-keys.json). With no keys this whole
+   section stays off and none of its buttons appear. Nothing secret is ever in the game file:
+   - the game only obeys control messages (maintenance, announcements, suspensions, corrections) carrying a valid
+     signature from the server's private key, which never leaves the developer's computer. Anyone can read them on the
+     public relays; nobody else can make one the game will accept, and an older one can't replace a newer one;
+   - what the game sends (live status, online results, reports, problem reports, appeals) is encrypted to the server's
+     public key, so only the server can read it. It never contains an email, password, room code or location. Live
+     status can be switched off in your profile. */
+const OPSK={"v":1,"sig":"BGs/lFU6FORb94vMzALEvYtZrzc+MOX1c3Oew0mkynnN3bLw5SjNI8OLWg2/MpITlVHATLAdvgPLbWaW0hxGEaw=","enc":"BKw3dRGhy6m/eX+K32tWAd7UaYz91Ps8cRt4tQbZ02c1do9srIjSE5aQATXJFKSAbJN3GFzqOwz1pwoXziS2BaM="};
+const GAMEVER="2026-11-09";
+const OPS_T='sundaykickabout/ops1/',OPS_CTL=OPS_T+'ctl';
+const OPS_WHY={cheating:'cheating',name:'an offensive name',abuse:'abuse or harassment',other:'breaking the rules'};
+const ops={on:!!(OPSK&&OPSK.sig&&OPSK.enc&&window.crypto&&crypto.subtle),ready:null,sid:'',n:0,sigK:null,aesK:null,eph:'',seq:0,h:'',hOf:'',
+  maint:null,ann:[],suspR:new Set(),mine:null,exp:0,acks:[],hbAt:0,hbSt:'',ctlAt:0,bad:0,opp:null,mid:'',midKey:'',errSeen:0,errSent:0,sent:{}};
+const opsTE=s=>new TextEncoder().encode(s);
+const opsB64=u=>btoa(String.fromCharCode(...u));
+const opsUnB64=s=>Uint8Array.from(atob(String(s)),c=>c.charCodeAt(0));
+const opsHex=u=>Array.from(u,x=>x.toString(16).padStart(2,'0')).join('');
+async function opsSha(s){return opsHex(new Uint8Array(await crypto.subtle.digest('SHA-256',opsTE(s))))}
+const opsShare=()=>club.opsShare!==false;
+function opsInit(){if(!ops.on)return Promise.resolve(false);if(ops.ready)return ops.ready;
+  ops.ready=(async()=>{try{const S=crypto.subtle;
+      ops.sigK=await S.importKey('raw',opsUnB64(OPSK.sig),{name:'ECDSA',namedCurve:'P-256'},false,['verify']);
+      // a throwaway key pair for this page: with the server's public key it gives an AES key only the server can match
+      const srv=await S.importKey('raw',opsUnB64(OPSK.enc),{name:'ECDH',namedCurve:'P-256'},false,[]);
+      const kp=await S.generateKey({name:'ECDH',namedCurve:'P-256'},false,['deriveBits']);
+      const hk=await S.importKey('raw',await S.deriveBits({name:'ECDH',public:srv},kp.privateKey,256),'HKDF',false,['deriveKey']);
+      ops.aesK=await S.deriveKey({name:'HKDF',hash:'SHA-256',salt:opsTE('sk-ops1'),info:opsTE('telemetry')},hk,{name:'AES-GCM',length:256},false,['encrypt']);
+      ops.eph=opsB64(new Uint8Array(await S.exportKey('raw',kp.publicKey)));ops.sid=opsHex(crypto.getRandomValues(new Uint8Array(8)));
+      try{ops.seq=+localStorage.getItem('kickabout-ops-seq')||0}catch(e){}await opsPid();return true}
+    catch(e){ops.on=false;return false}})();return ops.ready}
+// the server knows a save only by a one-way hash of its private id (so a correction reaches the right save)
+async function opsPid(){if(club.pid&&ops.hOf!==club.pid){ops.h=(await opsSha('sk-pid1:'+club.pid)).slice(0,32);ops.hOf=club.pid}}
+async function opsSeal(obj){const iv=crypto.getRandomValues(new Uint8Array(12));
+  const c=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:opsTE('sk-ops1')},ops.aesK,opsTE(JSON.stringify(obj))));
+  return JSON.stringify({v:1,e:ops.eph,iv:opsB64(iv),c:opsB64(c)})}
+async function opsSend(k,data,important){if(!await opsInit())return false;await opsPid();const cl=(await regConnect()).filter(c=>c.connected);if(!cl.length)return false;
+  const msg=await opsSeal({k,sid:ops.sid,n:++ops.n,t:Date.now(),ver:GAMEVER,pv:NETPV,h:ops.h,rid:club.reg&&club.reg.id||'',nm:String(club.name||'').slice(0,20),mg:club.mgr||'',...data});
+  for(const c of cl)try{c.publish(OPS_T+'t/'+ops.sid,msg,{qos:important?1:0})}catch(e){}return true}
+
+// ---- what this page is doing right now (the heartbeat) ----
+function opsState(){if(document.hidden)return'idle';if(mm.on)return'search';if(NET.on)return'online';if(netRole)return'lobby';
+  return state==='menu'?'menu':pen?'pens':'match'}
+async function opsMid(){const key=netCode+':'+(NET.host?netMatch:netGotMatch);if(key!==ops.midKey){ops.midKey=key;ops.mid=(await opsSha('sk-match1:'+key)).slice(0,16)}return ops.mid}
+async function opsHB(force){if(!ops.on||!opsShare())return;const st=opsState(),t=performance.now(),key=st==='online'?st+score.join('-'):st;// a goal online updates the live score straight away
+  if(!force&&key===ops.hbSt&&t-ops.hbAt<20000)return;ops.hbAt=t;ops.hbSt=key;const md=st==='search'?mm.fmt:st==='online'?PITCH:st==='lobby'?(NETMODES[club.netMode]?club.netMode:'volta'):PITCH;let om=null;
+  if(st==='online'){const okR=Object.keys(netRoutes).filter(k=>netRoutes[k]==='ok'),rt=NET.host&&nroom&&nroom.prefer?nroom.prefer.kind:okR.includes('peer')?'peer':okR.length?'relay':'';om={mid:await opsMid(),kind:netKind,role:NET.host?'host':'guest',fmt:PITCH,
+      sc:NET.host?[score[0],score[1]]:[score[1],score[0]],clk:Math.round(clock),rtt:NET.guest?Math.round(netRtt):0,rt:rt==='peer'?'direct':rt?'relay':'',opp:OPP&&OPP.name||''}}
+  else if(st==='lobby')om={role:netRole||'',fmt:md};
+  const ack=ops.acks.slice(-20);if(await opsSend('hb',{st,md,lv:st==='match'?club.level||'':'',om,ack}))ops.acks=[]}
+// the same final score goes from both laptops at full time; the server checks they agree
+async function opsResult(){if(!ops.on||!opsShare()||!NET.on)return;const o=ops.opp||{};
+  opsSend('res',{mid:await opsMid(),kind:netKind,fmt:PITCH,role:NET.host?'host':'guest',my:score[0],their:score[1],opp:{rid:o.rid||'',nm:o.nm||'',mg:o.mg||''}},true)}
+function opsOpp(pr){if(!pr)return;const rid=String(pr.rid||'');ops.opp={rid:/^[a-z0-9]{10,16}$/.test(rid)?rid:'',nm:String(pr.club||'').slice(0,20),mg:nameOk(String(pr.mg||'')),kind:netKind,at:Date.now()};if(ops.on)renderOnlinePlus()}
+// game errors (if any) are reported automatically, at most three a session, with file paths taken out
+function opsErrs(){if(!ops.on||!opsShare()||loopErrs<=ops.errSeen||ops.errSent>=3)return;ops.errSeen=loopErrs;ops.errSent++;
+  const e=String(window.__lastErr||'').replace(/\b(?:file|https?|blob):\/\/[^\s)]+/g,'<file>').slice(0,240);
+  opsSend('prob',{auto:1,cat:'bug',txt:'',errs:[e],st:opsState(),md:PITCH},true)}
+
+// ---- the signed control message ----
+async function opsCtl(buf){if(!await opsInit())return;let d;try{d=JSON.parse(new TextDecoder().decode(buf))}catch(e){return}
+  if(!d||d.v!==1||typeof d.p!=='string'||typeof d.s!=='string'||d.p.length>300000)return;
+  let ok=false;try{ok=await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},ops.sigK,opsUnB64(d.s),opsTE(d.p))}catch(e){}
+  if(!ok){ops.bad++;return}// not from the server: ignored
+  let p;try{p=JSON.parse(d.p)}catch(e){return}const now=Date.now();
+  // only ever move forward: an older signed message (a replay) can't replace a newer one, and stale ones expire
+  if(p.v!==1||!Number.isFinite(p.seq)||!(p.seq>ops.seq||(p.seq===ops.seq&&!ops.ctlAt))||!(now<=p.exp+600000))return;
+  ops.seq=p.seq;try{localStorage.setItem('kickabout-ops-seq',String(p.seq))}catch(e){}ops.ctlAt=now;ops.exp=+p.exp;opsApply(p)}
+// if the dashboard goes quiet, its last message lapses (maintenance and announcements stop) once it expires
+const opsFresh=()=>ops.ctlAt&&Date.now()<=ops.exp+600000;
+function opsApply(p){const now=Date.now(),list=x=>Array.isArray(x)?x:[];
+  ops.maint=p.maint&&p.maint.on?{msg:String(p.maint.msg||'').slice(0,200)}:null;
+  ops.ann=list(p.ann).slice(0,3).filter(a=>a&&(!a.until||a.until>now)).map(a=>({id:String(a.id||''),txt:String(a.txt||'').slice(0,220),lvl:a.lvl==='warn'?'warn':'info'}));
+  const S=list(p.susp);ops.suspR=new Set(S.map(s=>String(s&&s.rid||'')));const myRid=club.reg&&club.reg.id;
+  const m=S.find(s=>s&&((ops.h&&s.h===ops.h)||(myRid&&s.rid===myRid)));ops.mine=m?{id:String(m.id||''),until:+m.until||0,why:OPS_WHY[m.why]?m.why:'other'}:null;
+  let dirty=JSON.stringify(club.opsSusp||null)!==JSON.stringify(ops.mine);club.opsSusp=ops.mine;
+  // corrections for this save: each is applied once, and a removal never takes a balance below zero
+  club.opsDone=Array.isArray(club.opsDone)?club.opsDone:[];const notes=[];
+  for(const g of list(p.grants)){if(!g||!ops.h||g.h!==ops.h)continue;const id=String(g.id||'');if(!id||club.opsDone.includes(id))continue;
+    const c=clamp(Math.round(+g.c)||0,-1e6,1e6),tt=clamp(Math.round(+g.tt)||0,-1000,1000);
+    club.coins=Math.max(0,(club.coins||0)+c);club.tt=Math.max(0,(club.tt||0)+tt);club.opsDone.push(id);if(club.opsDone.length>300)club.opsDone.shift();ops.acks.push(id);dirty=true;
+    notes.push(`${String(g.msg||'A correction from the Sunday Kickabout team.').slice(0,140)} (${[c?`${c>0?'+':''}${c.toLocaleString()} coins`:'',tt?`${tt>0?'+':''}${tt} Training Token${Math.abs(tt)===1?'':'s'}`:''].filter(Boolean).join(', ')})`)}
+  if(dirty){saveClub();if(state==='menu')renderMenu()}
+  if(notes.length){ops.note=notes.join(' · ');toast(ops.note);opsHB(true)}
+  opsBar();if(state==='menu'){renderOnlinePlus();renderBoards()}}
+// online play is closed during maintenance and to a suspended club (everything offline still works)
+function opsMineNow(){const m=ops.ctlAt?ops.mine:club.opsSusp;return m&&(!m.until||m.until>Date.now())?m:null}
+function opsBlock(){if(!ops.on)return'';if(ops.maint&&opsFresh())return ops.maint.msg||'Online play is paused for maintenance. Please try again soon.';
+  const m=opsMineNow();return m?`Your club is suspended from online play until ${new Date(m.until).toLocaleString()} for ${OPS_WHY[m.why]||OPS_WHY.other}. Everything offline still works, and you can appeal from the Online tab.`:''}
+const opsHidden=rid=>ops.on&&!!rid&&ops.suspR.has(String(rid))&&!(club.reg&&rid===club.reg.id);
+
+// ---- what players see ----
+let opsGone=new Set();try{opsGone=new Set(JSON.parse(localStorage.getItem('kickabout-ops-gone')||'[]'))}catch(e){}
+function opsBar(){const el=$('opsbar');if(!el)return;const rows=[];if(ops.ctlAt&&!opsFresh()){ops.maint=null;ops.ann=[]}
+  if(ops.maint)rows.push(`<p class="opsann warn">🔧 ${esc(ops.maint.msg||'Online play is paused for maintenance.')}</p>`);
+  for(const a of ops.ann)if(!opsGone.has(a.id))rows.push(`<p class="opsann ${a.lvl}">📣 ${esc(a.txt)} <button class="ghost" data-opsgone="${esc(a.id)}" aria-label="Hide">✕</button></p>`);
+  if(ops.note)rows.push(`<p class="opsann info">🎁 ${esc(ops.note)} <button class="ghost" data-opsgone="note" aria-label="Hide">✕</button></p>`);
+  el.innerHTML=rows.join('');el.hidden=!rows.length}
+// the Online tab's extra lines: maintenance, a suspension (with appeal), reporting the last opponent, reporting a problem
+function opsOnlineHTML(){if(!ops.on)return'';const m=opsMineNow(),o=ops.opp;
+  return `${ops.maint?`<p class="opsann warn">🔧 ${esc(ops.maint.msg||'Online play is paused for maintenance.')}</p>`:''}
+    ${m?`<div class="opsann warn"><b>Your club is suspended from online play</b> until ${esc(new Date(m.until).toLocaleString())} for ${esc(OPS_WHY[m.why]||OPS_WHY.other)}. Single-player, packs and everything offline still work. <button class="btn" data-ops="appeal">Appeal</button></div>`:''}
+    <p class="hint opsline">${o&&(o.rid||o.nm)?`Last online opponent: <b>${esc(o.nm||'unknown')}</b>${o.mg?' ('+esc(o.mg)+')':''} <button class="btn" data-ops="repopp">Report</button> · `:''}<button class="btn" data-ops="prob">Report a problem</button></p>`}
+function opsDlg(kind,target){const box=$('opsdlg');if(!box)return;const t=target||{};
+  const head={rep:`Report ${esc(t.nm||'this club')}`,prob:'Report a problem',appeal:'Appeal your suspension'}[kind];
+  const cats=kind==='rep'?[['cheating','Cheating'],['name','Offensive name or club name'],['abuse','Abuse or harassment'],['other','Something else']]:kind==='prob'?[['bug','Something isn’t working'],['online','Online / connection'],['performance','Slow or jerky'],['account','Account or save'],['other','Something else']]:null;
+  box.innerHTML=`<div class="sqbox pbox" role="dialog" aria-label="${head}"><button class="ghost sqx" data-opsd="x">Close</button><h3>${head}</h3>
+    ${kind==='rep'?'<p class="hint">Goes privately to the game’s developer with this club’s public id. Please only report real problems.</p>':kind==='prob'?'<p class="hint">Goes privately to the game’s developer with your game version and any recent error messages. Nothing personal is sent.</p>':'<p class="hint">Tell the developer why the suspension should be lifted. You’ll see the result here.</p>'}
+    ${cats?`<label class="pfl">What’s it about?<select id="opsd-cat">${cats.map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</select></label>`:''}
+    <label class="pfl">${kind==='appeal'?'Your appeal':'Details (optional)'}<textarea id="opsd-txt" rows="4" maxlength="${kind==='rep'?500:800}"></textarea></label>
+    <div class="pfrow"><button class="btn gold" data-opsd="send">Send</button></div><p class="hint" id="opsd-msg"></p></div>`;
+  box.dataset.kind=kind;box.dataset.t=JSON.stringify(t);box.hidden=false}
+async function opsDlgSend(){const box=$('opsdlg'),kind=box.dataset.kind,t=JSON.parse(box.dataset.t||'{}'),msg=$('opsd-msg'),txt=($('opsd-txt').value||'').trim(),cat=$('opsd-cat')?$('opsd-cat').value:'';
+  const gap={rep:120000,prob:60000,appeal:600000}[kind];if(performance.now()-(ops.sent[kind]||-1e9)<gap){msg.textContent='You’ve just sent one. Please wait a little before sending another.';return}
+  if(kind==='appeal'&&txt.length<10){msg.textContent='Say a little more (10+ characters).';return}
+  msg.textContent='Sending…';let ok=false;
+  if(kind==='rep')ok=await opsSend('rep',{target:{rid:t.rid||'',nm:t.nm||'',mg:t.mg||''},cat,txt,ctx:t.ctx||'squad'},true);
+  else if(kind==='prob')ok=await opsSend('prob',{cat,txt,errs:loopErrs?[String(window.__lastErr||'').replace(/\b(?:file|https?|blob):\/\/[^\s)]+/g,'<file>').slice(0,240)]:[],st:opsState(),md:PITCH,rt:Object.keys(netRoutes).filter(k=>netRoutes[k]==='ok').join(' ')},true);
+  else if(kind==='appeal'){const m=opsMineNow();if(m)ok=await opsSend('app',{sus:m.id,txt},true)}
+  if(ok){ops.sent[kind]=performance.now();msg.textContent='Sent. Thank you.';setTimeout(()=>{box.hidden=true},1400)}
+  else msg.textContent='Couldn’t send: the game can’t reach the internet relays right now. Check your connection and try again.'}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-ops],[data-opsd],[data-opsgone],[data-opsrep]');if(!b)return;const d=b.dataset;
+  if(d.opsgone){if(d.opsgone==='note')ops.note='';else{opsGone.add(d.opsgone);try{localStorage.setItem('kickabout-ops-gone',JSON.stringify([...opsGone].slice(-30)))}catch(e){}}opsBar()}
+  else if(d.ops==='appeal')opsDlg('appeal');else if(d.ops==='prob')opsDlg('prob');
+  else if(d.ops==='repopp'&&ops.opp)opsDlg('rep',{...ops.opp,ctx:'opponent'});
+  else if(d.opsrep){const p=regBoard.get(d.opsrep);if(p)opsDlg('rep',{rid:p.id,nm:p.n,mg:p.mg,ctx:'squad'})}
+  else if(d.opsd==='x')$('opsdlg').hidden=true;else if(d.opsd==='send')opsDlgSend()});
+function opsBoot(){if(!ops.on)return;
+  HELP.push(['Live status, reports and appeals','<p>This copy of the game is linked to its developer’s dashboard. While you play it sends a small encrypted status every 20 seconds: your nickname, club name and public club id, what you’re doing (menus, a match against the computer, searching, a private lobby or an online match with its score), the difficulty and the game version. Only the developer can read it. It never includes your email, password, room codes or location. Turn it off in your profile (tap your nickname) whenever you like.</p><p><b>Report</b> a club from View Squad, or your last online opponent from the Online tab. <b>Report a problem</b> from the Online tab or your profile. The developer can post announcements, pause online play for maintenance, suspend a club from online play (single-player always works, and you can appeal from the Online tab) and correct coins or Training Tokens. The game only obeys messages signed by the developer’s own key, so nobody else can do any of this.</p>']);opsInit();setInterval(()=>{opsHB(false);opsErrs();if((ops.maint||ops.ann.length)&&!opsFresh())opsBar()},5000);setTimeout(()=>opsHB(true),4000);opsBar()}
 
 /* ---------- draw ---------- */
 function txt(s,x,y,size,col,align='center',stroke=true){
@@ -6105,7 +6248,7 @@ async function netJoin(code,role){const my=++netJoinId;
   if(nroom){try{await nroom.leave()}catch(e){}nroom=null}
   netRoutes={};const room=multiRoom([]);nroom=room;
   netCode=code;netRole=role;netSeenEv=0;netSeenPop=0;netSeenSfx=0;netGotMatch=0;netDoneMatch=0;gIn.seq=0;gIn.ack=0;gIn.list.length=0;netSqKey='';netJoinAt=performance.now();netLogAdd('joining room as '+role);
-  room.presence({role,v:1,pv:NETPV,club:(club.name||'My Club').slice(0,16),mg:club.mgr||'',kit:club.kit,...(role==='guest'?{sq:netMyTeam(false),csq:netMyTeam(true),cu:netCustom(),ev:[],k:[0,0]}:{m:0,nm:club.netMode||'volta'})});
+  room.presence({role,v:1,pv:NETPV,club:(club.name||'My Club').slice(0,16),mg:club.mgr||'',rid:club.reg&&club.reg.id||'',kit:club.kit,...(role==='guest'?{sq:netMyTeam(false),csq:netMyTeam(true),cu:netCustom(),ev:[],k:[0,0]}:{m:0,nm:club.netMode||'volta'})});
   room.onPeers(()=>netLobby());
   const live=()=>my===netJoinId&&nroom===room;
   const R=await netRoom();
@@ -6119,12 +6262,16 @@ async function netJoin(code,role){const my=++netJoinId;
   RELAYS().forEach((u,i)=>attempt('relay'+i,'relay',()=>mqttRoom(code,u)));
   return true}
 let netJoinAt=0,netSnapN=0;
-const netRouteText=()=>{const ok=[...new Set(Object.keys(netRoutes).filter(k=>netRoutes[k]==='ok').map(k=>ROUTE_NAME[k.replace(/\d+$/,'')]))];return ok.length?' (connected via '+ok.join(' + ')+')':' (still connecting…)'};
+const netRouteText=()=>{const ok=[...new Set(Object.keys(netRoutes).filter(k=>netRoutes[k]==='ok').map(k=>ROUTE_NAME[k.replace(/\d+$/,'')]))];return ok.length?' (connected via '+ok.join(' + ')+')':netDown()?' ⚠ '+NET_DOWN:' (still connecting…)'};
+// none of the online services answered: tell the player plainly instead of "connecting…" for ever (it keeps retrying)
+const NET_DOWN='Can’t reach the online services right now. Check your internet connection: some networks (school or work Wi-Fi, firewalls) block them. Still trying… Single-player works as normal.';
+const netDown=()=>(navigator.onLine===false||performance.now()-netJoinAt>12000)&&!Object.values(netRoutes).includes('ok');
+setInterval(()=>{if(nroom&&netRole&&!NET.on&&netDown())netStatus((netRole==='host'&&netCode?'Your code is '+netCode+'. ':'')+NET_DOWN,true)},3000);
 const newCode=()=>{const L='ABCDEFGHJKMNPQRSTUVWXYZ';return Array.from({length:4},()=>L[(Math.random()*L.length)|0]).join('')};
-async function netHost(){initAudio();if(netRole==='host'&&nroom){$('net-code').textContent=netCode;return}netCode=newCode();
+async function netHost(){{const ob=opsBlock();if(ob){netStatus(ob,true);toast(ob);return}}initAudio();if(netRole==='host'&&nroom){$('net-code').textContent=netCode;return}netCode=newCode();
   $('net-code').textContent='';netStatus('Opening a room…');$('net-host').disabled=true;const ok=await netJoin(netCode,'host');$('net-host').disabled=false;if(!ok)return;
   $('net-code').textContent=netCode;netStatus('Tell your friend this code. Waiting for them to join…');netLobby()}
-async function netJoinClick(){initAudio();const code=($('net-in').value||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,4);
+async function netJoinClick(){{const ob=opsBlock();if(ob){netStatus(ob,true);toast(ob);return}}initAudio();const code=($('net-in').value||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,4);
   if(code.length!==4){netStatus('Type the 4-letter code from the host.',true);return}
   netStatus('Joining '+code+'…');$('net-join').disabled=true;const ok=await netJoin(code,'guest');$('net-join').disabled=false;if(!ok)return;netStatus('In room '+code+'. Waiting for the host…');netLobby()}
 const NETOLD='is using a different version of Sunday Kickabout. You both need the same game file: send them this copy (or download theirs) and try again.';
@@ -6140,7 +6287,7 @@ function netStart(){const g=netPeer('guest');if(!g){netStatus('Your friend isn�
   const P=g.presence,sqd=(big?P.csq:P.sq)||{};netGuest={club:String(P.club||'Friend').slice(0,16),mg:nameOk(String(P.mg||'')),kit:typeof P.kit==='string'&&/^#[0-9a-f]{6}$/i.test(P.kit)?P.kit:'#4fb3ff',
     s:[...(Array.isArray(sqd.s)?sqd.s:[]),...E8()].slice(0,ns).map(x=>x==null?'':String(x)),f:FORM_KEYS[big?'classical':'volta'].includes(sqd.f)?sqd.f:FORM_KEYS[big?'classical':'volta'][0],att:sqd.att,cap:sqd.cap,al:Array.isArray(sqd.al)?sqd.al.map(x=>clamp(x|0||1,1,10)):[],st:Array.isArray(sqd.st)?sqd.st.slice(0,ns).map(a=>Array.isArray(a)?a.slice(0,7).map(Number):null):[],nm:Array.isArray(sqd.nm)?sqd.nm.map(x=>String(x||'').slice(0,16)):[],sh:Array.isArray(sqd.sh)?sqd.sh.map(x=>String(x||'').slice(0,10)):[],cu:P.cu&&typeof P.cu==='object'?P.cu:null};
   let kit=netGuest.kit;if(kitClash(kit,club.kit))kit=KITS.find(k=>!kitClash(k,club.kit)&&k!=='#2f2f3a')||'#4fb3ff';
-  OPP={name:netGuest.club.toUpperCase(),mg:netGuest.mg||'',kit,off:0};cupEvent=null;eventText=null;comp='online';
+  OPP={name:netGuest.club.toUpperCase(),mg:netGuest.mg||'',kit,off:0};cupEvent=null;eventText=null;comp='online';opsOpp(P);
   NET.on=true;NET.host=true;NET.guest=false;netMatch=(Date.now()%100000)+1;matchSerial++;ttCalc=null;
   initAudio();if(ac&&ac.state==='suspended')ac.resume();DF=levelDF('normal');setPitch(pk);{const g0=GM;GM=big?'classical':'volta';setup();GM=g0}hat=null;score=[0,0];mercy=false;clock=pk==='volta'?120:pk==='expanded'?210:180;style=0;shownStyle=0;hype=0;fire=0;streak=0;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];RS={x:0,y:0,charging:false,charge:0};netSeenEv=netSeenEvOf(g);RME=null;netTk=0;netFe=0;netImp=0;netCim=null;netPre=null;netGuestAt=performance.now();netWaiting=false;netResumeAt=0;netGuestBlind=false;
@@ -6358,7 +6505,7 @@ function guestBuild(h){const R=h.presence.r;if(!Array.isArray(R)||R.length<4)ret
     st.spLv=clamp(+r[14]|0||1,1,10);
     const sv=r[13]&&typeof r[13]==='object'?r[13]:{};for(const [k] of STATK){const v=+sv[k];st[k]=Number.isFinite(v)?clamp(v,.1,STATCAP):Number.isFinite(+st[k])?+st[k]:.6}
     const kit=typeof r[2]==='string'&&/^#[0-9a-f]{6}$/i.test(r[2])?r[2]:'#999999',p=mk(1-(+r[0]?1:0),j,st,kit,0,0,!!r[1]);p.slot={x:.3,y:.5,r:'MID'};return p});
-  const hk=players.find(p=>p.team===1&&!p.keeper);OPP={name:String(h.presence.club||'Host').toUpperCase().slice(0,16),mg:nameOk(String(h.presence.mg||'')),kit:hk?hk.kit:'#8e8ff0',off:0};
+  const hk=players.find(p=>p.team===1&&!p.keeper);OPP={name:String(h.presence.club||'Host').toUpperCase().slice(0,16),mg:nameOk(String(h.presence.mg||'')),kit:hk?hk.kit:'#8e8ff0',off:0};opsOpp(h.presence);
   return true}
 function guestBegin(h){matchSerial++;ttCalc=null;setPitch(['volta','classical','expanded'].includes(h.presence.pk)?h.presence.pk:'volta');if(!guestBuild(h))return;netRdyAt=performance.now()+400;netRdySent=0;NET.on=true;NET.guest=true;NET.host=false;comp='online';netLock=false;netGotMatch=h.presence.m;netGState='';
   netSeenPop=Infinity;netSeenSfx=Infinity;score=[0,0];clock=120;style=0;shownStyle=0;hype=0;fire=0;streak=0;hat=null;mercy=false;pen=null;cupEvent=null;eventText=null;
@@ -6585,7 +6732,7 @@ $('bulk-save').onclick=()=>{let n=0;
   applyNames();try{localStorage.setItem('kickabout-names',JSON.stringify(NAMES))}catch(e){}cloudPush();$('bulk-paste').value='';
   renderMenu();bulkRender();toast(n?`Saved ${n} name${n>1?'s':''}.`:'No names changed.')};
 $('bulk-clear').onclick=()=>{if(!Object.keys(NAMES).length){toast('Everyone already has their card name.');return}NAMES={};applyNames();try{localStorage.setItem('kickabout-names','{}')}catch(e){}cloudPush();renderMenu();bulkRender();toast('All names reset.')};
-renderMenu();cloudInit();profBoot();tutBoot();regBoot();
+renderMenu();cloudInit();profBoot();tutBoot();regBoot();opsBoot();
 let last=performance.now();
 function hitStop(f){if(!RM&&!NET.on)hitT=Math.max(hitT,f)}
 // Every frame starts from a clean drawing state, and one bad frame can never stop the game: errors are caught and the

@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Kickabout Admin</title><link rel="stylesheet" href="/static/admin.css"></head>
+<body class="login"><main class="loginbox">
+<h1>Sunday Kickabout</h1><p class="sub">Developer dashboard</p>
+<form id="f" autocomplete="on">
+<label>Account<input id="u" name="username" autocomplete="username" required maxlength="32"></label>
+<label>Password<input id="p" name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
+<label>Authenticator code <small>(only if you set one up)</small><input id="c" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></label>
+<button id="go" type="submit">Sign in</button>
+<p id="msg" role="alert"></p>
+</form>
+<p class="note">Private. Every sign-in and action is recorded in the audit log.</p>
+</main><script src="/static/login.js"></script></body></html>

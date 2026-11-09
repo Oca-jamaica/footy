@@ -380,6 +380,8 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
 .pbox{max-width:560px;display:flex;flex-direction:column;gap:8px}.pfl{display:flex;flex-direction:column;gap:4px;font-weight:800;font-size:13px;color:var(--muted)}.pfl input{font-size:17px}
 .pfrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.pfgo{font-size:15px;padding:6px 18px}.pacct{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}.pacct h4{margin:0 0 6px;color:var(--sun)}.pacct h4 small{color:var(--muted);font-weight:600}
 .pfin{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pfin input{font-family:var(--body);font-weight:700;font-size:15px;background:var(--ground-2);color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+#opsbar{width:100%;display:grid;gap:6px}.opsann{margin:0;padding:7px 12px;border-radius:12px;background:#0f2a37;border:1px solid var(--line);font-size:14px;text-align:left}.opsann.warn{border-color:var(--sun);color:var(--sun)}.opsann button{float:right;padding:0 8px;font-size:12px}
+.opsline{margin-top:8px}#opsdlg textarea,#opsdlg select{font:inherit;font-size:15px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--ground);color:var(--cream)}
 .psaves{margin-top:6px;padding:8px 10px;border-radius:12px;background:#0f2a37;font-size:13px}.psaves p{margin:3px 0}.pfok{color:var(--mint);font-weight:800}.pfoff{color:var(--muted);font-weight:800}.pfwarn{color:var(--sun);font-weight:800}
 .pacct>summary{cursor:pointer;list-style:none}.pacct>summary::-webkit-details-marker{display:none}.pacct>summary h4{display:inline}.pacct>summary h4::after{content:" \25BE";color:var(--muted)}
 .pfound{border:1px solid var(--sun);border-radius:12px;padding:10px;margin-bottom:8px;background:#12303e}.pfound p{margin:4px 0}
@@ -394,6 +396,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
   <div id="vig" hidden></div>
   <div class="menu" id="menu"><div class="menu-inner">
     <h1>Sunday Kickabout</h1>
+    <div id="opsbar" hidden></div>
     <div class="clubbar">
       <button class="res mgr" id="mgrpill" title="Your profile"></button><label for="club-name" style="display:flex;align-items:center;gap:6px">CLUB<input type="text" id="club-name" maxlength="14"></label>
       <div class="sw" id="club-kit" aria-label="Kit colour"></div>
@@ -542,7 +545,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
   <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span><span><button class="mute helpb" id="helpbtn" title="How everything works">HELP</button></span>
 </div>
 
-<div id="prof" class="ovl" hidden></div><div id="sqview" class="ovl" hidden></div><div id="rkreveal" class="ovl" hidden></div><div id="help" class="ovl" hidden></div><div id="tut" class="tutbar" hidden></div>
+<div id="prof" class="ovl" hidden></div><div id="sqview" class="ovl" hidden></div><div id="opsdlg" class="ovl" hidden></div><div id="rkreveal" class="ovl" hidden></div><div id="help" class="ovl" hidden></div><div id="tut" class="tutbar" hidden></div>
 <script>/*@GAME*/</script>
 
 </body></html>
