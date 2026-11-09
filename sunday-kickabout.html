@@ -3643,11 +3643,29 @@ function airStrike(m){airN[B.z>22?'header':'volley']++;const gx=goalX(m.team),k=
   m.dir=Math.atan2(ty-B.y,gx-B.x);shoot(m,header?'header':'volley',.9,ty);
   pop(header?'HEADER!':'VOLLEY!',m.x,m.y-50,m.team===0?C.sun:C.coral,22,70);if(m.team===0){slowmo(14,.4);addHype(8)}}
 const attackSpot=team=>{const gx=goalX(team);return{x:gx-Math.sign(gx-MIDX)*SPOT,y:MY}};
-// the special Through Ball flies ~9% slower than it used to (66 frames instead of 60 to the same spot)
+/* Offside, for through balls: a team-mate is offside if, when the ball is played, he's in the other half, ahead of the
+   ball, and nearer their goal line than the second-last opponent (the keeper usually being the last). */
+function isOffside(m,p){if(!m||m.team!==p.team||m.keeper)return false;const dir=Math.sign(goalX(p.team)-MIDX),depth=q=>(q.x-MIDX)*dir;
+  if(depth(m)<=0||depth(m)<=depth(B)+2)return false;
+  const ds=players.filter(q=>q.team!==p.team).map(depth).sort((a,b)=>b-a);return depth(m)>(ds[1]??-1e9)+4}
+// the flag goes up: the defending side restarts with the ball where the offside player was
+function offsideCall(p,m){const def=players.filter(q=>q.team!==p.team&&!q.keeper&&q.stun<=0),k=keeperOf(1-p.team);
+  let t2=def.length?def.reduce((a,b)=>dist(a,m)<dist(b,m)?a:b):k;if(!t2)t2=k;
+  B.owner=null;B.shot=null;B.pass=null;B.lobTo=null;B.graceTo=null;B.graceT=0;B.lobThrough=false;B.vx=B.vy=B.vz=0;B.z=0;
+  const s2=t2.team===0?1:-1;B.x=clamp(t2.x+s2*12,FX0+10,FX1-10);B.y=t2.y;give(t2);if(t2.keeper)t2.hold=40;
+  pop('OFFSIDE!',m.x,m.y-40,C.coral,26,80);S.whistle(1);if(m.team===0)S.aww();
+  for(const q of players)if(q.team===p.team&&!q.keeper)q.lobRun=null}
+/* The Through Ball special: played into the space just ahead of the best-placed runner (not always to the penalty spot),
+   about 8% slower than it used to be, and only within a sensible range, so it can't be launched from your own half for a
+   guaranteed goal. If the runner is offside, it's a free kick to the other side. */
 const THROUGH_T=66;
-function doThrough(p){if(B.owner!==p)return false;const sp=attackSpot(p.team);let m=null;
-  for(const q of outfield(p.team))if(q!==p&&(!m||dist(q,sp)<dist(m,sp)))m=q;if(!m)return false;
-  lobTo(p,m,sp.x,sp.y,THROUGH_T,true);pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
+function throughPick(p){const dir=Math.sign(goalX(p.team)-MIDX);let m=null,bs=-1e9;
+  for(const q of outfield(p.team)){if(q===p)continue;const fwd=(q.x-p.x)*dir,d=dist(q,p);if(fwd<-40||d>620*PSC)continue;const sc=fwd/200+(q.vx*dir)*.4-Math.abs(q.y-MY)/400-d/900;if(sc>bs){bs=sc;m=q}}return m}
+function doThrough(p){if(B.owner!==p)return false;const gx=goalX(p.team),dir=Math.sign(gx-MIDX),m=throughPick(p);
+  if(!m){if(p.team===0||hum(p))pop('nobody to play it to',p.x,p.y-34,C.muted,14);return false}
+  if(isOffside(m,p)){pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);offsideCall(p,m);return true}
+  const lead=150*PSC,tx=clamp(m.x+dir*lead,FX0+40,FX1-40),stop=gx-dir*SPOT,txx=dir>0?Math.min(tx,stop):Math.max(tx,stop),ty=m.y+(MY-m.y)*.25;
+  lobTo(p,m,txx,ty,THROUGH_T,true);pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
 function doLob(p){if(B.owner!==p)return false;const att=p.team===0?1:-1;let m=bestMate(p);
   if(!m){for(const q of outfield(p.team))if(q!==p&&(!m||(q.x-m.x)*att>0))m=q}if(!m)return false;
   const T=clamp(dist(p,m)/6.5,34,62),err=(1.25-(p.st.pass??.65))*55*(dist(p,m)/400+.5);lobTo(p,m,m.x+m.vx*T*.6+att*30+rnd(-err,err),m.y+m.vy*T*.6+rnd(-err,err),T,false);B.pass.chip=true;m.turbo=Math.min(m.turbo,T*.35);pop('CHIP PASS',p.x,p.y-34,p.team===0?C.sun:C.coral,18,70);return true}
@@ -3752,7 +3770,7 @@ function topSpeed(p){
   else if(p.knockT>0)s*=KNOCK[4];// knock-on: explode after the ball
   if(p.anim==='shield')s*=.55;
   if(p.ghost>0)s*=1.1;
-  if((B.lobTo===p||B.graceTo===p)&&B.lobThrough)s*=1.5;
+  if((B.lobTo===p||B.graceTo===p)&&B.lobThrough)s*=1.15;
   if(fire>0&&p.team===0)s*=1.07;
   return s;
 }
@@ -4048,7 +4066,7 @@ function carrierAI(p,dt){
     // a team-mate is running in behind (level with or past their last defender): slide him in
     if(Math.random()<.2+.6*IQ){const ll=lastLine(1-p.team,dir0);let tm=null,tb=-1e9;
       for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir0,run=m.vx*dir0,d=dist(p,m);if(fwd<30||run<1.2||d>520*PSC||m.x*dir0<ll-50)continue;
-        const lead={x:m.x+dir0*90,y:m.y+m.vy*20};if(laneBlocked(p,lead,22,p.team))continue;const sc=run+fwd/150-Math.abs(m.y-MY)/300;if(sc>tb){tb=sc;tm=m}}
+        if(isOffside(m,p))continue;const lead={x:m.x+dir0*90,y:m.y+m.vy*20};if(laneBlocked(p,lead,22,p.team))continue;const sc=run+fwd/150-Math.abs(m.y-MY)/300;if(sc>tb){tb=sc;tm=m}}
       if(tm&&Math.hypot(tm.x-gx,tm.y-MY)<dG+60){pass(p,tm,true);if(p.team===1)aiStat.through++;return}}
     if(dG<(DF.range+40)*(CL()?cStyle(p.team).shoot:1)*(XF>1?(CL()?1.3*PSC:1.2):1)){const open=!laneBlocked(p,{x:gx,y:MY},18,p.team);
       // shooting lane blocked: a smarter side squares it to a team-mate with a clear sight of goal
@@ -4057,7 +4075,7 @@ function carrierAI(p,dt){
     if(CL()&&Math.random()<.45+.55*cIQ(p.team)){const sty=cStyle(p.team),IQc=cIQ(p.team),ev=cPassEval(p,IQc,sty,true);
       let ahead=1e9;for(const q of defs)if((q.x-p.x)*dir0>-10&&Math.abs(q.y-p.y)<120)ahead=Math.min(ahead,dist(q,p));
       const keep=Math.min(ahead,220)/220*1.3-(ndd<50?.6:ndd<90?.25:0)+(dG<DF.range+80?.3:0);
-      if(ev&&ev.v>keep+lerp(.35,.05,IQc)/sty.pass){const m=ev.m,thr=m.vx*dir0>1.2&&m.x*dir0>lastLine(1-p.team,dir0)-60;pass(p,m,thr);if(thr&&p.team===1)aiStat.through++;return}}
+      if(ev&&ev.v>keep+lerp(.35,.05,IQc)/sty.pass){const m=ev.m,thr=m.vx*dir0>1.2&&m.x*dir0>lastLine(1-p.team,dir0)-60&&!isOffside(m,p);pass(p,m,thr);if(thr&&p.team===1)aiStat.through++;return}}
     if(ndd<44*(XF>1?1.4:1)){const m=bestMate(p);if(m&&Math.random()<.5*DF.press*XF){pass(p,m);return}
 }
     // on the big pitch the ball does the work: find a team-mate further up who's free and play it forward
@@ -4101,7 +4119,7 @@ function aiSpecial(p,dG,ndd){const sp=p.st.sp,def=SPECIALS[sp];if(!def)return fa
     const k=keeperOf(1-p.team),gx=goalX(p.team),ty=sp==='chip'?MY+rnd(-18,18):(k.y>MY?GY0+12:GY1-12);
     p.spCd=spCdOf(p)*1.5;p.dir=Math.atan2(ty-B.y,gx-B.x);pop(def.name,p.x,p.y-34,C.coral,20,70);S.special();shoot(p,sp,.85,ty);return true}
   if(sp==='turbo'&&ndd>70&&Math.random()<.4){p.spCd=spCdOf(p)*1.5;p.turbo=150;pop('TURBO',p.x,p.y-34,C.coral,16);return false}
-  if(sp==='through'&&dG<620&&Math.random()<.35&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}
+  if(sp==='through'&&dG<620&&Math.random()<.35&&!isOffside(throughPick(p),p)&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}
   if(sp==='lob'&&Math.random()<.3&&doLob(p)){p.spCd=spCdOf(p)*1.5;return true}
   if(sp==='onetwo'&&ndd<90&&Math.random()<.5&&doOneTwo(p)){p.spCd=def.cd*1.5;return true}
   if(sp==='ghost'&&ndd<85&&Math.random()<.5&&doGhost(p)){p.spCd=def.cd*1.5;return false}
@@ -4155,7 +4173,7 @@ function sweepPlan(k){const gx=k.team===0?FX0:FX1,s=k.team===0?1:-1,sk=kSkill(k)
   let firstAtt=1e9;
   for(const q of pts){if(q.z>(B.lobTo?60:24)&&!(B.lobTo&&q===pts[pts.length-1]))continue;
     const ax=(q.x-gx)*s;if(ax>zoneX||Math.abs(q.y-MY)>zoneY||ax<14)continue;
-    let tA=1e9;for(const o of opp){const boost=(B.lobTo===o||B.graceTo===o)&&B.lobThrough?1.5:1;tA=Math.min(tA,runT(o,q.x,q.y,topSpeed(o)*boost,3))}
+    let tA=1e9;for(const o of opp){const boost=(B.lobTo===o||B.graceTo===o)&&B.lobThrough?1.15:1;tA=Math.min(tA,runT(o,q.x,q.y,topSpeed(o)*boost,3))}
     let tD=1e9;for(const m of mates)tD=Math.min(tD,runT(m,q.x,q.y,topSpeed(m),5));
     firstAtt=Math.min(firstAtt,tA);
     const tK=runT(k,q.x,q.y,rate,lagK),arrive=Math.max(q.i,tK);
@@ -4267,7 +4285,7 @@ function ballUpdate(dt,live){
     const win=!d?0:chip?clamp(.42+(dist(m,B)-dist(d,B))/60+((d.st.tackle??.6)-.6)*.5,.2,.8):.55;
     if(d&&Math.random()<win){B.lobTo=null;m.lobRun=null;m.volley=false;const a=Math.atan2(MY-B.y,MIDX-B.x)+rnd(-.6,.6);d.hjump=18;airN.clear++;kick(d,a,9,3.4);pop('CLEARED',d.x,d.y-40,d.team===0?C.mint:C.muted,16,50);S.tap()}}
   if(B.lobTo&&wasAir&&B.z<=0){const m=B.lobTo;B.lobTo=null;m.lobRun=null;m.volley=false;
-    if(dist(m,B)<(B.lobThrough?72:58)&&m.stun<=0){give(m);if(m.team===0)ctrl=m;else if(NET.host)setCtrl2(m)}else{const th=B.lobThrough;B.vx*=th?0:.15;B.vy*=th?0:.15;B.vz=0;B.graceTo=m;B.graceT=th?75:40;m.lobRun={x:B.x,y:B.y}}}
+    if(dist(m,B)<(B.lobThrough?44:58)&&m.stun<=0){give(m);if(m.team===0)ctrl=m;else if(NET.host)setCtrl2(m)}else{const th=B.lobThrough;B.vx*=th?0:.15;B.vy*=th?0:.15;B.vz=0;B.graceTo=m;B.graceT=th?75:40;m.lobRun={x:B.x,y:B.y}}}
   if(B.graceT>0){B.graceT-=dt;if(B.graceT<=0||B.owner){if(B.graceTo)B.graceTo.lobRun=null;B.graceTo=null}}
   if(B.y<FY0+6){B.y=FY0+6;B.vy=Math.abs(B.vy)*.7}
   if(B.y>FY1-6){B.y=FY1-6;B.vy=-Math.abs(B.vy)*.7}
@@ -4296,7 +4314,7 @@ function ballUpdate(dt,live){
   }
   if(B.z<12){
     for(const p of players){
-      if(p.keeper||p.stun>0||(B.lockBy===p&&B.lockT>0)||(B.lobTo&&p!==B.lobTo&&!(B.pass&&B.pass.chip&&p.team!==B.lobTo.team&&B.vz<0))||(B.graceTo&&B.graceT>0&&p!==B.graceTo))continue;
+      if(p.keeper||p.stun>0||(B.lockBy===p&&B.lockT>0)||(B.lobTo&&p!==B.lobTo&&!(B.lobThrough&&p.team!==B.lobTo.team&&B.z<14)&&!(B.pass&&B.pass.chip&&p.team!==B.lobTo.team&&B.vz<0))||(B.graceTo&&B.graceT>0&&p!==B.graceTo&&!(B.lobThrough&&p.team!==B.graceTo.team)))continue;
       {const x0=B.x-B.vx*dt,y0=B.y-B.vy*dt,dx=B.x-x0,dy=B.y-y0,L2=dx*dx+dy*dy||1,u=clamp(((p.x-x0)*dx+(p.y-y0)*dy)/L2,0,1);if(Math.hypot(x0+dx*u-p.x,y0+dy*u-p.y)>(B.shot&&B.shot.team===0&&p.team===1?12:18)*(hr('giant')?1.4:1))continue}
       if(B.shot&&B.shot.team===0&&p.team===1&&sp>6.5){
         // your shots: a defender in the way only stops it some of the time; otherwise it takes a nick and carries on
@@ -5137,7 +5155,7 @@ $('rkreveal').addEventListener('click',e=>{if(e.target.closest('[data-rkok]'))$(
 const HELP=[
  ['Getting started','<p>Sunday Kickabout is arcade football. Build a club, collect footballers from packs, develop them, and win leagues, cups and online matches.</p><p>Start on the <b>Play</b> tab: pick Volta (5v5) or Classical (9v9), a difficulty and a competition, then press the big orange button.</p>'],
  ['Basic controls','<div class="hkeys"><p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</p><p><kbd>Shift</kbd> pass · without the ball: steal</p><p>Hold <kbd>Space</kbd> to shoot (longer = harder), <kbd>W</kbd>/<kbd>S</kbd> while holding to aim</p><p><kbd>F</kbd> cross · <kbd>C</kbd> slide tackle · <kbd>R</kbd> burst / lunge</p><p><kbd>E</kbd> skill move · <kbd>X</kbd> special ability · <kbd>Q</kbd> switch player</p><p><kbd>Esc</kbd> pause · <kbd>V</kbd> full screen · <kbd>N</kbd> connection details online</p></div><p>Control switches to whoever receives the ball, and to the best-placed defender when you defend.</p>'],
- ['Special abilities','<p>Every footballer has a special on <kbd>X</kbd>: Through Ball, Curler, Knuckleball, Rocket, Bicycle Kick, Interceptor, Turbo, Chip Pass or Chip. After using it, it recharges (the ring on the HUD).</p><p>Each footballer\'s special has 10 levels (Club → Special Abilities). Every level costs coins plus 2 Training Tokens and shortens the cooldown: Through Ball 25 s → 7 s, the shots and Interceptor 20 s → 5 s, Turbo and the chips 10 s → 3.5 s.</p>'],
+ ['Special abilities','<p>Every footballer has a special on <kbd>X</kbd>: Through Ball, Curler, Knuckleball, Rocket, Bicycle Kick, Interceptor, Turbo, Chip Pass or Chip. After using it, it recharges (the ring on the HUD).</p><p>Each footballer\'s special has 10 levels (Club → Special Abilities). Every level costs coins plus 2 Training Tokens and shortens the cooldown: Through Ball 25 s → 7 s, the shots and Interceptor 20 s → 5 s, Turbo and the chips 10 s → 3.5 s.</p><p><b>Through Ball</b> plays the ball into space just ahead of your best runner. Offside counts: if he’s beyond their second-last player (and ahead of the ball, in their half) when it’s played, the flag goes up and they get a free kick.</p>'],
  ['Player collection','<p>Open packs in Club → Packs. Each pack shows three footballers of one rarity and you sign one. Rarities: Bronze, Silver, Gold, Special and Icon (the very best). Odds are printed on every pack. Duplicates can be exchanged.</p>'],
  ['Player development','<p>Club → Development. Footballers gain XP from matches (or training with Training Tokens: the cost per 100 XP rises from 2 to 20 tokens as they level up). Levels unlock upgrade points (+1 to a stat for coins) and every two levels add +1 to their five best stats. Evolutions add more. The screen shows the current and maximum achievable OVR and exactly what each upgrade does.</p><p>Your Player (the footballer you create) trains +8 points at a time; prices climb to 75,000 coins for the last session.</p>'],
  ['Club development','<p>Club → Club Development: six departments, levels 1 to 5, paid with coins plus Club Tokens (one per Club Legacy level).</p><p>Fanbase: more match coins. Coaching Staff: up to 20% off every coin cost for training and abilities. Training Facilities: more XP. Stadium: bigger crowd and a small coin bonus. Scouting: better pack odds. Commercial: more objective coins and sponsor money.</p>'],

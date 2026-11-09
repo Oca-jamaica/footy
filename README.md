@@ -35,6 +35,10 @@ departments (Fanbase, Coaching Staff, Training Facilities, Stadium, Scouting, Co
 5,000 / 10,000 / 20,000 / 35,000 coins plus 1 Club Token per level.
 
 
+**Through Ball:** played into space ahead of the best runner (within range), about 8% slower than before, and offside counts:
+a runner beyond the second-last defender when it's played gives the other side a free kick. Defenders can win a dropping
+through ball.
+
 **Online modes:** Ranked, Friendly and Host / Join. Ranked and Friendly find a real opponent automatically (same match type
 and pitch; Ranked by similar rating, widening the longer you wait; never an AI). Ten placement matches set your first rank
 (Bronze → Silver → Gold → Platinum → Diamond → Champion → Legendary); after that wins earn Ranked Points and losses cost
