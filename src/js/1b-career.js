@@ -87,7 +87,7 @@ const DEPTS=[
   {k:'coach',n:'Coaching Staff',fx:[0,5,10,15,20],u:'% off training costs',d:'Cheaper coin costs for stat upgrades, evolutions, keeper training, created-player training and special ability upgrades. Training Token costs never change.'},
   {k:'train',n:'Training Facilities',fx:[0,5,10,15,25],u:'% more player XP',d:'Players level up faster from matches and training sessions (levels still stop at the maximum, and stats at each player’s potential).'},
   {k:'stad',n:'Stadium Development',fx:[0,1,2,3,4],u:'% more match coins',d:'Bigger stands, brighter floodlights, a fuller and livelier crowd, and a small attendance bonus on match coins.'},
-  {k:'scout',n:'Scouting Department',fx:[0,2.5,5,7.5,10],u:'% better odds of the higher rarity',d:'In packs that can give two rarities, the chance of the higher one goes up by this much of itself (5% becomes 5.5% at the top level). Single-rarity packs are unchanged; Icons are never guaranteed.'},
+  {k:'scout',n:'Scouting Department',fx:[0,2.5,5,7.5,10],u:'% better chance of a top-rated player',d:'Packs never change rarity: whatever rarity a pack gives, this raises the chance that its players come from the top quarter of that rarity’s ratings, by this much of itself (e.g. 25% becomes 27.5% at +10%). Players keep their real ratings.'},
   {k:'comm',n:'Commercial Department',fx:[0,5,10,15,20],u:'% more objective coins',d:'More coins from daily and weekly challenges and achievements, a sponsor payment at the end of every league season (500 per level), and your club on the stadium boards at level 3.'}];
 const depLv=k=>clamp(((club.dept||{})[k])|0||1,1,DEPMAX);
 const depFx=k=>DEPTS.find(d=>d.k===k).fx[depLv(k)-1];
@@ -104,9 +104,24 @@ function depBuy(k){const D=DEPTS.find(d=>d.k===k);if(!D)return;const L=depLv(k);
   club.coins-=c;club.ctk-=1;club.dept=club.dept||{};club.dept[k]=L+1;
   if(k==='stad'&&typeof buildCrowd==='function'){buildCrowd();pitchCv=null;skyCv=null}if(k==='comm'&&L+1>=3){club.cosOwned=[...new Set([...(club.cosOwned||[]),'boards_club'])]}
   toast(`${D.n} level ${L+1}: ${D.fx[L]}${D.u}`);S.goal();saveClub();renderMenu()}
-// scouting: a relative lift for the higher rarity in two-rarity packs, taken from the lower one
-function scoutOdds(odds){const s=depFx('scout')/100,ks=['bronze','silver','gold','special','icon'].filter(r=>(odds[r]||0)>0);if(!s||ks.length<2)return odds;
-  const o={...odds},hi=ks[ks.length-1],lo=ks[0],add=Math.min(o[lo],o[hi]*s);o[hi]=Math.round((o[hi]+add)*100)/100;o[lo]=Math.round((o[lo]-add)*100)/100;return o}
+/* Scouting: better players within a rarity, never a better rarity. A pack's rarity is rolled from its own odds, untouched.
+   Within that rarity the pack then picks a rating level (leaning towards the common, lower end) and deals real players
+   close to it. The "top-rated band" of a rarity is its top quarter of ratings in the player database (every card rated at
+   or above that rarity's 75th-percentile rating). Scouting multiplies the chance that the rating level falls in that band
+   by 1 + bonus (0 / 2.5 / 5 / 7.5 / 10% for levels 1-5), and scales every other rating level down to match, so the odds
+   always add up to 100%. Cards are never altered: they're real players at their real base ratings. A rarity whose ratings
+   don't spread (no top band distinct from the rest) is left unchanged. */
+const PACK_LEAN=2.2;
+function scoutBand(t){const sorted=PLAYERS.filter(p=>tier(p)===t).sort((a,b)=>ovr(a)-ovr(b)),n=sorted.length;if(!n)return null;
+  const r75=ovr(sorted[Math.min(n-1,Math.floor(n*.75))]),lo=ovr(sorted[0]);if(r75<=lo)return{sorted,n,cut:Infinity,base:[],pHigh:0};
+  // the chance of each sorted position being the pack's rating level, with no scouting: P(index=i) for floor(u^2.2*n)
+  const base=sorted.map((p,i)=>Math.pow((i+1)/n,1/PACK_LEAN)-Math.pow(i/n,1/PACK_LEAN));let pHigh=0;sorted.forEach((p,i)=>{if(ovr(p)>=r75)pHigh+=base[i]});
+  return{sorted,n,cut:r75,base,pHigh}}
+// the rating-level odds for a rarity at a scouting bonus b (0..0.1): top band x(1+b), the rest scaled to keep the total at 1
+function scoutLevelOdds(t,b){const S=scoutBand(t);if(!S)return null;if(!b||!S.pHigh||S.pHigh>=1)return{S,w:S.base,pHigh:S.pHigh};
+  const up=1+b,dn=(1-S.pHigh*up)/(1-S.pHigh);return{S,w:S.sorted.map((p,i)=>S.base[i]*(ovr(p)>=S.cut?up:dn)),pHigh:S.pHigh*up}}
+// the rating level for a pack of rarity t
+function scoutAnchor(t,b=depFx('scout')/100){const L=scoutLevelOdds(t,b);if(!L)return 60;let r=Math.random(),i=0;for(;i<L.w.length-1;i++){r-=L.w[i];if(r<0)break}return ovr(L.S.sorted[i])}
 
 function deptHTML(){ctkSync();const tk=ctk(),spent=DEPTS.reduce((a,D)=>a+depLv(D.k)-1,0);
   const fmt=(D,v)=>D.k==='stad'?`${[60,70,80,90,100][DEPTS.find(x=>x.k==='stad').fx.indexOf(v)]}% crowd · +${v}% match coins`:`${D.k==='coach'?'−':'+'}${v}${D.u}`;
@@ -114,6 +129,7 @@ function deptHTML(){ctkSync();const tk=ctk(),spent=DEPTS.reduce((a,D)=>a+depLv(D
     return `<div class="panel dept"><div class="dhead"><h4>${D.n}</h4><span class="ablv">${[1,2,3,4,5].map(i=>`<i class="${i<=L?'on':''}"></i>`).join('')}</span><b class="dlv">Level ${L}/${DEPMAX}</b></div>
      <p class="hint" style="margin:2px 0 6px">${D.d}</p>
      <p>Now: <b>${L===1&&!D.fx[0]&&D.k!=='stad'?'no bonus yet':fmt(D,D.fx[L-1])}</b>${max?'':` · next level: <b class="dnext">${fmt(D,D.fx[L])}</b>`}</p>
+     ${D.k==='scout'?`<p class="hint" style="margin:2px 0">Chance a pack's players come from the top-rated quarter of their rarity, now${max?'':' → next level'}: ${['bronze','silver','gold','special','icon'].map(t=>{const a=scoutLevelOdds(t,D.fx[L-1]/100),b=max?null:scoutLevelOdds(t,D.fx[L]/100);return a?`${TIERS[t].name} ${(a.pHigh*100).toFixed(1)}%${b?` → ${(b.pHigh*100).toFixed(1)}%`:''}`:''}).filter(Boolean).join(' · ')}. Rarity odds are never changed.</p>`:''}
      ${D.k==='comm'?`<p class="hint" style="margin:2px 0">Sponsor payment each league season: ${(500*(L-1)).toLocaleString()} coins${L<3?' · club advertising boards at level 3':' · club advertising boards unlocked'}</p>`:''}
      ${max?'<b class="maxl">MAX LEVEL</b>':`<button class="btn ${can?'gold':''}" data-dep="${D.k}" ${can?'':'disabled'}>Upgrade · ${c.toLocaleString()} coins + 1 Club Token</button>`}</div>`}).join('');
   return `<div class="panel"><h4>Club Development</h4><p><span class="ctk">${tk}</span> Club Token${tk===1?'':'s'} · ${(club.coins||0).toLocaleString()} coins · ${spent} of ${DEPTS.length*(DEPMAX-1)} department levels built</p>
@@ -137,7 +153,8 @@ function ablBuy(id){const p=byId(id);if(!p||!club.owned.includes(id))return;cons
 /* ===== upgrades, XP and evolutions ===== */
 const RAR=['bronze','silver','gold','special','icon'];
 const UPCAP={bronze:8,silver:10,gold:12,special:12,icon:14},UPBASE={bronze:100,silver:200,gold:400,special:800,icon:1300},STATMAX=5;
-const OVRCAP={bronze:80,silver:86,gold:93,special:96,icon:99};
+// how far evolutions alone can take each rarity (upgrades and levels can go further); Icons have no ceiling but their own potential
+const OVRCAP={bronze:80,silver:86,gold:93,special:96,icon:Infinity};
 const upOf=id=>(club.up||{})[id]||{};
 const upSpent=id=>Object.values(upOf(id)).reduce((a,b)=>a+b,0);
 const upRoom=p=>Math.min(UPCAP[tier(p)],2+2*lvlOf(p.id));// levelling up through XP unlocks more room
@@ -157,7 +174,7 @@ function playStatsX(p,lv,u,est){const b={...p};
   for(const k in u)if(k in b)b[k]+=u[k]*.01;
   let ev=evoBoostN(p,est);if(ev){const room=OVRCAP[tier(p)]-ovr({...b,isCustom:p.isCustom});ev=Math.max(0,Math.min(ev,room));for(const [k] of STATK)b[k]+=ev*.01}
   const ab=ABIL[p.ab];if(ab)for(const k in ab.fx)b[k]+=ab.fx[k];
-  for(const [k] of STATK)b[k]=Math.min(.99,b[k]);return b}
+  for(const [k] of STATK)b[k]=Math.min(STATCAP,b[k]);return b}
 // the stats a player actually takes onto the pitch: card stats plus everything you've invested in him
 function playStats(p){if(!p||!p.id)return p;const b=playStatsX(p,lvlOf(p.id),upOf(p.id),evoOf(p.id).st);b.spLv=ablOf(p.id);return b}
 const effOvr=p=>p?ovr(playStats(p)):0;
@@ -406,7 +423,7 @@ function careerAfterMatch(){if(NET.on||SG)return;const gf=score[0],ga=score[1],p
 /* ===== spending ===== */
 function upBuy(id,k){const p=byId(id);if(!p||p.isCustom||!club.owned.includes(id))return;const u=(club.up=club.up||{})[id]=club.up[id]||{};
   if(upSpent(id)>=upRoom(p)){toast(upRoom(p)<UPCAP[tier(p)]?`Level ${p.short} up by playing him to unlock more upgrades.`:'Fully upgraded.');return}
-  if((u[k]||0)>=STATMAX||playStats(p)[k]>=.99){toast('That stat is maxed.');return}
+  if((u[k]||0)>=STATMAX||playStats(p)[k]>=STATCAP){toast('That stat is maxed.');return}
   const c=upCost(p);if(club.coins<c){toast(`Needs ${c.toLocaleString()} coins.`);return}
   const before=effOvr(p),b0=Math.round(playStats(p)[k]*100);club.coins-=c;u[k]=(u[k]||0)+1;const after=effOvr(p);
   upFlash={id,k,from:b0,to:Math.round(playStats(p)[k]*100),o0:before,o1:after};S.skill(1);achCheck();saveClub();renderMenu()}
@@ -541,18 +558,19 @@ function devHTML(){const mine=ownedPlayers().filter(p=>!p.isCustom);if(!upId||!c
   if(!p)return gk+'<p class="hint">Sign players from packs to develop them.</p>';
   const s=playStats(p),base=p,u=upOf(p.id),room=upRoom(p),spent=upSpent(p.id),cap=UPCAP[tier(p)],cost=upCost(p),L=lvlOf(p.id),N=evoNeed(p);
   const MP=maxPlan(p),now=effOvr(p),lvMax=XPL.length-1,lb=Math.min(3,Math.floor(L/2));
+  const bsc=100/Math.max(100,...STATK.map(([k])=>statMax(p,k)));
   const rows=STATK.map(([k,l])=>{const b=Math.round(base[k]*100),v=Math.round(s[k]*100),mx=statMax(p,k),fl=upFlash&&upFlash.id===p.id&&upFlash.k===k,pv=upPreview(p,k),
-      lock=spent>=room||(u[k]||0)>=STATMAX||v>=99,why=v>=99?'stat at 99':(u[k]||0)>=STATMAX?`+${STATMAX} limit reached`:spent>=room?(room<cap?'level up to unlock':'no points left'):'';
-    return `<div class="strow dv"><span>${l}</span><div class="bar"><i style="width:${b}%"></i><u style="left:${b}%;width:${Math.max(0,v-b)}%"></u><s style="left:${v}%;width:${Math.max(0,mx-v)}%"></s></div><b>${fl?`<span class="flash">${upFlash.from}→</span>`:''}${v}</b><em title="Most this stat can reach">max ${mx}</em>
+      lock=spent>=room||(u[k]||0)>=STATMAX||v>=STATCAP*100,why=v>=STATCAP*100?'stat maxed':(u[k]||0)>=STATMAX?`+${STATMAX} limit reached`:spent>=room?(room<cap?'level up to unlock':'no points left'):'';
+    return `<div class="strow dv"><span>${l}</span><div class="bar"><i style="width:${b*bsc}%"></i><u style="left:${b*bsc}%;width:${Math.max(0,v-b)*bsc}%"></u><s style="left:${v*bsc}%;width:${Math.max(0,mx-v)*bsc}%"></s></div><b>${fl?`<span class="flash">${upFlash.from}→</span>`:''}${v}</b><em title="Most this stat can reach">max ${mx}</em>
       <button data-up="${k}" ${lock||club.coins<cost?'disabled':''} title="${lock?why:`${l} ${pv.s0} → ${pv.s1}, overall ${pv.o0} → ${pv.o1}`}">${lock?why:`${l} ${pv.s0} → ${pv.s1} · OVR ${pv.o0}${pv.o1!==pv.o0?` → <b>${pv.o1}</b>`:' (no change)'} · ${priceTag(upCostBase(p))}`}</button></div>`}).join('');
   const planTxt=Object.keys(MP.plan).length?Object.entries(MP.plan).map(([k,n])=>`${STATK.find(x=>x[0]===k)[1]} +${n}`).join(', '):'';
   const evo=N?`<div class="panel"><h4>Evolution · stage ${N.stage+1} of ${EVO[tier(p)].boost.length}</h4><p>+${N.boost} to every stat. Objective: play ${N.m} matches (${Math.min(N.have.m,N.m)}/${N.m}) and get ${N.n} ${N.w} (${Math.min(N.have.v,N.n)}/${N.n}) with him in your line-up.</p>
       <div class="prog"><i style="width:${Math.round(100*Math.min(1,(Math.min(1,N.have.m/N.m)+Math.min(1,N.have.v/N.n))/2))}%"></i></div>
-      <p>After this stage: OVR <b>${now} → ${ovr(playStatsX(p,L,u,N.stage+1))}</b></p><button class="btn gold" data-evo="1" ${N.have.m<N.m||N.have.v<N.n||club.coins<N.coins||club.tt<N.tt?'disabled':''}>Evolve · ${priceTag(N.coins0)} coins + ${N.tt} Training Tokens</button><p class="hint">Evolutions stop at ${OVRCAP[tier(p)]} overall for ${TIERS[tier(p)].name} players.</p></div>`
+      <p>After this stage: OVR <b>${now} → ${ovr(playStatsX(p,L,u,N.stage+1))}</b></p><button class="btn gold" data-evo="1" ${N.have.m<N.m||N.have.v<N.n||club.coins<N.coins||club.tt<N.tt?'disabled':''}>Evolve · ${priceTag(N.coins0)} coins + ${N.tt} Training Tokens</button><p class="hint">${isFinite(OVRCAP[tier(p)])?`Evolutions stop at ${OVRCAP[tier(p)]} overall for ${TIERS[tier(p)].name} players.`:'Icon evolutions go as far as his own maximum potential.'}</p></div>`
     :`<div class="panel"><h4>Evolution</h4><p class="flash">Fully evolved.</p></div>`;
   return `<div class="row" style="justify-content:center">${pickList}</div><div class="upg"><div>${cardHTML(p,{})}</div><div style="display:grid;gap:8px">
-    <div class="panel t-${tier(p)}"><h4>Upgrades · ${spent}/${cap} points used</h4><div class="potrow"><div><span class="ovrbig">${now}</span><small>current OVR</small></div><div><span class="ovrbig pot">${MP.ovr}</span><small>max achievable</small></div><div><span class="ovrbig rem">+${MP.ovr-now}</span><small>remaining potential</small></div><div><span class="ovrbig">${ovr(p)}</span><small>base card</small></div></div>
-    <p class="hint" style="margin:4px 0">Still to come: ${cap-spent} upgrade point${cap-spent===1?'':'s'}${room<cap?` (${Math.max(0,room-spent)} usable now, the rest unlock as he levels up)`:''} · ${EVO[tier(p)].boost.length-evoOf(p.id).st} evolution stage${EVO[tier(p)].boost.length-evoOf(p.id).st===1?'':'s'} · level bonus +${lb} now, +3 at level 6${planTxt?` · best use of the points left: ${planTxt}`:''}. Max achievable counts all of that; chemistry adds up to +3 more in matches. ${TIERS[tier(p)].name} evolutions stop at ${OVRCAP[tier(p)]}.</p>
+    <div class="panel t-${tier(p)}"><h4>Upgrades · ${spent}/${cap} points used</h4><div class="potrow"><div><span class="ovrbig">${now}</span><small>current OVR</small></div><div><span class="ovrbig pot">${MP.ovr}</span><small>max achievable</small></div>${now>=MP.ovr?'<div class="maxpot">MAX POTENTIAL REACHED</div>':`<div><span class="ovrbig rem">+${MP.ovr-now}</span><small>remaining potential</small></div>`}<div><span class="ovrbig">${ovr(p)}</span><small>base card</small></div></div>
+    <p class="hint" style="margin:4px 0">Still to come: ${cap-spent} upgrade point${cap-spent===1?'':'s'}${room<cap?` (${Math.max(0,room-spent)} usable now, the rest unlock as he levels up)`:''} · ${EVO[tier(p)].boost.length-evoOf(p.id).st} evolution stage${EVO[tier(p)].boost.length-evoOf(p.id).st===1?'':'s'} · level bonus +${lb} now, +3 at level 6${planTxt?` · best use of the points left: ${planTxt}`:''}. Max achievable counts all of that; chemistry adds up to +3 more in matches (never past 99 on its own). ${isFinite(OVRCAP[tier(p)])?`${TIERS[tier(p)].name} evolutions stop at ${OVRCAP[tier(p)]}.`:'There is no 99 ceiling: an Icon can be developed all the way to his own maximum.'}</p>
     ${upFlash&&upFlash.id===p.id?`<p class="flash">Upgraded: ${upFlash.o0} → ${upFlash.o1} OVR</p>`:''}
     ${coachLine()}<p class="hint">Level ${L} unlocks ${room} of ${cap} upgrade points${room<cap?' · play him or train him to level up for more':''}. Each stat can go up by ${STATMAX}. Each point costs a little more than the last.</p>${rows}</div>
     <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +${Math.round(100*(1+depFx('train')/100))} XP${depFx('train')?` (Training Facilities +${depFx('train')}%)`:''}. Every two levels adds +1 to his five best stats (up to +3).${L<lvMax?` Next level at ${XPL[L+1]} XP${L%2===1&&lb<3?`: five best stats +1, OVR ${now} → ${ovr(playStatsX(p,L+1,u,evoOf(p.id).st))}`:''}.`:' Top level reached.'}</p><button class="btn" data-train2="1" ${!trainTT(p.id)||club.tt<trainTT(p.id)?'disabled':''}>${trainTT(p.id)?`Train +${Math.round(100*(1+depFx('train')/100))} XP · ${trainTT(p.id)} Training Tokens`:'Top level reached'}</button><p class="hint" style="margin:4px 0 0">Tokens per session rise with his level: ${TRAINTT.join(' → ')}.</p></div>

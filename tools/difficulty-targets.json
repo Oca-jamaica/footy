@@ -1,0 +1,12 @@
+{
+ "_about": "Measured with tools/difficulty.cjs (a simple casual-player bot, 8 matches per mode and level). Chill and Medium are judged against the old numbers (before the Chill/Medium rebalance): their goals 3.0-4.4 on Chill and 3.3-4.6 on Medium, the bot tackled every 2.3-3.5 s on the ball, 2-8 slides a match. Hard and Extreme must stay strong.",
+ "cells": {
+  "*/chill":   {"aiGoals": ["<=", 1.4], "goalDiff": [">=", 0], "secsPerTackle": [">=", 4.0], "slides": ["<=", 1.0], "keeperBeaten": [">=", 80]},
+  "*/normal":  {"aiGoals": ["<=", 3.2], "secsPerTackle": [">=", 2.7], "slides": ["<=", 4.0], "keeperBeaten": [">=", 70]},
+  "*/hard":    {"aiGoals": [">=", 2.5], "secsPerTackle": ["<=", 3.4]},
+  "classical/extreme": {"aiGoals": [">=", 3.5], "keeperBeaten": ["<=", 60]},
+  "expanded/extreme":  {"aiGoals": [">=", 3.5], "keeperBeaten": ["<=", 60]},
+  "volta/extreme":     {"keeperBeaten": ["<=", 45]}
+ },
+ "order": [["aiGoals", "up", 0.4], ["slides", "up", 0.6]]
+}

@@ -7,7 +7,7 @@ function setup(){oppSeed=(Math.random()*OPPNAMES.length)|0;
   const o={pace:.7,shot:.72,fin:.6,skill:.55,pass:.65,tackle:.6,str:.6,sk:'roulette',sp:'curler'},gk={pace:.5,shot:.6,fin:.6,skill:.3,pass:.65,tackle:.5,str:.8,sk:'shield',sp:'turbo'};
   const q=sq(),slots=FORMS[q.f],n=slots.length;if(q.s.filter(Boolean).length<n){const keep=q.s.slice();autoPick(q);keep.forEach((id,i)=>{if(id&&!q.s.includes(id))q.s[i]=id})}
   const chem=NET.on?0:chemOf(q)*.0002;
-  const mine=q.s.map((id,i)=>{let p=byId(id)||STARTERS[i%3];p=playStats(p);if(chem){p={...p};for(const [k] of STATK)p[k]=Math.min(.99,p[k]+chem)}const f=posFit(natPos(p),slots[i].r);
+  const mine=q.s.map((id,i)=>{let p=byId(id)||STARTERS[i%3];p=playStats(p);if(chem){p={...p};for(const [k] of STATK)p[k]=Math.min(Math.max(.99,p[k]),p[k]+chem)}const f=posFit(natPos(p),slots[i].r);
     if(f>=1)return p;const c={...p};for(const [k] of STATK)c[k]=p[k]*f;return c});
   const avg={};for(const [k] of STATK)avg[k]=clamp(mine.reduce((a,p)=>a+p[k],0)/mine.length+OPP.off,.3,.99);Object.assign(o,avg);// opponents get stronger each round
   const keys=FORM_KEYS[PITCH!=='volta'?'classical':'volta'],oppF=OPP.form&&keys.includes(OPP.form)?OPP.form:pick(keys),oslots=FORMS[oppF];
@@ -596,7 +596,7 @@ function showMenu(left=false){
 
 /* ---------- ball actions ---------- */
 let lastPoss=0,introT=0,weather='clear';const INTRO=240;
-function give(p){B.claimBy=null;if(B.pass&&B.pass.ps!=null&&B.pass.from&&B.pass.from.team===1&&window.__plog)window.__plog.push([+B.pass.ps.toFixed(2),p.team===1?1:0,B.pass.through?1:0,Math.round(dist(B.pass.from,p))]);if(p.team===0&&lastPoss===1&&state==='play'&&!pvp()){const z=clamp(Math.floor((FX1-B.x)/(FX1-FX0)*5),0,4);aiStat['loss'+z]=(aiStat['loss'+z]||0)+1;aiStat[B.pass&&B.pass.from&&B.pass.from.team===1?'lossPass':B.shot?'lossShot':'lossCarry']=(aiStat[B.pass&&B.pass.from&&B.pass.from.team===1?'lossPass':B.shot?'lossShot':'lossCarry']||0)+1}if(lastPoss!==p.team&&state==='play')wonT[p.team]=t;if(B.pass&&B.pass.from&&B.pass.from.team!==p.team&&!p.keeper&&p.team===1&&state==='play')aiStat.icptWon++;{const wp=B.pass;if(wp&&wp.from&&wp.from.team===p.team&&wp.from!==p)wp.from.mP=(wp.from.mP||0)+1;if(B.shot&&p.keeper&&B.shot.team!==p.team)p.mSv=(p.mSv||0)+1}if(p.team===0&&!p.keeper&&lastPoss===1&&state==='play'){counterT=t;counterX=p.x}if(B.lobTo){B.lobTo.lobRun=null;B.lobTo=null}if(B.graceTo){B.graceTo.lobRun=null;B.graceTo=null;B.graceT=0}if(p.team===1)swT=Math.min(swT,4);if(lastPoss!==p.team&&!p.keeper&&state==='play'&&p.team===0){const near=outfield(1).sort((a,b)=>dist(a,p)-dist(b,p));near.forEach((q,i)=>q.caughtT=i?110:45)}
+function give(p){B.claimBy=null;if(p.team===1&&lastPoss===0&&state==='play'&&!pvp()){const k=p.aiSlide>0||p.slide?'winSlide':p.inter?'winInter':p.aiLunge>0?(p.bit?'winBite':'winLunge'):B.pass&&B.pass.from&&B.pass.from.team===0?'winPass':B.shot?'winShot':B.owner&&B.owner.team===0?'winDirect':'winLoose';aiStat[k]=(aiStat[k]||0)+1}if(B.pass&&B.pass.ps!=null&&B.pass.from&&B.pass.from.team===1&&window.__plog)window.__plog.push([+B.pass.ps.toFixed(2),p.team===1?1:0,B.pass.through?1:0,Math.round(dist(B.pass.from,p))]);if(p.team===0&&lastPoss===1&&state==='play'&&!pvp()){const z=clamp(Math.floor((FX1-B.x)/(FX1-FX0)*5),0,4);aiStat['loss'+z]=(aiStat['loss'+z]||0)+1;aiStat[B.pass&&B.pass.from&&B.pass.from.team===1?'lossPass':B.shot?'lossShot':'lossCarry']=(aiStat[B.pass&&B.pass.from&&B.pass.from.team===1?'lossPass':B.shot?'lossShot':'lossCarry']||0)+1}if(lastPoss!==p.team&&state==='play')wonT[p.team]=t;if(B.pass&&B.pass.from&&B.pass.from.team!==p.team&&!p.keeper&&p.team===1&&state==='play')aiStat.icptWon++;{const wp=B.pass;if(wp&&wp.from&&wp.from.team===p.team&&wp.from!==p)wp.from.mP=(wp.from.mP||0)+1;if(B.shot&&p.keeper&&B.shot.team!==p.team)p.mSv=(p.mSv||0)+1}if(p.team===0&&!p.keeper&&lastPoss===1&&state==='play'){counterT=t;counterX=p.x}if(B.lobTo){B.lobTo.lobRun=null;B.lobTo=null}if(B.graceTo){B.graceTo.lobRun=null;B.graceTo=null;B.graceT=0}if(p.team===1)swT=Math.min(swT,4);if(lastPoss!==p.team&&!p.keeper&&state==='play'&&p.team===0){const near=outfield(1).sort((a,b)=>dist(a,p)-dist(b,p));near.forEach((q,i)=>q.caughtT=i?110:45)}
   lastPoss=p.team;if(B.owner!==p)p.beatRun=0;if(p.team===1){chain=0}
   const wasPass=B.pass;
   if(p.team===0&&!p.keeper){passChain=(wasPass&&wasPass.from&&wasPass.from.team===0)?passChain+1:0;if(wasPass&&wasPass.from&&wasPass.from.team===0&&wasPass.from!==p){stats.passes++;addHype(4);if(passChain===3)pop('BALL CHARGED!',p.x,p.y-56,C.coral,16,60);if(passChain>=2){const lab=passChain>=6?'TIKI-TAKA':passChain>=4?'SILKY':'NICE MOVE';style+=passChain*6;pop(`${lab}  ${passChain+1} PASSES`,p.x,p.y-34,passChain>=4?C.sun:C.mint,15+Math.min(8,passChain*1.5),70);S.skill(Math.min(3,passChain-1));if(passChain>=4)burst(p.x,p.y,10,[C.sun,C.mint,C.cream],3,.05,[3,5])}if(wasPass.through)addStyle(20,p.x,p.y,'THROUGH BALL');if(wasPass.wall)addStyle(25,p.x,p.y,'ONE-TWO')}if(!p.wallTo)ctrl=p;
@@ -604,11 +604,11 @@ function give(p){B.claimBy=null;if(B.pass&&B.pass.ps!=null&&B.pass.from&&B.pass.
   if(p.team===1)passChain=0;
   if(B.shot&&p.keeper&&B.shot.team!==p.team){if(B.shot.team===0)stats.on++;pop(pick(['SAVED!','GREAT STOP','HELD IT']),p.x,p.y-30,C.cream,20);S.save();if(B.shot.team===1){addHype(10);style+=10}}
   if(NET.host&&p.team===1&&!p.keeper&&!p.wallTo)setCtrl2(p);
-  B.owner=p;B.shot=null;B.pass=null;B.curl=0;B.knuckle=0;B.rocket=false;B.z=0;B.vz=0;p.recvT=t;p.inBox=false;p.cGo=null;p.recvPass=!!(wasPass&&wasPass.from&&wasPass.from.team===p.team&&wasPass.from!==p);
+  B.owner=p;B.shot=null;B.pass=null;B.curl=0;B.knuckle=0;B.rocket=false;B.z=0;B.vz=0;B.airK=0;p.recvT=t;p.inBox=false;p.cGo=null;p.recvPass=!!(wasPass&&wasPass.from&&wasPass.from.team===p.team&&wasPass.from!==p);
   if(p.keeper)p.hold=p.team===0?30:45;
 }
 function kick(p,a,spd,vz){B.claimBy=null;B.kickN=(B.kickN||0)+1;if(NET.host&&p.team===1&&!p.keeper&&p!==ctrl2&&state==='play')netStat.aiKick1++;
-  B.owner=null;B.vx=Math.cos(a)*spd;B.vy=Math.sin(a)*spd;B.vz=vz;B.z=Math.max(B.z,1);B.lockBy=p;B.lockT=14;B.curl=0;B.knuckle=0;B.rocket=false;B.shot=null;B.pass=null;
+  B.owner=null;B.vx=Math.cos(a)*spd;B.vy=Math.sin(a)*spd;B.vz=vz;B.z=Math.max(B.z,1);B.lockBy=p;B.lockT=14;B.curl=0;B.knuckle=0;B.rocket=false;B.shot=null;B.pass=null;B.airK=0;
   B.x=p.x+Math.cos(a)*14;B.y=p.y+Math.sin(a)*14;
 }
 function pass(p,to,through=false,assist=1){if(p.team===1&&!hum(p)&&!p.keeper)aiStat.aiPasses++;if(NET.on)netKickLog(p,through?'through':'pass',to?players.indexOf(to):-1,0);
@@ -617,7 +617,7 @@ function pass(p,to,through=false,assist=1){if(p.team===1&&!hum(p)&&!p.keeper)aiS
   let tx=to.x+to.vx*lead+(through?att*90:0),ty=to.y+to.vy*lead;
   tx=clamp(tx,FX0+30,FX1-30);ty=clamp(ty,FY0+30,FY1-30);
   const d=Math.hypot(tx-p.x,ty-p.y);
-  let a=Math.atan2(ty-p.y,tx-p.x);if(assist<1)a=p.dir+angDiff(a,p.dir)*assist;a+=rnd(-1,1)*(through?.02*(1.3-ps):.09*(1.25-ps));
+  let a=Math.atan2(ty-p.y,tx-p.x);if(assist<1)a=p.dir+angDiff(a,p.dir)*assist;a+=rnd(-1,1)*(through?.02*(1.3-ps):.09*(1.25-ps))*(ezP(p)?ez('passErr'):1);
   const spd=clamp(d*.046+6.2,6.8,14.5*(1+(PSC-1)*.3))*(.82+ps*.28);
   kick(p,a,spd,d>260?2.2:.4);B.pass={from:p,to,through};p.dir=a;S.pass();
   if(p.team===0&&!p.keeper)passFx={x0:p.x,y0:p.y,x1:p.x+Math.cos(a)*d,y1:p.y+Math.sin(a)*d,t0:t};
@@ -769,6 +769,7 @@ function doSkill(p){if(p.team===1&&!hum(p))aiStat.aiSkills++;
 /* ---------- new ultimates (shared by you and the AI) ---------- */
 // Lofted ball that lands at (tx,ty) after T frames; only the intended teammate can take it, and he's pulled onto it.
 function lobTo(p,m,tx,ty,T,through){
+  if(ezP(p)){const e=(ez('passErr')-1)*34;tx+=rnd(-e,e);ty+=rnd(-e,e)}
   tx=clamp(tx,FX0+25,FX1-25);ty=clamp(ty,FY0+25,FY1-25);kick(p,0,0,0);
   const d=Math.hypot(tx-B.x,ty-B.y),a=Math.atan2(ty-B.y,tx-B.x),sum=(1-Math.pow(.996,T))/.004;
   B.vx=Math.cos(a)*d/sum;B.vy=Math.sin(a)*d/sum;B.vz=.25*T/2;B.z=1;B.lockT=T;
@@ -807,24 +808,26 @@ function offsideCall(p,m){const def=players.filter(q=>q.team!==p.team&&!q.keeper
   const s2=t2.team===0?1:-1;B.x=clamp(t2.x+s2*12,FX0+10,FX1-10);B.y=t2.y;give(t2);if(t2.keeper)t2.hold=40;
   pop('OFFSIDE!',m.x,m.y-40,C.coral,26,80);S.whistle(1);if(m.team===0)S.aww();
   for(const q of players)if(q.team===p.team&&!q.keeper)q.lobRun=null}
-/* The Through Ball special. It always goes towards the team-mate furthest up the pitch (towards the goal his side is
-   attacking, whichever way that is): only your own outfield players count, and not anyone who'd be offside, or who's on
-   the floor or dazed. If nobody's eligible it isn't played and the cooldown isn't spent. It's aimed, as before, into the
-   space just ahead of him (short of the penalty spot), but it travels at a fifth of its old speed (THROUGH_SPEED), as an
-   ordinary loose ball: defenders and the keeper can read it and cut it out, and it rolls and bounces off bodies like any
-   other ball. On the host the same code picks the target for both players, so both laptops see the same pass. */
-const THROUGH_T=66,THROUGH_SPEED=.2;
-function throughPick(p){const dir=Math.sign(goalX(p.team)-MIDX);let m=null,bx=-1e9;
-  for(const q of outfield(p.team)){if(q===p||q.team!==p.team||q.keeper||q.stun>0||q.fall>0||q.locked>0||isOffside(q,p))continue;if(q.x*dir>bx){bx=q.x*dir;m=q}}return m}
-function doThrough(p){if(B.owner!==p||state!=='play')return false;const gx=goalX(p.team),dir=Math.sign(gx-MIDX),m=throughPick(p);
+/* The Through Ball special: played into the space just ahead of the best-placed runner (not always to the penalty spot),
+   and only within a sensible range, so it can't be launched from your own half for a guaranteed goal. If the runner is
+   offside, it's a free kick to the other side. Its flight takes THROUGH_SLOW (5) times as long as it used to: the ball
+   follows exactly the same arc and lands on exactly the same spot, it just hangs in the air longer (its own clock runs
+   slower while it's airborne: speeds / 5, gravity / 25, air drag spread over 5x the frames), so defenders and keepers
+   have time to read where it will come down. Ordinary passes and other specials are untouched. */
+const THROUGH_T=66,THROUGH_SLOW=5;
+function throughPick(p){const dir=Math.sign(goalX(p.team)-MIDX);let m=null,bs=-1e9;
+  for(const q of outfield(p.team)){if(q===p)continue;const fwd=(q.x-p.x)*dir,d=dist(q,p);if(fwd<-40||d>620*PSC)continue;const sc=fwd/200+(q.vx*dir)*.4-Math.abs(q.y-MY)/400-d/900;if(sc>bs){bs=sc;m=q}}return m}
+function doThrough(p){if(B.owner!==p)return false;const gx=goalX(p.team),dir=Math.sign(gx-MIDX),m=throughPick(p);
   if(!m){if(p.team===0||hum(p))pop('nobody to play it to',p.x,p.y-34,C.muted,14);return false}
+  if(isOffside(m,p)){pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);offsideCall(p,m);return true}
   const lead=150*PSC,tx=clamp(m.x+dir*lead,FX0+40,FX1-40),stop=gx-dir*SPOT,txx=dir>0?Math.min(tx,stop):Math.max(tx,stop),ty=m.y+(MY-m.y)*.25;
   if(NET.on)netKickLog(p,'through',players.indexOf(m),0);
-  lobTo(p,m,txx,ty,THROUGH_T,true);
-  // the old pass's launch, at a fifth of the speed, then left to the normal ball physics
-  B.vx*=THROUGH_SPEED;B.vy*=THROUGH_SPEED;B.vz*=THROUGH_SPEED;B.lobTo=null;B.lobThrough=false;B.claimBy=null;B.lockBy=p;B.lockT=45;m.lobRun=null;// the passer can't just take it straight back
-  B.pass={from:p,to:m,through:true,special:true};m.tbAim={x:txx,y:ty};
-  pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
+  lobTo(p,m,txx,ty,THROUGH_T,true);airSlow(THROUGH_SLOW);B.lockT=THROUGH_T*THROUGH_SLOW;pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
+// slow a ball's flight down by k without changing its path: it then lands where it would have, k times later
+function airSlow(k){B.vx/=k;B.vy/=k;B.vz/=k;B.airK=k}
+// how high a defender can take a dropping through ball: standing, about head-to-chest height for a good defender (it
+// depends on his defending); sliding, only once it's at the grass
+const thruReach=p=>(p.slide||p.aiSlide>0||p.inter)?5:6+10*clamp(p.st.tackle??.6,0,1);
 function doLob(p){if(B.owner!==p)return false;const att=p.team===0?1:-1;let m=bestMate(p);
   if(!m){for(const q of outfield(p.team))if(q!==p&&(!m||(q.x-m.x)*att>0))m=q}if(!m)return false;
   const T=clamp(dist(p,m)/6.5,34,62),err=(1.25-(p.st.pass??.65))*55*(dist(p,m)/400+.5);lobTo(p,m,m.x+m.vx*T*.6+att*30+rnd(-err,err),m.y+m.vy*T*.6+rnd(-err,err),T,false);B.pass.chip=true;m.turbo=Math.min(m.turbo,T*.35);pop('CHIP PASS',p.x,p.y-34,p.team===0?C.sun:C.coral,18,70);return true}
@@ -922,6 +925,7 @@ function tackle(def,car){
 /* ---------- movement ---------- */
 function topSpeed(p){
   let s=(p.keeper?2.4:1.85+p.st.pace*1.85)*(1+(PSC-1)*.15);// PACE: ~45% faster at 99 than at 50; a touch quicker on the Expanded pitch
+  if(ezP(p))s*=ez('spd');
   if(B.owner===p)s*=.8+(p.st.skill??.6)*.1;// dribbling barely slows good dribblers, so you can run away from a chaser
   if(p.caughtT>0)s*=.8;
   if(p.sprint)s*=1.2+p.st.pace*.08;
@@ -951,7 +955,7 @@ function humanUpdate(p,dt){
       if(feint||spin){p.lunge=0;whiff(p,40,null,false);p.locked=40;pop('dodged',car.x,car.y-30,C.muted,15)}
       else{give(p);p.mT=(p.mT||0)+1;car.stun=60;car.vx*=.2;car.vy*=.2;p.lunge=0;p.tackleCd=LUNGE_CD;S.tackle();shake=Math.max(shake,RM?0:4);if(p.team===0){stats.tackles++;addHype(10);addStyle(15,p.x,p.y)}pop('STOLEN!  +15',p.x,p.y-48,C.mint,28,70);hitStop(4);S.ooh();slowmo(12,.35);flash=RM?0:.25}}
     else if(car&&(dist(p,B)<(p.slide?28:p.inter?24:23)||(p.slide&&dist(p,car)<30))){tackle(p,car)}
-    else if(!B.owner&&dist(p,B)<(p.slide?28:22)){if(p.slide){give(p);ctrl=p;B.vx=B.vy=0}p.lunge=0;p.slide=false;p.inter=false}
+    else if(!B.owner&&dist(p,B)<(p.slide?28:22)&&!(B.lobThrough&&B.lobTo&&B.lobTo.team!==p.team&&B.z>=thruReach(p))){if(p.slide){give(p);ctrl=p;B.vx=B.vy=0}p.lunge=0;p.slide=false;p.inter=false}
     if(p.lunge<=0&&p.slide){p.slide=false;p.stun=48;pop('up you get',p.x,p.y-28,C.muted,13)}
     if(p.lunge<=0&&!p.slide&&!p.inter&&B.owner!==p){whiff(p,30,null,false);p.locked=30;pop('whiff',p.x,p.y-28,C.muted,13)}// whiff: stuck in the lunge for a second
     if(p.lunge<=0)p.inter=false;
@@ -991,6 +995,22 @@ function humanUpdate(p,dt){
    spacing, runs into space, counters, through-ball timing and shot choice. Your own AI team-mates use a steady .6.
    Online both sides use the same value, so it stays fair. */
 const aiShotLog=[];const wonT=[-999,-999],aiStat={icpt:0,icptWon:0,through:0,square:0,chip:0,corner:0,counter:0,sweeps:0,tkTry:0,tkWon:0,slTry:0,slWon:0,aiShots:0,aiPasses:0,aiSkills:0,shFar:0,shMid:0,shBox:0,shD:0,shXG:0,aiGoals:0,aiBox:0,aiFwd:0,aiDrib:0};
+/* ---------- Chill and Medium: the computer's side plays the same football, just slower and kinder ----------
+   On top of the opponent's own strength, these two levels make the computer's players (never yours, and never online):
+   run a little slower, take a moment to react when you win the ball, press less hard and less high, give you more room
+   (a bigger gap when jockeying, the second man hanging further off, so you're not swarmed), tackle and slide far less,
+   read fewer of your passes, keep worse shape (small positioning errors), decide slower and less sharply on the ball, pass
+   and shoot less accurately, and put a weaker keeper in goal (less reach, slower reactions, worse reads, more spills).
+   Hard and Extreme are unchanged. tools/difficulty.cjs measures each level against tools/difficulty-targets.json. */
+const EASE={chill:{icpt:.55,spd:.86,react:30,press:.68,gap:16,cover:1.8,tackle:.22,win:60,room:105,slide:.08,read:.3,gk:.8,gkReact:1.5,gkErr:1.6,spill:.12,shotErr:1.9,passErr:2.4,decide:1.8,wobble:55,chaos:2.4},
+  normal:{icpt:.74,spd:.93,react:24,press:.76,gap:10,cover:1.45,tackle:.36,win:45,room:85,slide:.4,read:.65,gk:.9,gkReact:1.2,gkErr:1.25,spill:.06,shotErr:1.4,passErr:1.6,decide:1.3,wobble:28,chaos:1.5}};
+const EZ=()=>pvp()||SG?null:EASE[club.level]||null;
+const ez=(k,d=1)=>{const e=EZ();return e?e[k]:d};
+// the computer's outfield players on Chill/Medium (offline only)
+const ezP=p=>p.team===1&&!p.keeper&&!hum(p)&&!!EZ();
+// whether he's committing to tackles right now: decided afresh every half second, so on Chill/Medium a defender often
+// just jockeys instead of diving in the moment you take a heavy touch (decided every 1 s on Chill, 0.75 s on Medium)
+const ezGate=p=>{if(p.team!==1||!EZ())return true;if(t-(p.ezAt??-99)>ez('win',30)){p.ezAt=t;p.ezOk=Math.random()<ez('tackle')}return p.ezOk};
 function aiIQ(team){if(pvp())return .55;if(team===0)return .6;const b={chill:.15,normal:.42,hard:.72,extreme:.95}[club.level]??.42;return clamp(b+(DF.read||0)*.35-.04,0,1)}
 const lastLine=(team,dir)=>{let v=-1e9;for(const q of outfield(team))v=Math.max(v,q.x*dir);return v};// deepest outfield player of `team`, measured along dir
 // the open spot near a target: tries a few nearby points and keeps the one furthest from the opposition
@@ -1035,10 +1055,11 @@ function cEngage(p,o,team,IQ,dt){const ownGoal=team===0?FX0:FX1,dxg=ownGoal-o.x,
     // quicker) and shuffles a little slower than a flat-out run, so a sharp cut, a skill or a change of pace can beat him.
     const tc=lerp(10,4,IQ),k=Math.min(1,dt/tc);if(p.jkO!==o){p.jkO=o;p.jx=o.x;p.jy=o.y;p.jvx=o.vx||0;p.jvy=o.vy||0}
     p.jx+=(o.x-p.jx)*k;p.jy+=(o.y-p.jy)*k;p.jvx+=((o.vx||0)-p.jvx)*k;p.jvy+=((o.vy||0)-p.jvy)*k;
-    const off=lerp(24,15,IQ);tx=p.jx+ux*off+p.jvx*5;ty=p.jy+uy*off+p.jvy*5;steer(p,tx,ty,ts*lerp(.84,.95,IQ),dt);tx=null}
-  if(tx!=null)steer(p,tx,ty,ts,dt);
+    const off=lerp(24,15,IQ)+(team===1?ez('gap',0):0);tx=p.jx+ux*off+p.jvx*5;ty=p.jy+uy*off+p.jvy*5;steer(p,tx,ty,ts*lerp(.84,.95,IQ)*(team===1?ez('press'):1),dt);tx=null}
+  if(tx!=null)steer(p,tx,ty,ts*(team===1?ez('press'):1),dt);
   p.jockT=d<60&&goalSide?(p.jockT||0)+dt:0;
-  if((p.cDec=(p.cDec||0)-dt)>0)return;p.cDec=lerp(8,3,IQ)+Math.random()*3;
+  if((p.cDec=(p.cDec||0)-dt)>0)return;p.cDec=(lerp(8,3,IQ)+Math.random()*3)*(team===1?ez('decide'):1);
+  if(team===1&&EZ()&&t-wonT[1-team]<ez('react'))return;// you've just won it: they take a moment
   if(p.tackleCd>0||kickT>0||o.keeper||koGrace(p)||p.fall>0)return;
   const human=o===ctrl||o===ctrl2,shooting=human&&(o===ctrl?charging:!!(RS&&RS.charging)),csp=Math.hypot(o.vx||0,o.vy||0),dG=Math.hypot(ownGoal-o.x,MY-o.y),danger=dG<BOX*2.2;
   let others=0;for(const q of outfield(team)){if(q===p)continue;const a=(q.x-o.x)*ux+(q.y-o.y)*uy;if(a>10&&a<260*PSC&&Math.abs((q.x-o.x)*(-uy)+(q.y-o.y)*ux)<95*PSC)others++}
@@ -1048,19 +1069,19 @@ function cEngage(p,o,team,IQ,dt){const ownGoal=team===0?FX0:FX1,dxg=ownGoal-o.x,
     if(p.st.sp==='slide'&&d>25&&d<110&&notBehind(p,o)&&(lastMan||danger)&&Math.random()<.2+.3*IQ){p.spCd=spCdOf(p)*1.4;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);aiStat.tkTry++;return}}
   // sliding tackle: worth the risk when he's through, about to shoot or getting away; from the side or front only
   if(d>26&&d<74&&front>-.7&&t-(p.cSlideT||-999)>lerp(140,70,IQ)){let want=0;if(lastMan&&csp>1.5)want+=.5;if(shooting)want+=.6;if(!goalSide&&dist(p,B)<62)want+=.45;if(danger)want+=.25;want*=1.5;
-    want*=lerp(.3,1,IQ)*(DF.slide||LV().extreme?1:.55);
+    want*=lerp(.3,1,IQ)*(DF.slide||LV().extreme?1:.55)*(team===1?ez('slide'):1);
     // sharper defenders time the slide for a loose touch rather than diving in on a ball glued to his foot
     if(IQ>.5)want*=looseAt(o,6)>.22?1.35:.55;
     if(Math.random()<want){p.windup=Math.max(3,wu-2);p.windSlide=true;p.tackleCd=LUNGE_CD;p.cSlideT=t;return}}
   // standing tackle: close, from the front or side, timed for his heavy touch (better sides wait for the moment)
-  if(dist(p,B)<36&&front>-.25){const at=looseAt(o,wu+2),thr=lerp(.12,.4,IQ),stuck=p.jockT>lerp(70,35,IQ)&&csp<1.2;
+  if(dist(p,B)<36&&front>-.25&&ezGate(p)){const at=looseAt(o,wu+2),thr=lerp(.12,.4,IQ),stuck=p.jockT>lerp(70,35,IQ)&&csp<1.2;
     if(at>thr||stuck||(lastMan&&danger&&dist(p,B)<26)||Math.random()<.18*(1-IQ)){p.windup=wu;p.tackleCd=LUNGE_CD*2/DF.press;return}}}
 // the second man: on the line between the ball and goal, close enough to step in when the first is beaten
 function cCoverRun(p,o,team,IQ,dt){const ownGoal=team===0?FX0:FX1,dxg=ownGoal-o.x,dyg=MY-o.y,dg=Math.hypot(dxg,dyg)||1,shooting=(o===ctrl&&charging)||(o===ctrl2&&RS&&RS.charging);
   // he's lining up a shot: get into the line of it (closer for sharper sides) to block
-  const cd=shooting&&dg<BOX*2.6?Math.min(dg*.5,lerp(70,40,IQ)):Math.min(dg*.55,lerp(125,80,IQ)*Math.sqrt(PSC));
+  const cd=(shooting&&dg<BOX*2.6?Math.min(dg*.5,lerp(70,40,IQ)):Math.min(dg*.55,lerp(125,80,IQ)*Math.sqrt(PSC)))*(team===1?ez('cover'):1);
   steer(p,o.x+dxg/dg*cd,o.y+dyg/dg*cd,topSpeed(p),dt);
-  if(dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&!o.keeper&&notBehind(p,o)&&looseAt(o,4)>lerp(.2,.4,IQ)){p.windup=team===1&&o.team===0?4:2;p.tackleCd=LUNGE_CD*2/DF.press}}
+  if(dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&!o.keeper&&notBehind(p,o)&&looseAt(o,4)>lerp(.2,.4,IQ)&&ezGate(p)){p.windup=team===1&&o.team===0?4:2;p.tackleCd=LUNGE_CD*2/DF.press}}
 // where a defender stands when he isn't engaging: a back line goal-side of the ball, midfield screening in front of it,
 // everyone squeezed towards the ball's side; the line pushes up with the ball (higher for pressing sides)
 function cDefSpot(p,team,sty){const own0=team===0?FX0:FX1,dir=team===0?1:-1,Wd=FX1-FX0,bx=clamp((B.x-own0)*dir/Wd,0,1),r=p.slot.r,y0=FY0+(FY1-FY0)*p.slot.y;
@@ -1105,6 +1126,15 @@ function cAttackShape(p,team,owner,tx,ty,IQ){const att=team===0?1:-1,tg=team===0
   // don't get cut off from play on the big pitch
   const far=(560+180*(PSC-1))*PSC;if(dx(x)-dx(owner.x)>far)x=owner.x+att*far;
   return{x,y:ty,run:false}}
+/* Their through ball is up: the defender going for it runs to where he reads it'll come down. His read starts off by up
+   to ~80 px (less for good defenders and sharper sides) and sharpens as it drops. Once it's low enough he can take it
+   standing; if it's dropping just out of reach he can go to ground for it, timed for when it's at the grass. */
+function thruDefend(p,team,dt){const IQ=aiIQ(team),sk=clamp((.5*IQ+.5*(p.st.tackle??.6))*(team===1?ez('read'):1),0,1),P=B.pass||{};P.rd=P.rd||{};
+  const key=players.indexOf(p);if(P.rd[key]==null)P.rd[key]=rnd(0,6.283);const e=(1-sk)*80*PSC*clamp(B.z/70,.2,1);
+  const tx=B.lobX+Math.cos(P.rd[key])*e,ty=B.lobY+Math.sin(P.rd[key])*e;
+  if(B.z<7&&B.vz<0&&p.tackleCd<=0&&p.stun<=0&&dist(p,B)>26&&dist(p,B)<75&&Math.random()<(.04+.1*(p.st.tackle??.6))*(team===1?ez('slide'):1)*dt){
+    p.aiSlide=16;p.slide=true;p.tackleCd=LUNGE_CD;p.dir=Math.atan2(B.y+B.vy*4-p.y,B.x+B.vx*4-p.x);if(team===1)aiStat.slTry++;return true}
+  steer(p,tx,ty,topSpeed(p),dt);return true}
 function teamAI(team,dt){
   const own=outfield(team),opp=1-team,owner=B.owner,att=team===0?1:-1,ownGoal=team===0?FX0:FX1;
   const ai=own.filter(p=>!(team===0&&p===ctrl)&&p!==ctrl2);
@@ -1113,20 +1143,21 @@ function teamAI(team,dt){
   // online: whoever has the ball for the joining player's team is theirs, even if he's stunned or mid-move
   if(NET.on&&team===1&&owner&&owner.team===1&&!owner.keeper&&owner!==ctrl2)setCtrl2(owner);
   const chipIn=!owner&&B.lobTo&&B.lobTo.team!==team&&B.pass&&B.pass.chip;// they've chipped it: someone go and attack where it drops
+  const thruIn=!owner&&B.lobTo&&B.lobThrough&&B.lobTo.team!==team;// their through ball is in the air: read where it comes down
   let chaser=null,cover=null;const IQ=aiIQ(team),CLs=CL(),IQc=CLs?cIQ(team):IQ,STY=CLs?cStyle(team):null;for(const p of ai){p.icpt=null;p.cBlock=null}
   if(!owner||(theyHave&&!owner.keeper)){
-    const target=owner||(chipIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*8,y:B.y+B.vy*8});
+    const target=owner||(chipIn||thruIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*8,y:B.y+B.vy*8});
     const cands=ai.filter(p=>p.stun<=0);
     if(B.pass&&!owner){const r=cands.find(p=>p===B.pass.to);if(r)chaser=r}
     // their pass is rolling: the defender who can cut it out first goes for the interception point (better sides read it more often)
-    if(!chaser&&!owner&&B.pass&&B.pass.from&&B.pass.from.team===opp&&!B.lobTo&&B.z<12&&cands.length){const P0=B.pass;P0.read=P0.read||{};if(P0.read[team]==null)P0.read[team]=Math.random()<.3+.65*IQ;
+    if(!chaser&&!owner&&B.pass&&B.pass.from&&B.pass.from.team===opp&&!B.lobTo&&B.z<12&&cands.length){const P0=B.pass;P0.read=P0.read||{};if(P0.read[team]==null)P0.read[team]=Math.random()<(.3+.65*IQ)*(team===1?ez('read'):1);
       if(P0.read[team]){const pts=ballPathPts(60,3),rcv=P0.to;let bp=null,bq=null,bm=1e9;
         for(const q of pts){if(q.i<3)continue;const tr=rcv?runT(rcv,q.x,q.y,topSpeed(rcv),2):1e9;for(const c of cands){const tc=runT(c,q.x,q.y,topSpeed(c),4);if(tc<=q.i+2&&tc<tr-2&&tc<bm){bm=tc;bp=c;bq=q}}if(bp)break}
         if(bp){chaser=bp;bp.icpt={x:bq.x,y:bq.y};if(team===1&&!P0.cnt){P0.cnt=1;aiStat.icpt++}}}}
     if(!chaser&&cands.length){chaser=cands.reduce((a,b)=>dist(a,target)<dist(b,target)?a:b);
       if(team===0&&ctrl&&dist(ctrl,target)<dist(chaser,target)+(theyHave?120:50))chaser=null}
     // a second defender drops goal-side of the ball to stop the carrier running straight through
-    if(theyHave){const near=Math.abs(owner.x-ownGoal)<(FX1-FX0)*.33,f=near?.3:.55,gs={x:owner.x+(ownGoal-owner.x)*f,y:owner.y+(MY-owner.y)*f+(team===1&&near?(owner.y<MY?1:-1)*10:0)};
+    if(theyHave){const near=Math.abs(owner.x-ownGoal)<(FX1-FX0)*.33,f=Math.min(.92,(near?.3:.55)*(team===1?ez('cover'):1)),gs={x:owner.x+(ownGoal-owner.x)*f,y:owner.y+(MY-owner.y)*f+(team===1&&near?(owner.y<MY?1:-1)*10:0)};
       const cc=cands.filter(p=>p!==chaser);if(cc.length)cover=cc.reduce((a,b)=>dist(a,gs)<dist(b,gs)?a:b);if(cover)cover.coverPt=gs}
     // Classical: the engager is whoever gets goal-side first; the cover sits on the line to goal behind him
     if(CLs&&theyHave&&cands.length){chaser=cEngager(team,cands,owner,STY);
@@ -1144,6 +1175,7 @@ function teamAI(team,dt){
       if([...markOf.values()].includes(q))continue;
       for(const d of free){if(markOf.has(d))continue;const h=homes.get(d),v=Math.hypot(q.x-h.x,q.y-h.y)*.6+dist(d,q)*.4;if(Math.hypot(q.x-h.x,q.y-h.y)<R&&v<bv){bv=v;bd=d}}
       if(bd)markOf.set(bd,q)}}
+  const react0=team===1&&theyHave&&!!EZ()&&t-wonT[opp]<ez('react');
   const counter=hasBall&&t-wonT[team]<150&&IQ>.2&&owner&&outfield(opp).filter(q=>(q.x-B.x)*att>0).length<=Math.floor(outfield(opp).length/2);
   for(const p of ai){
     p.sprint=false;
@@ -1172,9 +1204,11 @@ function teamAI(team,dt){
       if(dist(p,B)<20&&p.tackleCd<=0&&notBehind(p,owner))tackle(p,owner);continue}
     if(CLs&&theyHave&&p===chaser){cEngage(p,owner,team,IQc,dt);continue}
     if(CLs&&theyHave&&p===cover){cCoverRun(p,owner,team,IQc,dt);continue}
-    if(p===chaser&&team===1&&owner&&owner.team===0&&owner.x<MIDX-20-(DF.press-.5)*260){
+    if((p===chaser||p===cover)&&react0){steer(p,owner.x+(ownGoal-owner.x)*.25,owner.y+(MY-owner.y)*.25,topSpeed(p)*.5,dt);continue}// you've just won it: they take a moment
+    if(p===chaser&&team===1&&owner&&owner.team===0&&owner.x<MIDX-20-(DF.press*ez('press')-.5)*260&&dist(p,owner)>48){// (comes right up to him: he challenges)
       const a=Math.atan2(MY-owner.y,FX1-owner.x);steer(p,owner.x+Math.cos(a)*60,owner.y+Math.sin(a)*60,topSpeed(p)*.8,dt);continue}
     if(p===chaser){
+      if(thruIn&&thruDefend(p,team,dt))continue;
       let tgt=owner?{x:B.x+Math.cos(owner.dir)*10,y:B.y+Math.sin(owner.dir)*10}:chipIn?{x:B.lobX,y:B.lobY}:p.icpt?p.icpt:{x:B.x+B.vx*6,y:B.y+B.vy*6};
       // you're strolling with it: they don't just trail you, they get round in front and win it
       const csp=owner?Math.hypot(owner.vx,owner.vy):9,slow=team===1&&owner&&owner.team===0&&!owner.keeper&&csp<topSpeed(p)*1.02,side=owner?Math.cos(angDiff(Math.atan2(p.y-owner.y,p.x-owner.x),owner.dir)):1;
@@ -1184,13 +1218,13 @@ function teamAI(team,dt){
       if(team===1&&p.st.sp==='stomp'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<95&&Math.random()<.02*dt&&doStomp(p)){p.spCd=SPECIALS.stomp.cd*1.7;continue}
       if(team===1&&p.st.sp==='slide'&&p.spCd<=0&&owner&&owner.team===0&&!owner.keeper&&dist(p,owner)<110&&dist(p,owner)>25&&notBehind(p,owner)&&Math.random()<.015*dt){
         p.spCd=spCdOf(p)*1.4;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);continue}
-      if(team===1&&owner&&owner.team===0&&!owner.keeper&&p.tackleCd<=0&&dist(p,owner)>(slow?20:28)&&dist(p,owner)<(slow?75:60)&&side>(slow?-.55:.3)&&Math.random()<(LV().extreme?.006:DF.slide?.0035:.0016)*(slow?(side<.3?9:3.5):1)*dt){p.windup=slow?5:10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
-      steer(p,tgt.x,tgt.y,topSpeed(p)*(trailing?1.16:slow?.92:team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press),dt);
-      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai*(slow?3.5:1):.012)*dt*(!cover&&Math.abs(p.x-ownGoal)<(FX1-FX0)*.3?1-.55*IQ:1))){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
+      if(team===1&&owner&&owner.team===0&&!owner.keeper&&p.tackleCd<=0&&dist(p,owner)>(slow?20:28)&&dist(p,owner)<(slow?75:60)&&side>(slow?-.55:.3)&&Math.random()<(LV().extreme?.006:DF.slide?.0035:.0016)*(slow?(side<.3?9:3.5):1)*ez('slide')*dt){p.windup=slow?5:10;p.windSlide=true;p.tackleCd=LUNGE_CD;continue}
+      steer(p,tgt.x,tgt.y,topSpeed(p)*(trailing?1.16:slow?.92:team===1&&owner?(.72+.15*DF.press)*(1+(LV().ai-1)*.6):1)*Math.min(1.15,tacOf(team).press)*(team===1&&owner?ez('press'):1),dt);
+      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&ezGate(p)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai*(slow?3.5:1):.012)*dt*(!cover&&Math.abs(p.x-ownGoal)<(FX1-FX0)*.3?1-.55*IQ:1))){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}
       continue;
     }
-    if(p===cover){steer(p,p.coverPt.x,p.coverPt.y,topSpeed(p)*(team===1?.86:.95),dt);
-      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}continue}
+    if(p===cover){steer(p,p.coverPt.x,p.coverPt.y,topSpeed(p)*(team===1?.86*ez('press'):.95),dt);
+      if(owner&&dist(p,B)<34&&p.tackleCd<=0&&kickT<=0&&notBehind(p,owner)&&ezGate(p)&&((B.loose||0)>.38-DF.read||Math.random()<(team===1?.006*LV().ai:.012)*dt)){if(team===1&&owner.team===0){p.windup=[10,6,4,3][clamp(Math.round(LV().shift)+1,0,3)];p.tackleCd=LUNGE_CD*2/DF.press}else{p.aiLunge=13;p.tackleCd=LUNGE_CD*2/DF.press;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x)}}continue}
     let tx,ty,spd;
     if(hasBall){
       const h=homePos(p,true);tx=h.x;ty=h.y;
@@ -1227,11 +1261,14 @@ function teamAI(team,dt){
         if(B.pass&&B.pass.through&&B.pass.to===m&&B.pass.from&&B.pass.from.team===opp){gx2=m.x+(ownGoal-m.x)*.1;gy2=m.y;p.sprint=!CLs&&IQ>.3}
         // blocking the carrier's best pass: stand in the lane
         if(p.cBlock){gx2=p.cBlock.x;gy2=p.cBlock.y}
+        if(team===1&&EZ()){const w=ez('wobble',0)*PSC*.6;gx2+=Math.sin(t*.011+p.i*2.1)*w;gy2+=Math.cos(t*.013+p.i*1.3)*w}
         tx=gx2;ty=gy2;spd=CLs?topSpeed(p)*(Math.hypot(tx-p.x,ty-p.y)>60?1:.9):topSpeed(p)*(team===1?.76+.2*DF.press:1)*.95*(p.sprint?1.12:1)}
-      else{tx=h.x;ty=h.y;spd=topSpeed(p)*.85;
+      else{tx=h.x;ty=h.y;spd=topSpeed(p)*.85;if(team===1&&EZ()){const w=ez('wobble',0)*PSC;tx+=Math.sin(t*.011+p.i*2.1)*w;ty+=Math.cos(t*.013+p.i*1.3)*w*.8}
         // beaten (the ball is between him and his goal): race back goal-side at full pace
         if(CLs&&(B.x-p.x)*att<-30)spd=topSpeed(p)}
     }
+    // Chill/Medium: only the man engaging you comes close; everyone else keeps a little room instead of crowding you
+    if(team===1&&theyHave&&EZ()&&!owner.keeper){const R=ez('room',0)*Math.sqrt(PSC),dx=tx-owner.x,dy=ty-owner.y,d=Math.hypot(dx,dy);if(d<R){const k=d>.1?R/d:0;tx=owner.x+(k?dx*k:R);ty=owner.y+(k?dy*k:0)}}
     // spacing: don't bunch up on top of a team-mate (the ball-chaser and cover are left alone)
     {const R=(46+30*IQ)*PSC;for(const q of own){if(q===p)continue;const dx=tx-q.x,dy=ty-q.y,d=Math.hypot(dx,dy);if(d<R&&d>.1){const f=(R-d)/R*R*.6;tx+=dx/d*f;ty+=dy/d*f}}}
     steer(p,clamp(tx,FX0+40,FX1-40),clamp(ty,FY0+25,FY1-25),spd,dt);
@@ -1267,7 +1304,7 @@ function cCarrier(p,dt){const team=p.team,gx=goalX(team),dir=Math.sign(gx-MIDX),
   const hot=sq.xg>lerp(.5,.36,IQ)&&Math.random()<.35*dt;
   // a defender has just arrived on him: think again now
   const jumped=nd&&ndd<34&&p.dec>4&&(p.cLastNd||99)>=34;p.cLastNd=ndd;
-  if(p.dec<=0||hot||jumped){p.dec=((12-5*IQ)+rnd(0,8-4*IQ))/XF;
+  if(p.dec<=0||hot&&!EZ()||jumped){p.dec=((12-5*IQ)+rnd(0,8-4*IQ))/XF*(team===1?ez('decide'):1);
     const opts=[],add=(v,f,k)=>opts.push({v:v+gaussN()*.02*(1-IQ),f,k}),lossHere=cLoss(team,p.x),speedP=topSpeed(p);
     // 1. shoot
     // shooting zones: from deep it isn't an option at all; from range only a genuine sight of goal (and better finishers
@@ -1310,7 +1347,7 @@ function cCarrier(p,dt){const team=p.team,gx=goalX(team),dir=Math.sign(gx-MIDX),
     // pick: his best option of each kind (best pass, best dribble...) goes forward, then the best kind usually wins, but not
     // always (sharper sides stray less); comparing kinds rather than every single pass stops passing winning on numbers alone
     const bestOf=new Map();for(const o of opts){const b=bestOf.get(o.k);if(!b||o.v>b.v)bestOf.set(o.k,o)}const fin=[...bestOf.values()];
-    const tau=lerp(.026,.01,IQ)/XF,top=Math.max(...fin.map(o=>o.v));let sum=0;for(const o of fin){o.w=Math.exp((o.v-top)/tau);sum+=o.w}
+    const tau=lerp(.026,.01,IQ)/XF*(team===1?ez('chaos'):1),top=Math.max(...fin.map(o=>o.v));let sum=0;for(const o of fin){o.w=Math.exp((o.v-top)/tau);sum+=o.w}
     let r=Math.random()*sum,ch=fin[fin.length-1];for(const o of fin){r-=o.w;if(r<=0){ch=o;break}}
     p.cLast=ch.k;if(team===1)aiStat['k_'+ch.k]=(aiStat['k_'+ch.k]||0)+1;if(window.__cdbg&&window.__cdbg.length<3000)window.__cdbg.push({k:ch.k,x:+((p.x-FX0)/(FX1-FX0)*(team?-1:1)+(team?1:0)).toFixed(2),nd:Math.round(ndd),o:Object.fromEntries(fin.map(o=>[o.k,+o.v.toFixed(3)]))});ch.f();if(B.owner!==p)return}
   // between decisions: carry it where he decided, else towards the box
@@ -1326,7 +1363,7 @@ function carrierAI(p,dt){
   // Extreme: twice as decisive with the ball (twice the decisions, twice as keen to shoot, pass and beat a man)
   const XF=p.team===1&&!NET.on&&LV().extreme?2:1;
   if(p.dec<=0){
-    p.dec=((13-5*IQ)+rnd(0,9-4*IQ))/XF;
+    p.dec=((13-5*IQ)+rnd(0,9-4*IQ))/XF*(p.team===1?ez('decide'):1);
     // a team-mate is running in behind (level with or past their last defender): slide him in
     if(Math.random()<.2+.6*IQ){const ll=lastLine(1-p.team,dir0);let tm=null,tb=-1e9;
       for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir0,run=m.vx*dir0,d=dist(p,m);if(fwd<30||run<1.2||d>520*PSC||m.x*dir0<ll-50)continue;
@@ -1378,12 +1415,12 @@ function aiSpecial(p,dG,ndd){const sp=p.st.sp,def=SPECIALS[sp];if(!def)return fa
     if(smart&&sp!=='chip'&&sp!=='curler'&&laneBlocked(p,{x:gx0,y:MY},18,p.team))return false;// smart sides save the strike for a clear sight of goal
   }
   if(smart&&sp==='turbo'&&outfield(1-p.team).some(q=>(q.x-p.x)*dir>0&&(q.x-p.x)*dir<170&&Math.abs(q.y-p.y)<70))return false;// no space to run into
-  if(smart&&sp==='through'){const m=throughPick(p);if(!m||m.vx*dir<.5||(m.x-p.x)*dir<20)return false}// nobody making the run
+  if(smart&&sp==='through'&&!outfield(p.team).some(m=>m!==p&&m.vx*dir>1&&(m.x-p.x)*dir>20))return false;// nobody making the run
   if(['curler','rocket','knuckle','chip'].includes(sp)){
     const k=keeperOf(1-p.team),gx=goalX(p.team),ty=sp==='chip'?MY+rnd(-18,18):(k.y>MY?GY0+12:GY1-12);
     p.spCd=spCdOf(p)*1.5;p.dir=Math.atan2(ty-B.y,gx-B.x);pop(def.name,p.x,p.y-34,C.coral,20,70);S.special();shoot(p,sp,.85,ty);return true}
   if(sp==='turbo'&&ndd>70&&Math.random()<.4){p.spCd=spCdOf(p)*1.5;p.turbo=150;pop('TURBO',p.x,p.y-34,C.coral,16);return false}
-  if(sp==='through'&&dG<620&&Math.random()<.35){const m=throughPick(p);if(m&&(m.x-p.x)*dir>40&&dist(p,m)<220&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}}
+  if(sp==='through'&&dG<620&&Math.random()<.35&&!isOffside(throughPick(p),p)&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}
   if(sp==='lob'&&Math.random()<.3&&doLob(p)){p.spCd=spCdOf(p)*1.5;return true}
   if(sp==='onetwo'&&ndd<90&&Math.random()<.5&&doOneTwo(p)){p.spCd=def.cd*1.5;return true}
   if(sp==='ghost'&&ndd<85&&Math.random()<.5&&doGhost(p)){p.spCd=def.cd*1.5;return false}
@@ -1410,7 +1447,7 @@ function aiShoot(p,dG){
   const IQ=aiIQ(p.team);let c=k.y>MY?GY0+12:GY1-12;
   // the far corner from the keeper, unless a body is in the way and the other corner is clear
   if(Math.random()<.2+.7*IQ){const o=c===GY0+12?GY1-12:GY0+12;if(laneBlocked(p,{x:gx,y:c},14,p.team)&&!laneBlocked(p,{x:gx,y:o},14,p.team))c=o}
-  const ty=c+rnd(-1,1)*DF.err*.75*(dG/200);
+  const ty=c+rnd(-1,1)*DF.err*.75*(dG/200)*(p.team===1?ez('shotErr'):1);
   const kOut=Math.abs(k.x-gx);
   let type='normal';const ch=rnd(.55,1);
   const r=Math.random();if(kOut>60&&dG<340&&r<.3+.6*IQ){type='chip';if(p.team===1)aiStat.chip++}else if(dG<190&&kOut>36&&r<.3)type='chip';else if(dG<260&&r<.22)type='curler';
@@ -1421,13 +1458,23 @@ const noKeep=()=>hr('nokeep')||(comp==='skill'&&SG&&SG.k==='slalom');
 // The keeper reads a shot the moment it's struck: he predicts where it will cross his line (curl included), with an
 // error that grows with pace, swerve and knuckle and shrinks with his quality. Then he has to get there: a short
 // reaction, then a dive that accelerates. Placement and pace beat him; a shot straight at him doesn't.
-const kgk=k=>pvp()?1.02:k.team===0?(k.st.gkv||1.02):DF.gk;
+/* Extreme: the opposition keeper is still elite, but beatable: a little less reach and dive (4%), about 6% slower to
+   react, a slightly worse read of where a shot is going (10%; worse still against a good finisher or when you're clean
+   through one-on-one), a little less sharp in his positioning, and now and then (7%) he spills a hard shot he'd normally
+   hold. Measured with placed shots from set spots: still clearly tougher than Hard from the edge of the box and range.
+   Chill, Medium and Hard keepers, your own keeper and online keepers are unchanged. */
+const kXN=k=>k.team===1&&!pvp()&&!!LV().extreme;
+const kgk=k=>pvp()?1.02:k.team===0?(k.st.gkv||1.02):DF.gk*(kXN(k)?.96:1)*ez('gk');
 function keeperRead(k,react,type='normal'){
   const gk=kgk(k),spd=Math.hypot(B.vx,B.vy),a=Math.atan2(B.vy,B.vx);
   let py=curlCross(B.x,B.y,a,spd,B.curl||0,B.vz||0,k.x);if(py==null){const tt=(k.x-B.x)/(B.vx||1e-3);py=B.y+B.vy*Math.max(0,tt)}
   const far=Math.abs(k.x-B.x),clean=B.shot&&B.shot.perfect;
   const sig=(3+spd*.45*(1.3-gk*.55)+far*.05)*(type==='curler'?(gk===1.02?1.25:1.7):type==='knuckle'?2.4:type==='rocket'?1.3:type==='volley'?1.7:type==='header'?1.3:1)*(clean?1.4:1);
-  k.planErr=gaussN()*sig;k.planD0=Math.max(40,far);k.planY=py+k.planErr;k.react=Math.max(2,react)*KREACT;k.track=true;k.dv=0;k.diving=false}
+  let sg=sig,rc=Math.max(2,react)*KREACT;
+  if(kXN(k)&&B.shot&&B.shot.by){const sh=B.shot.by,gx=goalX(sh.team),one=Math.hypot(sh.x-gx,sh.y-MY)<BOX*1.2&&!outfield(k.team).some(q=>dist(q,sh)<70)&&!laneBlocked(sh,{x:gx,y:MY},20,sh.team);
+    sg*=1.1*(1+.8*((sh.st.fin??.6)-.6))*(one?1.25:1);rc=rc*1.06+(one?1:0)}
+  if(k.team===1&&EZ()){sg*=ez('gkErr');rc*=ez('gkReact')}
+  k.planErr=gaussN()*sg;k.planD0=Math.max(40,far);k.planY=py+k.planErr;k.react=rc;k.track=true;k.dv=0;k.diving=false}
 const KREACT=1.1;// keepers take 10% longer to react to a shot (and to decide to come off their line) than they used to
 /* ---------- sweeper keeper ----------
    When a through ball or loose ball runs in behind the defence, the keeper races the attackers to it. He reads the ball's
@@ -1437,8 +1484,8 @@ const KREACT=1.1;// keepers take 10% longer to react to a shot (and to decide to
    Same code runs on the host online, so it is identical for both players. */
 const kSkill=k=>clamp((kgk(k)-.8)/.6,0,1);
 const KSW_SPD=3.15;
-function ballPathPts(n,stp){const out=[];let x=B.x,y=B.y,z=B.z,vx=B.vx,vy=B.vy,vz=B.vz||0;const fg=B.curl?.992:hr('ice')?.994:weather==='rain'?.988:.984;
-  for(let i=0;i<=n;i++){if(i%stp===0)out.push({i,x,y,z});const fr=z>0?.996:fg;x+=vx;y+=vy;vx*=fr;vy*=fr;if(z>0||vz>0){vz-=.25;z+=vz;if(z<0){z=0;vz=Math.abs(vz)>1.2?-vz*.45:0}}
+function ballPathPts(n,stp){const out=[];let x=B.x,y=B.y,z=B.z,vx=B.vx,vy=B.vy,vz=B.vz||0,aK=B.airK>1?B.airK:1;const fg=B.curl?.992:hr('ice')?.994:weather==='rain'?.988:.984;
+  for(let i=0;i<=n;i++){if(i%stp===0)out.push({i,x,y,z});const k=z>0||vz>0?aK:1,fr=z>0?Math.pow(.996,1/k):fg;x+=vx;y+=vy;vx*=fr;vy*=fr;if(z>0||vz>0){vz-=.25/(k*k);z+=vz;if(z<0){z=0;aK=1;vz=Math.abs(vz)>1.2?-vz*.45:0}}
     if(x<FX0-30||x>FX1+30||y<FY0-30||y>FY1+30)break}return out}
 // frames for a player to reach a point: run time plus a little to turn and get going
 const runT=(p,x,y,spd,lag)=>Math.hypot(x-p.x,y-p.y)/spd+lag;
@@ -1526,8 +1573,8 @@ function keeperUpdate(k,dt){
     const out=14+(threat<220?(220-threat)/220*40*(mine?1:gk):0);
     let ty=clamp(MY+(B.y-MY)*.55,GY0+6,GY1-6);
     // their keeper watches your shooting stance and shades towards where you're aiming: switch corners late to beat him
-    const sh=B.owner;if(!mine&&sh&&sh.team!==k.team&&sh.aimY!=null&&(sh===ctrl?charging:sh===ctrl2&&RS&&RS.charging))ty=clamp(ty+(sh.aimY-ty)*.3*gk,GY0+4,GY1-4);
-    steer(k,gx+s*out,ty,k.wide?2.9:2.3,dt);
+    const sh=B.owner,xn=kXN(k);if(!mine&&sh&&sh.team!==k.team&&sh.aimY!=null&&(sh===ctrl?charging:sh===ctrl2&&RS&&RS.charging))ty=clamp(ty+(sh.aimY-ty)*(xn?.22:.3)*gk,GY0+4,GY1-4);
+    steer(k,gx+s*out,ty,(k.wide?2.9:2.3)*(xn?.93:1),dt);
     if(!B.owner&&!B.lobTo&&!(B.graceT>0)&&B.lockBy!==k&&Math.abs(B.x-gx)<BOX&&Math.abs(B.y-MY)<130&&B.z<24&&Math.hypot(B.vx,B.vy)<(mine?6:4)&&dist(k,B)<(mine?150:120))steer(k,B.x,B.y,mine?3.4:2.8,dt);
   }
 }
@@ -1550,9 +1597,10 @@ function ballUpdate(dt,live){
   if(B.curl&&sp>1){const nx=-B.vy/sp,ny=B.vx/sp;B.vx+=nx*B.curl*dt;B.vy+=ny*B.curl*dt;B.curl*=Math.pow(.997,dt)}
   if(B.knuckle&&sp>3){const nx=-B.vy/sp,ny=B.vx/sp,w=Math.sin(t*.45)*B.knuckle;B.vx+=nx*w*dt;B.vy+=ny*w*dt}
   B.x+=B.vx*dt;B.y+=B.vy*dt;B.spin+=sp*.06*dt;
-  const fr=B.z>0?.996:B.curl?.992:hr('ice')?.994:weather==='rain'?.988:.984;B.vx*=Math.pow(fr,dt);B.vy*=Math.pow(fr,dt);
+  const aK=B.airK>1&&(B.z>0||B.vz>0)?B.airK:1;
+  const fr=B.z>0?Math.pow(.996,1/aK):B.curl?.992:hr('ice')?.994:weather==='rain'?.988:.984;B.vx*=Math.pow(fr,dt);B.vy*=Math.pow(fr,dt);
   const wasAir=B.z>0;
-  if(B.z>0||B.vz>0){B.vz-=(B.knuckle?.34:.25)*dt;B.z+=B.vz*dt;if(B.z<0){B.z=0;if(B.vz<-1.8){tone(110,.07,'sine',Math.min(.16,-B.vz*.03),0,.6);grass(B.x,B.y,3)}B.vz=Math.abs(B.vz)>1.2?-B.vz*.45:0;if(B.vz>0){B.curl*=.4;B.knuckle=0}}}
+  if(B.z>0||B.vz>0){B.vz-=(B.knuckle?.34:.25)/(aK*aK)*dt;B.z+=B.vz*dt;if(B.z<0){B.z=0;if(B.vz<-1.8){tone(110,.07,'sine',Math.min(.16,-B.vz*.03),0,.6);grass(B.x,B.y,3)}B.vz=Math.abs(B.vz)>1.2?-B.vz*.45:0;if(B.vz>0){B.curl*=.4;B.knuckle=0}}}
   if(B.lobTo&&B.claimBy&&B.z<44&&dist(B.claimBy,B)<30&&B.claimBy.stun<=0){const k=B.claimBy;B.claimBy=null;airN.claim++;give(k);k.hold=40;pop('CLAIMED',k.x,k.y-34,C.cream,17,60);S.save()}
   else if(B.lobTo&&B.lobTo.volley&&B.vz<0&&B.z<54&&B.z>2&&dist(B.lobTo,B)<44&&B.lobTo.stun<=0)airStrike(B.lobTo);
   // a chip pass is contested as it drops into reach: a defender who's got there can win it
@@ -1565,6 +1613,7 @@ function ballUpdate(dt,live){
     for(const q of outfield(1-m.team))if(q.stun<=0&&dist(q,B)<(chip?36:30)&&(chip||dist(q,B)<dist(m,B))&&(!d||dist(q,B)<dist(d,B)))d=q;
     const win=!d?0:chip?clamp(.42+(dist(m,B)-dist(d,B))/60+((d.st.tackle??.6)-.6)*.5,.2,.8):.55;
     if(d&&Math.random()<win){B.lobTo=null;m.lobRun=null;m.volley=false;const a=Math.atan2(MY-B.y,MIDX-B.x)+rnd(-.6,.6);d.hjump=18;airN.clear++;kick(d,a,9,3.4);pop('CLEARED',d.x,d.y-40,d.team===0?C.mint:C.muted,16,50);S.tap()}}
+  if(wasAir&&B.z<=0)B.airK=0;
   if(B.lobTo&&wasAir&&B.z<=0){const m=B.lobTo;B.lobTo=null;m.lobRun=null;m.volley=false;
     if(dist(m,B)<(B.lobThrough?44:58)&&m.stun<=0){give(m);if(m.team===0)ctrl=m;else if(NET.host)setCtrl2(m)}else{const th=B.lobThrough;B.vx*=th?0:.15;B.vy*=th?0:.15;B.vz=0;B.graceTo=m;B.graceT=th?75:40;m.lobRun={x:B.x,y:B.y}}}
   if(B.graceT>0){B.graceT-=dt;if(B.graceT<=0||B.owner){if(B.graceTo)B.graceTo.lobRun=null;B.graceTo=null}}
@@ -1589,14 +1638,24 @@ function ballUpdate(dt,live){
         if(B.shot.team===0)stats.on++;k.mSv=(k.mSv||0)+1;
         B.vx=s*rnd(3,5);B.vy=(B.y<k.y?-1:1)*rnd(4,7);B.vz=3;B.lockBy=k;B.lockT=16;B.curl=0;B.knuckle=0;B.rocket=false;
         pop(pick(['PARRIED!','WHAT A SAVE','FINGERTIPS']),k.x,k.y-30,C.cream,20);S.save();S.ooh();hitStop(5);slowmo(16,.4);shake=Math.max(shake,RM?0:5);B.shot=null;reboundT=t;if(k.team===0){addHype(8);style+=10}
-      }else give(k);
+      }else if(k.team===1&&B.shot&&Math.hypot(B.vx,B.vy)>7.5&&Math.random()<(kXN(k)?.07:ez('spill',0))){B.vx=s*rnd(1.2,2.4);B.vy=rnd(-2.2,2.2);B.vz=1.5;B.lockBy=k;B.lockT=22;B.shot=null;reboundT=t;
+        pop('SPILLED IT!',k.x,k.y-30,C.sun,19);S.tap()}
+      else give(k);
       return;
     }
   }
-  if(B.z<12){
+  // a through ball dropping into reach of both the runner and a defender: one honest contest, decided by who's closer
+  // and how good the defender is (a defender alone under it simply takes it, in the loop below)
+  if(B.lobThrough&&B.lobTo&&B.pass&&!B.pass.ct&&B.z<18&&B.vz<0){const m=B.lobTo,mIn=m.stun<=0&&B.z<12&&dist(m,B)<18;let d=null;
+    for(const q of outfield(1-m.team))if(q.stun<=0&&B.z<thruReach(q)&&dist(q,B)<((q.slide||q.aiSlide>0)&&B.z<5?24:18)&&(!d||dist(q,B)<dist(d,B)))d=q;
+    if(d&&mIn){B.pass.ct=true;const w=Math.random()<clamp(.5+(dist(m,B)-dist(d,B))/30+((d.st.tackle??.6)-.6)*.6,.1,.9)?d:m;
+      if(w===d){B.lobTo=null;m.lobRun=null;m.volley=false;airN.clear++;give(d);if(d.team===0){ctrl=d;stats.tackles++;pop('READ IT!',d.x,d.y-40,C.mint,16,60)}else pop('READ IT',d.x,d.y-40,C.muted,16,50);S.tap()}
+      else{give(m);if(m.team===0)ctrl=m;else if(NET.host)setCtrl2(m)}}}
+  if(!B.owner&&B.z<(B.lobThrough?18:12)){
     for(const p of players){
-      if(p.keeper||p.stun>0||(B.lockBy===p&&B.lockT>0)||(B.lobTo&&p!==B.lobTo&&!(B.lobThrough&&p.team!==B.lobTo.team&&B.z<14)&&!(B.pass&&B.pass.chip&&p.team!==B.lobTo.team&&B.vz<0))||(B.graceTo&&B.graceT>0&&p!==B.graceTo&&!(B.lobThrough&&p.team!==B.graceTo.team)))continue;
-      {const x0=B.x-B.vx*dt,y0=B.y-B.vy*dt,dx=B.x-x0,dy=B.y-y0,L2=dx*dx+dy*dy||1,u=clamp(((p.x-x0)*dx+(p.y-y0)*dy)/L2,0,1);if(Math.hypot(x0+dx*u-p.x,y0+dy*u-p.y)>(B.shot&&B.shot.team===0&&p.team===1?12:18)*(hr('giant')?1.4:1))continue}
+      if(B.lobThrough&&B.lobTo&&(p===B.lobTo?B.z>=12:p.team!==B.lobTo.team&&B.z>=thruReach(p)))continue;
+      if(p.keeper||p.stun>0||(B.lockBy===p&&B.lockT>0)||(B.lobTo&&p!==B.lobTo&&!(B.lobThrough&&p.team!==B.lobTo.team&&B.z<18)&&!(B.pass&&B.pass.chip&&p.team!==B.lobTo.team&&B.vz<0))||(B.graceTo&&B.graceT>0&&p!==B.graceTo&&!(B.lobThrough&&p.team!==B.graceTo.team)))continue;
+      {const x0=B.x-B.vx*dt,y0=B.y-B.vy*dt,dx=B.x-x0,dy=B.y-y0,L2=dx*dx+dy*dy||1,u=clamp(((p.x-x0)*dx+(p.y-y0)*dy)/L2,0,1);if(Math.hypot(x0+dx*u-p.x,y0+dy*u-p.y)>(B.shot&&B.shot.team===0&&p.team===1?12:(p.slide||p.aiSlide>0)&&B.z<5?24:18)*(hr('giant')?1.4:1)*(p.team===1&&B.pass&&B.pass.from&&B.pass.from.team===0?ez('icpt'):1))continue}// (Chill/Medium: your passes have to go closer to them to be cut out)
       if(B.shot&&B.shot.team===0&&p.team===1&&sp>6.5){
         // your shots: a defender in the way only stops it some of the time; otherwise it takes a nick and carries on
         const stopCh=clamp(.45+(p.st.tackle??.6)*.3-(sp-10)*.02,.35,.7);

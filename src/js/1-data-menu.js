@@ -28,7 +28,7 @@ const SPECIALS={
   rocket:{name:'ROCKET',cd:1200,d:'Hardest shot in the game. Can burst through the keeper’s hands.'},
   knuckle:{name:'KNUCKLEBALL',cd:1140,d:'Wobbling, dipping strike. Keepers react late.'},
   chip:{name:'CHIP',cd:960,d:'Lob over a keeper who has come off his line.'},
-  through:{name:'THROUGH BALL',cd:900,d:'Plays it towards your furthest-forward team-mate (never one who\'s offside), at a fifth of the old speed: defenders and the keeper can read it.'},
+  through:{name:'THROUGH BALL',cd:900,d:'Floats it over the defence into the space ahead of your best runner, who bursts onto it. It hangs in the air for a few seconds, so defenders can read where it will land.'},
   bicycle:{name:'BICYCLE KICK',cd:900,d:'Only straight off a teammate’s pass: flip and volley it first time. Very likely to go in.'},
   lob:{name:'CHIP PASS',cd:960,d:'Lofted pass over the defence to your best-placed teammate. Defenders can still attack it as it drops.'},
 
@@ -214,11 +214,15 @@ const PACKS=[
   {id:'premium',name:'Premium Gold Pack',cost:5000,odds:{bronze:0,silver:0,gold:80,special:20,icon:0},d:'Three golds, or three Specials 20% of the time. Sign one.'},
   {id:'elite',name:'Elite Pack',cost:12500,odds:{bronze:0,silver:0,gold:30,special:70,icon:0},d:'Three Specials 70% of the time, otherwise top golds. Sign one.'},
   {id:'icon',name:'Icon Pack',cost:50000,odds:{bronze:0,silver:0,gold:0,special:0,icon:100},d:'Guaranteed: three Icons. Sign one.'}];
-const ovr=p=>{if(p.isCustom)return customOvr(p);const v=[p.pace,p.shot,p.fin,p.skill,p.pass,p.tackle,p.str].sort((a,b)=>b-a).slice(0,5);return Math.min(99,Math.round(v.reduce((a,b)=>a+b,0)/5*100))};
+// overall rating: the average of a player's best five stats. No 99 ceiling: a fully developed star whose stats go past
+// 99 (through levels, upgrades and evolutions) is rated above 99. Each player still stops at his own maximum potential.
+const ovr=p=>{if(p.isCustom)return customOvr(p);const v=[p.pace,p.shot,p.fin,p.skill,p.pass,p.tackle,p.str].sort((a,b)=>b-a).slice(0,5);return Math.round(v.reduce((a,b)=>a+b,0)/5*100)};
+// a numeric safety limit for developed stats (well above anything development can reach), so physics never sees runaway values
+const STATCAP=1.2;
 
 // Your created player: every stat point counts towards the rating, so training always moves it up.
 function customOvr(p){const all=[p.pace,p.shot,p.fin,p.skill,p.pass,p.tackle,p.str],top=[...all].sort((a,b)=>b-a).slice(0,5);
-  const t5=top.reduce((a,b)=>a+b,0)/5,av=all.reduce((a,b)=>a+b,0)/7;return Math.min(99,Math.round((t5*.5+av*.5)*100+2))}
+  const t5=top.reduce((a,b)=>a+b,0)/5,av=all.reduce((a,b)=>a+b,0)/7;return Math.round((t5*.5+av*.5)*100+2)}
 // Training spreads its points over your best stats straight away (you can still move them in the editor).
 function autoSpend(c,pts){const ks=STATK.map(([k])=>k);let guard=0;
   while(pts>0&&guard++<200){const order=ks.filter(k=>c[k]<.99).sort((a,b)=>c[b]-c[a]).slice(0,3);if(!order.length)break;
@@ -425,7 +429,7 @@ function renderMenu(){
       p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${(custom.budget||BUDGET)>=650||club.coins<coachCost(myTrainBase())?'disabled':''}>${(custom.budget||BUDGET)>=650?'Fully trained':`Train +8 pts · ${priceTag(myTrainBase())} (session ${myTrainIx()+1}/${MYTRAIN_N})`}</button>`:''})}).join('');
   renderSquadExtras();
   // packs
-  $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const so=scoutOdds(k.odds),sc=depFx('scout')&&so!==k.odds,od=Object.entries(so).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ')+(sc?` (scouting +${depFx('scout')}%)`:'');
+  $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const od=Object.entries(k.odds).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ')+(depFx('scout')?` · top-rated chance +${depFx('scout')}% (scouting)`:'');
     return `<button class="packbtn t-${k.id==='premium'||k.id==='elite'?'special':k.id}" data-pack="${k.id}" ${!free&&club.coins<k.cost?'disabled':''}><b>${k.name}</b><span>${k.d}</span><span style="color:var(--tc)">Odds: ${od}</span><em>${free?`FREE${(club.free||{})[k.id]>1?' ×'+club.free[k.id]:''}`:k.cost.toLocaleString()+' coins'}</em></button>`}).join('');
   if(tab==='club')renderClub();
   const canFill=ownedPlayers().length>=4;
@@ -531,7 +535,8 @@ function rollTier(odds){let r=Math.random()*100;for(const k of ['icon','special'
 // A pack is one tier, one card per position, ratings close together and new cards first, so every pick is a real dilemma.
 function dealHardPick(t){
   // the best players in each tier are the rare ones: the pack's rating level leans hard towards the bottom of the tier
-  const inTier=PLAYERS.filter(p=>tier(p)===t),sorted=inTier.slice().sort((a,b)=>ovr(a)-ovr(b)),anchor=ovr(sorted[Math.min(sorted.length-1,Math.floor(Math.pow(Math.random(),2.2)*sorted.length))]);
+  // (scouting lifts the chance of it landing in the tier's top-rated quarter, see scoutAnchor)
+  const inTier=PLAYERS.filter(p=>tier(p)===t),anchor=scoutAnchor(t);
   const out=['ATT','MID','DEF'].map(pos=>{const all=inTier.filter(p=>natPos(p)===pos),fresh=all.filter(p=>!club.owned.includes(p.id));
     const pool=(fresh.length?fresh:all).slice().sort((a,b)=>(Math.abs(ovr(a)-anchor)+(ovr(a)>anchor?3:0))-(Math.abs(ovr(b)-anchor)+(ovr(b)>anchor?3:0))+(Math.random()-.5)*2);
     return pick(pool.slice(0,2))});
@@ -543,7 +548,7 @@ function openPack(id){
   if(!free&&club.coins<k.cost)return;
   initAudio();if(ac&&ac.state==='suspended')ac.resume();
   if(gift)club.gift=false;else if(owed)club.free[id]--;else club.coins-=k.cost;
-  const cards=dealHardPick(rollTier(scoutOdds(k.odds)));
+  const cards=dealHardPick(rollTier(k.odds));// rarity from the pack's own odds; scouting only works within it
   const res=cards.map(p=>({p,dup:club.owned.includes(p.id)}));
   saveClub();
   const el=$('pack');el.hidden=false;$('pack-title').textContent=k.name;$('pack-note').textContent='';$('pack-done').hidden=true;

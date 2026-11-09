@@ -336,7 +336,11 @@ function netCustom(){const c=custom;return{name:c.name,short:c.short,num:c.num,s
 // the guest's line-up for the host's chosen match type: Volta 5-a-side or Classical 9-a-side
 function netMyTeam(cl){const q=cl?club.csquads[club.cactive||0]:club.squads[club.active],n=cl?8:4;
   if(q.s.filter(Boolean).length<n){const g0=GM;GM=cl?'classical':'volta';autoPick(q);GM=g0}const ids=q.s.map((id,i)=>id||STARTERS[i%3].id);
-  return{s:ids,al:ids.map(id=>ablOf(id)),f:q.f,att:q.att??null,cap:q.cap??null,nm:ids.map(id=>{const p=byId(id);return p?p.name:''}),sh:ids.map(id=>{const p=byId(id);return p?p.short:''})}}
+  // each player's developed stats (levels, upgrades, evolutions) go too, so he plays online as he does offline
+  const stOf=id=>{const p=byId(id);if(!p||p.isCustom)return null;const b=playStats(p);return STATK.map(([k])=>Math.round((+b[k]||0)*1000)/1000)};
+  return{s:ids,al:ids.map(id=>ablOf(id)),st:ids.map(stOf),f:q.f,att:q.att??null,cap:q.cap??null,nm:ids.map(id=>{const p=byId(id);return p?p.name:''}),sh:ids.map(id=>{const p=byId(id);return p?p.short:''})}}
+// the most a player could ever reach through normal development, stat by stat (what a joining player's stats are held to)
+function devCeil(p){const u={};for(const [k] of STATK)u[k]=STATMAX;return playStatsX(p,XPL.length-1,u,EVO[tier(p)].boost.length)}
 const netPeer=role=>nroom?nroom.find(role):null;
 // Two ways to reach the other laptop, tried together: the Claude room (both signed in on claude.ai) and a direct
 // browser-to-browser link (WebRTC through the free PeerJS service), which also works from the downloaded game file.
@@ -474,7 +478,7 @@ async function netLeave(){const r=nroom;nroom=null;netCode='';netRole=null;netPr
 function netStart(){const g=netPeer('guest');if(!g){netStatus('Your friend isn’t in the room any more.',true);return}if(+g.presence.pv!==NETPV){netLobby();return}
   const nm=NETMODES[club.netMode]?club.netMode:'volta',pk=nm==='volta'?'volta':nm==='expanded'?'expanded':'classical',big=pk!=='volta',ns=big?8:4;
   const P=g.presence,sqd=(big?P.csq:P.sq)||{};netGuest={club:String(P.club||'Friend').slice(0,16),mg:nameOk(String(P.mg||'')),kit:typeof P.kit==='string'&&/^#[0-9a-f]{6}$/i.test(P.kit)?P.kit:'#4fb3ff',
-    s:[...(Array.isArray(sqd.s)?sqd.s:[]),...E8()].slice(0,ns).map(x=>x==null?'':String(x)),f:FORM_KEYS[big?'classical':'volta'].includes(sqd.f)?sqd.f:FORM_KEYS[big?'classical':'volta'][0],att:sqd.att,cap:sqd.cap,al:Array.isArray(sqd.al)?sqd.al.map(x=>clamp(x|0||1,1,10)):[],nm:Array.isArray(sqd.nm)?sqd.nm.map(x=>String(x||'').slice(0,16)):[],sh:Array.isArray(sqd.sh)?sqd.sh.map(x=>String(x||'').slice(0,10)):[],cu:P.cu&&typeof P.cu==='object'?P.cu:null};
+    s:[...(Array.isArray(sqd.s)?sqd.s:[]),...E8()].slice(0,ns).map(x=>x==null?'':String(x)),f:FORM_KEYS[big?'classical':'volta'].includes(sqd.f)?sqd.f:FORM_KEYS[big?'classical':'volta'][0],att:sqd.att,cap:sqd.cap,al:Array.isArray(sqd.al)?sqd.al.map(x=>clamp(x|0||1,1,10)):[],st:Array.isArray(sqd.st)?sqd.st.slice(0,ns).map(a=>Array.isArray(a)?a.slice(0,7).map(Number):null):[],nm:Array.isArray(sqd.nm)?sqd.nm.map(x=>String(x||'').slice(0,16)):[],sh:Array.isArray(sqd.sh)?sqd.sh.map(x=>String(x||'').slice(0,10)):[],cu:P.cu&&typeof P.cu==='object'?P.cu:null};
   let kit=netGuest.kit;if(kitClash(kit,club.kit))kit=KITS.find(k=>!kitClash(k,club.kit)&&k!=='#2f2f3a')||'#4fb3ff';
   OPP={name:netGuest.club.toUpperCase(),mg:netGuest.mg||'',kit,off:0};cupEvent=null;eventText=null;comp='online';
   NET.on=true;NET.host=true;NET.guest=false;netMatch=(Date.now()%100000)+1;matchSerial++;ttCalc=null;
@@ -490,8 +494,9 @@ const netSeenEvOf=g=>{const ev=g&&g.presence&&g.presence.ev;return Array.isArray
 function netGuestTeam(){const g=netGuest,gs=FORMS[g.f],n=gs.length;
   g.s.forEach((id,i)=>{let c=id==='custom'&&g.cu?{...custom,...g.cu,id:'gcustom',isCustom:true}:byId(id);if(!c||c.isCustom&&id!=='custom')c=STARTERS[i%3];
     const fit=posFit(natPos(c),gs[i].r),st={...c,id:(c.id||'x')+'_opp'};if(fit<1)for(const [k] of STATK)st[k]=c[k]*fit;
+    {const d=(g.st||[])[i];if(Array.isArray(d)&&!c.isCustom&&c.id&&byId(c.id)){const cap=devCeil(c);STATK.forEach(([k],j)=>{const v=+d[j];if(Number.isFinite(v))st[k]=clamp(v,c[k],cap[k])*(fit<1?fit:1)})}}
     if(g.nm[i])st.name=g.nm[i];if(g.sh[i])st.short=g.sh[i];st.spLv=(g.al||[])[i]||1;
-    for(const [k] of STATK)st[k]=clamp(+st[k]||.5,.2,.99);if(!SKILLS[st.sk])st.sk='roulette';if(!SPECIALS[st.sp])st.sp='curler';
+    for(const [k] of STATK)st[k]=clamp(+st[k]||.5,.2,STATCAP);if(!SKILLS[st.sk])st.sk='roulette';if(!SPECIALS[st.sp])st.sp='curler';
     const p=mk(1,n+1+i,st,OPP.kit,0,0);p.slot=gs[i];p.role=g.att===i?'att':g.cap===i?'cap':null;players.push(p)})}
 // the match types a host can pick, and the pre-match handshake
 const NETMODES={volta:'Volta 5v5',classical:'Classical Standard 9v9',expanded:'Classical Expanded 9v9'},NETCOUNT=3000;
@@ -607,7 +612,7 @@ function netSnapOf(){
   const ix=p=>p?players.indexOf(p):-1;
   const p=players.map(q=>{const v={};for(const k of VISK){const x=q[k];if(x)v[k]=typeof x==='number'?r1(x):x===true?1:x}return[Math.round(q.x),Math.round(q.y),Math.round(q.dir*100)/100,v,r1(q.vx||0),r1(q.vy||0)]});
   const c=ctrl2;const a=c?[r1(c.skillCd),r1(c.spCd),r1(c.slideCd),r1(c.blungeCd||0),r1(c.tackleCd),Math.round(c.stam),c.aimY==null?null:Math.round(c.aimY),RS.charging?1:0,Math.round(RS.charge*100)/100]:null;
-  const s={n:++netSnapN,ht:Math.round(performance.now()),pr:netPrep?(netPrep.go?Math.max(1,Math.ceil((NETCOUNT-(performance.now()-netPrep.go))/1000)):-1):0,ack:netSeenEv,tk:netTk,cim:netCim,lt:B.lobTo&&!B.owner?[ix(B.lobTo),Math.round(B.lobX),Math.round(B.lobY),B.lobThrough?1:0]:0,pt:B.pass&&!B.owner?[ix(B.pass.from),ix(B.pass.to)]:0,me2:RME?RME.stamp:0,mh:RME?Math.round(performance.now()-RME.at):0,w:netWaiting?1:0,ep:netEpoch,dg:[netStat.evRecv||0,netStat.evDone||0,netStat.evHeld||0,netStat.evRefused||0,String(netStat.lastRefused||'').slice(0,40)],cs:[c2seq,ix(ctrl2)],rs:performance.now()<netResumeAt?Math.ceil((netResumeAt-performance.now())/1000):0,pc:netPrep?netPrep.ck.map(x=>x?1:0):0,s:state,st:Math.round(stT),c:Math.round(clock*10),sc:score.slice(),b:[Math.round(B.x),Math.round(B.y),r1(B.z),ballCharge(),Math.round((B.spin||0)*100)/100,r1(B.vx||0),r1(B.vy||0),r1(B.vz||0),Math.round((B.curl||0)*1000)/1000,weather==='rain'?1:0],o:ix(B.owner),c1:ix(ctrl),c2:ix(ctrl2),p,a,kt:Math.round(kickT),
+  const s={n:++netSnapN,ht:Math.round(performance.now()),pr:netPrep?(netPrep.go?Math.max(1,Math.ceil((NETCOUNT-(performance.now()-netPrep.go))/1000)):-1):0,ack:netSeenEv,tk:netTk,cim:netCim,lt:B.lobTo&&!B.owner?[ix(B.lobTo),Math.round(B.lobX),Math.round(B.lobY),B.lobThrough?1:0]:0,pt:B.pass&&!B.owner?[ix(B.pass.from),ix(B.pass.to)]:0,me2:RME?RME.stamp:0,mh:RME?Math.round(performance.now()-RME.at):0,w:netWaiting?1:0,ep:netEpoch,dg:[netStat.evRecv||0,netStat.evDone||0,netStat.evHeld||0,netStat.evRefused||0,String(netStat.lastRefused||'').slice(0,40)],cs:[c2seq,ix(ctrl2)],rs:performance.now()<netResumeAt?Math.ceil((netResumeAt-performance.now())/1000):0,pc:netPrep?netPrep.ck.map(x=>x?1:0):0,s:state,st:Math.round(stT),c:Math.round(clock*10),sc:score.slice(),b:[Math.round(B.x),Math.round(B.y),r1(B.z),ballCharge(),Math.round((B.spin||0)*100)/100,r1(B.vx||0),r1(B.vy||0),r1(B.vz||0),Math.round((B.curl||0)*1000)/1000,weather==='rain'?1:0,B.airK>1?B.airK:0],o:ix(B.owner),c1:ix(ctrl),c2:ix(ctrl2),p,a,kt:Math.round(kickT),
     pp:netPopsOut.slice(-8),fx:netSfxOut.slice(-10),sh:r1(shake),fl:r1(flash),ns:netShake.map(Math.round),sco:ix(scorer),cel:celebType,ph:state==='goal'||state==='concede'?String(phrase||'').slice(0,60):''};
   if(hat)s.hat=[hat.n,hat.team,String(hat.name).slice(0,16),hat.txt,Math.round(t-hat.t0)];
   return s}
@@ -691,7 +696,7 @@ function guestBuild(h){const R=h.presence.r;if(!Array.isArray(R)||R.length<4)ret
     if(Array.isArray(r[9]))st.look=r[9];if(st.id==='hcustom')st.id='x';
     // the real stats come with the line-up, so your own player plays exactly as he does on the host
     st.spLv=clamp(+r[14]|0||1,1,10);
-    const sv=r[13]&&typeof r[13]==='object'?r[13]:{};for(const [k] of STATK){const v=+sv[k];st[k]=Number.isFinite(v)?clamp(v,.1,.99):Number.isFinite(+st[k])?+st[k]:.6}
+    const sv=r[13]&&typeof r[13]==='object'?r[13]:{};for(const [k] of STATK){const v=+sv[k];st[k]=Number.isFinite(v)?clamp(v,.1,STATCAP):Number.isFinite(+st[k])?+st[k]:.6}
     const kit=typeof r[2]==='string'&&/^#[0-9a-f]{6}$/i.test(r[2])?r[2]:'#999999',p=mk(1-(+r[0]?1:0),j,st,kit,0,0,!!r[1]);p.slot={x:.3,y:.5,r:'MID'};return p});
   const hk=players.find(p=>p.team===1&&!p.keeper);OPP={name:String(h.presence.club||'Host').toUpperCase().slice(0,16),mg:nameOk(String(h.presence.mg||'')),kit:hk?hk.kit:'#8e8ff0',off:0};
   return true}
@@ -746,10 +751,10 @@ function gState(g){if(netLock)return;
   stT=+g.st||0}
 let guestCh=0,netLastEcho=0;
 // Where the host's ball is by now: the same friction, gravity, bounce and curl the host uses, run forward f frames
-function ballAhead(x,y,z,vx,vy,vz,curl,f,rain){const n=Math.min(12,Math.ceil(f)),h=f/Math.max(1,n);
+function ballAhead(x,y,z,vx,vy,vz,curl,f,rain,aK){const n=Math.min(12,Math.ceil(f)),h=f/Math.max(1,n);let k=aK>1?aK:1;
   for(let i=0;i<n;i++){const sp=Math.hypot(vx,vy);if(curl&&sp>1){vx+=-vy/sp*curl*h;vy+=vx/sp*curl*h;curl*=Math.pow(.997,h)}
-    x+=vx*h;y+=vy*h;const fr=z>0?.996:curl?.992:rain?.988:.984,k=Math.pow(fr,h);vx*=k;vy*=k;
-    if(z>0||vz>0){vz-=.25*h;z+=vz*h;if(z<0){z=0;vz=Math.abs(vz)>1.2?-vz*.45:0}}
+    x+=vx*h;y+=vy*h;const fr=z>0?Math.pow(.996,1/k):curl?.992:rain?.988:.984,kf=Math.pow(fr,h);vx*=kf;vy*=kf;
+    if(z>0||vz>0){vz-=.25/(k*k)*h;z+=vz*h;if(z<0){z=0;k=1;vz=Math.abs(vz)>1.2?-vz*.45:0}}
     if(y<FY0+6){y=FY0+6;vy=Math.abs(vy)*.7}if(y>FY1-6){y=FY1-6;vy=-Math.abs(vy)*.7}}
   return[x,y,z]}
 /* Smooth picture on the joining laptop. Every snapshot carries the host's clock time. This laptop keeps the last
@@ -763,7 +768,7 @@ const gBuf=[],gWin=[];let gOff=null,gD=60,gR=-1e12,gP=0,gIv=33,gBallSrc='',gBall
 function gVis(p,v){for(const k of VISK){if(k==='vy')continue;let x=v[k];if(x===undefined)x=k==='anim'?null:k==='flip'?1:0;p[k]=x}if(p.lean)p.lean=-p.lean;if(p.fallDir)p.fallDir=MA(p.fallDir)}
 function gBufAdd(g,reset){const now=performance.now(),ht=Number.isFinite(+g.ht)&&+g.ht>0?+g.ht:now,b=g.b||[];
   const e={ht,g,done:false,o:g.o,p:g.p.map(r=>Array.isArray(r)?[MX(+r[0]||0),+r[1]||0,MA(+r[2]||0),-(+r[4]||0),+r[5]||0,r[3]||{}]:null),
-    b:[MX(+b[0]||MIDX),+b[1]||MY,+b[2]||0,-(+b[5]||0),+b[6]||0,+b[7]||0,-(+b[8]||0),!!b[9]]};
+    b:[MX(+b[0]||MIDX),+b[1]||MY,+b[2]||0,-(+b[5]||0),+b[6]||0,+b[7]||0,-(+b[8]||0),!!b[9],+b[10]||0]};
   // clock: the smallest (arrival - host time) over the last 3 s is the fastest a snapshot can get here; how much later
   // than that the others arrive is the unevenness the picture has to absorb
   gWin.push([now,now-ht]);while(gWin.length&&now-gWin[0][0]>3000)gWin.shift();
@@ -787,7 +792,7 @@ function gBallAt(R){const n=gBuf.length;if(!n)return null;let i=n-1;while(i>0&&g
   if(i<n-1&&R>=a.ht){const Bq=gBuf[i+1].b,u=(R-a.ht)/Math.max(1,gBuf[i+1].ht-a.ht);return[A[0]+(Bq[0]-A[0])*u,A[1]+(Bq[1]-A[1])*u,A[2]+(Bq[2]-A[2])*u]}
   const f=clamp((R-a.ht)/16.667,0,8);
   if(a.o>=0&&a.p[a.o]){const O=a.p[a.o];return[A[0]+O[3]*f,A[1]+O[4]*f,A[2]]}
-  return ballAhead(A[0],A[1],A[2],A[3],A[4],A[5],A[6],f,A[7])}
+  return ballAhead(A[0],A[1],A[2],A[3],A[4],A[5],A[6],f,A[7],A[8])}
 // how much of the way to the present a loose ball is shown: all of it at your footballer's feet, none from 400 px away
 const gNear2=d=>d<40?1:d>400?0:1-(d-40)/360;
 function gRender(dt){const now=performance.now();if(gOff==null||!gBuf.length)return false;
@@ -958,7 +963,7 @@ function toggleFull(){const st=document.querySelector('.stage'),fs=document.full
 $('fullscr').onclick=toggleFull;$('fullscr2').onclick=toggleFull;
 const fsLabel=()=>{const on=!!(document.fullscreenElement||document.webkitFullscreenElement);$('fullscr').textContent=on?'Exit full screen (V)':'Full screen (V)';$('fullscr2').textContent=on?'Exit full screen':'Full screen'};
 document.addEventListener('fullscreenchange',fsLabel);document.addEventListener('webkitfullscreenchange',fsLabel);
-window.__kick={errs:()=>loopErrs,acct:{v1:async(e,pw)=>{const d=await acctDerive(e,pw,1),keep=acct;acct={k:d.k};const s=await acctSeal(snapshotSave());acct=keep;for(const c of await regConnect()){const go=()=>c.publish(ACCT_T+d.id,s,{qos:1,retain:true});if(c.connected)go();else c.once('connect',go)}return d.id},st:()=>acct&&{...acct,k:'-'},fetch:()=>acct?acctFetch(acct.id,acct.k).then(r=>({ok:r.ok,at:r.sv&&r.sv.at,coins:r.sv&&r.sv.club.coins})):null},oj:()=>({on:!!(OJ.slam||OJ.z>.002||OJ.vig>0||OJ.lines.length||OJ.strobe>0),slam:OJ.slam&&OJ.slam.text,style:Math.round(style),hype:Math.round(hype),fire:Math.round(fire),chain}),dbg:{gdTokens:(a,b)=>gdTokens(a,b),ttCalc:()=>ttCalc,tPick:p=>throughPick(p),isOff:(m,p)=>isOffside(m,p),doThrough:p=>doThrough(p),aiStat:()=>aiStat,shotLog:()=>aiShotLog.slice(),earnNote:()=>earnNote,cv:()=>({rollTier,ABTIER,sweepPlan,kSkill,byId,upOf,UPCAP,EVO,XPL,STATMAX,tier,depBuy,depLv,depFx,ctk,ctkSync,maxPlan,statMax,upPreview,playStatsX,scoutOdds,matchPay,gdTokens,legacyXP,upBuy,ablBuy,coachCost,upCost,effOvr,cdSecs,spCdOf,PACKS,legNeed,trainDo,evoDo,evoNeed,ovr}),snapSize:()=>JSON.stringify(netSnapOf()).length,prep:()=>!!netPrep,allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p),look:p.look,skin:p.skin})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,netEpoch:()=>{netEpoch++},forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,FY0,FY1,MY,MIDX,GY0,GY1,BOX,BOXH,PITCH}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({stat:netStat,log:netLogBuf.slice(-40),c2:{seq:c2seq,rme:RME&&{idx:RME.idx,on:RME.on,age:Math.round(performance.now()-RME.at)}},gcs:gCs,wait:netWaiting,gwait:netGuestWait,routes:{...netRoutes},prefer:nroom&&nroom.prefer?nroom.prefer.kind:null,gm:{on:gPr.on,seq:gIn.seq,ack:gIn.ack,pending:gIn.list.filter(e=>e[0]>gIn.ack).length,wait:netGuestWait,rtt:netRtt},RSp:RS&&RS.pend?RS.pend.k:null,RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+window.__kick={errs:()=>loopErrs,acct:{v1:async(e,pw)=>{const d=await acctDerive(e,pw,1),keep=acct;acct={k:d.k};const s=await acctSeal(snapshotSave());acct=keep;for(const c of await regConnect()){const go=()=>c.publish(ACCT_T+d.id,s,{qos:1,retain:true});if(c.connected)go();else c.once('connect',go)}return d.id},st:()=>acct&&{...acct,k:'-'},fetch:()=>acct?acctFetch(acct.id,acct.k).then(r=>({ok:r.ok,at:r.sv&&r.sv.at,coins:r.sv&&r.sv.club.coins})):null},oj:()=>({on:!!(OJ.slam||OJ.z>.002||OJ.vig>0||OJ.lines.length||OJ.strobe>0),slam:OJ.slam&&OJ.slam.text,style:Math.round(style),hype:Math.round(hype),fire:Math.round(fire),chain}),dbg:{scout:{band:t=>{const s=scoutBand(t);return s&&{n:s.n,cut:s.cut,pHigh:s.pHigh}},odds:(t,b)=>{const L=scoutLevelOdds(t,b);return L&&{pHigh:L.pHigh,sum:L.w.reduce((a,x)=>a+x,0)}},anchor:(t,b)=>scoutAnchor(t,b),deal:t=>dealHardPick(t).map(p=>({id:p.id,ovr:ovr(p),tier:tier(p)})),roll:o=>rollTier(o),depFx:k=>depFx(k)},gdTokens:(a,b)=>gdTokens(a,b),ttCalc:()=>ttCalc,tPick:p=>throughPick(p),isOff:(m,p)=>isOffside(m,p),doThrough:p=>doThrough(p),aiStat:()=>aiStat,shotLog:()=>aiShotLog.slice(),earnNote:()=>earnNote,cv:()=>({rollTier,ABTIER,sweepPlan,kSkill,byId,upOf,UPCAP,EVO,XPL,STATMAX,tier,depBuy,depLv,depFx,ctk,ctkSync,maxPlan,statMax,upPreview,playStatsX,scoutLevelOdds,matchPay,gdTokens,legacyXP,upBuy,ablBuy,coachCost,upCost,effOvr,cdSecs,spCdOf,PACKS,legNeed,trainDo,evoDo,evoNeed,ovr}),snapSize:()=>JSON.stringify(netSnapOf()).length,prep:()=>!!netPrep,allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p),look:p.look,skin:p.skin})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,netEpoch:()=>{netEpoch++},forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,FY0,FY1,MY,MIDX,GY0,GY1,BOX,BOXH,PITCH}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({stat:netStat,log:netLogBuf.slice(-40),c2:{seq:c2seq,rme:RME&&{idx:RME.idx,on:RME.on,age:Math.round(performance.now()-RME.at)}},gcs:gCs,wait:netWaiting,gwait:netGuestWait,routes:{...netRoutes},prefer:nroom&&nroom.prefer?nroom.prefer.kind:null,gm:{on:gPr.on,seq:gIn.seq,ack:gIn.ack,pending:gIn.list.filter(e=>e[0]>gIn.ack).length,wait:netGuestWait,rtt:netRtt},RSp:RS&&RS.pend?RS.pend.k:null,RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 // Getting ready: a panel over the pitch while both laptops load, then the countdown
 // before kick-off online: the two clubs and their managers face off, then the countdown (or what's still being checked)
 let vsT0=0,vsLast=0;
