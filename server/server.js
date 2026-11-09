@@ -33,6 +33,9 @@ const secure=!!(CFG.tlsCert&&CFG.tlsKey);
 if(!isLoop(CFG.host)&&!secure&&!CFG.trustProxy){console.error(`Refusing to listen on ${CFG.host} without HTTPS. Set TLS_CERT and TLS_KEY, or run behind an HTTPS reverse proxy with TRUST_PROXY=1, or keep HOST=127.0.0.1.`);process.exit(1)}
 
 let KEYS;try{KEYS=C.loadKeys(CFG.secrets)}catch(e){console.error(`Can't read the private keys (${e.message}).\nRun "node setup.js" first, or set SECRETS_FILE.`);process.exit(1)}
+// the private keys must belong to the public keys built into the game, or players' games will ignore this server
+try{const pk=JSON.parse(fs.readFileSync(E.PUBLIC_KEYS_FILE||path.join(__dirname,'public-keys.json'),'utf8'));
+  if(pk.sig!==KEYS.pub.sig||pk.enc!==KEYS.pub.enc)console.warn('WARNING: these private keys do not match public-keys.json, the keys built into the game. Players\u2019 games will ignore this dashboard until you use the matching keys, or rebuild the game ("node build.mjs") and share it again.')}catch(e){}
 fs.mkdirSync(CFG.data,{recursive:true,mode:0o700});
 
 // ---------------------------------------------------------------- small helpers

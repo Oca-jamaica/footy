@@ -98,10 +98,11 @@ function opsBar(){const el=$('opsbar');if(!el)return;const rows=[];if(ops.ctlAt&
   if(ops.note)rows.push(`<p class="opsann info">🎁 ${esc(ops.note)} <button class="ghost" data-opsgone="note" aria-label="Hide">✕</button></p>`);
   el.innerHTML=rows.join('');el.hidden=!rows.length}
 // the Online tab's extra lines: maintenance, a suspension (with appeal), reporting the last opponent, reporting a problem
-function opsOnlineHTML(){if(!ops.on)return'';const m=opsMineNow(),o=ops.opp;
-  return `${ops.maint?`<p class="opsann warn">🔧 ${esc(ops.maint.msg||'Online play is paused for maintenance.')}</p>`:''}
-    ${m?`<div class="opsann warn"><b>Your club is suspended from online play</b> until ${esc(new Date(m.until).toLocaleString())} for ${esc(OPS_WHY[m.why]||OPS_WHY.other)}. Single-player, packs and everything offline still work. <button class="btn" data-ops="appeal">Appeal</button></div>`:''}
-    <p class="hint opsline">${o&&(o.rid||o.nm)?`Last online opponent: <b>${esc(o.nm||'unknown')}</b>${o.mg?' ('+esc(o.mg)+')':''} <button class="btn" data-ops="repopp">Report</button> · `:''}<button class="btn" data-ops="prob">Report a problem</button></p>`}
+function opsOnlineTop(){if(!ops.on)return'';const m=opsMineNow();
+  return `${ops.maint&&opsFresh()?`<p class="opsann warn">🔧 ${esc(ops.maint.msg||'Online play is paused for maintenance.')}</p>`:''}
+    ${m?`<div class="opsann warn"><b>Your club is suspended from online play</b> until ${esc(new Date(m.until).toLocaleString())} for ${esc(OPS_WHY[m.why]||OPS_WHY.other)}. Single-player, packs and everything offline still work. <button class="btn" data-ops="appeal">Appeal</button></div>`:''}`}
+function opsOnlineHTML(){if(!ops.on)return'';const o=ops.opp;
+  return `<p class="hint opsline">${o&&(o.rid||o.nm)?`Last online opponent: <b>${esc(o.nm||'unknown')}</b>${o.mg?' ('+esc(o.mg)+')':''} <button class="btn" data-ops="repopp">Report</button> · `:''}<button class="btn" data-ops="prob">Report a problem</button></p>`}
 function opsDlg(kind,target){const box=$('opsdlg');if(!box)return;const t=target||{};
   const head={rep:`Report ${esc(t.nm||'this club')}`,prob:'Report a problem',appeal:'Appeal your suspension'}[kind];
   const cats=kind==='rep'?[['cheating','Cheating'],['name','Offensive name or club name'],['abuse','Abuse or harassment'],['other','Something else']]:kind==='prob'?[['bug','Something isn’t working'],['online','Online / connection'],['performance','Slow or jerky'],['account','Account or save'],['other','Something else']]:null;

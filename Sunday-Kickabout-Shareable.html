@@ -5252,7 +5252,7 @@ function renderOnlinePlus(){const el=$('ol-plus');if(!el)return;const R=rkState(
       <button class="go" data-mm="ranked">Find Ranked match</button></div></div>`}
   else if(olMode==='friendly'){body=`<div class="olpanel"><h3>Friendly</h3><p>Play a real person straight away: you're paired with someone else who chose Friendly with the same match type. No RP, no effect on placements.</p>
       <p class="hint">Coins as for any online match. The first 8 friendlies each day pay full coins, later ones a quarter (so rewards can't be farmed).</p><button class="go" data-mm="friendly">Find Friendly match</button></div>`}
-  el.innerHTML=`<div class="olmodes">${card('ranked','Ranked','Climb the ranks','🏆')}${card('friendly','Friendly','Find an opponent','🤝')}${card('host','Host / Join','Private matches','🔑')}</div>
+  el.innerHTML=`${opsOnlineTop()}<div class="olmodes">${card('ranked','Ranked','Climb the ranks','🏆')}${card('friendly','Friendly','Find an opponent','🤝')}${card('host','Host / Join','Private matches','🔑')}</div>
     <div class="olfmt"><span class="lab">MATCH</span>${Object.entries(NETMODES).map(([k,n])=>`<button data-nm="${k}" aria-pressed="${fmt===k}">${n}</button>`).join('')}</div>${body}
     ${mm.on?`<div class="mmsearch"><div class="mmspin"></div><div><b>Searching for ${mm.kind==='ranked'?'a Ranked':'a Friendly'} opponent…</b><p class="hint" id="mm-info">${mmInfo()}</p></div><button class="ghost" data-mmcancel="1">Cancel</button></div>`:''}
     ${opsOnlineHTML()}
@@ -5770,10 +5770,11 @@ function opsBar(){const el=$('opsbar');if(!el)return;const rows=[];if(ops.ctlAt&
   if(ops.note)rows.push(`<p class="opsann info">🎁 ${esc(ops.note)} <button class="ghost" data-opsgone="note" aria-label="Hide">✕</button></p>`);
   el.innerHTML=rows.join('');el.hidden=!rows.length}
 // the Online tab's extra lines: maintenance, a suspension (with appeal), reporting the last opponent, reporting a problem
-function opsOnlineHTML(){if(!ops.on)return'';const m=opsMineNow(),o=ops.opp;
-  return `${ops.maint?`<p class="opsann warn">🔧 ${esc(ops.maint.msg||'Online play is paused for maintenance.')}</p>`:''}
-    ${m?`<div class="opsann warn"><b>Your club is suspended from online play</b> until ${esc(new Date(m.until).toLocaleString())} for ${esc(OPS_WHY[m.why]||OPS_WHY.other)}. Single-player, packs and everything offline still work. <button class="btn" data-ops="appeal">Appeal</button></div>`:''}
-    <p class="hint opsline">${o&&(o.rid||o.nm)?`Last online opponent: <b>${esc(o.nm||'unknown')}</b>${o.mg?' ('+esc(o.mg)+')':''} <button class="btn" data-ops="repopp">Report</button> · `:''}<button class="btn" data-ops="prob">Report a problem</button></p>`}
+function opsOnlineTop(){if(!ops.on)return'';const m=opsMineNow();
+  return `${ops.maint&&opsFresh()?`<p class="opsann warn">🔧 ${esc(ops.maint.msg||'Online play is paused for maintenance.')}</p>`:''}
+    ${m?`<div class="opsann warn"><b>Your club is suspended from online play</b> until ${esc(new Date(m.until).toLocaleString())} for ${esc(OPS_WHY[m.why]||OPS_WHY.other)}. Single-player, packs and everything offline still work. <button class="btn" data-ops="appeal">Appeal</button></div>`:''}`}
+function opsOnlineHTML(){if(!ops.on)return'';const o=ops.opp;
+  return `<p class="hint opsline">${o&&(o.rid||o.nm)?`Last online opponent: <b>${esc(o.nm||'unknown')}</b>${o.mg?' ('+esc(o.mg)+')':''} <button class="btn" data-ops="repopp">Report</button> · `:''}<button class="btn" data-ops="prob">Report a problem</button></p>`}
 function opsDlg(kind,target){const box=$('opsdlg');if(!box)return;const t=target||{};
   const head={rep:`Report ${esc(t.nm||'this club')}`,prob:'Report a problem',appeal:'Appeal your suspension'}[kind];
   const cats=kind==='rep'?[['cheating','Cheating'],['name','Offensive name or club name'],['abuse','Abuse or harassment'],['other','Something else']]:kind==='prob'?[['bug','Something isn’t working'],['online','Online / connection'],['performance','Slow or jerky'],['account','Account or save'],['other','Something else']]:null;

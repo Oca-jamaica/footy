@@ -67,7 +67,7 @@ function renderOnlinePlus(){const el=$('ol-plus');if(!el)return;const R=rkState(
       <button class="go" data-mm="ranked">Find Ranked match</button></div></div>`}
   else if(olMode==='friendly'){body=`<div class="olpanel"><h3>Friendly</h3><p>Play a real person straight away: you're paired with someone else who chose Friendly with the same match type. No RP, no effect on placements.</p>
       <p class="hint">Coins as for any online match. The first 8 friendlies each day pay full coins, later ones a quarter (so rewards can't be farmed).</p><button class="go" data-mm="friendly">Find Friendly match</button></div>`}
-  el.innerHTML=`<div class="olmodes">${card('ranked','Ranked','Climb the ranks','🏆')}${card('friendly','Friendly','Find an opponent','🤝')}${card('host','Host / Join','Private matches','🔑')}</div>
+  el.innerHTML=`${opsOnlineTop()}<div class="olmodes">${card('ranked','Ranked','Climb the ranks','🏆')}${card('friendly','Friendly','Find an opponent','🤝')}${card('host','Host / Join','Private matches','🔑')}</div>
     <div class="olfmt"><span class="lab">MATCH</span>${Object.entries(NETMODES).map(([k,n])=>`<button data-nm="${k}" aria-pressed="${fmt===k}">${n}</button>`).join('')}</div>${body}
     ${mm.on?`<div class="mmsearch"><div class="mmspin"></div><div><b>Searching for ${mm.kind==='ranked'?'a Ranked':'a Friendly'} opponent…</b><p class="hint" id="mm-info">${mmInfo()}</p></div><button class="ghost" data-mmcancel="1">Cancel</button></div>`:''}
     ${opsOnlineHTML()}
