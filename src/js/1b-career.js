@@ -383,8 +383,12 @@ function cosUse(id){const c=COS.find(x=>x.id===id);if(!c||!cosOwned(id))return;c
 // signing a player
 function careerSigned(p){stat('signed',1);achCheck()}
 // called once the coins are in: records, challenges, legacy, chemistry, evolution progress
-// Training Tokens = max(0, goals scored - goals conceded), once per completed match, in every mode (online too)
-function gdTokens(gf,ga){const n=Math.max(0,(gf|0)-(ga|0));if(n){res();club.tt+=n;earnNote+=` · +${n} Training Token${n>1?'s':''} (goal difference)`}saveClub()}
+// Training Tokens = floor(max(0, goals scored - goals conceded) / 2): half the winning margin, rounded down. Paid once
+// per completed match (a match can't pay twice), in every mode, online too; coin multipliers don't change it.
+let matchSerial=0,ttPaidFor=-1,ttCalc=null;
+const gdTokenCount=(gf,ga)=>Math.floor(Math.max(0,(gf|0)-(ga|0))/2);
+function gdTokens(gf,ga){if(ttPaidFor===matchSerial)return;ttPaidFor=matchSerial;const d=Math.max(0,(gf|0)-(ga|0)),n=gdTokenCount(gf,ga);ttCalc={gf:gf|0,ga:ga|0,d,n};
+  if(n){res();club.tt+=n;earnNote+=` · +${n} Training Token${n>1?'s':''} (half the winning margin)`}saveClub()}
 function careerAfterMatch(){if(NET.on||SG)return;const gf=score[0],ga=score[1],pw=pen&&pen.winner!=null?pen.winner:null,won=gf>ga||pw===0,draw=gf===ga&&pw==null;
   stat('matches');if(won){stat('wins');stat(GM==='classical'?'cwins':'vwins')}stat('goals',gf);if(ga===0)stat('cleans');
   chProg('wins',won?1:0);chProg('goals',gf);chProg('passes',stats.passes||0);chProg('clean',ga===0?1:0);chProg('skills',stats.skills||0);chProg('tackles',stats.tackles||0);

@@ -28,7 +28,7 @@ const SPECIALS={
   rocket:{name:'ROCKET',cd:1200,d:'Hardest shot in the game. Can burst through the keeper’s hands.'},
   knuckle:{name:'KNUCKLEBALL',cd:1140,d:'Wobbling, dipping strike. Keepers react late.'},
   chip:{name:'CHIP',cd:960,d:'Lob over a keeper who has come off his line.'},
-  through:{name:'THROUGH BALL',cd:900,d:'Floats it over everyone onto the penalty spot after one second. Your best runner bursts onto it.'},
+  through:{name:'THROUGH BALL',cd:900,d:'Plays it towards your furthest-forward team-mate (never one who\'s offside), at a fifth of the old speed: defenders and the keeper can read it.'},
   bicycle:{name:'BICYCLE KICK',cd:900,d:'Only straight off a teammate’s pass: flip and volley it first time. Very likely to go in.'},
   lob:{name:'CHIP PASS',cd:960,d:'Lofted pass over the defence to your best-placed teammate. Defenders can still attack it as it drops.'},
 

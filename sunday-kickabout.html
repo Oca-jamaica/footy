@@ -396,6 +396,8 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
 .pbox{max-width:560px;display:flex;flex-direction:column;gap:8px}.pfl{display:flex;flex-direction:column;gap:4px;font-weight:800;font-size:13px;color:var(--muted)}.pfl input{font-size:17px}
 .pfrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.pfgo{font-size:15px;padding:6px 18px}.pacct{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}.pacct h4{margin:0 0 6px;color:var(--sun)}.pacct h4 small{color:var(--muted);font-weight:600}
 .pfin{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pfin input{font-family:var(--body);font-weight:700;font-size:15px;background:var(--ground-2);color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+.psaves{margin-top:6px;padding:8px 10px;border-radius:12px;background:#0f2a37;font-size:13px}.psaves p{margin:3px 0}.pfok{color:var(--mint);font-weight:800}.pfoff{color:var(--muted);font-weight:800}.pfwarn{color:var(--sun);font-weight:800}
+.pacct>summary{cursor:pointer;list-style:none}.pacct>summary::-webkit-details-marker{display:none}.pacct>summary h4{display:inline}.pacct>summary h4::after{content:" \25BE";color:var(--muted)}
 .pfound{border:1px solid var(--sun);border-radius:12px;padding:10px;margin-bottom:8px;background:#12303e}.pfound p{margin:4px 0}
 @media (max-width:520px){.pfin{grid-template-columns:1fr}}
 .tutbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:55;max-width:520px;width:calc(100% - 32px)}.tutbar[hidden]{display:none}
@@ -587,7 +589,7 @@ const SPECIALS={
   rocket:{name:'ROCKET',cd:1200,d:'Hardest shot in the game. Can burst through the keeper’s hands.'},
   knuckle:{name:'KNUCKLEBALL',cd:1140,d:'Wobbling, dipping strike. Keepers react late.'},
   chip:{name:'CHIP',cd:960,d:'Lob over a keeper who has come off his line.'},
-  through:{name:'THROUGH BALL',cd:900,d:'Floats it over everyone onto the penalty spot after one second. Your best runner bursts onto it.'},
+  through:{name:'THROUGH BALL',cd:900,d:'Plays it towards your furthest-forward team-mate (never one who\'s offside), at a fifth of the old speed: defenders and the keeper can read it.'},
   bicycle:{name:'BICYCLE KICK',cd:900,d:'Only straight off a teammate’s pass: flip and volley it first time. Very likely to go in.'},
   lob:{name:'CHIP PASS',cd:960,d:'Lofted pass over the defence to your best-placed teammate. Defenders can still attack it as it drops.'},
 
@@ -1562,8 +1564,12 @@ function cosUse(id){const c=COS.find(x=>x.id===id);if(!c||!cosOwned(id))return;c
 // signing a player
 function careerSigned(p){stat('signed',1);achCheck()}
 // called once the coins are in: records, challenges, legacy, chemistry, evolution progress
-// Training Tokens = max(0, goals scored - goals conceded), once per completed match, in every mode (online too)
-function gdTokens(gf,ga){const n=Math.max(0,(gf|0)-(ga|0));if(n){res();club.tt+=n;earnNote+=` · +${n} Training Token${n>1?'s':''} (goal difference)`}saveClub()}
+// Training Tokens = floor(max(0, goals scored - goals conceded) / 2): half the winning margin, rounded down. Paid once
+// per completed match (a match can't pay twice), in every mode, online too; coin multipliers don't change it.
+let matchSerial=0,ttPaidFor=-1,ttCalc=null;
+const gdTokenCount=(gf,ga)=>Math.floor(Math.max(0,(gf|0)-(ga|0))/2);
+function gdTokens(gf,ga){if(ttPaidFor===matchSerial)return;ttPaidFor=matchSerial;const d=Math.max(0,(gf|0)-(ga|0)),n=gdTokenCount(gf,ga);ttCalc={gf:gf|0,ga:ga|0,d,n};
+  if(n){res();club.tt+=n;earnNote+=` · +${n} Training Token${n>1?'s':''} (half the winning margin)`}saveClub()}
 function careerAfterMatch(){if(NET.on||SG)return;const gf=score[0],ga=score[1],pw=pen&&pen.winner!=null?pen.winner:null,won=gf>ga||pw===0,draw=gf===ga&&pw==null;
   stat('matches');if(won){stat('wins');stat(GM==='classical'?'cwins':'vwins')}stat('goals',gf);if(ga===0)stat('cleans');
   chProg('wins',won?1:0);chProg('goals',gf);chProg('passes',stats.passes||0);chProg('clean',ga===0?1:0);chProg('skills',stats.skills||0);chProg('tackles',stats.tackles||0);
@@ -3415,7 +3421,7 @@ function sgUpdate(dt){if(!SG)return;
 function sgGoal(team){if(SG.k==='target'){const corner=Math.abs(B.y-MY)>36,pts=corner?3:1;SG.pts+=pts;pop(corner?'TOP CORNER  +3':'GOAL  +1',FX1-80,B.y-30,corner?C.sun:C.cream,corner?24:18,60);
     netShake[1]=30;S.goal();if(corner)burst(FX1-10,B.y,60,CONF,8,.12);B.owner=null;B.vx=B.vy=B.vz=0;B.x=FX1+20;SG.parked=true;SG.wait=26;return}
   if(SG.k==='slalom'){SG.done=SG.gi>=SG.gates.length;if(!SG.done){SG.time+=3;pop('MISSED GATES  +3s',FX1-80,MY-30,C.coral,18,60)}netShake[1]=40;S.goal();burst(FX1-10,MY,90,CONF,9,.12);B.x=FX1+20;B.vx=B.vy=B.vz=0;SG.parked=true;clock=0}}
-function startMatch(){
+function startMatch(){matchSerial++;ttCalc=null;
   if(ownedPlayers().length<4)return;
   comp=club.comp||'cup';
   // Classical is played on the big pitch; skill games, challenges and online always use the Volta cage
@@ -3451,7 +3457,7 @@ function showMenu(left=false){
 
 /* ---------- ball actions ---------- */
 let lastPoss=0,introT=0,weather='clear';const INTRO=240;
-function give(p){B.claimBy=null;if(lastPoss!==p.team&&state==='play')wonT[p.team]=t;if(B.pass&&B.pass.from&&B.pass.from.team!==p.team&&!p.keeper&&p.team===1&&state==='play')aiStat.icptWon++;{const wp=B.pass;if(wp&&wp.from&&wp.from.team===p.team&&wp.from!==p)wp.from.mP=(wp.from.mP||0)+1;if(B.shot&&p.keeper&&B.shot.team!==p.team)p.mSv=(p.mSv||0)+1}if(p.team===0&&!p.keeper&&lastPoss===1&&state==='play'){counterT=t;counterX=p.x}if(B.lobTo){B.lobTo.lobRun=null;B.lobTo=null}if(B.graceTo){B.graceTo.lobRun=null;B.graceTo=null;B.graceT=0}if(p.team===1)swT=Math.min(swT,4);if(lastPoss!==p.team&&!p.keeper&&state==='play'&&p.team===0){const near=outfield(1).sort((a,b)=>dist(a,p)-dist(b,p));near.forEach((q,i)=>q.caughtT=i?110:45)}
+function give(p){B.claimBy=null;if(B.pass&&B.pass.ps!=null&&B.pass.from&&B.pass.from.team===1&&window.__plog)window.__plog.push([+B.pass.ps.toFixed(2),p.team===1?1:0,B.pass.through?1:0,Math.round(dist(B.pass.from,p))]);if(p.team===0&&lastPoss===1&&state==='play'&&!pvp()){const z=clamp(Math.floor((FX1-B.x)/(FX1-FX0)*5),0,4);aiStat['loss'+z]=(aiStat['loss'+z]||0)+1;aiStat[B.pass&&B.pass.from&&B.pass.from.team===1?'lossPass':B.shot?'lossShot':'lossCarry']=(aiStat[B.pass&&B.pass.from&&B.pass.from.team===1?'lossPass':B.shot?'lossShot':'lossCarry']||0)+1}if(lastPoss!==p.team&&state==='play')wonT[p.team]=t;if(B.pass&&B.pass.from&&B.pass.from.team!==p.team&&!p.keeper&&p.team===1&&state==='play')aiStat.icptWon++;{const wp=B.pass;if(wp&&wp.from&&wp.from.team===p.team&&wp.from!==p)wp.from.mP=(wp.from.mP||0)+1;if(B.shot&&p.keeper&&B.shot.team!==p.team)p.mSv=(p.mSv||0)+1}if(p.team===0&&!p.keeper&&lastPoss===1&&state==='play'){counterT=t;counterX=p.x}if(B.lobTo){B.lobTo.lobRun=null;B.lobTo=null}if(B.graceTo){B.graceTo.lobRun=null;B.graceTo=null;B.graceT=0}if(p.team===1)swT=Math.min(swT,4);if(lastPoss!==p.team&&!p.keeper&&state==='play'&&p.team===0){const near=outfield(1).sort((a,b)=>dist(a,p)-dist(b,p));near.forEach((q,i)=>q.caughtT=i?110:45)}
   lastPoss=p.team;if(B.owner!==p)p.beatRun=0;if(p.team===1){chain=0}
   const wasPass=B.pass;
   if(p.team===0&&!p.keeper){passChain=(wasPass&&wasPass.from&&wasPass.from.team===0)?passChain+1:0;if(wasPass&&wasPass.from&&wasPass.from.team===0&&wasPass.from!==p){stats.passes++;addHype(4);if(passChain===3)pop('BALL CHARGED!',p.x,p.y-56,C.coral,16,60);if(passChain>=2){const lab=passChain>=6?'TIKI-TAKA':passChain>=4?'SILKY':'NICE MOVE';style+=passChain*6;pop(`${lab}  ${passChain+1} PASSES`,p.x,p.y-34,passChain>=4?C.sun:C.mint,15+Math.min(8,passChain*1.5),70);S.skill(Math.min(3,passChain-1));if(passChain>=4)burst(p.x,p.y,10,[C.sun,C.mint,C.cream],3,.05,[3,5])}if(wasPass.through)addStyle(20,p.x,p.y,'THROUGH BALL');if(wasPass.wall)addStyle(25,p.x,p.y,'ONE-TWO')}if(!p.wallTo)ctrl=p;
@@ -3459,7 +3465,7 @@ function give(p){B.claimBy=null;if(lastPoss!==p.team&&state==='play')wonT[p.team
   if(p.team===1)passChain=0;
   if(B.shot&&p.keeper&&B.shot.team!==p.team){if(B.shot.team===0)stats.on++;pop(pick(['SAVED!','GREAT STOP','HELD IT']),p.x,p.y-30,C.cream,20);S.save();if(B.shot.team===1){addHype(10);style+=10}}
   if(NET.host&&p.team===1&&!p.keeper&&!p.wallTo)setCtrl2(p);
-  B.owner=p;B.shot=null;B.pass=null;B.curl=0;B.knuckle=0;B.rocket=false;B.z=0;B.vz=0;p.recvT=t;p.recvPass=!!(wasPass&&wasPass.from&&wasPass.from.team===p.team&&wasPass.from!==p);
+  B.owner=p;B.shot=null;B.pass=null;B.curl=0;B.knuckle=0;B.rocket=false;B.z=0;B.vz=0;p.recvT=t;p.inBox=false;p.cGo=null;p.recvPass=!!(wasPass&&wasPass.from&&wasPass.from.team===p.team&&wasPass.from!==p);
   if(p.keeper)p.hold=p.team===0?30:45;
 }
 function kick(p,a,spd,vz){B.claimBy=null;B.kickN=(B.kickN||0)+1;if(NET.host&&p.team===1&&!p.keeper&&p!==ctrl2&&state==='play')netStat.aiKick1++;
@@ -3508,7 +3514,7 @@ function curlCross(x,y,a,spd,curl,vz,gx){let vx=Math.cos(a)*spd,vy=Math.sin(a)*s
 function solveCurl(x,y,a0,spd,curl,vz,gx,ty){let lo=a0-.6,hi=a0+.6;const f=a=>{const c=curlCross(x,y,a,spd,curl,vz,gx);return c==null?NaN:c-ty};
   let flo=f(lo),fhi=f(hi);if(!(flo*fhi<0))return a0;
   for(let i=0;i<22;i++){const m=(lo+hi)/2,fm=f(m);if(isNaN(fm))return a0;if(fm*flo<=0){hi=m;fhi=fm}else{lo=m;flo=fm}}return (lo+hi)/2}
-function shoot(p,type,ch,aim=null){if(p.team===1&&!hum(p))aiStat.aiShots++;if(NET.on)netKickLog(p,'shot',type,ch);
+function shoot(p,type,ch,aim=null){if(p.team===1&&!hum(p)){aiStat.aiShots++;const L=FX1-FX0,d=Math.hypot(p.x-goalX(p.team),p.y-MY);aiStat.shD+=d/L;aiStat[d>L*.4?'shFar':d>BOX*1.5?'shMid':'shBox']++;{const q=shotQ(p);aiStat.shXG+=q.xg;aiShotLog.push([+(d/L).toFixed(2),+q.xg.toFixed(3),0,type]);if(aiShotLog.length>400)aiShotLog.shift()}}if(NET.on)netKickLog(p,'shot',type,ch);
   const gx=goalX(p.team),att=p.team===0?1:-1,fin=p.st.fin,pow=p.st.shot,fz=(fire>0&&p.team===0&&!NET.on)?1.1:1;// online, ON FIRE is for show only, for both sides
   let ty=aim;
   // no aim assist: the ball goes exactly where you're facing
@@ -3662,17 +3668,24 @@ function offsideCall(p,m){const def=players.filter(q=>q.team!==p.team&&!q.keeper
   const s2=t2.team===0?1:-1;B.x=clamp(t2.x+s2*12,FX0+10,FX1-10);B.y=t2.y;give(t2);if(t2.keeper)t2.hold=40;
   pop('OFFSIDE!',m.x,m.y-40,C.coral,26,80);S.whistle(1);if(m.team===0)S.aww();
   for(const q of players)if(q.team===p.team&&!q.keeper)q.lobRun=null}
-/* The Through Ball special: played into the space just ahead of the best-placed runner (not always to the penalty spot),
-   about 8% slower than it used to be, and only within a sensible range, so it can't be launched from your own half for a
-   guaranteed goal. If the runner is offside, it's a free kick to the other side. */
-const THROUGH_T=66;
-function throughPick(p){const dir=Math.sign(goalX(p.team)-MIDX);let m=null,bs=-1e9;
-  for(const q of outfield(p.team)){if(q===p)continue;const fwd=(q.x-p.x)*dir,d=dist(q,p);if(fwd<-40||d>620*PSC)continue;const sc=fwd/200+(q.vx*dir)*.4-Math.abs(q.y-MY)/400-d/900;if(sc>bs){bs=sc;m=q}}return m}
-function doThrough(p){if(B.owner!==p)return false;const gx=goalX(p.team),dir=Math.sign(gx-MIDX),m=throughPick(p);
+/* The Through Ball special. It always goes towards the team-mate furthest up the pitch (towards the goal his side is
+   attacking, whichever way that is): only your own outfield players count, and not anyone who'd be offside, or who's on
+   the floor or dazed. If nobody's eligible it isn't played and the cooldown isn't spent. It's aimed, as before, into the
+   space just ahead of him (short of the penalty spot), but it travels at a fifth of its old speed (THROUGH_SPEED), as an
+   ordinary loose ball: defenders and the keeper can read it and cut it out, and it rolls and bounces off bodies like any
+   other ball. On the host the same code picks the target for both players, so both laptops see the same pass. */
+const THROUGH_T=66,THROUGH_SPEED=.2;
+function throughPick(p){const dir=Math.sign(goalX(p.team)-MIDX);let m=null,bx=-1e9;
+  for(const q of outfield(p.team)){if(q===p||q.team!==p.team||q.keeper||q.stun>0||q.fall>0||q.locked>0||isOffside(q,p))continue;if(q.x*dir>bx){bx=q.x*dir;m=q}}return m}
+function doThrough(p){if(B.owner!==p||state!=='play')return false;const gx=goalX(p.team),dir=Math.sign(gx-MIDX),m=throughPick(p);
   if(!m){if(p.team===0||hum(p))pop('nobody to play it to',p.x,p.y-34,C.muted,14);return false}
-  if(isOffside(m,p)){pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);offsideCall(p,m);return true}
   const lead=150*PSC,tx=clamp(m.x+dir*lead,FX0+40,FX1-40),stop=gx-dir*SPOT,txx=dir>0?Math.min(tx,stop):Math.max(tx,stop),ty=m.y+(MY-m.y)*.25;
-  lobTo(p,m,txx,ty,THROUGH_T,true);pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
+  if(NET.on)netKickLog(p,'through',players.indexOf(m),0);
+  lobTo(p,m,txx,ty,THROUGH_T,true);
+  // the old pass's launch, at a fifth of the speed, then left to the normal ball physics
+  B.vx*=THROUGH_SPEED;B.vy*=THROUGH_SPEED;B.vz*=THROUGH_SPEED;B.lobTo=null;B.lobThrough=false;B.claimBy=null;B.lockBy=p;B.lockT=45;m.lobRun=null;// the passer can't just take it straight back
+  B.pass={from:p,to:m,through:true,special:true};m.tbAim={x:txx,y:ty};
+  pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
 function doLob(p){if(B.owner!==p)return false;const att=p.team===0?1:-1;let m=bestMate(p);
   if(!m){for(const q of outfield(p.team))if(q!==p&&(!m||(q.x-m.x)*att>0))m=q}if(!m)return false;
   const T=clamp(dist(p,m)/6.5,34,62),err=(1.25-(p.st.pass??.65))*55*(dist(p,m)/400+.5);lobTo(p,m,m.x+m.vx*T*.6+att*30+rnd(-err,err),m.y+m.vy*T*.6+rnd(-err,err),T,false);B.pass.chip=true;m.turbo=Math.min(m.turbo,T*.35);pop('CHIP PASS',p.x,p.y-34,p.team===0?C.sun:C.coral,18,70);return true}
@@ -3838,7 +3851,7 @@ function humanUpdate(p,dt){
    (nudged by division). It changes decisions, not stats: interceptions, marking the dangerous runner, blocking lanes,
    spacing, runs into space, counters, through-ball timing and shot choice. Your own AI team-mates use a steady .6.
    Online both sides use the same value, so it stays fair. */
-const wonT=[-999,-999],aiStat={icpt:0,icptWon:0,through:0,square:0,chip:0,corner:0,counter:0,sweeps:0,tkTry:0,tkWon:0,slTry:0,slWon:0,aiShots:0,aiPasses:0,aiSkills:0};
+const aiShotLog=[];const wonT=[-999,-999],aiStat={icpt:0,icptWon:0,through:0,square:0,chip:0,corner:0,counter:0,sweeps:0,tkTry:0,tkWon:0,slTry:0,slWon:0,aiShots:0,aiPasses:0,aiSkills:0,shFar:0,shMid:0,shBox:0,shD:0,shXG:0,aiGoals:0,aiBox:0,aiFwd:0,aiDrib:0};
 function aiIQ(team){if(pvp())return .55;if(team===0)return .6;const b={chill:.15,normal:.42,hard:.72,extreme:.95}[club.level]??.42;return clamp(b+(DF.read||0)*.35-.04,0,1)}
 const lastLine=(team,dir)=>{let v=-1e9;for(const q of outfield(team))v=Math.max(v,q.x*dir);return v};// deepest outfield player of `team`, measured along dir
 // the open spot near a target: tries a few nearby points and keeps the one furthest from the opposition
@@ -3934,6 +3947,25 @@ function homePos(p,attacking){
   const y0=FY0+(FY1-FY0)*f.y,ty=y0+(B.y-y0)*(f.r==='DEF'?.38:.25);
   return{x:p.team===0?FX0+fx*(FX1-FX0):FX1-fx*(FX1-FX0),y:clamp(ty,FY0+25,FY1-25)};
 }
+/* Classical attacking shape, off the ball. Forwards live on the shoulder of the last defender (onside, in the gaps between
+   defenders) rather than on the goal line next to the keeper; now and then, when the man on the ball has time to pick a
+   pass, one of them times a run in behind for the through ball. Nobody without the ball stands in the keeper's area, and
+   on the big pitch the forwards don't drift so far ahead that they're cut off from the rest of the team. */
+function cAttackShape(p,team,owner,tx,ty,IQ){const att=team===0?1:-1,tg=team===0?FX1:FX0,opp=1-team,dx=x=>x*att;
+  const line=Math.max(lastLine(opp,att),dx(B.x)),keeperZone=dx(tg)-Math.max(BOX*.36,95);
+  // the run in behind: started when the carrier is facing up with time on the ball and this forward is near the line
+  if((p.cRun||0)>0){p.cRun-=1;const rx=tg-att*Math.max(BOX*.45,120),ry=p.cRunY;return{x:rx,y:ry,run:true}}
+  if(p.slot.r==='ATT'||p.role==='att'){const near=Math.abs(dx(p.x)-line)<90*PSC,facing=Math.cos(owner.dir)*att>.3,time=openness(owner)>70;
+    if(near&&facing&&time&&dx(owner.x)<line-40&&(p.cRunCd=(p.cRunCd||0)-1)<=0&&Math.random()<.02+.05*IQ){p.cRun=Math.round(45+20*PSC);p.cRunCd=150;
+      // into the biggest gap between their defenders near his lane
+      const ys=outfield(opp).filter(q=>Math.abs(dx(q.x)-line)<160*PSC).map(q=>q.y).concat([FY0+60,FY1-60]).sort((a,b)=>a-b);let gy=p.y,gw=0;
+      for(let i=1;i<ys.length;i++){const mid=(ys[i]+ys[i-1])/2,w=ys[i]-ys[i-1]-Math.abs(mid-p.y)*.5;if(w>gw){gw=w;gy=mid}}p.cRunY=clamp(gy,FY0+50,FY1-50);
+      return{x:tg-att*Math.max(BOX*.45,120),y:p.cRunY,run:true}}}
+  // stay onside and out of the keeper's area (the box runs above already stop at the near post, the spot or the edge)
+  let x=tx;const cap=Math.min(line+4,keeperZone);if(dx(x)>cap)x=cap*att;
+  // don't get cut off from play on the big pitch
+  const far=(560+180*(PSC-1))*PSC;if(dx(x)-dx(owner.x)>far)x=owner.x+att*far;
+  return{x,y:ty,run:false}}
 function teamAI(team,dt){
   const own=outfield(team),opp=1-team,owner=B.owner,att=team===0?1:-1,ownGoal=team===0?FX0:FX1;
   const ai=own.filter(p=>!(team===0&&p===ctrl)&&p!==ctrl2);
@@ -4032,7 +4064,10 @@ function teamAI(team,dt){
       // around the box: one attacks the near post, one the far post, the rest the edge of the box for a cut-back
       const tg=team===0?FX1:FX0;
       if(owner&&owner!==p&&p.slot.r!=='DEF'&&Math.abs(owner.x-tg)<BOX*1.7){const runners=ai.filter(q=>q.slot.r!=='DEF'&&q!==owner).sort((a,b)=>Math.abs(a.x-tg)-Math.abs(b.x-tg)),k=runners.indexOf(p),bs=owner.y<MY?-1:1;
-        const spot=k===0?{x:tg-att*55*PSC,y:MY+bs*40}:k===1?{x:tg-att*70*PSC,y:MY-bs*55}:{x:tg-att*BOX*1.05,y:MY+(k%2?-1:1)*60};const w=.35+.55*IQ;tx+=(spot.x-tx)*w;ty+=(spot.y-ty)*w}
+        // (on the Classical pitches: the near post at a realistic distance, the penalty spot, and the edge of the box, never
+        // standing on the keeper)
+        const spot=CLs?(k===0?{x:tg-att*BOX*.4,y:MY+bs*(GY1-GY0)*.42}:k===1?{x:tg-att*SPOT,y:MY-bs*38}:{x:tg-att*BOX*1.05,y:MY+(k%2?-1:1)*70*PSC})
+          :k===0?{x:tg-att*70,y:MY+bs*40}:k===1?{x:tg-att*80,y:MY-bs*55}:{x:tg-att*BOX*1.05,y:MY+(k%2?-1:1)*60};const w=.35+.55*IQ;tx+=(spot.x-tx)*w;ty+=(spot.y-ty)*w}
       // Classical: the nearest midfielder or defender offers a short angled pass to a team-mate who's being closed down
       if(CLs&&owner&&owner!==p&&p.slot.r!=='ATT'&&openness(owner)<75&&ai.filter(q=>q!==owner&&q.slot.r!=='ATT').sort((a,b)=>dist(a,owner)-dist(b,owner))[0]===p){
         const sd=p.y<owner.y?-1:1,w=.3+.6*IQc;tx+=(owner.x-att*70*PSC-tx)*w;ty+=(owner.y+sd*85*PSC-ty)*w}
@@ -4040,7 +4075,8 @@ function teamAI(team,dt){
       if(owner&&owner!==p&&p.slot.r!=='DEF'){if((p.runT=(p.runT||0)-dt)<=0){p.runT=10+rnd(0,6);p.runPt=Math.random()<.25+.7*IQ?openSpot(p,tx,ty,att,55*PSC):null;p.runB={x:tx,y:ty}}
         if(p.runPt){tx+=p.runPt.x-p.runB.x;ty+=p.runPt.y-p.runB.y}}
       if(owner&&dist({x:tx,y:ty},owner)<80){ty+=(ty<owner.y?-1:1)*60}
-      spd=topSpeed(p)*(p.turbo>0||p.sprint||(CLs&&counter&&p.slot.r!=='DEF')?1:.85);
+      if(CLs&&owner&&owner!==p&&p.slot.r!=='DEF'){const a=cAttackShape(p,team,owner,tx,ty,IQc);tx=a.x;ty=a.y;if(a.run)p.sprint=false}
+      spd=topSpeed(p)*(p.turbo>0||p.sprint||(CLs&&counter&&p.slot.r!=='DEF')||p.cRun>0?1:.85);
     }else{
       const h=CLs?cDefSpot(p,team,STY):homePos(p,false);let m=markOf.get(p);
       if(!m&&IQ<.3){let md=150*PSC;for(const q of attackers){if(taken.has(q))continue;const d=Math.hypot(q.x-h.x,q.y-h.y);if(d<md){md=d;m=q}}}
@@ -4062,7 +4098,89 @@ function teamAI(team,dt){
     steer(p,clamp(tx,FX0+40,FX1-40),clamp(ty,FY0+25,FY1-25),spd,dt);
   }
 }
+/* ---------- Classical: the computer's ball carrier thinks like a footballer ----------
+   Every few frames he weighs what he could do by how likely each is to end in a goal, less the risk of giving the ball
+   away (worse the nearer his own goal): shoot (the real chance from here, see shotQ), pass (to feet, into a runner's
+   stride, across goal, a switch to the open side, a long ball, a cross), dribble (along the most open lane, bursting
+   into space), take his man on with a skill, or keep it until something opens up. A shot from distance only wins when
+   it's genuinely a better bet than working the ball closer, so speculative efforts from halfway are rare and good
+   finishers are the ones who try them. The choice has a little randomness in it (less the better the side), so he isn't
+   predictable; better sides also judge more accurately and decide quicker. */
+// how dangerous it is for footballer `who` to have the ball at (x,y): the chance he'd have shooting from there (the real
+// keeper and defenders counted, the same estimate the shot itself uses), or, further out, credit for ground gained
+function cThreat(who,x,y){const team=who.team,gx=goalX(team),dir=Math.sign(gx-MIDX),L=FX1-FX0;if((gx-x)*dir<10)return .02;
+  const prog=clamp(1-(gx-x)*dir/L,0,1);return Math.max(shotQ(who,x,y).xg,.02+.25*prog*prog)}
+// what losing the ball here costs: little in their half, a lot in front of your own goal
+const cLoss=(team,x)=>{const dir=Math.sign(goalX(team)-MIDX),prog=clamp(.5+(x-MIDX)*dir/(FX1-FX0),0,1);return .015+.1*Math.pow(1-prog,2)};
+// the chance a ball played from a to (rx,ry), arriving after T frames, gets there before a defender can step in
+function cLaneSafe(a,rx,ry,T,team,lofted){let risk=0,space=1e9;const lx=rx-a.x,ly=ry-a.y,L2=lx*lx+ly*ly||1;
+  for(const q of players){if(q.team===team)continue;const dR=Math.hypot(q.x-rx,q.y-ry);space=Math.min(space,dR);
+    // can he reach where it's going before it gets there?
+    const tq=runT(q,rx,ry,topSpeed(q)*(q.keeper?.9:1),q.keeper?4:3);if(tq<T)risk+=clamp((T-tq)/14,0,1)*(q.keeper&&!lofted?1.2:.9);
+    if(!lofted&&!q.keeper){const u=clamp(((q.x-a.x)*lx+(q.y-a.y)*ly)/L2,0,1),dd=Math.hypot(a.x+lx*u-q.x,a.y+ly*u-q.y),reach=18+topSpeed(q)*u*T*.35;if(u>.08&&dd<reach)risk+=(1-dd/reach)*1.3}}
+  return{ps:Math.exp(-1.6*risk),space}}
+function cCarrier(p,dt){const team=p.team,gx=goalX(team),dir=Math.sign(gx-MIDX),defs=outfield(1-team),mates=outfield(team).filter(m=>m!==p),L=FX1-FX0,H=FY1-FY0;
+  let nd=null,ndd=1e9;for(const q of defs){const d=dist(q,p);if(d<ndd){ndd=d;nd=q}}
+  const IQ=cIQ(team),sty=cStyle(team),XF=team===1&&!NET.on&&LV().extreme?2:1,dG=Math.hypot(p.x-gx,p.y-MY),sq=shotQ(p);
+  if(dG<BOX*1.1&&!p.inBox){p.inBox=true;if(team===1)aiStat.aiBox++}
+  p.dec-=dt;
+  // a real chance: don't wait for the next think, and the closer it is the less he dithers
+  const hot=sq.xg>lerp(.5,.36,IQ)&&Math.random()<.35*dt;
+  // a defender has just arrived on him: think again now
+  const jumped=nd&&ndd<34&&p.dec>4&&(p.cLastNd||99)>=34;p.cLastNd=ndd;
+  if(p.dec<=0||hot||jumped){p.dec=((12-5*IQ)+rnd(0,8-4*IQ))/XF;
+    const opts=[],add=(v,f,k)=>opts.push({v:v+gaussN()*.02*(1-IQ),f,k}),lossHere=cLoss(team,p.x),speedP=topSpeed(p);
+    // 1. shoot
+    // shooting zones: from deep it isn't an option at all; from range only a genuine sight of goal (and better finishers
+    // see more of those); around the box it's weighed against everything else; in the box he's looking to finish
+    const elite=(p.st.fin??.6)>.84&&(p.st.shot??.6)>.84,minXG=(elite?.04:lerp(.075,.055,IQ))*(dG<BOX*1.3?.6:1);
+    if(sq.xg>=minXG&&(dG<L*.36||elite&&dG<L*.45)){let v=sq.xg*(.86+.28*DF.shoot)*sty.shoot-(1-sq.xg)*.02+(dG<BOX*1.1?.03:dG<BOX*1.6?.01:0);if(elite)v*=1.25;
+      add(v,()=>{if(p.spCd<=0&&['curler','rocket','knuckle','chip'].includes(p.st.sp)&&sq.xg>.07&&Math.random()<.55&&aiSpecial(p,dG,ndd))return;aiShoot(p,dG)},'shot')}
+    // 2. passes: to feet, into a runner's stride (not offside), and long balls over the top on the big pitches
+    const crowd=defs.filter(q=>dist(q,p)<150*PSC).length;
+    for(const m of mates){const d=dist(p,m);if(d<45||d>780*PSC)continue;
+      const after=(rx,ry,space)=>cThreat(m,rx,ry)*(.55+.45*clamp(space/95,0,1));
+      {const lead=10+d/35,rx=clamp(m.x+m.vx*lead,FX0+30,FX1-30),ry=clamp(m.y+m.vy*lead,FY0+30,FY1-30),T=Math.hypot(rx-p.x,ry-p.y)/10.5,s=cLaneSafe(p,rx,ry,T,team,false);s.ps*=clamp(.97-d/(1700*PSC),.5,.97);
+        let v=s.ps*after(rx,ry,s.space)-(1-s.ps)*lossHere;if(crowd>=3&&Math.abs(m.y-p.y)>H*.33)v+=.025;// switch it when the near side is packed
+        const gain=(rx-p.x)*dir;v-=gain<-40?.025:gain<60?.012:0;add(v*tacOf(team).pass,()=>{pass(p,m);if(B.pass)B.pass.ps=s.ps;if(team===1&&(m.x-p.x)*dir>60)aiStat.aiFwd++},'pass')}
+      if((m.x-p.x)*dir>25&&m.vx*dir>.8&&!isOffside(m,p)){const rx=clamp(m.x+m.vx*28+dir*90,FX0+30,FX1-30),ry=clamp(m.y+m.vy*28,FY0+30,FY1-30),Tb=Math.hypot(rx-p.x,ry-p.y)/10.5,Tm=runT(m,rx,ry,topSpeed(m)*1.1,0),s=cLaneSafe(p,rx,ry,Math.max(Tb,Tm),team,false);s.ps*=clamp(.85-d/(900*PSC),.2,.8);
+        const v=s.ps*after(rx,ry,s.space)*1.05-(1-s.ps)*lossHere;add(v*tacOf(team).pass,()=>{pass(p,m,true);if(B.pass)B.pass.ps=s.ps;if(team===1){aiStat.through++;aiStat.aiFwd++}},'through')}
+      if(PITCH!=='volta'&&(m.x-p.x)*dir>180&&d>230&&!isOffside(m,p)){const T=clamp(d/7.5,38,78),rx=clamp(m.x+dir*45+m.vx*T*.5,FX0+30,FX1-30),ry=clamp(m.y+m.vy*T*.5,FY0+30,FY1-30),s=cLaneSafe(p,rx,ry,T,team,true);
+        const acc=.55+.35*(p.st.pass??.6);const v=s.ps*acc*after(rx,ry,s.space)*(.85+(PSC-1)*.4)*sty.long-(1-s.ps*acc)*lossHere;
+        add(v,()=>{lobTo(p,m,rx,ry,T,false);B.pass.chip=true;pop('LONG BALL',p.x,p.y-34,team===0?C.sun:C.coral,15,50);if(team===1)aiStat.aiFwd++},'long')}}
+    // 3. a cross from out wide near the box, to whoever's attacking it
+    if(Math.abs(p.y-MY)>BOXH*.75&&(gx-p.x)*dir<BOX*1.9){let best=0;for(const m of mates){const md=Math.hypot(m.x-gx,m.y-MY);if(md<BOX*1.25)best=Math.max(best,shotQ(m).xg*.8+.05)}
+      if(best>0)add(best*(.5+.35*(p.st.pass??.6))-.5*lossHere*.4,()=>{p.dir=Math.atan2(MY-p.y,gx-p.x);cross(p)},'cross')}
+    // 4. dribble: the most open lane towards goal, taking his pace and dribbling into account
+    {const ag=Math.atan2(MY-p.y,gx-p.x),SL=(80+50*(p.st.skill??.6))*Math.sqrt(PSC),sk=p.st.skill??.6;let bd=null;
+      for(const o of [0,-.45,.45,-.95,.95,Math.atan2(0,dir)-ag]){const a=ag+o,ex=p.x+Math.cos(a)*SL,ey=p.y+Math.sin(a)*SL;if(ey<FY0+40||ey>FY1-40||ex<FX0+30||ex>FX1-30)continue;
+        let keep=1,clear=1e9;for(const q of [...defs,keeperOf(1-team)].filter(Boolean)){const qx=q.x+q.vx*6,qy=q.y+q.vy*6;for(const u of [.35,.7,1]){const px=p.x+(ex-p.x)*u,py=p.y+(ey-p.y)*u,tq=Math.hypot(qx-px,qy-py)/Math.max(1,topSpeed(q)),tm=u*SL/speedP;
+            clear=Math.min(clear,Math.hypot(qx-px,qy-py));const c=(tq+4)/(tm+4);if(c<1.15)keep*=1-clamp((1.15-c)/.9,0,1)*(1.05-.5*sk)*.5}}
+        const tE=cThreat(p,ex,ey),tH=cThreat(p,p.x,p.y),v=keep*(tH+(tE-tH)*.75)-(1-keep)*lossHere;if(!bd||v>bd.v)bd={v,ex,ey,keep,clear,a}}
+      if(bd)add(bd.v+.004,()=>{p.cGo={x:bd.ex,y:bd.ey,T:22};if(team===1)aiStat.aiDrib++;
+          // open grass ahead: knock it on and go
+          if(bd.keep>.85&&bd.clear>110&&(p.blungeCd||0)<=0&&!p.anim&&p.stam>20&&Math.random()<.5){push(p,bd.a,7.4,13,{a:bd.a,spd:6,T:10});p.blungeCd=BLUNGE_CD*1.4;S.swoosh();grass(p.x,p.y,5)}
+          else if(bd.keep>.8&&bd.clear>150&&p.st.sp==='turbo'&&p.spCd<=0)aiSpecial(p,dG,ndd)},'dribble')}
+    // 5. take his man on: one defender right in front and a skill ready
+    if(nd&&ndd<120&&(nd.x-p.x)*dir>-15&&p.skillCd<=0&&!p.anim){const sk=p.st.skill??.6,pb=clamp(.45+.45*sk-.2*((nd.st.tackle??.6)-.6)+(DF.skills===false?-.2:0),.15,.9),fx=p.x+dir*120*Math.sqrt(PSC);
+      add(pb*cThreat(p,fx,p.y+(MY-p.y)*.2)-(1-pb)*lossHere*.6+.012,()=>{doSkill(p)},'skill')}
+    // 6. keep it: shield or turn away and wait for a run
+    add(cThreat(p,p.x,p.y)*(ndd<40?.45:ndd<80?.62:.72)-(ndd<40?lossHere*.3:0),()=>{const a=nd&&ndd<120?Math.atan2(p.y-nd.y,p.x-nd.x):Math.atan2(MY-p.y,gx-p.x);p.cGo={x:clamp(p.x+Math.cos(a)*60,FX0+40,FX1-40),y:clamp(p.y+Math.sin(a)*60,FY0+40,FY1-40),T:14}},'keep');
+    // other specials (one-two, ghost, chip pass, bicycle...) now and then, as before
+    if(p.spCd<=0&&!['curler','rocket','knuckle','chip'].includes(p.st.sp)&&Math.random()<.25&&aiSpecial(p,dG,ndd))return;
+    // pick: his best option of each kind (best pass, best dribble...) goes forward, then the best kind usually wins, but not
+    // always (sharper sides stray less); comparing kinds rather than every single pass stops passing winning on numbers alone
+    const bestOf=new Map();for(const o of opts){const b=bestOf.get(o.k);if(!b||o.v>b.v)bestOf.set(o.k,o)}const fin=[...bestOf.values()];
+    const tau=lerp(.026,.01,IQ)/XF,top=Math.max(...fin.map(o=>o.v));let sum=0;for(const o of fin){o.w=Math.exp((o.v-top)/tau);sum+=o.w}
+    let r=Math.random()*sum,ch=fin[fin.length-1];for(const o of fin){r-=o.w;if(r<=0){ch=o;break}}
+    p.cLast=ch.k;if(team===1)aiStat['k_'+ch.k]=(aiStat['k_'+ch.k]||0)+1;if(window.__cdbg&&window.__cdbg.length<3000)window.__cdbg.push({k:ch.k,x:+((p.x-FX0)/(FX1-FX0)*(team?-1:1)+(team?1:0)).toFixed(2),nd:Math.round(ndd),o:Object.fromEntries(fin.map(o=>[o.k,+o.v.toFixed(3)]))});ch.f();if(B.owner!==p)return}
+  // between decisions: carry it where he decided, else towards the box
+  let tx,ty;if(p.cGo&&(p.cGo.T-=dt)>0){tx=p.cGo.x;ty=p.cGo.y}else{p.cGo=null;tx=gx-dir*BOX*.9;ty=MY+(p.y-MY)*.6}
+  const sp=Math.hypot(p.vx,p.vy);p.stuckT=sp<1.2?(p.stuckT||0)+dt:Math.max(0,(p.stuckT||0)-dt);
+  if(p.stuckT>36){p.stuckT=0;const m=bestMate(p);if(m){pass(p,m);return}}
+  steer(p,clamp(tx,FX0+30,FX1-30),clamp(ty,FY0+40,FY1-40),topSpeed(p),dt)}
 function carrierAI(p,dt){
+  if(CL()){cCarrier(p,dt);return}
   const gx=goalX(p.team),defs=outfield(1-p.team);
   let nd=null,ndd=1e9;for(const q of defs){const d=dist(q,p);if(d<ndd){ndd=d;nd=q}}
   const dG=Math.hypot(p.x-gx,p.y-MY);p.dec-=dt;const IQ=aiIQ(p.team),dir0=Math.sign(gx-p.x)||1;
@@ -4121,17 +4239,33 @@ function aiSpecial(p,dG,ndd){const sp=p.st.sp,def=SPECIALS[sp];if(!def)return fa
     if(smart&&sp!=='chip'&&sp!=='curler'&&laneBlocked(p,{x:gx0,y:MY},18,p.team))return false;// smart sides save the strike for a clear sight of goal
   }
   if(smart&&sp==='turbo'&&outfield(1-p.team).some(q=>(q.x-p.x)*dir>0&&(q.x-p.x)*dir<170&&Math.abs(q.y-p.y)<70))return false;// no space to run into
-  if(smart&&sp==='through'&&!outfield(p.team).some(m=>m!==p&&m.vx*dir>1&&(m.x-p.x)*dir>20))return false;// nobody making the run
+  if(smart&&sp==='through'){const m=throughPick(p);if(!m||m.vx*dir<.5||(m.x-p.x)*dir<20)return false}// nobody making the run
   if(['curler','rocket','knuckle','chip'].includes(sp)){
     const k=keeperOf(1-p.team),gx=goalX(p.team),ty=sp==='chip'?MY+rnd(-18,18):(k.y>MY?GY0+12:GY1-12);
     p.spCd=spCdOf(p)*1.5;p.dir=Math.atan2(ty-B.y,gx-B.x);pop(def.name,p.x,p.y-34,C.coral,20,70);S.special();shoot(p,sp,.85,ty);return true}
   if(sp==='turbo'&&ndd>70&&Math.random()<.4){p.spCd=spCdOf(p)*1.5;p.turbo=150;pop('TURBO',p.x,p.y-34,C.coral,16);return false}
-  if(sp==='through'&&dG<620&&Math.random()<.35&&!isOffside(throughPick(p),p)&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}
+  if(sp==='through'&&dG<620&&Math.random()<.35){const m=throughPick(p);if(m&&(m.x-p.x)*dir>40&&dist(p,m)<220&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}}
   if(sp==='lob'&&Math.random()<.3&&doLob(p)){p.spCd=spCdOf(p)*1.5;return true}
   if(sp==='onetwo'&&ndd<90&&Math.random()<.5&&doOneTwo(p)){p.spCd=def.cd*1.5;return true}
   if(sp==='ghost'&&ndd<85&&Math.random()<.5&&doGhost(p)){p.spCd=def.cd*1.5;return false}
   if(sp==='bicycle'&&bikeReady(p)&&Math.random()<.6&&doBicycle(p)){p.spCd=spCdOf(p)*1.5;return true}
   return false}
+/* How good a chance is a shot from (x,y) right now, 0 to 1? The angle of goal mouth the shooter can see, less the part
+   the keeper covers from there, shrinking with distance; bodies in the line of the shot and a defender breathing down
+   his neck cut it further; better finishers and harder strikers keep more of it from range. This is what the computer
+   weighs a shot against a pass or a dribble with. */
+function shotQ(p,x=p.x,y=p.y){const gx=goalX(p.team),dir=Math.sign(gx-MIDX),d=Math.hypot(gx-x,MY-y);
+  if((gx-x)*dir<10)return{xg:0,d,open:0};
+  const base=Math.atan2(MY-y,gx-x),lo0=angDiff(Math.atan2(GY0-y,gx-x),base),hi0=angDiff(Math.atan2(GY1-y,gx-x),base),lo=Math.min(lo0,hi0),hi=Math.max(lo0,hi0);
+  let open=hi-lo;const k=keeperOf(1-p.team);
+  if(k&&!noKeep()&&!(k.stun>0)&&(k.x-x)*dir>0){const kd=Math.max(18,Math.hypot(k.x-x,k.y-y)),kc=angDiff(Math.atan2(k.y-y,k.x-x),base),h=Math.atan2(22+14*kgk(k),kd);
+    open-=Math.max(0,Math.min(hi,kc+h)-Math.max(lo,kc-h))}
+  open=Math.max(0,open);const fin=p.st.fin??.6,pow=p.st.shot??.6;
+  let q=Math.pow(clamp(open/.42,0,1),.85)*Math.exp(-Math.max(0,d-80)/(170+150*fin+90*pow))*(.55+.5*fin);
+  let block=0,press=1e9;for(const o of outfield(1-p.team)){const od=Math.hypot(o.x-x,o.y-y);press=Math.min(press,od);
+    const ux=gx-x,uy=MY-y,L2=ux*ux+uy*uy,u=((o.x-x)*ux+(o.y-y)*uy)/L2;if(u>0&&u<1){const off=Math.abs((o.x-x)*uy-(o.y-y)*ux)/Math.sqrt(L2),w=12+(hi-lo)/2*u*Math.sqrt(L2)*.6;if(off<w)block++}}
+  q*=Math.pow(.55,block)*(press<26?.7:press<45?.86:1);
+  return{xg:clamp(q,0,.95),d,open,block,press}}
 function aiShoot(p,dG){
   const k=keeperOf(1-p.team),gx=goalX(p.team);
   const IQ=aiIQ(p.team);let c=k.y>MY?GY0+12:GY1-12;
@@ -4154,7 +4288,8 @@ function keeperRead(k,react,type='normal'){
   let py=curlCross(B.x,B.y,a,spd,B.curl||0,B.vz||0,k.x);if(py==null){const tt=(k.x-B.x)/(B.vx||1e-3);py=B.y+B.vy*Math.max(0,tt)}
   const far=Math.abs(k.x-B.x),clean=B.shot&&B.shot.perfect;
   const sig=(3+spd*.45*(1.3-gk*.55)+far*.05)*(type==='curler'?(gk===1.02?1.25:1.7):type==='knuckle'?2.4:type==='rocket'?1.3:type==='volley'?1.7:type==='header'?1.3:1)*(clean?1.4:1);
-  k.planErr=gaussN()*sig;k.planD0=Math.max(40,far);k.planY=py+k.planErr;k.react=Math.max(2,react);k.track=true;k.dv=0;k.diving=false}
+  k.planErr=gaussN()*sig;k.planD0=Math.max(40,far);k.planY=py+k.planErr;k.react=Math.max(2,react)*KREACT;k.track=true;k.dv=0;k.diving=false}
+const KREACT=1.1;// keepers take 10% longer to react to a shot (and to decide to come off their line) than they used to
 /* ---------- sweeper keeper ----------
    When a through ball or loose ball runs in behind the defence, the keeper races the attackers to it. He reads the ball's
    path, his own run against the nearest attacker and the nearest defender, and commits only when he expects to win it.
@@ -4222,7 +4357,7 @@ function sweeperTick(k,dt){const gx=k.team===0?FX0:FX1,sk=kSkill(k);
   if(!P0){k.swSeen=0;k.swErr=null;return false}
   // first time he sees it he forms his read of the race; he needs to see it for a few frames (less for good keepers) before he goes
   if(!k.swErr)k.swErr=1+rnd(-.8,1)*(.05+.42*(1-sk));
-  k.swSeen=(k.swSeen||0)+3;if(k.swSeen<3+Math.round(9*(1-sk)))return false;
+  k.swSeen=(k.swSeen||0)+3;if(k.swSeen<(3+Math.round(9*(1-sk)))*KREACT)return false;
   k.sweep={x:P0.x,y:P0.y,t:0,re:4,p0:P0};k.wide=true;k.swSeen=0;k.swErr=null;k.sweeps=(k.sweeps||0)+1;aiStat.sweeps++;return true}
 function keeperUpdate(k,dt){
   if(noKeep()){const gx=k.team===0?FX0:FX1;k.x=gx+(k.team===0?-8:8);k.y=GY1+30;k.vx=k.vy=0;if(B.owner===k){B.owner=null;const m=outfield(k.team)[0];if(m)give(m)}return}
@@ -4348,6 +4483,7 @@ function ballUpdate(dt,live){
 /* ---------- goals + celebrations ---------- */
 function goalFor(team){
   if(comp==='skill'&&SG){sgGoal(team);return}
+  if(team===1&&!pvp()){aiStat.aiGoals++;const l=aiShotLog[aiShotLog.length-1];if(l&&B.shot&&B.shot.team===1)l[2]=1}
   wasBehind=team===0&&score[0]<score[1];
   score[team]++;if(hr('golden')||(hr('first3')&&score[team]>=3))clock=Math.min(clock,.01);charging=false;
   const sh=B.shot,sc=sh&&sh.by.team===team?sh.by:(team===0?ctrl:outfield(1)[0]);
@@ -5113,12 +5249,12 @@ function regProfile(){const R=rkState(),g0=GM;const lin=(cl)=>{GM=cl?'classical'
 let regCl=[],regTimer=null,regBoard=new Map(),regLoading=false;
 async function regConnect(){if(regCl.length)return regCl;const M=await loadMqtt();if(!M)return[];
   for(const u0 of RELAYS()){const U=typeof u0==='string'?{url:u0}:u0;let c;try{c=M.connect(U.url,{clientId:'skreg_'+Math.random().toString(36).slice(2,10),keepalive:30,connectTimeout:8000,reconnectPeriod:5000,clean:true,...(U.username?{username:U.username,password:U.password}:{})})}catch(e){continue}
-    c.on('message',(tp,buf)=>{if(tp.startsWith(ACCT_T)){acctMsg(tp,buf);return}try{regIn(JSON.parse(new TextDecoder().decode(buf)))}catch(e){}});c.on('connect',()=>c.subscribe(REG+'+',{qos:0}));c.on('error',()=>{});regCl.push(c)}return regCl}
+    c.on('message',(tp,buf)=>{if(tp.startsWith(ACCT_T)||tp.startsWith(ACCT_T2)){acctMsg(tp,buf);return}try{regIn(JSON.parse(new TextDecoder().decode(buf)))}catch(e){}});c.on('connect',()=>c.subscribe(REG+'+',{qos:0}));c.on('error',()=>{});regCl.push(c)}return regCl}
 // only well-formed, believable profiles get onto the board
 function regIn(d){if(!d||d.v!==1||!/^[a-z0-9]{10,16}$/.test(String(d.id)))return;const num=(x,a,b)=>Number.isFinite(+x)?clamp(+x,a,b):a;
   const fam=f=>{const r=d.rk&&d.rk[f]||{};const rp=num(r.rp,0,5000),pd=r.pd?1:0;return{rp:pd?rp:0,pl:num(r.pl,0,10),pd,ix:pd?rankIx(rp):-1,w:num(r.w,0,1e5)|0,d:num(r.d,0,1e5)|0,l:num(r.l,0,1e5)|0}};
   const lin=s=>{if(!s||!Array.isArray(s.p))return{f:'',r:0,p:[]};return{f:String(s.f||'').slice(0,8),r:num(s.r,0,99)|0,p:s.p.slice(0,9).filter(Array.isArray).map(x=>[String(x[0]||'').slice(0,16),String(x[1]||'').slice(0,4),num(x[2],1,99)|0,['bronze','silver','gold','special','icon'].includes(x[3])?x[3]:'bronze',String(x[4]||'').slice(0,16),num(x[5],1,10)|0,num(x[6],0,8)|0])}};
-  const p={id:String(d.id),n:String(d.n||'Club').slice(0,20),mg:String(d.mg||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,16),b:String(d.b||'⚽').slice(0,4),k:/^#[0-9a-f]{6}$/i.test(d.k)?d.k:'#888888',t:num(d.t,0,9e15),pl:num(d.pl,0,1e6)|0,rk:{volta:fam('volta'),classical:fam('classical')},sq:{volta:lin(d.sq&&d.sq.volta),classical:lin(d.sq&&d.sq.classical)}};
+  const p={id:String(d.id),n:String(d.n||'Club').slice(0,20),mg:nameOk(String(d.mg||'')),b:String(d.b||'⚽').slice(0,4),k:/^#[0-9a-f]{6}$/i.test(d.k)?d.k:'#888888',t:num(d.t,0,9e15),pl:num(d.pl,0,1e6)|0,rk:{volta:fam('volta'),classical:fam('classical')},sq:{volta:lin(d.sq&&d.sq.volta),classical:lin(d.sq&&d.sq.classical)}};
   const old=regBoard.get(p.id);if(!old||p.t>=old.t)regBoard.set(p.id,p);if(!regLoading)renderBoards()}
 async function regPublish(){if(!club.reg)return;const cl=await regConnect(),s=JSON.stringify(regProfile());
   for(const c of cl){const go=()=>{try{c.publish(REG+club.reg.id,s,{qos:0,retain:true})}catch(e){}};if(c.connected)go();else c.once('connect',go)}}
@@ -5126,7 +5262,7 @@ function regPublishSoon(){clearTimeout(regTimer);regTimer=setTimeout(regPublish,
 async function regLoad(){regLoading=true;renderBoards();await regConnect();setTimeout(()=>{regLoading=false;renderBoards()},2500)}
 // Every club is on the leaderboard automatically: it gets a random public id the first time the game opens, and its
 // public profile is published then and again whenever anything on it changes (name, badge, line-ups, ratings, ranks).
-function regEnsure(){if(!club.reg){club.reg={id:Array.from({length:12},()=>'abcdefghjkmnpqrstuvwxyz23456789'[(Math.random()*31)|0]).join(''),at:Date.now()};saveClub()}}
+function regEnsure(){if(!club.reg){const r=crypto.getRandomValues(new Uint8Array(12));club.reg={id:Array.from(r,x=>'abcdefghjkmnpqrstuvwxyz23456789'[x%31]).join(''),at:Date.now()};saveClub()}}
 let regKey='',regLoadedAt=0;
 function regAuto(){regEnsure();const p=regProfile();delete p.t;const k=JSON.stringify(p);if(k!==regKey){regKey=k;regPublish()}}
 function regBoot(){regEnsure();setTimeout(regAuto,2500);setInterval(regAuto,20000)}
@@ -5170,8 +5306,8 @@ const HELP=[
  ['Game modes','<p><b>Volta 5v5</b>: fast football in a cage, 2 minutes, 1× coins.</p><p><b>Classical Standard 9v9</b>: full pitch, 3 minutes, 1.5× coins. <b>Classical Expanded</b>: a bigger pitch, 3½ minutes, 1.875× coins. The green bubble shows the coin multiplier for your mode, pitch and difficulty.</p>'],
  ['Leagues and tournaments','<p>Volta and Classical each have five divisions (Amateur → Legendary). Ten clubs, nine rounds, top three promoted, bottom three relegated. A top-three finish earns a World Club Championship place (64-club knockout). There are also the Sunday Cup, the Grand Tournament, friendlies, challenges and skill games.</p>'],
  ['Online multiplayer','<p><b>Ranked</b>: matched with a real person of similar rating. Ten placement matches give your first rank (Bronze → Silver → Gold → Platinum → Diamond → Champion → Legendary), then wins earn RP and losses cost RP. Volta and Classical are ranked separately. Seasons last a month; rewards come from your best rank.</p><p><b>Friendly</b>: matched with anyone choosing Friendly, no RP. <b>Host / Join</b>: a private match with a 4-letter code.</p><p>Both players control their own team; the host\'s laptop runs the match. You both need the same version of the game.</p>'],
- ['Your name and saving','<p>Your name (tap it at the top of the menu to change it) is shown next to your club on the leaderboard, in View Squad and to your opponent online, so everyone can see whose team is whose.</p><p><b>Save your progress with email</b> (optional): create an account with an email and password, then log in with the same two on any other device to carry on. It saves by itself after every change. Your save is locked on your device with your password before it is stored, and your email and password never leave the device. There is no password reset, so keep the password safe; the save code under Club works as a backup.</p>'],
- ['Rewards','<p>Coins for every match (more for wins, goals, harder difficulty and bigger pitches). Training Tokens equal to your goal difference in a win. Club Legacy XP from every match, with a reward at every level, plus a Club Token. Challenges, achievements, league seasons, cups and Ranked promotions pay out too.</p>']];
+ ['Nickname and saving','<p>A nickname is all you need to play (tap it at the top of the menu to change it). It is shown next to your club on the leaderboard, in View Squad, in matchmaking and to your opponent online.</p><p><b>Saved on this device</b>: always, automatically, in this browser. Clearing the browser\'s data, a private window, or another browser or device won\'t have it.</p><p><b>SAVE YOUR ACCOUNT</b> (optional): add an email and password to keep a locked copy of your progress online, then log in with the same two on another device to carry on. It saves by itself after every change and each save is read back before it counts. Your progress is locked on your device with your password, and your email and password never leave the device or appear anywhere public. There is no password reset, so keep the password safe; the save code under Club works as a backup.</p>'],
+ ['Rewards','<p>Coins for every match (more for wins, goals, harder difficulty and bigger pitches). Training Tokens for half your winning margin, rounded down (win 2-0 or 3-1: 1 token; 4-0: 2; 1-0 or a draw: none). Club Legacy XP from every match, with a reward at every level, plus a Club Token. Challenges, achievements, league seasons, cups and Ranked promotions pay out too.</p>']];
 let helpPg=0;
 function renderHelp(){const h=$('help');h.innerHTML=`<div class="hbox" role="dialog" aria-label="Help"><div class="hnav">${HELP.map(([t],i)=>`<button data-hp="${i}" aria-pressed="${i===helpPg}">${i+1}. ${t}</button>`).join('')}<button data-hp="tut" class="btn">Replay tutorial</button></div>
   <div class="hmain"><h3>${HELP[helpPg][0]}</h3><div class="htext">${HELP[helpPg][1]}</div><div class="hfoot"><button class="ghost" data-hprev="1" ${helpPg?'':'disabled'}>Previous</button><span>${helpPg+1} / ${HELP.length}</span><button class="go" data-hnext="1">${helpPg<HELP.length-1?'Next':'Done'}</button></div></div>
@@ -5290,27 +5426,35 @@ function ojDraw(){if(!NET.on)return;
     txt(s.text,3,5,s.size,'rgba(0,0,0,.45)','center',false);txt(s.text,0,0,s.size,s.col);
     if(s.sub)txt(s.sub,0,s.size*.62,Math.round(s.size*.32),C.cream,'center',false);ctx.restore()}}
 
-/* ---------- your name, and an optional email login that keeps your progress ----------
-   Your name (the manager) is shown next to your club on the leaderboard, in View Squad and to your opponent online,
-   so people can see whose team is whose. It's asked for once, the first time the game opens.
+/* ---------- your nickname, and SAVE YOUR ACCOUNT (optional) ----------
+   A nickname is all you need to play. It's asked for the first time the game opens (existing saves are kept; they're
+   just asked for one), checked for length and characters, and shown next to your club on the leaderboard, in View
+   Squad, in matchmaking and to opponents online. It's never used to identify you: every install gets a random internal
+   id (club.pid, from the browser's secure random generator) and your public club profile has its own random id.
 
-   The login is optional. There's no Sunday Kickabout server, so it works like this: your email and password are
-   turned on this device into a lock (PBKDF2, 210,000 rounds) and a private address. Your save is locked (AES-GCM)
-   here with it and the locked copy is kept on the same public relays the online game uses, at that address. Only
-   someone with the same email AND password can find it or open it; the relays only ever see scrambled data, and your
-   email and password never leave this device. No email is sent, so there's no address check and no password reset:
-   forget the password and that copy can't be opened (your progress on this device is unaffected). The relays are
-   free public services, so a copy could be cleared; this device always keeps its own save too. */
+   Saving: progress is always saved on this device (browser storage). That copy goes if the browser's data is cleared,
+   in a private window, or on another browser or device, so it can't always be recovered.
+   SAVE YOUR ACCOUNT is optional. There's no Sunday Kickabout server, so it works like this: your email and password are
+   turned on this device into a lock (PBKDF2-SHA256, 600,000 rounds) and a private address. Your save is locked
+   (AES-GCM) here and the locked copy is kept on the public relays the online game uses, at that address. Only the same
+   email AND password can find it or open it; the relays only ever see scrambled data, and the email and password never
+   leave this device (the email is never shown anywhere public). After every save the game reads the copy back and
+   opens it, and only then says it's saved, with how many relays confirmed it. No email is sent: there's no address
+   check and no password reset. The relays are free public services and could clear a copy, so the device keeps its own
+   save and the save code under Club is a further backup. Logins made with the first version (210,000 rounds) are moved
+   to the stronger lock the next time you log in. */
 const ACCT_T='sundaykickabout/acct1/';
-let acct=null,acctTimer=null,acctBusy=false,acctMsgTxt='',acctMsgBad=false,acctFound=null;const acctWait=new Map();
+let acct=null,acctTimer=null,acctBusy=false,acctMsgTxt='',acctMsgBad=false,acctFound=null,acctMigrated=null;const acctWait=new Map();
 try{const a=JSON.parse(localStorage.getItem('kickabout-acct')||'null');if(a&&/^[0-9a-f]{32}$/.test(a.id)&&a.k)acct=a}catch(e){}
 const acctSave=()=>{try{if(acct)localStorage.setItem('kickabout-acct',JSON.stringify(acct));else localStorage.removeItem('kickabout-acct')}catch(e){}};
 const b64u8=u=>{let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)};
 const u8b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-async function acctDerive(email,pw){const te=new TextEncoder(),base=await crypto.subtle.importKey('raw',te.encode(pw),'PBKDF2',false,['deriveBits']);
-  const b=new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:te.encode('sundaykickabout-acct-v1|'+email),iterations:210000},base,512));
+async function acctDerive(email,pw,v=2){const te=new TextEncoder(),base=await crypto.subtle.importKey('raw',te.encode(pw),'PBKDF2',false,['deriveBits']);
+  const b=new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:te.encode((v===1?'sundaykickabout-acct-v1|':'sundaykickabout-acct-v2|')+email),iterations:v===1?210000:600000},base,512));
   // first half: the address; second half (an independent block): the lock
-  return{id:[...b.slice(0,16)].map(x=>x.toString(16).padStart(2,'0')).join(''),k:b64u8(b.slice(32,64))}}
+  return{id:[...b.slice(0,16)].map(x=>x.toString(16).padStart(2,'0')).join(''),k:b64u8(b.slice(32,64)),v}}
+// where a login's copies live: first-version logins kept their address; newer ones use the stronger lock's
+const acctTopic=a=>(a.v===2?ACCT_T2:ACCT_T)+a.id;const ACCT_T2='sundaykickabout/acct2/';
 async function acctSeal(obj){const key=await crypto.subtle.importKey('raw',u8b64(acct.k),'AES-GCM',false,['encrypt']);
   let data=new TextEncoder().encode(JSON.stringify(obj)),z=0;
   if(window.CompressionStream){try{data=new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());z=1}catch(e){}}
@@ -5321,72 +5465,103 @@ async function acctOpen(txt,k){try{const d=JSON.parse(txt);if(!d||d.v!==1)return
   if(d.z)pt=new Uint8Array(await new Response(new Blob([pt]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
   const sv=JSON.parse(new TextDecoder().decode(pt));return sv&&sv.club&&Array.isArray(sv.club.owned)?sv:null}catch(e){return null}}
 // copies arriving from the relays (routed here by the leaderboard connection, which these share)
-function acctMsg(tp,buf){const id=tp.slice(ACCT_T.length),w=acctWait.get(id);if(w){w.list.push(new TextDecoder().decode(buf));if(!w.first)w.first=performance.now()}}
+function acctMsg(tp,buf){const id=tp.slice(tp.lastIndexOf('/')+1),w=acctWait.get(id);if(w){w.list.push(new TextDecoder().decode(buf));if(!w.first)w.first=performance.now()}}
 // read every relay's copy for this address and open the newest
-async function acctFetch(id,k){const cl=await regConnect();if(!cl.length)return{ok:false,sv:null};const w={list:[],first:0};acctWait.set(id,w);
-  for(const c of cl){const sub=()=>{try{c.subscribe(ACCT_T+id,{qos:1})}catch(e){}};if(c.connected)sub();else c.once('connect',sub)}
-  const t0=performance.now();await new Promise(r=>{const iv=setInterval(()=>{const n=performance.now();if(n-t0>4500||(w.first&&n-w.first>1200)){clearInterval(iv);r()}},100)});
-  for(const c of cl)try{c.unsubscribe(ACCT_T+id)}catch(e){}acctWait.delete(id);
-  let best=null;for(const s of w.list){const sv=await acctOpen(s,k);if(sv&&(!best||(+sv.at||0)>(+best.at||0)))best=sv}
-  return{ok:cl.some(c=>c.connected),sv:best}}
+async function acctFetch(id,k,v=2,wait=4500){const cl=await regConnect();if(!cl.length)return{ok:false,sv:null,n:0};const w={list:[],first:0,by:new Set()},tp=(v===2?ACCT_T2:ACCT_T)+id;acctWait.set(id,w);
+  for(const c of cl){const sub=()=>{try{c.subscribe(tp,{qos:1})}catch(e){}};if(c.connected)sub();else c.once('connect',sub)}
+  const t0=performance.now();await new Promise(r=>{const iv=setInterval(()=>{const n=performance.now();if(n-t0>wait||(w.first&&n-w.first>1500)){clearInterval(iv);r()}},100)});
+  for(const c of cl)try{c.unsubscribe(tp)}catch(e){}acctWait.delete(id);
+  let best=null,ats=[];for(const s of w.list){const sv=await acctOpen(s,k);if(sv){ats.push(+sv.at||0);if(!best||(+sv.at||0)>(+best.at||0))best=sv}}
+  return{ok:cl.some(c=>c.connected),sv:best,ats,relays:cl.filter(c=>c.connected).length}}
 const svKey=sv=>JSON.stringify([sv.club,sv.names||{},sv.custom||{}]);let acctKey='';
 // save to the account, but only if something changed, and never over a newer copy another device saved meanwhile
 // (that's asked about instead); "keep" is the player's explicit choice to replace the account's copy
 async function acctPushNow(keep){if(!acct||acct.hold&&!keep)return false;const cl=await regConnect();if(!cl.some(c=>c.connected))return false;
   const sv=snapshotSave(),key=svKey(sv);if(key===acctKey&&!keep)return true;
-  if(!keep){const r=await acctFetch(acct.id,acct.k);if(r.ok&&r.sv&&(+r.sv.at||0)>(+acct.at||0)+1000&&svKey(r.sv)!==key){acct.hold=true;acctFound=r.sv;acctSave();acctPill();profOpen();return false}}
+  if(!keep){const r=await acctFetch(acct.id,acct.k,acct.v||1);if(r.ok&&r.sv&&(+r.sv.at||0)>(+acct.at||0)+1000&&svKey(r.sv)!==key){acct.hold=true;acctFound=r.sv;acctSave();acctPill();profOpen();return false}}
   const s=await acctSeal(sv);
-  for(const c of cl){const go=()=>{try{c.publish(ACCT_T+acct.id,s,{qos:1,retain:true})}catch(e){}};if(c.connected)go();else c.once('connect',go)}
-  acct.at=sv.at;acct.hold=false;acctKey=key;acctSave();acctPill();if(!$('prof').hidden)profRender();return true}
+  for(const c of cl){const go=()=>{try{c.publish(acctTopic(acct),s,{qos:1,retain:true})}catch(e){}};if(c.connected)go();else c.once('connect',go)}
+  acct.at=sv.at;acct.hold=false;acctKey=key;acctSave();acctPill();if(!$('prof').hidden)profRender();
+  acctVerify(sv.at);return true}
+// read the copy back from the relays and open it: only a copy that's been shown to come back counts as saved
+async function acctVerify(at){if(!acct)return;await new Promise(r=>setTimeout(r,1200));const r=await acctFetch(acct.id,acct.k,acct.v||1,3500);
+  const n=r.ats.filter(a=>a===at).length;acct.ver={at,n,of:r.relays,t:Date.now()};acctSave();acctPill();if(!$('prof').hidden)profRender();
+  // moved to the stronger lock and the new copy is confirmed: clear the old copy off the relays
+  if(n&&acctMigrated){const old=ACCT_T+acctMigrated.id;acctMigrated=null;for(const c of await regConnect())if(c.connected)try{c.publish(old,'',{qos:1,retain:true})}catch(e){}}
+  return n}
 // after anything is saved on this device: a fresh locked copy a few seconds later (only from the menus, never mid-match)
 function acctPush(){if(!acct||acct.hold)return;clearTimeout(acctTimer);acctTimer=setTimeout(async()=>{if(NET.on||state!=='menu'){acctPush();return}if(acctBusy){acctPush();return}acctBusy=true;try{await acctPushNow()}catch(e){}acctBusy=false},4000)}
 function acctLoad(sv){try{localStorage.setItem('kickabout-club-before-load',JSON.stringify(snapshotSave()))}catch(e){}
   club={...club,...sv.club};loadClubFrom(JSON.parse(JSON.stringify(sv.club)));NAMES={...(sv.names||{})};applyNames();
   if(sv.custom&&sv.custom.name)custom={...custom,...sv.custom,isCustom:true};best=Math.max(best,+sv.best||0);
   try{localStorage.setItem('kickabout-club',JSON.stringify(club));localStorage.setItem('kickabout-names',JSON.stringify(NAMES));localStorage.setItem('kickabout-custom',JSON.stringify(custom));localStorage.setItem('kickabout-best3',best)}catch(e){}
-  acct.at=+sv.at||Date.now();acct.hold=false;acctKey=svKey(snapshotSave());acctSave();cloudPush();setup();renderMenu();regAuto()}
+  acct.at=+sv.at||Date.now();acct.hold=false;acctKey=svKey(snapshotSave());acctSave();cloudPush();setup();renderMenu();regAuto();
+  if(acctMigrated)setTimeout(()=>acctPushNow(true),100)}
 // nothing to lose on this device yet: no matches played, starting players and coins untouched
 const freshClub=()=>(club.played||0)===0&&club.owned.length<=13&&(club.coins||0)>=1400;
 const svLine=sv=>{const c=sv.club;return `${esc(c.name||'My Club')}${c.mgr?' · manager '+esc(c.mgr):''} · ${c.owned.length} players · ${(+c.coins||0).toLocaleString()} coins · ${c.played||0} matches played`};
 const emailOk=e=>/^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,24}$/.test(e);
+// a password that would take real work to guess: 10+ characters with some variety (or 16+), not a well-known one,
+// and not just the email's name
+const COMMONPW=['password','passw0rd','1234567890','qwertyuiop','iloveyou','football','sunday','kickabout','letmein','welcome','abc123','123456789'];
+function pwProblem(pw,e){if(pw.length<10)return 'Use a password of at least 10 characters.';const kinds=[/[a-z]/,/[A-Z]/,/[0-9]/,/[^A-Za-z0-9]/].filter(r=>r.test(pw)).length;
+  if(pw.length<16&&kinds<2)return 'Mix letters with numbers or symbols (or use 16+ characters).';const lo=pw.toLowerCase();
+  if(COMMONPW.some(c=>lo.includes(c))&&pw.length<16)return 'That password is too easy to guess.';const nm=(e.split('@')[0]||'').toLowerCase();if(nm.length>=4&&lo.includes(nm))return 'Don’t use your email’s name in the password.';return ''}
 async function acctLogin(create){const e=($('pf-email').value||'').trim().toLowerCase(),pw=$('pf-pw').value||'';
   if(!emailOk(e)){acctMsgSet('That email doesn’t look right.',true);return}
-  if(pw.length<8){acctMsgSet('Use a password of at least 8 characters (one you don’t use anywhere else).',true);return}
+  {const pp=create?pwProblem(pw,e):pw.length<8?'That password is too short.':'';if(pp){acctMsgSet(pp+' Pick one you don’t use anywhere else.',true);return}}
   if(!window.crypto||!crypto.subtle){acctMsgSet('This browser can’t lock saves (it needs a secure page). Use the save code under Club instead.',true);return}
-  acctMsgSet(create?'Creating your account…':'Looking for your save…');const d=await acctDerive(e,pw);const r=await acctFetch(d.id,d.k);
+  acctMsgSet(create?'Creating your account…':'Looking for your save…');const d=await acctDerive(e,pw,2);let r=await acctFetch(d.id,d.k,2);
   if(!r.ok){acctMsgSet('Couldn’t reach the save relays (are you online?). Nothing was changed; try again in a moment.',true);return}
-  acct={e,id:d.id,k:d.k,at:0};
+  // a save made with the first version of the lock: open it, then it moves to the stronger lock on the next save
+  if(!r.sv){const d1=await acctDerive(e,pw,1),r1=await acctFetch(d1.id,d1.k,1);if(r1.sv){r=r1;acctMigrated={id:d1.id}}}
+  acct={e,id:d.id,k:d.k,v:2,at:0};
   if(r.sv){if(freshClub()){acctLoad(r.sv);acctMsgSet('Welcome back! Your progress has been loaded.');toast('Progress loaded from your account');profRender();return}
     acct.hold=true;acctSave();acctFound=r.sv;acctMsgSet('');profRender();return}
   if(!create){acct=null;acctMsgSet('No save found for that email and password. Check both, or press Create account to start one with this device’s progress.',true);return}
   acctSave();const ok=await acctPushNow();acctMsgSet(ok?'Account created. Your progress is saved and will keep saving automatically.':'Account created, but the first save didn’t go through yet; it will retry.');profRender()}
 function acctMsgSet(m,bad){acctMsgTxt=m;acctMsgBad=!!bad;const el=$('pf-msg');if(el){el.textContent=m;el.style.color=bad?'var(--coral)':''}}
 // on start-up: if another device saved since this one last did, ask before anything is overwritten
-async function acctBoot(){if(!acct)return;try{const r=await acctFetch(acct.id,acct.k);if(!r.ok)return;
+async function acctBoot(){if(!acct)return;try{const r=await acctFetch(acct.id,acct.k,acct.v||1);if(!r.ok)return;
   if(r.sv&&(+r.sv.at||0)>(+acct.at||0)+1000&&JSON.stringify(r.sv.club)!==JSON.stringify(club)){acct.hold=true;acctFound=r.sv;acctSave();profOpen();return}
   acct.hold=false;acctSave();acctPush()}catch(e){}}
-function acctPill(){const el=$('mgrpill');if(!el)return;el.textContent=(club.mgr||'Add your name')+(acct?' ☁':'');el.title=acct?'Your profile · progress saving to '+acct.e:'Your profile · log in to save your progress'}
+function acctPill(){const el=$('mgrpill');if(!el)return;el.textContent=(club.mgr||'Pick a nickname')+(acct?' ☁':'');el.title=acct?'Your profile · saving to your account':'Your profile · saved on this device (SAVE YOUR ACCOUNT is optional)'}
 function profOpen(){profRender();$('prof').hidden=false;setTimeout(()=>{const i=$(club.mgr?'pf-email':'pf-name');if(i&&!acct)i.focus()},50)}
 function profRender(){const box=$('prof'),first=!club.mgr,ago=a=>{const s=Math.round((Date.now()-a)/1000);return !a?'not yet':s<60?'just now':s<3600?Math.round(s/60)+' min ago':Math.round(s/3600)+' h ago'};
   const found=acctFound&&acct&&acct.hold?`<div class="pfound"><b>Progress found on your account</b><p>${svLine(acctFound)}<br><small>saved ${ago(+acctFound.at)}</small></p><p><b>On this device:</b> ${svLine({club})}</p>
     <div class="pfrow"><button class="btn gold" data-pf="load">Load my account’s progress</button><button class="btn" data-pf="keep">Keep this device’s (replaces the account copy)</button></div></div>`:'';
+  const v=acct&&acct.ver&&acct.ver.at===acct.at?acct.ver:null;
+  const cloudLine=!acct?'<span class="pfoff">Off</span> · optional':acct.hold?'<span class="pfwarn">Waiting for you to choose below</span>'
+    :v?(v.n?`<span class="pfok">On</span> · last saved ${ago(acct.at)}, read back from ${v.n} of ${v.of} relay${v.of===1?'':'s'}`:`<span class="pfwarn">Not confirmed</span> · the last save couldn’t be read back yet; keep a save code (Club tab) as a backup`)
+    :acct.at?`<span class="pfok">On</span> · saved ${ago(acct.at)}, checking…`:'<span class="pfok">On</span>';
   box.innerHTML=`<div class="sqbox pbox" role="dialog" aria-label="Your profile">${first?'':'<button class="ghost sqx" data-pf="x">Close</button>'}
     <h3>${first?'Welcome to Sunday Kickabout!':'Your profile'}</h3>
-    <label class="pfl">Your name<input type="text" id="pf-name" maxlength="16" placeholder="e.g. Sam" value="${esc(club.mgr||'')}" autocomplete="nickname"></label>
-    <small class="hint">Shown next to your club on the leaderboard, in View Squad and to your opponents online, so everyone can see whose team is whose.</small>
+    ${first?'<p class="hint">Pick a nickname and you’re ready to play. No email needed.</p>':''}
+    <label class="pfl">Nickname<input type="text" id="pf-name" maxlength="16" placeholder="e.g. Sam" value="${esc(club.mgr||'')}" autocomplete="nickname"></label>
+    <small class="hint">2–16 characters: letters, numbers, spaces and . _ - '. Shown next to your club on the leaderboard, in View Squad, in matchmaking and to opponents online.</small>
     <label class="pfl">Club name<input type="text" id="pf-club" maxlength="14" value="${esc(club.name||'')}"></label>
     <div class="pfrow"><button class="btn gold pfgo" data-pf="go">${first?'Let’s play':'Save'}</button></div>
-    <div class="pacct"><h4>Save your progress with email <small>(optional)</small></h4>${found}
-    ${acct&&!acct.hold?`<p>Logged in as <b>${esc(acct.e)}</b> · last saved ${ago(acct.at)}</p><div class="pfrow"><button class="btn" data-pf="sync">Save now</button><button class="btn" data-pf="out">Log out</button></div>`
-      :acct&&acct.hold?'':`<div class="pfin"><input type="email" id="pf-email" placeholder="Email" autocomplete="username"><input type="password" id="pf-pw" placeholder="Password (8+ characters)" autocomplete="current-password"></div>
+    <div class="psaves"><p><b>Saved on this device:</b> <span class="pfok">On</span> · automatic, in this browser. Clearing the browser’s data, a private window, or another browser or device won’t have it, so on its own it can’t always be recovered.</p>
+      <p><b>Saved to your account:</b> ${cloudLine}</p></div>
+    <details class="pacct" ${first&&!acct?'':'open'}><summary><h4>SAVE YOUR ACCOUNT <small>(optional)</small></h4></summary>${found}
+    <p class="hint">Email is optional: you can play everything without it. Add an email and password to keep a locked copy of your progress online, which can help you recover it or carry on on another device. Your email is never shown to anyone.</p>
+    ${acct&&!acct.hold?`<p>Logged in as <b>${esc(acct.e)}</b></p><div class="pfrow"><button class="btn" data-pf="sync">Save now</button><button class="btn" data-pf="out">Log out</button></div>`
+      :acct&&acct.hold?'':`<div class="pfin"><input type="email" id="pf-email" placeholder="Email" autocomplete="username"><input type="password" id="pf-pw" placeholder="Password (10+ characters)" autocomplete="current-password"></div>
       <div class="pfrow"><button class="btn gold" data-pf="create">Create account</button><button class="btn" data-pf="login">Log in</button></div>`}
     <p class="hint" id="pf-msg">${esc(acctMsgTxt)}</p>
-    <details><summary class="hint">How this works</summary><p class="hint">Log in on any device with the same email and password to carry on where you left off; it saves automatically after every change. Your save is locked on this device with your password before it’s stored on public relays, so nobody else can read it, and your email and password never leave this device. No email is sent, so there is no password reset: if you forget it, that copy can’t be opened. This device always keeps its own save too, and the save code under Club still works as a backup.</p></details></div></div>`;
+    <details><summary class="hint">How it works</summary><p class="hint">Log in on any device with the same email and password to carry on; it saves by itself after every change, and each save is read back from the relays before it counts. Your progress is locked on this device with your password (PBKDF2 + AES-GCM) before it leaves, so the relays only see scrambled data, and your email and password never leave this device. There’s no Sunday Kickabout server: copies are kept on free public relays, which could clear them, so this device keeps its own save too and the save code under Club is a further backup. No email is sent, so there’s no password reset: if you forget the password, that copy can’t be opened.</p></details></details></div>`;
   acctMsgSet(acctMsgTxt,acctMsgBad)}
-const nameOk=s=>s.replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,16);
+// nicknames: 2-16 characters, letters (any language), numbers, spaces and . _ - ' (starting with a letter or number)
+function nickCheck(raw){const s=String(raw||'').replace(/\s+/g,' ').trim();
+  if(s.length<2)return{err:'Your nickname needs at least 2 characters.'};if(s.length>16)return{err:'Keep your nickname to 16 characters or fewer.'};
+  if(!/^[\p{L}\p{N}][\p{L}\p{N} ._'\-]*$/u.test(s))return{err:'Use letters, numbers, spaces and . _ - \' only, starting with a letter or number.'};return{ok:s}}
+// other players' names as they arrive: anything outside those characters is dropped
+const nameOk=s=>String(s||'').replace(/[^\p{L}\p{N} ._'\-]/gu,'').replace(/\s+/g,' ').trim().slice(0,16);
+// every install gets its own random internal id (never the nickname); the public club id is random too
+function pidEnsure(){if(!club.pid||!/^[0-9a-f]{32}$/.test(club.pid)){const b=crypto.getRandomValues(new Uint8Array(16));club.pid=[...b].map(x=>x.toString(16).padStart(2,'0')).join('');saveClub()}}
 $('prof').addEventListener('click',async e=>{const b=e.target.closest('[data-pf]');if(!b)return;const k=b.dataset.pf;
-  if(k==='go'){const n=nameOk($('pf-name').value||'');if(n.length<2){$('pf-name').focus();acctMsgSet('Type your name (at least 2 letters) so others know whose team this is.',true);return}
-    const wasFirst=!club.mgr;club.mgr=n;const cn=($('pf-club').value||'').trim().slice(0,14);if(cn)club.name=cn;acctMsgSet('');saveClub();renderMenu();regAuto();
+  if(k==='go'){const c=nickCheck($('pf-name').value);if(c.err){$('pf-name').focus();acctMsgSet(c.err,true);return}const n=c.ok;
+    const wasFirst=!club.mgr;club.mgr=n;pidEnsure();const cn=($('pf-club').value||'').trim().slice(0,14);if(cn)club.name=cn;acctMsgSet('');saveClub();renderMenu();regAuto();
     if(!acct||!acct.hold){$('prof').hidden=true;if(wasFirst&&club.tut&&!club.tut.done)setTimeout(tutShow,400)}else profRender();return}
   if(k==='x'){$('prof').hidden=true;return}
   if(k==='create'||k==='login'){b.disabled=true;try{await acctLogin(k==='create')}catch(err){acctMsgSet('Something went wrong; nothing was changed.',true)}b.disabled=false;acctPill();return}
@@ -5396,7 +5571,9 @@ $('prof').addEventListener('click',async e=>{const b=e.target.closest('[data-pf]
   if(k==='keep'){acctFound=null;const ok=await acctPushNow(true);acctMsgSet(ok?'This device’s progress is now saved to your account.':'Couldn’t reach the relays; it will keep trying.',!ok);acctPill();profRender()}});
 $('prof').addEventListener('keydown',e=>{if(e.key==='Enter'){if(e.target.id==='pf-name'||e.target.id==='pf-club'){const b=$('prof').querySelector('[data-pf="go"]');if(b)b.click()}else if(e.target.id==='pf-pw'){const b=$('prof').querySelector('[data-pf="login"]');if(b)b.click()}}e.stopPropagation()});
 $('mgrpill').onclick=profOpen;
-function profBoot(){acctPill();if(!club.mgr)setTimeout(profOpen,300);acctBoot()}
+function profBoot(){if(club.mgr)pidEnsure();acctPill();if(!club.mgr)setTimeout(profOpen,300);acctBoot()}
+// the club name follows the nickname until you choose one yourself
+$('prof').addEventListener('input',e=>{if(e.target.id==='pf-club')e.target.dataset.touched='1';if(e.target.id==='pf-name'&&!club.mgr){const c=$('pf-club');if(c&&!c.dataset.touched&&/^(Sunday XI|.*FC)$/.test(c.value)){const n=nickCheck(e.target.value);c.value=n.ok?(n.ok+' FC').slice(0,14):'Sunday XI'}}});
 
 /* ---------- draw ---------- */
 function txt(s,x,y,size,col,align='center',stroke=true){
@@ -5632,6 +5809,9 @@ function drawFulltime(){
   const rows=[['Shots',stats.shots],['On target',Math.min(stats.on,stats.shots)],['Skills landed',stats.skills],['Passes',stats.passes],['Tackles won',stats.tackles],['Style points',style.toLocaleString()]];
   if(!NET.on)rows.forEach((r,i)=>{const y=win?420+i*22:330+i*26;txt(r[0],W/2-110,y,16,C.muted,'left',false);txt(String(r[1]),W/2+110,y,16,C.cream,'right',false)});
   if(stT>40){ctx.fillStyle='rgba(20,48,63,.92)';rr(W-250,H-110,220,60,30);ctx.fill();ctx.fillStyle=C.sun;ctx.beginPath();ctx.arc(W-215,H-80,14,0,7);ctx.fill();ctx.strokeStyle='#c99a2e';ctx.lineWidth=3;ctx.stroke();txt('+'+Math.round(shownEarned).toLocaleString(),W-190,H-80,30,C.sun,'left',false)}
+  if(stT>45&&ttCalc&&!SG){const T=ttCalc,a=Math.min(1,(stT-45)/20),x=W-330,y=H-182;ctx.save();ctx.globalAlpha=a;ctx.fillStyle='rgba(20,48,63,.92)';rr(x,y,300,60,16);ctx.fill();
+    txt(T.n?`+${T.n} TRAINING TOKEN${T.n>1?'S':''}`:'NO TRAINING TOKENS',x+14,y+19,17,T.n?C.mint:C.muted,'left',false);
+    txt(T.d>0?`${T.gf}–${T.ga}: winning margin ${T.d} ÷ 2 = ${T.d%2?(T.d/2).toFixed(1)+' → '+T.n+' (rounded down)':T.n}`:`${T.gf}–${T.ga}: no winning margin (½ of 0 = 0)`,x+14,y+42,12,C.cream,'left',false);ctx.restore()}
   if(stT>50&&earnNote&&!NET.guest){ctx.globalAlpha=Math.min(1,(stT-50)/20);ctx.font='700 13px Nunito,sans-serif';const tw=Math.min(620,ctx.measureText(earnNote).width+28);ctx.fillStyle='rgba(20,48,63,.9)';rr(W/2-tw/2,H-72,tw,24,12);ctx.fill();txt(earnNote,W/2,H-60,12,C.cream,'center',false);ctx.globalAlpha=1}
   if(eventText){ctx.fillStyle='rgba(20,48,63,.92)';rr(W/2-300,44,600,40,20);ctx.fill();txt(eventText,W/2,64,cupEvent==='champion'?22:17,cupEvent==='out'?C.coral:cupEvent==='champion'?C.sun:C.mint,'center',false)}
   else if(cupEvent&&club.cup){const c=club.cup,nm=CUPS[c.tier];ctx.fillStyle='rgba(20,48,63,.92)';rr(W/2-230,44,460,40,20);ctx.fill();
@@ -5874,7 +6054,7 @@ function netStart(){const g=netPeer('guest');if(!g){netStatus('Your friend isn�
     s:[...(Array.isArray(sqd.s)?sqd.s:[]),...E8()].slice(0,ns).map(x=>x==null?'':String(x)),f:FORM_KEYS[big?'classical':'volta'].includes(sqd.f)?sqd.f:FORM_KEYS[big?'classical':'volta'][0],att:sqd.att,cap:sqd.cap,al:Array.isArray(sqd.al)?sqd.al.map(x=>clamp(x|0||1,1,10)):[],nm:Array.isArray(sqd.nm)?sqd.nm.map(x=>String(x||'').slice(0,16)):[],sh:Array.isArray(sqd.sh)?sqd.sh.map(x=>String(x||'').slice(0,10)):[],cu:P.cu&&typeof P.cu==='object'?P.cu:null};
   let kit=netGuest.kit;if(kitClash(kit,club.kit))kit=KITS.find(k=>!kitClash(k,club.kit)&&k!=='#2f2f3a')||'#4fb3ff';
   OPP={name:netGuest.club.toUpperCase(),mg:netGuest.mg||'',kit,off:0};cupEvent=null;eventText=null;comp='online';
-  NET.on=true;NET.host=true;NET.guest=false;netMatch=(Date.now()%100000)+1;
+  NET.on=true;NET.host=true;NET.guest=false;netMatch=(Date.now()%100000)+1;matchSerial++;ttCalc=null;
   initAudio();if(ac&&ac.state==='suspended')ac.resume();DF=levelDF('normal');setPitch(pk);{const g0=GM;GM=big?'classical':'volta';setup();GM=g0}hat=null;score=[0,0];mercy=false;clock=pk==='volta'?120:pk==='expanded'?210:180;style=0;shownStyle=0;hype=0;fire=0;streak=0;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];RS={x:0,y:0,charging:false,charge:0};netSeenEv=netSeenEvOf(g);RME=null;netTk=0;netFe=0;netImp=0;netCim=null;netPre=null;netGuestAt=performance.now();netWaiting=false;netResumeAt=0;netGuestBlind=false;
   c2seq=0;c2pend=null;ctrl2=null;menuEl.hidden=true;edEl.hidden=true;cv.focus();kickoff(0);
@@ -6092,7 +6272,7 @@ function guestBuild(h){const R=h.presence.r;if(!Array.isArray(R)||R.length<4)ret
     const kit=typeof r[2]==='string'&&/^#[0-9a-f]{6}$/i.test(r[2])?r[2]:'#999999',p=mk(1-(+r[0]?1:0),j,st,kit,0,0,!!r[1]);p.slot={x:.3,y:.5,r:'MID'};return p});
   const hk=players.find(p=>p.team===1&&!p.keeper);OPP={name:String(h.presence.club||'Host').toUpperCase().slice(0,16),mg:nameOk(String(h.presence.mg||'')),kit:hk?hk.kit:'#8e8ff0',off:0};
   return true}
-function guestBegin(h){setPitch(['volta','classical','expanded'].includes(h.presence.pk)?h.presence.pk:'volta');if(!guestBuild(h))return;netRdyAt=performance.now()+400;netRdySent=0;NET.on=true;NET.guest=true;NET.host=false;comp='online';netLock=false;netGotMatch=h.presence.m;netGState='';
+function guestBegin(h){matchSerial++;ttCalc=null;setPitch(['volta','classical','expanded'].includes(h.presence.pk)?h.presence.pk:'volta');if(!guestBuild(h))return;netRdyAt=performance.now()+400;netRdySent=0;NET.on=true;NET.guest=true;NET.host=false;comp='online';netLock=false;netGotMatch=h.presence.m;netGState='';
   netSeenPop=Infinity;netSeenSfx=Infinity;score=[0,0];clock=120;style=0;shownStyle=0;hype=0;fire=0;streak=0;hat=null;mercy=false;pen=null;cupEvent=null;eventText=null;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];charging=false;charge=0;introT=0;paused=false;$('pause').hidden=true;hitT=0;slowT=0;timeScale=1;
   menuEl.hidden=true;edEl.hidden=true;$('pack').hidden=true;cv.focus();state='play';stT=0;S.whistle(1);netLastSnapAt=performance.now();netGuestWait=false;netLastEcho=0;netLastG=null;
@@ -6355,7 +6535,7 @@ function toggleFull(){const st=document.querySelector('.stage'),fs=document.full
 $('fullscr').onclick=toggleFull;$('fullscr2').onclick=toggleFull;
 const fsLabel=()=>{const on=!!(document.fullscreenElement||document.webkitFullscreenElement);$('fullscr').textContent=on?'Exit full screen (V)':'Full screen (V)';$('fullscr2').textContent=on?'Exit full screen':'Full screen'};
 document.addEventListener('fullscreenchange',fsLabel);document.addEventListener('webkitfullscreenchange',fsLabel);
-window.__kick={errs:()=>loopErrs,acct:{st:()=>acct&&{...acct,k:'-'},fetch:()=>acct?acctFetch(acct.id,acct.k).then(r=>({ok:r.ok,at:r.sv&&r.sv.at,coins:r.sv&&r.sv.club.coins})):null},oj:()=>({on:!!(OJ.slam||OJ.z>.002||OJ.vig>0||OJ.lines.length||OJ.strobe>0),slam:OJ.slam&&OJ.slam.text,style:Math.round(style),hype:Math.round(hype),fire:Math.round(fire),chain}),dbg:{aiStat:()=>aiStat,earnNote:()=>earnNote,cv:()=>({rollTier,ABTIER,sweepPlan,kSkill,byId,upOf,UPCAP,EVO,XPL,STATMAX,tier,depBuy,depLv,depFx,ctk,ctkSync,maxPlan,statMax,upPreview,playStatsX,scoutOdds,matchPay,gdTokens,legacyXP,upBuy,ablBuy,coachCost,upCost,effOvr,cdSecs,spCdOf,PACKS,legNeed,trainDo,evoDo,evoNeed,ovr}),snapSize:()=>JSON.stringify(netSnapOf()).length,prep:()=>!!netPrep,allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p),look:p.look,skin:p.skin})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,netEpoch:()=>{netEpoch++},forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,FY0,FY1,MY,MIDX,GY0,GY1,BOX,BOXH,PITCH}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({stat:netStat,log:netLogBuf.slice(-40),c2:{seq:c2seq,rme:RME&&{idx:RME.idx,on:RME.on,age:Math.round(performance.now()-RME.at)}},gcs:gCs,wait:netWaiting,gwait:netGuestWait,routes:{...netRoutes},prefer:nroom&&nroom.prefer?nroom.prefer.kind:null,gm:{on:gPr.on,seq:gIn.seq,ack:gIn.ack,pending:gIn.list.filter(e=>e[0]>gIn.ack).length,wait:netGuestWait,rtt:netRtt},RSp:RS&&RS.pend?RS.pend.k:null,RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+window.__kick={errs:()=>loopErrs,acct:{v1:async(e,pw)=>{const d=await acctDerive(e,pw,1),keep=acct;acct={k:d.k};const s=await acctSeal(snapshotSave());acct=keep;for(const c of await regConnect()){const go=()=>c.publish(ACCT_T+d.id,s,{qos:1,retain:true});if(c.connected)go();else c.once('connect',go)}return d.id},st:()=>acct&&{...acct,k:'-'},fetch:()=>acct?acctFetch(acct.id,acct.k).then(r=>({ok:r.ok,at:r.sv&&r.sv.at,coins:r.sv&&r.sv.club.coins})):null},oj:()=>({on:!!(OJ.slam||OJ.z>.002||OJ.vig>0||OJ.lines.length||OJ.strobe>0),slam:OJ.slam&&OJ.slam.text,style:Math.round(style),hype:Math.round(hype),fire:Math.round(fire),chain}),dbg:{gdTokens:(a,b)=>gdTokens(a,b),ttCalc:()=>ttCalc,tPick:p=>throughPick(p),isOff:(m,p)=>isOffside(m,p),doThrough:p=>doThrough(p),aiStat:()=>aiStat,shotLog:()=>aiShotLog.slice(),earnNote:()=>earnNote,cv:()=>({rollTier,ABTIER,sweepPlan,kSkill,byId,upOf,UPCAP,EVO,XPL,STATMAX,tier,depBuy,depLv,depFx,ctk,ctkSync,maxPlan,statMax,upPreview,playStatsX,scoutOdds,matchPay,gdTokens,legacyXP,upBuy,ablBuy,coachCost,upCost,effOvr,cdSecs,spCdOf,PACKS,legNeed,trainDo,evoDo,evoNeed,ovr}),snapSize:()=>JSON.stringify(netSnapOf()).length,prep:()=>!!netPrep,allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p),look:p.look,skin:p.skin})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,netEpoch:()=>{netEpoch++},forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,FY0,FY1,MY,MIDX,GY0,GY1,BOX,BOXH,PITCH}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({stat:netStat,log:netLogBuf.slice(-40),c2:{seq:c2seq,rme:RME&&{idx:RME.idx,on:RME.on,age:Math.round(performance.now()-RME.at)}},gcs:gCs,wait:netWaiting,gwait:netGuestWait,routes:{...netRoutes},prefer:nroom&&nroom.prefer?nroom.prefer.kind:null,gm:{on:gPr.on,seq:gIn.seq,ack:gIn.ack,pending:gIn.list.filter(e=>e[0]>gIn.ack).length,wait:netGuestWait,rtt:netRtt},RSp:RS&&RS.pend?RS.pend.k:null,RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 // Getting ready: a panel over the pitch while both laptops load, then the countdown
 // before kick-off online: the two clubs and their managers face off, then the countdown (or what's still being checked)
 let vsT0=0,vsLast=0;

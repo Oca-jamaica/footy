@@ -36,15 +36,27 @@ read the game better as well as play better: they cut out passes, mark the most 
 track runs, make runs into space, counter-attack, time through balls and pick the open corner. Keepers come off their
 line to sweep up through balls and loose balls behind the defence (better keepers judge it better).
 
-**Rewards:** every match pays Training Tokens for goal difference (`max(0, goals scored − goals conceded)`), with no
-multipliers or caps. Every Club Legacy level pays exactly 1 Club Token. Club Tokens build the six Club Development
+**Rewards:** every completed match pays Training Tokens for half the winning margin, rounded down
+(`floor(max(0, goals scored − goals conceded) ÷ 2)`: 2–0 or 3–1 pays 1, 4–0 pays 2, 1–0 or a draw pays nothing), once per
+match, online too, with no multipliers; the full-time screen shows the sum. Other token rewards are unchanged. Every Club Legacy level pays exactly 1 Club Token. Club Tokens build the six Club Development
 departments (Fanbase, Coaching Staff, Training Facilities, Stadium, Scouting, Commercial), levels 1–5, for
 5,000 / 10,000 / 20,000 / 35,000 coins plus 1 Club Token per level.
 
 
-**Through Ball:** played into space ahead of the best runner (within range), about 8% slower than before, and offside counts:
-a runner beyond the second-last defender when it's played gives the other side a free kick. Defenders can win a dropping
-through ball.
+**Through Ball (special):** aimed into the space ahead of the team-mate furthest up the pitch (towards the goal his side
+attacks), never an opponent, the keeper, anyone on the floor, or anyone offside; if nobody's eligible it isn't played and
+the cooldown isn't spent. It travels at 0.20× its previous speed as an ordinary loose ball that defenders and keepers can
+cut out. Measured: it now travels about 50–80 px (it used to cover 570–630 px and reach the runner every time), so the
+passer's side usually just collects it again. That's the requested multiplier, kept as asked; `THROUGH_SPEED` in
+`src/js/2-engine.js` is the one number to change. Cooldowns are unchanged (25 s at level 1 to 7 s at level 10).
+
+**Computer's attack (Classical pitches):** the ball carrier weighs shooting, passing (to feet, into a runner's stride,
+across goal, switches, long balls, crosses), dribbling into the most open lane, taking a man on, or keeping it, by how
+likely each is to lead to a goal, with a little randomness. Shots are judged by a scoring-chance estimate (distance,
+angle, keeper position, bodies in the way, pressure, the shooter's finishing and power), so long shots only happen when
+they're a genuine chance, mostly by good finishers. Off the ball, forwards stay onside on the shoulder of the last
+defender, attack the near post, penalty spot and edge of the box rather than the keeper's area, and time runs in
+behind. Volta keeps its previous attacking play. Keepers on both sides react 10% later to shots than before.
 
 **Online modes:** Ranked, Friendly and Host / Join. Ranked and Friendly find a real opponent automatically (same match type
 and pitch; Ranked by similar rating, widening the longer you wait; never an AI). Ten placement matches set your first rank
@@ -54,16 +66,20 @@ months: rewards for your best rank, then points move part of the way back to the
 as a loss. Friendly pays normal online coins (a quarter after 8 a day). Leaderboard tab (next to Online): every club is on it automatically and kept up to date; Global clubs and Ranked
 (ordered by results only), with a read-only View Squad.
 
-**Your name and saving with email:** the first time the game opens it asks for your name (the manager), which is shown
-next to your club on the leaderboard, in View Squad, in matchmaking and on the VS card online. Tap your name at the top
-to change it. Logging in with an email and password is optional: progress then saves automatically and loads on any
-other device with the same email and password (it asks first if that device has progress of its own, and won't
-overwrite a newer copy from another device without asking). There's no server of our own, so the save is locked on your
-device (PBKDF2 + AES-GCM, from your email and password) and the locked copy is kept as a retained message on the same
-public relays; your email and password never leave the device and the relays only see scrambled data. No email is sent,
-so there's no address check and no password reset, and a public relay could clear the copy, so the device's own save
-and the save code under Club stay as backups. A proper account system (verified email, password reset) needs a backend
-such as Supabase or Firebase Auth.
+**Nickname and saving:** the first time the game opens it asks for a nickname (2–16 letters, numbers, spaces or
+. _ - '), which is all you need to play; it's shown next to your club on the leaderboard, in View Squad, in matchmaking
+and on the VS card online. Nicknames aren't identities: each install has a random internal id and each public club
+profile a separate random id. Progress is always saved on the device (browser storage), which is lost if the browser's
+data is cleared. SAVE YOUR ACCOUNT is optional: with an email and password, progress also saves automatically to a
+locked copy and loads on any other device with the same email and password (it asks first if that device has progress
+of its own, and won't overwrite a newer copy from another device without asking). There's no server of our own, so the
+save is locked on the device (PBKDF2-SHA256 with 600,000 rounds, then AES-GCM) and the locked copy is kept as a retained
+message on the public relays; the email and password never leave the device and never appear in anything public. Each
+save is read back from the relays and opened before the game calls it saved. No email is sent, so there's no address
+check and no password reset, and a public relay could clear a copy (anyone can also overwrite or delete retained
+messages on a public relay, though not read them; the device puts its copy back), so the device's own save and the
+save code under Club stay as backups. A proper account system (verified email, password reset, protected storage)
+needs a backend such as Supabase or Firebase Auth.
 
 **What needs a server:** matchmaking and the leaderboards run over the same free public relays as online play, with no
 server of our own. Each club's rating lives in its own save, and leaderboard profiles are retained messages on public
