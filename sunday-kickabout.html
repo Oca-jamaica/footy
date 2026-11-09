@@ -359,6 +359,40 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
 .soon b{font-family:var(--display);font-weight:400;font-size:28px;color:var(--sun)}
 .cabinet{display:flex;flex-wrap:wrap;gap:8px}.troph{border:1px solid var(--line);border-radius:12px;padding:6px 10px;background:#12303e;font-size:12px;text-align:center;min-width:110px}.troph b{display:block;font-size:24px}
 .welcome{border:1px solid var(--mint);color:var(--mint)}
+
+/* online: modes, ranks, placement ring, matchmaking, leaderboards, help, tutorial */
+.olmodes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%}
+.olm{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 8px;border-radius:16px;border:1px solid var(--line);background:var(--ground-2);color:var(--cream);cursor:pointer;font:inherit}
+.olm b{font-family:var(--display);font-weight:400;font-size:22px}.olm small{color:var(--muted)}.olm .olic{font-size:26px}
+.olm[aria-pressed="true"]{border-color:var(--sun);box-shadow:0 0 0 2px rgba(255,209,102,.35);background:linear-gradient(180deg,#1f4256,#183544)}
+.olfmt{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;margin:10px 0}.olfmt .lab{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--muted)}
+.olfmt button{font:inherit;font-weight:800;font-size:13px;border:1px solid var(--line);background:var(--ground-2);color:var(--muted);padding:6px 12px;border-radius:999px;cursor:pointer}.olfmt button[aria-pressed="true"]{background:var(--cream);color:var(--ground)}
+.olpanel{border:1px solid var(--line);border-radius:16px;background:var(--ground-2);padding:14px;text-align:left}.olpanel h3{margin:0 0 6px;font-family:var(--display);font-weight:400;color:var(--sun)}
+.olpanel.rk{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.rkright{flex:1;min-width:240px}
+.pring{position:relative;width:150px;height:150px}.pring svg{transform:rotate(-90deg)}.pr-bg{fill:none;stroke:#3a4652;stroke-width:10}
+.pr-fg{fill:none;stroke:#5fe3ff;stroke-width:10;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(95,227,255,.8));transition:stroke-dashoffset 1.1s cubic-bezier(.3,.7,.3,1)}
+.pr-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.pr-in b{font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:.04em;color:#c9d2da}
+.pr-lab{text-align:center;margin:4px 0 0;font-weight:800;color:var(--cream);width:150px}
+.rkb{--s:64px;width:var(--s);height:calc(var(--s)*1.1);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;vertical-align:middle;clip-path:polygon(50% 0,100% 18%,92% 72%,50% 100%,8% 72%,0 18%);background:linear-gradient(160deg,var(--c),var(--c2));color:#1b1205;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.rkb i{font-style:normal;font-size:calc(var(--s)*.22)}.rkb b{font-size:calc(var(--s)*.13);font-weight:900;letter-spacing:.03em}.rkb.un{background:linear-gradient(160deg,#9aa4ad,#55606a);color:#222}
+.rkb.leg{background:linear-gradient(160deg,#ffe27a,#ff8a1f 50%,#d2321e);animation:leg 1.8s ease-in-out infinite alternate}@keyframes leg{from{filter:drop-shadow(0 0 4px rgba(255,140,40,.6))}to{filter:drop-shadow(0 0 14px rgba(255,90,30,.95))}}
+.rkladder{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.rkst{display:flex;flex-direction:column;align-items:center;opacity:.55}.rkst.on{opacity:1}.rkst small{font-size:10px;color:var(--muted)}
+.mmsearch{display:flex;gap:14px;align-items:center;margin-top:10px;padding:12px;border-radius:14px;background:#0f2a37;border:1px solid var(--mint)}.mmsearch p{margin:2px 0}
+.mmspin{width:34px;height:34px;border-radius:50%;border:4px solid rgba(127,224,180,.25);border-top-color:var(--mint);animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+#ol-board{margin-top:14px}.lbhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.lbhead h3{margin:0;font-family:var(--display);font-weight:400;color:var(--sun)}.lbt tr.me{background:rgba(255,209,102,.12)}
+.ovl{position:fixed;inset:0;z-index:60;background:rgba(5,10,16,.72);display:flex;align-items:center;justify-content:center;padding:16px}.ovl[hidden]{display:none}
+.sqbox,.hbox{position:relative;max-width:900px;width:100%;max-height:88vh;overflow:auto;background:var(--ground-2);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:left;color:var(--cream)}
+.sqbox h3,.hmain h3{margin:0 0 6px;font-family:var(--display);font-weight:400;color:var(--sun);font-size:24px}.sqx,.hx{position:absolute;top:10px;right:10px}
+.sqv{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:10px}.sqc{display:flex;flex-direction:column;border-radius:10px;padding:8px;background:#12303e;border-left:4px solid var(--tc,#888)}.sqc b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--sun)}.sqc small{color:var(--muted)}
+.rkrv{text-align:center;color:var(--cream);display:flex;flex-direction:column;align-items:center;gap:8px;animation:pb .4s ease-out}.rkrv h2{font-family:var(--display);font-weight:400;font-size:46px;margin:0}.rkrvb{animation:rv 1.2s .9s both cubic-bezier(.2,1.4,.4,1)}@keyframes rv{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
+.hbox{display:grid;grid-template-columns:220px 1fr;gap:16px}.hnav{display:flex;flex-direction:column;gap:4px}.hnav button{font:inherit;text-align:left;padding:7px 10px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer}
+.hnav button[aria-pressed="true"]{background:#12303e;border-color:var(--sun);color:var(--cream)}.hmain{min-height:300px;display:flex;flex-direction:column}.htext{flex:1;line-height:1.5}.hfoot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radius:6px;background:#0d2230;border:1px solid var(--line);font:700 12px var(--body);text-align:center}
+@media (max-width:640px){.hbox{grid-template-columns:1fr}.hnav{flex-direction:row;flex-wrap:wrap}.olmodes{grid-template-columns:1fr}}
+.helpb{color:var(--sun)!important;border-color:var(--sun)!important}
+.tutbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:55;max-width:520px;width:calc(100% - 32px)}.tutbar[hidden]{display:none}
+.tbox{background:#0f2a37;border:2px solid var(--sun);border-radius:16px;padding:14px;color:var(--cream);box-shadow:0 10px 30px rgba(0,0,0,.5)}.tbox h3{margin:2px 0 4px;font-family:var(--display);font-weight:400;color:var(--sun)}.tbox small{color:var(--muted)}.tfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+.tutmark{outline:3px solid var(--sun)!important;outline-offset:3px;box-shadow:0 0 0 6px rgba(255,209,102,.25)!important;border-radius:10px;animation:tm 1s ease-in-out infinite alternate}@keyframes tm{to{outline-color:rgba(255,209,102,.4)}}
 </style>
 
 <div class="stage">
@@ -369,7 +403,7 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
     <div class="clubbar">
       <label for="club-name" style="display:flex;align-items:center;gap:6px">CLUB<input type="text" id="club-name" maxlength="14"></label>
       <div class="sw" id="club-kit" aria-label="Kit colour"></div>
-      <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button><button class="res ctkp" id="ctkp" title="Club Tokens (Club Development)"></button>
+      <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button><button class="res ctkp" id="ctkp" title="Club Tokens (Club Development)"></button><button class="res helpb" id="helpbtn3" title="How everything works">? Help</button>
     </div>
     <div class="tabs" role="tablist"><button role="tab" id="tab-team" aria-selected="true">Play</button><button role="tab" id="tab-squad" aria-selected="false">Squad</button><button role="tab" id="tab-club" aria-selected="false">Club</button><button role="tab" id="tab-online" aria-selected="false">Online</button></div>
     <p class="result" id="result" hidden></p>
@@ -427,16 +461,19 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
       <p class="hint" style="margin-top:10px">Every pack shows you three players of one rarity and you sign one. All packs are bought with coins you earn by playing: no real money, ever. Signing a player you already own keeps the duplicate for Exchanges.</p>
     </section>
     <section id="sec-online" hidden style="width:100%">
-      <div class="online">
+      <div id="ol-plus"></div>
+      <div id="ol-host" hidden><div class="online">
         <div class="ocard"><h3>Host a match</h3><p class="hint">Pick the match, then press Host. You get a 4-letter code; your friend types it on their laptop.</p>
           <div class="forms" id="net-mode" role="group" aria-label="Match type"></div>
           <button class="go" id="net-host">Host</button><div class="ncode" id="net-code" aria-live="polite"></div><button class="go" id="net-start" hidden>Kick off</button></div>
         <div class="ocard"><h3>Join a match</h3><p class="hint">Got a code from a friend? Type it here.</p>
           <div class="row"><input type="text" id="net-in" maxlength="4" placeholder="CODE" autocomplete="off" aria-label="Match code"><button class="go" id="net-join">Join</button></div></div>
       </div>
-      <p class="toast" id="net-status" aria-live="polite"></p>
       <p class="hint" id="net-note"></p>
       <p class="hint">You each play with your own team and line-up (your Volta line-up for Volta, your Classical line-up for Classical), and you both see yourself attacking left to right. After Kick off both laptops load the match and confirm they’re ready before a 3-2-1 countdown. No penalties: a draw is a draw. Coins: 60 for a win, 30 for a draw, 15 for a loss (Classical 1.5×).</p>
+      </div>
+      <p class="toast" id="net-status" aria-live="polite"></p>
+      <div id="ol-board" class="panel"></div>
     </section>
     <section id="sec-coll" hidden style="width:100%">
       <h3 class="sec-title">Collection <span class="hint" id="collect-count"></span></h3>
@@ -475,7 +512,7 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
   <div class="menu" id="pause" hidden><div class="menu-inner">
     <h1>Paused</h1>
     <p class="hint">Take a breather. Leaving ends the match with no coins. Forfeiting counts as a 0–3 defeat in your cup or tournament run.</p>
-    <div class="row"><button class="go" id="resume">Resume</button><button class="ghost" id="leave">Leave match</button><button class="ghost" id="forfeit">Forfeit</button><button class="ghost" id="fixscr2">Fix screen</button><button class="ghost" id="fullscr2">Full screen</button></div>
+    <div class="row"><button class="go" id="resume">Resume</button><button class="ghost" id="leave">Leave match</button><button class="ghost" id="forfeit">Forfeit</button><button class="ghost" id="fixscr2">Fix screen</button><button class="ghost" id="fullscr2">Full screen</button><button class="ghost" id="helpbtn2">Help</button></div>
   </div></div>
   <div class="editor" id="editor" hidden><div class="ed-inner">
     <h2>Create your player</h2>
@@ -508,9 +545,10 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
   <span><kbd>1</kbd>–<kbd>6</kbd> celebration</span>
   <span><button class="mute" id="mute">Sound on (M)</button></span>
   <span><button class="mute" id="fixscr" title="Use this if the screen ever goes black or freezes">Fix screen (G)</button></span>
-  <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span>
+  <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span><span><button class="mute helpb" id="helpbtn" title="How everything works">HELP</button></span>
 </div>
 
+<div id="sqview" class="ovl" hidden></div><div id="rkreveal" class="ovl" hidden></div><div id="help" class="ovl" hidden></div><div id="tut" class="tutbar" hidden></div>
 <script>(()=>{
 const cv=document.getElementById('pitch'),ctx0=cv.getContext('2d');let ctx=ctx0;
 const W=1000,H=620,DPR=Math.min(2,window.devicePixelRatio||1);
@@ -632,6 +670,10 @@ let NAMES={};try{NAMES=JSON.parse(localStorage.getItem('kickabout-names')||'{}')
 for(const p of PLAYERS){p.name0=p.name;p.short0=p.short;if(NAMES[p.id]){p.name=NAMES[p.id];p.short=NAMES[p.id].split(' ').pop().toUpperCase().slice(0,10)}}
 const ROSTER=PLAYERS,STARTERS=PLAYERS.filter(p=>['dave','leon','gaz'].includes(p.id)),MID=[];
 const BUDGET=470;
+// Your Player's training: 23 sessions of +8 points (470 → 650). Prices climb steadily from 400 coins to exactly 75,000
+// for the last session (before any Coaching Staff discount).
+const MYTRAIN_N=Math.ceil((650-BUDGET)/8),myTrainIx=()=>clamp(Math.ceil(((custom.budget||BUDGET)-BUDGET)/8),0,MYTRAIN_N-1),
+  myTrainCost=i=>i>=MYTRAIN_N-1?75000:Math.round(400*Math.pow(75000/400,i/(MYTRAIN_N-1))/50)*50,myTrainBase=()=>myTrainCost(myTrainIx());
 let custom={id:'custom',name:'Your Name',short:'NAME',num:99,tag:'Created player',pace:.75,shot:.75,fin:.7,skill:.7,pass:.7,tackle:.5,str:.6,sk:'roulette',sp:'curler',celeb:0,skin:SKINS[1],hair:HAIRS[0],isCustom:true};
 try{const c=JSON.parse(localStorage.getItem('kickabout-custom')||'null');if(c&&c.name)custom={...custom,...c,isCustom:true}}catch(e){}
 function natPos(p){if(p.pos)return p.pos;const d=p.tackle*1.6+p.str*.6,m=p.pass*1.3+p.skill*.7,a=(p.shot+p.fin)*.8+p.pace*.3;return d>=m&&d>=a?'DEF':m>=a?'MID':'ATT'}
@@ -892,7 +934,7 @@ function setGM(g){if(g===GM)return;club.compBy=club.compBy||{};club.compBy[GM]=c
 function renderMenu(){
   careerInit();applyNames();
   for(const k of ['team','squad','club','online'])$('tab-'+k).setAttribute('aria-selected',tab===k);
-  $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';
+  $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';if(tab==='online')renderOnlinePlus();
   $('sec-packs').hidden=!(tab==='club'&&ctab==='packs');$('sec-coll').hidden=!(tab==='club'&&ctab==='coll');
   comp=club.comp||'league';if(!COMPS[GM].includes(compKey())){comp=club.comp='league'}
   document.querySelectorAll('.lvl button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lv===(club.level||'normal')?'true':'false'));
@@ -931,7 +973,7 @@ function renderMenu(){
   $('benchctl').innerHTML=`<span class="hint" style="margin:0">${benchList.length} players · best for the selected ${slots[selSlot]?slots[selSlot].r:''} spot first</span>`+(benchList.length>36?`<button class="ghost" data-benchall="1">${benchAll?'Show fewer':'Show all '+benchList.length}</button>`:'');
   $('bench').innerHTML=(benchAll?benchList:benchList.slice(0,36)).map(p=>{const at=q.s.indexOf(p.id);return cardHTML(p,{pickable:true,inteam:at>=0,badge:at>=0?slots[at].r[0]:'',
     extra:!p.isCustom?renameUI(p,'bench'):
-      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<coachCost(400)||(custom.budget||BUDGET)>=650?'disabled':''}>Train +8 pts · ${priceTag(400)}</button>`:''})}).join('');
+      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${(custom.budget||BUDGET)>=650||club.coins<coachCost(myTrainBase())?'disabled':''}>${(custom.budget||BUDGET)>=650?'Fully trained':`Train +8 pts · ${priceTag(myTrainBase())} (session ${myTrainIx()+1}/${MYTRAIN_N})`}</button>`:''})}).join('');
   renderSquadExtras();
   // packs
   $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const so=scoutOdds(k.odds),sc=depFx('scout')&&so!==k.odds,od=Object.entries(so).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ')+(sc?` (scouting +${depFx('scout')}%)`:'');
@@ -1023,7 +1065,7 @@ $('market').addEventListener('keydown',renameKey);
 $('bench').addEventListener('click',e=>{
   if(renameClick(e,'bench'))return;
   if(e.target.closest('[data-edit]')){openEditor();return}
-  const tr=e.target.closest('[data-train]');if(tr){if(club.coins>=coachCost(400)){const was=ovr(custom),gain=Math.min(8,650-(custom.budget||BUDGET));club.coins-=coachCost(400);custom.budget=(custom.budget||BUDGET)+gain;autoSpend(custom,gain);const now=ovr(custom);try{localStorage.setItem('kickabout-custom',JSON.stringify(custom))}catch(e){}saveClub();S.skill(2);renderMenu();showUpgrade(was,now);openEditor()}return}
+  const tr=e.target.closest('[data-train]');if(tr){const price=coachCost(myTrainBase());if((custom.budget||BUDGET)<650&&club.coins>=price){const was=ovr(custom),gain=Math.min(8,650-(custom.budget||BUDGET));club.coins-=price;custom.budget=(custom.budget||BUDGET)+gain;autoSpend(custom,gain);const now=ovr(custom);try{localStorage.setItem('kickabout-custom',JSON.stringify(custom))}catch(e){}saveClub();S.skill(2);renderMenu();showUpgrade(was,now);openEditor()}return}
   const c=e.target.closest('.card[data-id]');if(c){lastSlotClick=-1;placePlayer(c.dataset.id)}});
 $('bench').addEventListener('keydown',e=>{if(renameKey(e))return;
   const c=e.target.closest('.card[data-id]');if(c&&e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();placePlayer(c.dataset.id)}});
@@ -1540,7 +1582,9 @@ function evoDo(id){const p=byId(id),N=p&&evoNeed(p);if(!N)return;if(N.have.m<N.m
   if(club.coins<N.coins||res().tt<N.tt){toast('Not enough coins or Training Tokens.');return}
   const before=effOvr(p);club.coins-=N.coins;club.tt-=N.tt;club.evo[id]={st:N.stage+1,m:0,g:0,p:0,t:0};stat('evos');if(!evoNeed(p))stat('evomax');
   toast(`${p.name} evolved! ${before} → ${effOvr(p)} OVR`);S.goal();confetti(tier(p));achCheck();saveClub();renderMenu()}
-function trainDo(id){const p=byId(id);if(!p||res().tt<2)return;club.tt-=2;club.xp=club.xp||{};const b=lvlOf(id);const gx=Math.round(100*(1+depFx('train')/100));club.xp[id]=(club.xp[id]||0)+gx;
+// Training Tokens for a 100 XP session rise with his level: 2 at the start up to 20 for the last level; none once he's at the top
+const TRAINTT=[2,4,5,7,9,11,15,20],trainTT=id=>{const L=lvlOf(id);return L>=XPL.length-1?0:TRAINTT[Math.min(L,TRAINTT.length-1)]};
+function trainDo(id){const p=byId(id),c=trainTT(id);if(!p||!c||res().tt<c)return;club.tt-=c;club.xp=club.xp||{};const b=lvlOf(id);const gx=Math.round(100*(1+depFx('train')/100));club.xp[id]=(club.xp[id]||0)+gx;
   toast(`Training session: ${p.short} +${gx} XP`+(lvlOf(id)>b?` · now Lv ${lvlOf(id)}`:''));S.skill(1);saveClub();renderMenu()}
 function gkTrain(){const lv=club.gkLv||0;if(lv>=GKMAX)return;const c=gkCost(lv);if(club.coins<c){toast(`Needs ${c.toLocaleString()} coins.`);return}club.coins-=c;club.gkLv=lv+1;toast(`Keeper training: Goalkeeping now ${gkRating()}`);S.skill(1);saveClub();renderMenu()}
 const gkRating=()=>70+(club.gkLv||0)*3;
@@ -1678,7 +1722,7 @@ function devHTML(){const mine=ownedPlayers().filter(p=>!p.isCustom);if(!upId||!c
     <p class="hint" style="margin:4px 0">Still to come: ${cap-spent} upgrade point${cap-spent===1?'':'s'}${room<cap?` (${Math.max(0,room-spent)} usable now, the rest unlock as he levels up)`:''} · ${EVO[tier(p)].boost.length-evoOf(p.id).st} evolution stage${EVO[tier(p)].boost.length-evoOf(p.id).st===1?'':'s'} · level bonus +${lb} now, +3 at level 6${planTxt?` · best use of the points left: ${planTxt}`:''}. Max achievable counts all of that; chemistry adds up to +3 more in matches. ${TIERS[tier(p)].name} evolutions stop at ${OVRCAP[tier(p)]}.</p>
     ${upFlash&&upFlash.id===p.id?`<p class="flash">Upgraded: ${upFlash.o0} → ${upFlash.o1} OVR</p>`:''}
     ${coachLine()}<p class="hint">Level ${L} unlocks ${room} of ${cap} upgrade points${room<cap?' · play him or train him to level up for more':''}. Each stat can go up by ${STATMAX}. Each point costs a little more than the last.</p>${rows}</div>
-    <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +${Math.round(100*(1+depFx('train')/100))} XP${depFx('train')?` (Training Facilities +${depFx('train')}%)`:''}. Every two levels adds +1 to his five best stats (up to +3).${L<lvMax?` Next level at ${XPL[L+1]} XP${L%2===1&&lb<3?`: five best stats +1, OVR ${now} → ${ovr(playStatsX(p,L+1,u,evoOf(p.id).st))}`:''}.`:' Top level reached.'}</p><button class="btn" data-train2="1" ${club.tt<2?'disabled':''}>Train · 2 Training Tokens</button></div>
+    <div class="panel"><h4>Training · Level ${L}</h4><p class="hint">${xpOf(p.id)} XP. Matches give XP (more for goals, tackles and wins). A training session gives +${Math.round(100*(1+depFx('train')/100))} XP${depFx('train')?` (Training Facilities +${depFx('train')}%)`:''}. Every two levels adds +1 to his five best stats (up to +3).${L<lvMax?` Next level at ${XPL[L+1]} XP${L%2===1&&lb<3?`: five best stats +1, OVR ${now} → ${ovr(playStatsX(p,L+1,u,evoOf(p.id).st))}`:''}.`:' Top level reached.'}</p><button class="btn" data-train2="1" ${!trainTT(p.id)||club.tt<trainTT(p.id)?'disabled':''}>${trainTT(p.id)?`Train +${Math.round(100*(1+depFx('train')/100))} XP · ${trainTT(p.id)} Training Tokens`:'Top level reached'}</button><p class="hint" style="margin:4px 0 0">Tokens per session rise with his level: ${TRAINTT.join(' → ')}.</p></div>
     ${ablPanel(p)}${evo}${p.ab?`<div class="panel"><h4>Signature ability · ${ABIL[p.ab].name}</h4><p>${ABIL[p.ab].d}. Always on when he plays.</p></div>`:''}${gk}</div></div>`}
 $('club-body').addEventListener('change',e=>{if(e.target.id==='dev-pick'){upId=e.target.value;upFlash=null;renderMenu()}});
 $('club-body').addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
@@ -3287,7 +3331,7 @@ goBtn.onclick=startMatch;
 let paused=false;
 function setPause(v){if(state==='menu')return;paused=v;$('pause').hidden=!v;if(v){charging=false;for(const k in keys)keys[k]=false;$('resume').focus()}else cv.focus()}
 $('resume').onclick=()=>setPause(false);
-$('leave').onclick=()=>{paused=false;$('pause').hidden=true;if(NET.on)netLeave();showMenu(true)};
+$('leave').onclick=()=>{paused=false;$('pause').hidden=true;if(NET.on){onlineLeft();netLeave()}showMenu(true)};
 $('forfeit').onclick=()=>{if(NET.on){$('leave').onclick();return}paused=false;$('pause').hidden=true;pen=null;score=[0,3];style=0;awardCoins();club.coins-=earned;earned=0;saveClub();
   showMenu(false);resultEl.textContent='You forfeited. It counts as a 0–3 defeat.'+(eventText?' '+eventText:'')};
 addEventListener('keydown',e=>{
@@ -3384,7 +3428,7 @@ function startMatch(){
   weather=!SG&&comp!=='friendly'&&Math.random()<.2?'rain':'clear';
 }
 function showMenu(left=false){
-  state='menu';menuEl.hidden=false;
+  state='menu';menuEl.hidden=false;tutAfterMatch();
   const pw=pen&&pen.winner!=null?pen.winner:null;const r=score[0]>score[1]?'You won':score[0]<score[1]?'You lost':pw===0?'Won on penalties':pw===1?'Lost on penalties':'Draw';
   resultEl.hidden=false;resultEl.textContent=`Last match: ${r} ${score[0]}–${score[1]} · ${style.toLocaleString()} style pts`+(true?` · +${earned} coins`:` · best ${best.toLocaleString()}`);
   if((comp==='league'||comp==='wcc')&&eventText&&!left)resultEl.textContent=eventText+' · '+resultEl.textContent;
@@ -3414,7 +3458,7 @@ function kick(p,a,spd,vz){B.claimBy=null;B.kickN=(B.kickN||0)+1;if(NET.host&&p.t
   B.owner=null;B.vx=Math.cos(a)*spd;B.vy=Math.sin(a)*spd;B.vz=vz;B.z=Math.max(B.z,1);B.lockBy=p;B.lockT=14;B.curl=0;B.knuckle=0;B.rocket=false;B.shot=null;B.pass=null;
   B.x=p.x+Math.cos(a)*14;B.y=p.y+Math.sin(a)*14;
 }
-function pass(p,to,through=false,assist=1){if(NET.on)netKickLog(p,through?'through':'pass',to?players.indexOf(to):-1,0);
+function pass(p,to,through=false,assist=1){if(p.team===1&&!hum(p)&&!p.keeper)aiStat.aiPasses++;if(NET.on)netKickLog(p,through?'through':'pass',to?players.indexOf(to):-1,0);
   const ps=p.st.pass??.65,att=p.team===0?1:-1;
   const lead=through?28:10+dist(p,to)/35;
   let tx=to.x+to.vx*lead+(through?att*90:0),ty=to.y+to.vy*lead;
@@ -3456,7 +3500,7 @@ function curlCross(x,y,a,spd,curl,vz,gx){let vx=Math.cos(a)*spd,vy=Math.sin(a)*s
 function solveCurl(x,y,a0,spd,curl,vz,gx,ty){let lo=a0-.6,hi=a0+.6;const f=a=>{const c=curlCross(x,y,a,spd,curl,vz,gx);return c==null?NaN:c-ty};
   let flo=f(lo),fhi=f(hi);if(!(flo*fhi<0))return a0;
   for(let i=0;i<22;i++){const m=(lo+hi)/2,fm=f(m);if(isNaN(fm))return a0;if(fm*flo<=0){hi=m;fhi=fm}else{lo=m;flo=fm}}return (lo+hi)/2}
-function shoot(p,type,ch,aim=null){if(NET.on)netKickLog(p,'shot',type,ch);
+function shoot(p,type,ch,aim=null){if(p.team===1&&!hum(p))aiStat.aiShots++;if(NET.on)netKickLog(p,'shot',type,ch);
   const gx=goalX(p.team),att=p.team===0?1:-1,fin=p.st.fin,pow=p.st.shot,fz=(fire>0&&p.team===0)?1.1:1;
   let ty=aim;
   // no aim assist: the ball goes exactly where you're facing
@@ -3525,7 +3569,7 @@ function pushDir(p,lateral){
 }
 function push(p,a,spd,frames,next=null){p.push={a,spd,T:frames,max:frames,next}}
 let KNOCK=[7.6,16,7.4,30,1.6];
-function doSkill(p){
+function doSkill(p){if(p.team===1&&!hum(p))aiStat.aiSkills++;
   const sk=p.st.sk,def=SKILLS[sk];
   if(!def||p.skillCd>0||p.stam<def.stam||p.anim||p.stun>0||B.owner!==p)return;
   p.skillCd=def.cd;p.stam-=def.stam;S.swoosh();
@@ -3598,9 +3642,11 @@ function airStrike(m){airN[B.z>22?'header':'volley']++;const gx=goalX(m.team),k=
   m.dir=Math.atan2(ty-B.y,gx-B.x);shoot(m,header?'header':'volley',.9,ty);
   pop(header?'HEADER!':'VOLLEY!',m.x,m.y-50,m.team===0?C.sun:C.coral,22,70);if(m.team===0){slowmo(14,.4);addHype(8)}}
 const attackSpot=team=>{const gx=goalX(team);return{x:gx-Math.sign(gx-MIDX)*SPOT,y:MY}};
+// the special Through Ball flies ~9% slower than it used to (66 frames instead of 60 to the same spot)
+const THROUGH_T=66;
 function doThrough(p){if(B.owner!==p)return false;const sp=attackSpot(p.team);let m=null;
   for(const q of outfield(p.team))if(q!==p&&(!m||dist(q,sp)<dist(m,sp)))m=q;if(!m)return false;
-  lobTo(p,m,sp.x,sp.y,60,true);pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
+  lobTo(p,m,sp.x,sp.y,THROUGH_T,true);pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
 function doLob(p){if(B.owner!==p)return false;const att=p.team===0?1:-1;let m=bestMate(p);
   if(!m){for(const q of outfield(p.team))if(q!==p&&(!m||(q.x-m.x)*att>0))m=q}if(!m)return false;
   const T=clamp(dist(p,m)/6.5,34,62),err=(1.25-(p.st.pass??.65))*55*(dist(p,m)/400+.5);lobTo(p,m,m.x+m.vx*T*.6+att*30+rnd(-err,err),m.y+m.vy*T*.6+rnd(-err,err),T,false);B.pass.chip=true;m.turbo=Math.min(m.turbo,T*.35);pop('CHIP PASS',p.x,p.y-34,p.team===0?C.sun:C.coral,18,70);return true}
@@ -3766,7 +3812,7 @@ function humanUpdate(p,dt){
    (nudged by division). It changes decisions, not stats: interceptions, marking the dangerous runner, blocking lanes,
    spacing, runs into space, counters, through-ball timing and shot choice. Your own AI team-mates use a steady .6.
    Online both sides use the same value, so it stays fair. */
-const wonT=[-999,-999],aiStat={icpt:0,icptWon:0,through:0,square:0,chip:0,corner:0,counter:0,sweeps:0,tkTry:0,tkWon:0,slTry:0,slWon:0};
+const wonT=[-999,-999],aiStat={icpt:0,icptWon:0,through:0,square:0,chip:0,corner:0,counter:0,sweeps:0,tkTry:0,tkWon:0,slTry:0,slWon:0,aiShots:0,aiPasses:0,aiSkills:0};
 function aiIQ(team){if(pvp())return .55;if(team===0)return .6;const b={chill:.15,normal:.42,hard:.72,extreme:.95}[club.level]??.42;return clamp(b+(DF.read||0)*.35-.04,0,1)}
 const lastLine=(team,dir)=>{let v=-1e9;for(const q of outfield(team))v=Math.max(v,q.x*dir);return v};// deepest outfield player of `team`, measured along dir
 // the open spot near a target: tries a few nearby points and keeps the one furthest from the opposition
@@ -3823,7 +3869,7 @@ function cEngage(p,o,team,IQ,dt){const ownGoal=team===0?FX0:FX1,dxg=ownGoal-o.x,
     if(p.st.sp==='stomp'&&d<95&&Math.random()<.25*IQ&&doStomp(p)){p.spCd=SPECIALS.stomp.cd*1.7;return}
     if(p.st.sp==='slide'&&d>25&&d<110&&notBehind(p,o)&&(lastMan||danger)&&Math.random()<.2+.3*IQ){p.spCd=spCdOf(p)*1.4;p.inter=true;p.aiLunge=16;p.lungeDir=Math.atan2(B.y-p.y,B.x-p.x);pop('INTERCEPTOR',p.x,p.y-34,C.coral,16);ring(p.x,p.y,C.coral);aiStat.tkTry++;return}}
   // sliding tackle: worth the risk when he's through, about to shoot or getting away; from the side or front only
-  if(d>26&&d<74&&front>-.55&&t-(p.cSlideT||-999)>lerp(170,90,IQ)){let want=0;if(lastMan&&csp>1.5)want+=.45;if(shooting)want+=.55;if(!goalSide)want+=.3;if(danger)want+=.2;
+  if(d>26&&d<74&&front>-.7&&t-(p.cSlideT||-999)>lerp(140,70,IQ)){let want=0;if(lastMan&&csp>1.5)want+=.5;if(shooting)want+=.6;if(!goalSide&&dist(p,B)<62)want+=.45;if(danger)want+=.25;want*=1.5;
     want*=lerp(.3,1,IQ)*(DF.slide||LV().extreme?1:.55);
     // sharper defenders time the slide for a loose touch rather than diving in on a ball glued to his foot
     if(IQ>.5)want*=looseAt(o,6)>.22?1.35:.55;
@@ -3994,35 +4040,37 @@ function carrierAI(p,dt){
   const gx=goalX(p.team),defs=outfield(1-p.team);
   let nd=null,ndd=1e9;for(const q of defs){const d=dist(q,p);if(d<ndd){ndd=d;nd=q}}
   const dG=Math.hypot(p.x-gx,p.y-MY);p.dec-=dt;const IQ=aiIQ(p.team),dir0=Math.sign(gx-p.x)||1;
+  // Extreme: twice as decisive with the ball (twice the decisions, twice as keen to shoot, pass and beat a man)
+  const XF=p.team===1&&!NET.on&&LV().extreme?2:1;
   if(p.dec<=0){
-    p.dec=(13-5*IQ)+rnd(0,9-4*IQ);
+    p.dec=((13-5*IQ)+rnd(0,9-4*IQ))/XF;
     // a team-mate is running in behind (level with or past their last defender): slide him in
     if(Math.random()<.2+.6*IQ){const ll=lastLine(1-p.team,dir0);let tm=null,tb=-1e9;
       for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir0,run=m.vx*dir0,d=dist(p,m);if(fwd<30||run<1.2||d>520*PSC||m.x*dir0<ll-50)continue;
         const lead={x:m.x+dir0*90,y:m.y+m.vy*20};if(laneBlocked(p,lead,22,p.team))continue;const sc=run+fwd/150-Math.abs(m.y-MY)/300;if(sc>tb){tb=sc;tm=m}}
       if(tm&&Math.hypot(tm.x-gx,tm.y-MY)<dG+60){pass(p,tm,true);if(p.team===1)aiStat.through++;return}}
-    if(dG<(DF.range+40)*(CL()?cStyle(p.team).shoot:1)){const open=!laneBlocked(p,{x:gx,y:MY},18,p.team);
+    if(dG<(DF.range+40)*(CL()?cStyle(p.team).shoot:1)*(XF>1?(CL()?1.3*PSC:1.2):1)){const open=!laneBlocked(p,{x:gx,y:MY},18,p.team);
       // shooting lane blocked: a smarter side squares it to a team-mate with a clear sight of goal
-      if(!open&&Math.random()<.15+.6*IQ){let sm=null,sd=1e9;for(const m of outfield(p.team)){if(m===p)continue;const md=Math.hypot(m.x-gx,m.y-MY);if(md<dG+40&&md<sd&&openness(m)>40&&!laneBlocked(m,{x:gx,y:MY},18,p.team)&&!laneBlocked(p,m,20,p.team)){sd=md;sm=m}}if(sm){pass(p,sm);if(p.team===1)aiStat.square++;return}}const ch=(open?.7:.26)*DF.shoot*(dG<230?1.9:1)*(ndd<30?.7:1)*LV().ai;if(Math.random()<ch){aiShoot(p,dG);return}}
+      if(!open&&Math.random()<.15+.6*IQ){let sm=null,sd=1e9;for(const m of outfield(p.team)){if(m===p)continue;const md=Math.hypot(m.x-gx,m.y-MY);if(md<dG+40&&md<sd&&openness(m)>40&&!laneBlocked(m,{x:gx,y:MY},18,p.team)&&!laneBlocked(p,m,20,p.team)){sd=md;sm=m}}if(sm){pass(p,sm);if(p.team===1)aiStat.square++;return}}const ch=(open?.7:.26)*DF.shoot*(dG<230?1.9:1)*(ndd<30?.7:1)*LV().ai*XF;if(Math.random()<ch){aiShoot(p,dG);return}}
     if(Math.abs(p.x-gx)<120){const m=bestMate(p);if(m&&Math.random()<.5){pass(p,m);return}aiShoot(p,dG);return}// never dribble into the byline
     if(CL()&&Math.random()<.45+.55*cIQ(p.team)){const sty=cStyle(p.team),IQc=cIQ(p.team),ev=cPassEval(p,IQc,sty,true);
       let ahead=1e9;for(const q of defs)if((q.x-p.x)*dir0>-10&&Math.abs(q.y-p.y)<120)ahead=Math.min(ahead,dist(q,p));
       const keep=Math.min(ahead,220)/220*1.3-(ndd<50?.6:ndd<90?.25:0)+(dG<DF.range+80?.3:0);
       if(ev&&ev.v>keep+lerp(.35,.05,IQc)/sty.pass){const m=ev.m,thr=m.vx*dir0>1.2&&m.x*dir0>lastLine(1-p.team,dir0)-60;pass(p,m,thr);if(thr&&p.team===1)aiStat.through++;return}}
-    if(ndd<44){const m=bestMate(p);if(m&&Math.random()<.5*DF.press){pass(p,m);return}
+    if(ndd<44*(XF>1?1.4:1)){const m=bestMate(p);if(m&&Math.random()<.5*DF.press*XF){pass(p,m);return}
 }
     // on the big pitch the ball does the work: find a team-mate further up who's free and play it forward
     if(PITCH!=='volta'&&dG>DF.range){const dir=Math.sign(gx-p.x);let fm=null,fs=-1e9;
       for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir,d=dist(p,m);if(fwd<50||d>560*PSC)continue;const o=openness(m);if(o<38||laneBlocked(p,m,24,p.team))continue;
         const sc=fwd/140+o/70-d/700+(Math.abs(m.y-MY)<(FY1-FY0)*.25?.3:0);if(sc>fs){fs=sc;fm=m}}
-      if(fm&&Math.random()<(ndd<110?.65:.32)*(.8+DF.press*.3)*tacOf(p.team).pass){pass(p,fm);return}
+      if(fm&&Math.random()<(ndd<110?.65:.32)*(.8+DF.press*.3)*tacOf(p.team).pass*XF){pass(p,fm);return}
       // a long ball over the top or across to a forward who's got away from his man (more of these on the Expanded pitch)
       if(!fm||Math.random()<.4){let lm=null,ls=-1e9;for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir,d=dist(p,m);if(fwd<200||d>760*PSC||d<220)continue;const o=openness(m);if(o<45)continue;const sc=fwd/200+o/60;if(sc>ls){ls=sc;lm=m}}
         if(lm&&Math.random()<(.18+(PSC-1)*.5)*tacOf(p.team).pass*cStyle(p.team).long){const T=clamp(dist(p,lm)/7.5,38,78);lobTo(p,lm,lm.x+dir*45+lm.vx*T*.5,lm.y+lm.vy*T*.5,T,false);B.pass.chip=true;pop('LONG BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,15,50);return}}
       // switch it to the far side when the near side is crowded
       if(ndd<120&&Math.random()<.25){const far=outfield(p.team).filter(m=>m!==p&&Math.abs(m.y-p.y)>(FY1-FY0)*.4&&openness(m)>45&&!laneBlocked(p,m,24,p.team));if(far.length){pass(p,pick(far));return}}}
     // their own skill move when someone closes them down
-    if(nd&&ndd<95&&p.skillCd<=0&&!p.anim&&Math.random()<.55+DF.press*.3){doSkill(p);if(p.skillCd>0)return}
+    if(nd&&ndd<95*(XF>1?1.35:1)&&p.skillCd<=0&&!p.anim&&Math.random()<(.55+DF.press*.3)*XF){doSkill(p);if(p.skillCd>0){if(XF>1)p.skillCd*=.5;return}}
     if(nd&&ndd<80&&(p.blungeCd||0)<=0&&!p.anim&&Math.random()<.45){const side=Math.sin(angDiff(Math.atan2(nd.y-p.y,nd.x-p.x),p.dir))>0?-1:1,a=p.dir+side*.75;push(p,a,7.4,13,{a:p.dir,spd:6,T:10});p.blungeCd=BLUNGE_CD*1.4;S.swoosh();grass(p.x,p.y,5);return}
     if(p.spCd<=0&&aiSpecial(p,dG,ndd))return;
     if(Math.abs(p.y-MY)>(FY1-FY0)*.15&&Math.abs(p.x-gx)<460&&Math.random()<.4&&outfield(p.team).some(m=>m!==p&&Math.hypot(gx-m.x,MY-m.y)<300)){p.dir=Math.atan2(MY-p.y,gx-p.x);cross(p);return}
@@ -4379,7 +4427,7 @@ function awardCoins(){awardCoins0();
   matchRatings=calcRatings();const m=matchRatings.motm;if(m.p.team===0){const b=Math.round(25*matchMul()*LV().coin);earned+=b;club.coins+=b;earnNote+=` · man of the match +${b}`;saveClub()}
   careerAfterMatch()}
 function awardCoins0(){earned=0;shownEarned=0;earnNote='';
-  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=matchPay(score[0]>score[1]?'Online win':score[0]<score[1]?'Online defeat':'Online draw',r,score[0]*10,1);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;gdTokens(score[0],score[1]);saveClub();return}
+  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=matchPay(score[0]>score[1]?'Online win':score[0]<score[1]?'Online defeat':'Online draw',r,score[0]*10,1);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;gdTokens(score[0],score[1]);onlineResult();saveClub();return}
   const pw=pen&&pen.winner!=null?pen.winner:null;
   const r=score[0]>score[1]?100:score[0]<score[1]?20:pw===0?80:pw===1?30:45;
   let bonus=0;const won=score[0]>score[1]||pw===0;
@@ -4887,6 +4935,247 @@ function drawPenHUD(){
     if(pen.sub&&pen.resT>14){ctx.globalAlpha=Math.min(1,(pen.resT-14)/12);txt(pen.sub,W/2,228,20,pen.good?C.mint:C.cream);ctx.globalAlpha=1}}
 }
 
+/* ===================== Online: Ranked, Friendly, club directory, help and tutorial =====================
+   Ranked and Friendly find an opponent automatically through the same public relays the online mode already uses
+   (no server of our own), then play through the existing, tested Host / Join machinery: one laptop hosts a room with a
+   fresh code, the other joins it, and the usual readiness checks run before kick-off.
+
+   What a game file can and can't do: there is no server here, so ratings and the club directory live on each player's
+   laptop and on public relays (published as retained messages). The game checks what it reads (sizes, ranges, that a
+   rank matches its points) and never lets anyone change another club, but it cannot stop a determined cheat from
+   publishing a fake profile or editing their own save. A secure, cheat-proof ladder needs a real backend (see README). */
+
+// ---------- ranks ----------
+const RANKS=[{n:'Bronze',rp:0,c:'#cd7f32',c2:'#7a4a1c'},{n:'Silver',rp:300,c:'#d7dde3',c2:'#7d8792'},{n:'Gold',rp:700,c:'#f6cd4f',c2:'#a2761a'},
+  {n:'Platinum',rp:1100,c:'#8ff0f5',c2:'#2b8f9c'},{n:'Diamond',rp:1500,c:'#5d9cff',c2:'#1d3fb3'},{n:'Champion',rp:1900,c:'#b57bff',c2:'#5a2aa8'},{n:'Legendary',rp:2300,c:'#ffd24a',c2:'#d2321e'}];
+const PLACE_N=10,MMR0=1000;
+const rankIx=rp=>{let i=0;for(let k=0;k<RANKS.length;k++)if(rp>=RANKS[k].rp)i=k;return i};
+const famOf=fmt=>fmt==='volta'?'volta':'classical';// Standard and Expanded share the Classical ladder
+const seasonId=()=>{const d=new Date();return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')};
+const seasonLeft=()=>{const d=new Date(),e=Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1);return Math.max(0,Math.ceil((e-Date.now())/864e5))};
+const PROMO=[null,{coins:1000},{coins:2000,cos:'badge_gold'},{coins:3500,pack:'gold'},{coins:5000,pack:'premium'},{coins:8000,pack:'elite'},{coins:12000,pack:'icon'}];
+const SEASONREW=[{coins:500},{coins:1000},{coins:2000},{coins:3500,pack:'gold'},{coins:5000,pack:'premium'},{coins:8000,pack:'elite'},{coins:12000,pack:'elite',tt:10}];
+function rkState(){const R=club.rk=club.rk||{};R.fam=R.fam||{};for(const f of ['volta','classical'])R.fam[f]=R.fam[f]||{mmr:MMR0,rp:0,pl:0,placed:false,w:0,d:0,l:0,best:-1,promo:{}};
+  R.done=R.done||[];R.badges=R.badges||[];R.fr=R.fr||{day:'',n:0};
+  // a new season: rewards for the best rank reached last season, then points come part of the way back towards the middle
+  const s=seasonId();if(!R.season)R.season=s;
+  if(R.season!==s){const got=[];for(const f of ['volta','classical']){const F=R.fam[f];if(F.placed&&F.best>=0){got.push(`${f==='volta'?'Volta':'Classical'} ${RANKS[F.best].n}: `+grant(SEASONREW[F.best]))}
+      if(F.placed){F.rp=Math.round(F.rp*.6+300*.4);F.best=rankIx(F.rp);F.promo={}}}
+    R.lastSeason={id:R.season,got};R.season=s;saveClub()}
+  return R}
+// Elo: the expected score from the two ratings, so beating a stronger opponent is worth more than beating a weaker one
+const eloE=(a,b)=>1/(1+Math.pow(10,(b-a)/400));
+function rankedResult(fam,S,oppMmr,key){const R=rkState(),F=R.fam[fam];if(R.done.includes(key))return null;R.done.push(key);if(R.done.length>80)R.done.shift();
+  const E=eloE(F.mmr,oppMmr),K=F.placed?28:44;F.mmr=Math.round(F.mmr+K*(S-E));
+  if(S===1)F.w++;else if(S===0)F.l++;else F.d++;
+  const out={fam,S,before:{rp:F.rp,ix:F.placed?rankIx(F.rp):-1,pl:F.pl}};
+  if(!F.placed){F.pl=Math.min(PLACE_N,F.pl+1);
+    if(F.pl>=PLACE_N){F.placed=true;F.rp=clamp(Math.round((F.mmr-820)*2.4),0,2100);out.reveal=true}}// placement decides the starting rank
+  else{const d=Math.round(34*(S-E))+(S===1?4:S===0?-2:0);F.rp=Math.max(0,F.rp+d);out.delta=d}
+  if(F.placed){const ix=rankIx(F.rp);out.ix=ix;if(ix>F.best){F.best=ix}
+    // first time reaching a rank this season: a promotion reward (and a badge for your club)
+    for(let k=1;k<=ix;k++)if(!F.promo[k]){F.promo[k]=1;const r=PROMO[k];out.promo=(out.promo?out.promo+' · ':'')+RANKS[k].n+': '+grant(r);if(!R.badges.includes('rank'+k))R.badges.push('rank'+k)}}
+  saveClub();return out}
+
+// ---------- the badge ----------
+function rankBadgeHTML(ix,size=64,label=true){if(ix<0)return `<span class="rkb un" style="--s:${size}px"><i>?</i></span>`;const r=RANKS[ix];
+  return `<span class="rkb ${ix===6?'leg':''}" style="--s:${size}px;--c:${r.c};--c2:${r.c2}"><i>${'★'.repeat(Math.min(3,1+(ix>3?2:ix>1?1:0)))}</i>${label?`<b>${r.n.toUpperCase()}</b>`:''}</span>`}
+// the placement ring: grey with UNRANKED in the middle; each placement match fills exactly a tenth in glowing cyan
+let ringShown={};
+function placeRingHTML(fam){const F=rkState().fam[fam],n=F.placed?PLACE_N:F.pl,from=ringShown[fam]??n,C=2*Math.PI*54;
+  const off=k=>(C*(1-k/PLACE_N)).toFixed(1);
+  return `<div class="pring" data-fam="${fam}" data-from="${from}" data-to="${n}"><svg viewBox="0 0 128 128" width="150" height="150"><circle cx="64" cy="64" r="54" class="pr-bg"/>
+    <circle cx="64" cy="64" r="54" class="pr-fg" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off(from)}" data-off="${off(n)}"/></svg>
+    <div class="pr-in">${F.placed?rankBadgeHTML(rankIx(F.rp),58,false)+`<b style="color:${RANKS[rankIx(F.rp)].c}">${RANKS[rankIx(F.rp)].n.toUpperCase()}</b>`:'<b>UNRANKED</b>'}</div></div>
+    <p class="pr-lab">${F.placed?`${F.rp.toLocaleString()} RP`:`Placement Matches: ${F.pl}/${PLACE_N}`}</p>`}
+function animateRings(){document.querySelectorAll('.pring').forEach(el=>{const fg=el.querySelector('.pr-fg');if(!fg)return;requestAnimationFrame(()=>requestAnimationFrame(()=>{fg.style.strokeDashoffset=fg.dataset.off}));ringShown[el.dataset.fam]=+el.dataset.to})}
+
+// ---------- the Online screen ----------
+let olMode='ranked',lbTab='clubs',lbSort='rp',lbFam='volta';
+function renderOnlinePlus(){const el=$('ol-plus');if(!el)return;const R=rkState(),fmt=NETMODES[club.netMode]?club.netMode:'volta',fam=famOf(fmt);
+  const card=(k,t,s,ic)=>`<button class="olm" data-olm="${k}" aria-pressed="${olMode===k}"><span class="olic">${ic}</span><b>${t}</b><small>${s}</small></button>`;
+  let body='';
+  if(olMode==='ranked'){const F=R.fam[fam],ix=F.placed?rankIx(F.rp):-1,nx=ix>=0&&ix<6?RANKS[ix+1]:null;
+    body=`<div class="olpanel rk"><div class="rkleft">${placeRingHTML(fam)}</div><div class="rkright">
+      <h3>${fam==='volta'?'Volta':'Classical'} Ranked · Season ${R.season}</h3>
+      <p>${F.placed?`${RANKS[ix].n} · ${F.rp.toLocaleString()} RP${nx?` · ${(nx.rp-F.rp).toLocaleString()} RP to ${nx.n}`:' · the top rank'}`:`Play ${PLACE_N-F.pl} more placement match${PLACE_N-F.pl===1?'':'es'} to get your rank.`}</p>
+      <p class="hint">Record: ${F.w} won · ${F.d} drawn · ${F.l} lost · season ends in ${seasonLeft()} day${seasonLeft()===1?'':'s'}. Ranked is only ever against a real person. Wins earn RP and losses cost RP, more for beating a stronger player. Volta and Classical have separate ranks (Standard and Expanded share the Classical rank).</p>
+      <div class="rkladder">${RANKS.map((r,i)=>`<span class="rkst ${i===ix?'on':''}" title="${r.n}: ${r.rp} RP">${rankBadgeHTML(i,30,false)}<small>${r.n}</small></span>`).join('')}</div>
+      <button class="go" data-mm="ranked">Find Ranked match</button></div></div>`}
+  else if(olMode==='friendly'){body=`<div class="olpanel"><h3>Friendly</h3><p>Play a real person straight away: you're paired with someone else who chose Friendly with the same match type. No RP, no effect on placements.</p>
+      <p class="hint">Coins as for any online match. The first 8 friendlies each day pay full coins, later ones a quarter (so rewards can't be farmed).</p><button class="go" data-mm="friendly">Find Friendly match</button></div>`}
+  el.innerHTML=`<div class="olmodes">${card('ranked','Ranked','Climb the ranks','🏆')}${card('friendly','Friendly','Find an opponent','🤝')}${card('host','Host / Join','Private matches','🔑')}</div>
+    <div class="olfmt"><span class="lab">MATCH</span>${Object.entries(NETMODES).map(([k,n])=>`<button data-nm="${k}" aria-pressed="${fmt===k}">${n}</button>`).join('')}</div>${body}
+    ${mm.on?`<div class="mmsearch"><div class="mmspin"></div><div><b>Searching for ${mm.kind==='ranked'?'a Ranked':'a Friendly'} opponent…</b><p class="hint" id="mm-info">${mmInfo()}</p></div><button class="ghost" data-mmcancel="1">Cancel</button></div>`:''}
+    ${R.lastSeason&&R.lastSeason.got&&R.lastSeason.got.length?`<p class="flash">Season ${R.lastSeason.id} rewards: ${esc(R.lastSeason.got.join(' · '))}</p>`:''}`;
+  $('ol-host').hidden=olMode!=='host';animateRings();renderBoards()}
+document.addEventListener('click',e=>{const t=e.target.closest('#ol-plus [data-olm],#ol-plus [data-mm],#ol-plus [data-mmcancel],#ol-plus [data-nm]');if(!t)return;const d=t.dataset;
+  if(d.olm){olMode=d.olm;renderOnlinePlus()}
+  else if(d.nm){if(mm.on||NET.on)return;club.netMode=d.nm;saveClub();renderNetModes();renderOnlinePlus()}
+  else if(d.mm)mmStart(d.mm);else if(d.mmcancel)mmStop('Search cancelled.')});
+
+// ---------- matchmaking over the public relays ----------
+/* Everyone searching publishes a small "I'm looking" message every second on the queue for their exact match type
+   (Ranked or Friendly, and Volta / Classical Standard / Classical Expanded), so a Friendly is never paired with a Ranked
+   search and both always play the same pitch. Ranked looks for a similar rating first and widens the range the longer
+   it waits. The searcher with the lower id offers a match with a fresh room code; the other accepts; then one hosts
+   and one joins through the normal online code, with all its readiness checks. Nobody is ever given an AI opponent. */
+const mm=window.__mm={on:false,kind:'',fmt:'',id:'',t0:0,seen:new Map(),offer:null,timer:null,cl:[]};
+let netKind='private',netMM=null;
+const mmTopic=()=>`sundaykickabout/mm${NETPV}/${mm.kind}-${mm.fmt}`;
+function mmWindow(){const s=(performance.now()-mm.t0)/1000;return mm.kind==='ranked'?Math.round(Math.min(800,90+18*s)):99999}
+function mmInfo(){if(!mm.on)return'';const s=Math.round((performance.now()-mm.t0)/1000),n=[...mm.seen.values()].filter(x=>performance.now()-x.at<3000).length;
+  return `${NETMODES[mm.fmt]} · ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} · ${mm.cl.filter(c=>c.connected).length?'connected to matchmaking':'connecting to matchmaking…'}${mm.kind==='ranked'?` · rating range ±${mmWindow()}`:''} · ${n} other${n===1?'':'s'} searching${mm.offer?' · opponent found, connecting…':''}`}
+async function mmConnect(){if(mm.cl.length)return;const M=await loadMqtt();if(!M){netStatus('Matchmaking needs the internet (the relay library didn’t load).',true);return}
+  for(const u0 of RELAYS()){const U=typeof u0==='string'?{url:u0}:u0;let c;try{c=M.connect(U.url,{clientId:'skmm_'+Math.random().toString(36).slice(2,10),keepalive:20,connectTimeout:8000,reconnectPeriod:3000,clean:true,...(U.username?{username:U.username,password:U.password}:{})})}catch(e){continue}
+    c.on('connect',()=>{c.subscribe([mmTopic()+'/q/+',mmTopic()+'/o/'+mm.id],{qos:0});mmSubbed(c)});c.on('message',(tp,buf)=>{try{mmMsg(tp,JSON.parse(new TextDecoder().decode(buf)))}catch(e){}});c.on('error',()=>{});mm.cl.push(c)}}
+const mmSubbed=c=>{c.__topic=mmTopic()};
+function mmPub(sub,obj){const s=JSON.stringify(obj);for(const c of mm.cl)if(c.connected)try{c.publish(mmTopic()+sub,s,{qos:0})}catch(e){}}
+function mmMsg(tp,d){if(!mm.on||!d||typeof d!=='object')return;const parts=tp.split('/'),kind=parts[parts.length-2];
+  if(kind==='q'){const id=String(d.id||'');if(!/^[a-z0-9]{8,16}$/.test(id)||id===mm.id||+d.pv!==NETPV)return;mm.seen.set(id,{id,r:clamp(+d.r||MMR0,0,4000),n:String(d.n||'').slice(0,16),at:performance.now(),busy:!!d.busy})}
+  else if(kind==='o'){const from=String(d.from||'');if(!/^[a-z0-9]{8,16}$/.test(from))return;
+    if(d.acc){if(mm.offer&&mm.offer.to===from&&d.code===mm.offer.code)mmGo('host',mm.offer)}// they accepted our offer
+    else if(!mm.offer&&from<mm.id&&typeof d.code==='string'&&/^[A-Z]{6}$/.test(d.code)){const ok=mm.kind!=='ranked'||Math.abs(clamp(+d.r||MMR0,0,4000)-mmRating())<=mmWindow()+60;
+      if(ok){const o={to:from,code:d.code,r:clamp(+d.r||MMR0,0,4000),n:String(d.n||'').slice(0,16)},acc={from:mm.id,acc:1,code:d.code,r:mmRating(),n:club.name};
+        // say yes a few times (messages can be lost), keeping the matchmaking connection open a moment so they actually go
+        mmPub('/o/'+from,acc);const pub=mm.cl.slice(),tp=mmTopic()+'/o/'+from;for(const ms of [400,900,1500])setTimeout(()=>{for(const c of pub)if(c.connected)try{c.publish(tp,JSON.stringify(acc),{qos:0})}catch(e){}},ms);mmGo('guest',o)}}}}
+const mmRating=()=>rkState().fam[famOf(mm.fmt)].mmr;
+function mmTick(){if(!mm.on)return;const now=performance.now();for(const [k,v] of mm.seen)if(now-v.at>4000)mm.seen.delete(k);
+  mmPub('/q/'+mm.id,{id:mm.id,r:mmRating(),n:(club.name||'Club').slice(0,16),pv:NETPV,busy:!!mm.offer});
+  if(mm.offer&&now-mm.offer.at>4000)mm.offer=null;// no answer: try someone else
+  if(!mm.offer){const W=mmWindow(),me=mmRating();let best=null;for(const v of mm.seen.values()){if(v.busy||v.id<mm.id)continue;const d=Math.abs(v.r-me);if(d<=W&&(!best||d<Math.abs(best.r-me)))best=v}
+    // the lower id makes the offer, with a fresh 6-letter room code
+    if(best){const code=Array.from({length:6},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[(Math.random()*23)|0]).join('');mm.offer={to:best.id,code,r:best.r,n:best.n,at:now};mmPub('/o/'+best.id,{from:mm.id,code,r:me,n:club.name})}}
+  const i=$('mm-info');if(i)i.textContent=mmInfo()}
+async function mmStart(kind){if(mm.on||NET.on)return;if(nroom)await netLeave();initAudio();
+  mm.on=true;mm.kind=kind;mm.fmt=NETMODES[club.netMode]?club.netMode:'volta';mm.id=Math.random().toString(36).slice(2,12).padEnd(10,'0');mm.t0=performance.now();mm.seen.clear();mm.offer=null;
+  netLogAdd('searching '+kind+' '+mm.fmt);renderOnlinePlus();await mmConnect();for(const c of mm.cl)if(c.connected){c.subscribe([mmTopic()+'/q/+',mmTopic()+'/o/'+mm.id],{qos:0})}
+  clearInterval(mm.timer);mm.timer=setInterval(mmTick,1000);mmTick()}
+function mmStop(msg){if(!mm.on&&!mm.cl.length)return;clearInterval(mm.timer);mm.on=false;mm.offer=null;
+  const cl=mm.cl;mm.cl=[];setTimeout(()=>{for(const c of cl)try{c.end(false)}catch(e){}},2500);if(msg)netStatus(msg);renderOnlinePlus()}
+// paired: one hosts, one joins, through the normal online code
+async function mmGo(role,o){const kind=mm.kind,fmt=mm.fmt;mmStop('');netKind=kind;netMM={role,code:o.code,oppId:o.to,oppMmr:o.r,oppName:o.n,fam:famOf(fmt),fmt,at:performance.now(),started:false};
+  club.netMode=fmt;renderNetModes();netStatus(`Opponent found: ${o.n||'a player'}. Connecting…`);netLogAdd('paired as '+role+' with '+o.n);
+  await netJoin(o.code,role);
+  // if they never turn up, go back to searching rather than wait forever
+  setTimeout(()=>{if(netMM&&netMM.code===o.code&&!netMM.started&&!NET.on){netLeave();netKind='private';const k=netMM.fmt;netMM=null;club.netMode=k;netStatus('The opponent didn’t connect. Searching again…');mmStart(kind)}},25000)}
+// host side of a matched game: kick off as soon as the right opponent is in the room (the usual readiness checks follow)
+function mmHostAuto(g){if(!netMM||netMM.role!=='host'||netMM.started||!g||+g.presence.pv!==NETPV)return;netMM.started=true;netLogAdd('opponent in the room: kick-off');netStart()}
+function mmGuestBegan(){if(netMM)netMM.started=true}
+// full time in a Ranked or Friendly match (both laptops run this with the same final score)
+function onlineResult(){if(netKind==='private'||!netMM)return;const S=score[0]>score[1]?1:score[0]<score[1]?0:.5,key=netKind+':'+netMatchKey();
+  if(netKind==='ranked'){const r=rankedResult(netMM.fam,S,netMM.oppMmr,key);if(r){netMM.result=r;const F=rkState().fam[netMM.fam];
+      earnNote+=r.reveal?` · placement complete: ${RANKS[rankIx(F.rp)].n}`:F.placed?` · ${r.delta>=0?'+':''}${r.delta} RP (${F.rp} RP, ${RANKS[rankIx(F.rp)].n})`:` · placement ${F.pl}/${PLACE_N}`;if(r.promo)earnNote+=' · promoted: '+r.promo}}
+  else{const R=rkState(),day=new Date().toISOString().slice(0,10);if(R.fr.day!==day){R.fr.day=day;R.fr.n=0}R.fr.n++;
+    if(R.fr.n>8){const cut=Math.round(earned*.75);club.coins-=cut;earned-=cut;earnNote+=' · friendly coins ×0.25 after 8 today'}}
+  regPublishSoon()}
+const netMatchKey=()=>(NET.host?netMatch:netGotMatch)+'-'+(netMM?netMM.code:'');
+// leaving a Ranked match early counts as a loss, so nobody can dodge a defeat by quitting
+function onlineLeft(){if(netKind==='ranked'&&netMM&&(netMM.started||NET.on)&&!netMM.result&&state!=='fulltime'){const r=rankedResult(netMM.fam,0,netMM.oppMmr,'ranked:'+netMatchKey());if(r)toast('Left a Ranked match: it counts as a loss.')}
+  netKind='private';netMM=null}
+
+// ---------- club directory (both leaderboards and View Squad) ----------
+/* Registering gives your club a random public id and publishes a public profile: name, badge, kit, team ratings,
+   ranks and records, and your two line-ups (names, positions, ratings, rarities, specials). Nothing personal. It is
+   re-published after every online match and when your team changes, as a retained message on the public relays, so
+   anyone who opens the leaderboard sees the latest copy. Profiles that don't look right are ignored. */
+const REG='sundaykickabout/clubs1/p/';
+function regProfile(){const R=rkState(),g0=GM;const lin=(cl)=>{GM=cl?'classical':'volta';const q=sq(),f=FORMS[q.f];const ps=q.s.map((id,i)=>{const p=byId(id);return p?[String(p.name).slice(0,16),f[i]?f[i].r:natPos(p),effOvr(p),tier(p),SPECIALS[p.sp]?SPECIALS[p.sp].name:'',ablOf(p.id),lvlOf(p.id)]:null}).filter(Boolean);const r=teamRating(q);return{f:q.f,r,p:ps}};
+  let v,c;try{v=lin(false);c=lin(true)}finally{GM=g0}
+  const fam=f=>{const F=R.fam[f];return{rp:F.placed?F.rp:0,pl:F.pl,pd:F.placed?1:0,ix:F.placed?rankIx(F.rp):-1,w:F.w,d:F.d,l:F.l}};
+  return{v:1,id:club.reg.id,n:String(club.name||'My Club').slice(0,20),b:String(club.badge||'⚽').slice(0,4),k:club.kit,t:Date.now(),pl:club.played||0,rk:{volta:fam('volta'),classical:fam('classical')},sq:{volta:v,classical:c}}}
+let regCl=[],regTimer=null,regBoard=new Map(),regLoading=false;
+async function regConnect(){if(regCl.length)return regCl;const M=await loadMqtt();if(!M)return[];
+  for(const u0 of RELAYS()){const U=typeof u0==='string'?{url:u0}:u0;let c;try{c=M.connect(U.url,{clientId:'skreg_'+Math.random().toString(36).slice(2,10),keepalive:30,connectTimeout:8000,reconnectPeriod:5000,clean:true,...(U.username?{username:U.username,password:U.password}:{})})}catch(e){continue}
+    c.on('message',(tp,buf)=>{try{regIn(JSON.parse(new TextDecoder().decode(buf)))}catch(e){}});c.on('connect',()=>c.subscribe(REG+'+',{qos:0}));c.on('error',()=>{});regCl.push(c)}return regCl}
+// only well-formed, believable profiles get onto the board
+function regIn(d){if(!d||d.v!==1||!/^[a-z0-9]{10,16}$/.test(String(d.id)))return;const num=(x,a,b)=>Number.isFinite(+x)?clamp(+x,a,b):a;
+  const fam=f=>{const r=d.rk&&d.rk[f]||{};const rp=num(r.rp,0,5000),pd=r.pd?1:0;return{rp:pd?rp:0,pl:num(r.pl,0,10),pd,ix:pd?rankIx(rp):-1,w:num(r.w,0,1e5)|0,d:num(r.d,0,1e5)|0,l:num(r.l,0,1e5)|0}};
+  const lin=s=>{if(!s||!Array.isArray(s.p))return{f:'',r:0,p:[]};return{f:String(s.f||'').slice(0,8),r:num(s.r,0,99)|0,p:s.p.slice(0,9).filter(Array.isArray).map(x=>[String(x[0]||'').slice(0,16),String(x[1]||'').slice(0,4),num(x[2],1,99)|0,['bronze','silver','gold','special','icon'].includes(x[3])?x[3]:'bronze',String(x[4]||'').slice(0,16),num(x[5],1,10)|0,num(x[6],0,8)|0])}};
+  const p={id:String(d.id),n:String(d.n||'Club').slice(0,20),b:String(d.b||'⚽').slice(0,4),k:/^#[0-9a-f]{6}$/i.test(d.k)?d.k:'#888888',t:num(d.t,0,9e15),pl:num(d.pl,0,1e6)|0,rk:{volta:fam('volta'),classical:fam('classical')},sq:{volta:lin(d.sq&&d.sq.volta),classical:lin(d.sq&&d.sq.classical)}};
+  const old=regBoard.get(p.id);if(!old||p.t>=old.t)regBoard.set(p.id,p);if(!regLoading)renderBoards()}
+async function regPublish(){if(!club.reg)return;const cl=await regConnect(),s=JSON.stringify(regProfile());
+  for(const c of cl){const go=()=>{try{c.publish(REG+club.reg.id,s,{qos:0,retain:true})}catch(e){}};if(c.connected)go();else c.once('connect',go)}}
+function regPublishSoon(){clearTimeout(regTimer);regTimer=setTimeout(regPublish,1500)}
+async function regLoad(){regLoading=true;renderBoards();await regConnect();setTimeout(()=>{regLoading=false;renderBoards()},2500)}
+function regJoin(){if(!club.reg){club.reg={id:Array.from({length:12},()=>'abcdefghjkmnpqrstuvwxyz23456789'[(Math.random()*31)|0]).join(''),at:Date.now()};saveClub()}regPublish();toast('Your club is on the leaderboard.');regLoad()}
+function renderBoards(){const el=$('ol-board');if(!el)return;const me=club.reg&&club.reg.id;const list=[...regBoard.values()];if(me&&!regBoard.has(me)&&club.reg)list.push(regInFromMine());
+  const fam=lbFam,wr=p=>{const t=p.rk[fam],n=t.w+t.d+t.l;return n>=10?t.w/n:-1};
+  const sorts={rp:(a,b)=>(b.rk[fam].pd-a.rk[fam].pd)||b.rk[fam].rp-a.rk[fam].rp,rank:(a,b)=>b.rk[fam].ix-a.rk[fam].ix||b.rk[fam].rp-a.rk[fam].rp,ovr:(a,b)=>b.sq[fam].r-a.sq[fam].r,wins:(a,b)=>(b.rk.volta.w+b.rk.classical.w)-(a.rk.volta.w+a.rk.classical.w),wr:(a,b)=>wr(b)-wr(a)};
+  let rows=lbTab==='ranked'?list.filter(p=>p.rk[fam].pd):list;rows.sort(lbTab==='ranked'?sorts.rp:(sorts[lbSort]||sorts.ovr));if(lbSort==='wr'&&lbTab==='clubs')rows=rows.filter(p=>wr(p)>=0);
+  el.innerHTML=`<div class="lbhead"><h3>Leaderboards</h3><div class="subtabs">${[['clubs','Global clubs'],['ranked','Ranked']].map(([k,n])=>`<button data-lbt="${k}" aria-pressed="${lbTab===k}">${n}</button>`).join('')}</div>
+    <div class="subtabs">${[['volta','Volta'],['classical','Classical']].map(([k,n])=>`<button data-lbf="${k}" aria-pressed="${lbFam===k}">${n}</button>`).join('')}</div>
+    ${lbTab==='clubs'?`<select id="lb-sort" aria-label="Sort">${[['ovr','Team rating'],['rp','Ranked Points'],['rank','Online rank'],['wins','Total ranked wins'],['wr','Win % (10+ matches)']].map(([k,n])=>`<option value="${k}" ${lbSort===k?'selected':''}>Sort: ${n}</option>`).join('')}</select>`:''}
+    <button class="btn" data-lbload="1">Refresh</button>${club.reg?'':'<button class="btn gold" data-lbjoin="1">Put my club on the leaderboard</button>'}</div>
+    <p class="hint">${lbTab==='ranked'?'Ordered by competitive results only (Ranked Points), never by squad strength.':'Every club that has joined the leaderboard, whatever its rank.'} Shared through public relays: profiles are checked, but this isn't a secure server, so treat it as a friendly board rather than an official ranking.${regLoading?' Loading…':''}</p>
+    <div class="ltwrap"><table class="lt lbt"><tr><th>#</th><th>Club</th><th>Team</th><th>Rank</th><th>RP</th><th>W-D-L</th><th>Played</th><th></th></tr>
+    ${rows.slice(0,100).map((p,i)=>{const t=p.rk[fam];return `<tr class="${p.id===me?'me':''}"><td>${i+1}</td><td><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}</td><td>${p.sq[fam].r||'–'}</td><td>${t.pd?rankBadgeHTML(t.ix,24,false)+' '+RANKS[t.ix].n:`<span class="hint">Unranked ${t.pl}/10</span>`}</td><td>${t.pd?t.rp.toLocaleString():'–'}</td><td>${t.w}-${t.d}-${t.l}</td><td>${p.pl}</td><td><button class="btn" data-vsq="${p.id}">View squad</button></td></tr>`}).join('')||`<tr><td colspan="8" class="hint">${regLoading?'Loading…':'No clubs yet. Press Refresh, or put your club on the board.'}</td></tr>`}</table></div>`}
+function regInFromMine(){const raw=regProfile();regIn(raw);const p=regBoard.get(raw.id);return p}
+function viewSquad(id){const p=regBoard.get(id);if(!p)return;const box=$('sqview');const lin=(s,t)=>`<h4>${t} · ${esc(s.f||'')} · team ${s.r||'–'}</h4><div class="sqv">${s.p.map(x=>`<div class="sqc t-${x[3]}"><b>${x[2]}</b><span>${esc(x[0])}</span><small>${esc(x[1])} · ${TIERS[x[3]].name}</small><small>${x[4]?esc(x[4])+' Lv '+x[5]:''}${x[6]?' · player Lv '+x[6]:''}</small></div>`).join('')||'<p class="hint">No line-up shared.</p>'}</div>`;
+  box.innerHTML=`<div class="sqbox" role="dialog" aria-label="Squad"><button class="ghost sqx" data-sqx="1">Close</button><h3><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}</h3>
+    <p class="hint">Read-only. Volta ${p.rk.volta.pd?RANKS[p.rk.volta.ix].n+' '+p.rk.volta.rp+' RP':'unranked'} · Classical ${p.rk.classical.pd?RANKS[p.rk.classical.ix].n+' '+p.rk.classical.rp+' RP':'unranked'}</p>${lin(p.sq.volta,'Volta')}${lin(p.sq.classical,'Classical')}</div>`;box.hidden=false}
+document.addEventListener('click',e=>{const t=e.target.closest('#ol-board button,#sqview [data-sqx]');if(!t)return;const d=t.dataset;
+  if(d.lbt){lbTab=d.lbt;renderBoards()}else if(d.lbf){lbFam=d.lbf;renderBoards()}else if(d.lbload)regLoad();else if(d.lbjoin)regJoin();else if(d.vsq)viewSquad(d.vsq);else if(d.sqx)$('sqview').hidden=true});
+document.addEventListener('change',e=>{if(e.target.id==='lb-sort'){lbSort=e.target.value;renderBoards()}});
+$('sqview').addEventListener('click',e=>{if(e.target.id==='sqview')$('sqview').hidden=true});
+
+// ---------- placement reveal ----------
+function rankReveal(fam){const F=rkState().fam[fam],ix=rankIx(F.rp),r=RANKS[ix],el=$('rkreveal');
+  el.innerHTML=`<div class="rkrv"><p>${fam==='volta'?'VOLTA':'CLASSICAL'} PLACEMENT COMPLETE</p>${placeRingHTML(fam)}<div class="rkrvb">${rankBadgeHTML(ix,120,true)}</div><h2 style="color:${r.c}">${r.n.toUpperCase()}</h2><p>${F.rp.toLocaleString()} RP</p><button class="go" data-rkok="1">Continue</button></div>`;
+  el.hidden=false;ringShown[fam]=PLACE_N-1;el.querySelectorAll('.pring').forEach(x=>x.dataset.from=PLACE_N-1);animateRings();S.goal&&S.goal()}
+$('rkreveal').addEventListener('click',e=>{if(e.target.closest('[data-rkok]'))$('rkreveal').hidden=true});
+
+// ---------- help ----------
+const HELP=[
+ ['Getting started','<p>Sunday Kickabout is arcade football. Build a club, collect footballers from packs, develop them, and win leagues, cups and online matches.</p><p>Start on the <b>Play</b> tab: pick Volta (5v5) or Classical (9v9), a difficulty and a competition, then press the big orange button.</p>'],
+ ['Basic controls','<div class="hkeys"><p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</p><p><kbd>Shift</kbd> pass · without the ball: steal</p><p>Hold <kbd>Space</kbd> to shoot (longer = harder), <kbd>W</kbd>/<kbd>S</kbd> while holding to aim</p><p><kbd>F</kbd> cross · <kbd>C</kbd> slide tackle · <kbd>R</kbd> burst / lunge</p><p><kbd>E</kbd> skill move · <kbd>X</kbd> special ability · <kbd>Q</kbd> switch player</p><p><kbd>Esc</kbd> pause · <kbd>V</kbd> full screen · <kbd>N</kbd> connection details online</p></div><p>Control switches to whoever receives the ball, and to the best-placed defender when you defend.</p>'],
+ ['Special abilities','<p>Every footballer has a special on <kbd>X</kbd>: Through Ball, Curler, Knuckleball, Rocket, Bicycle Kick, Interceptor, Turbo, Chip Pass or Chip. After using it, it recharges (the ring on the HUD).</p><p>Each footballer\'s special has 10 levels (Club → Special Abilities). Every level costs coins plus 2 Training Tokens and shortens the cooldown: Through Ball 25 s → 7 s, the shots and Interceptor 20 s → 5 s, Turbo and the chips 10 s → 3.5 s.</p>'],
+ ['Player collection','<p>Open packs in Club → Packs. Each pack shows three footballers of one rarity and you sign one. Rarities: Bronze, Silver, Gold, Special and Icon (the very best). Odds are printed on every pack. Duplicates can be exchanged.</p>'],
+ ['Player development','<p>Club → Development. Footballers gain XP from matches (or training with Training Tokens: the cost per 100 XP rises from 2 to 20 tokens as they level up). Levels unlock upgrade points (+1 to a stat for coins) and every two levels add +1 to their five best stats. Evolutions add more. The screen shows the current and maximum achievable OVR and exactly what each upgrade does.</p><p>Your Player (the footballer you create) trains +8 points at a time; prices climb to 75,000 coins for the last session.</p>'],
+ ['Club development','<p>Club → Club Development: six departments, levels 1 to 5, paid with coins plus Club Tokens (one per Club Legacy level).</p><p>Fanbase: more match coins. Coaching Staff: up to 20% off every coin cost for training and abilities. Training Facilities: more XP. Stadium: bigger crowd and a small coin bonus. Scouting: better pack odds. Commercial: more objective coins and sponsor money.</p>'],
+ ['Game modes','<p><b>Volta 5v5</b>: fast football in a cage, 2 minutes, 1× coins.</p><p><b>Classical Standard 9v9</b>: full pitch, 3 minutes, 1.5× coins. <b>Classical Expanded</b>: a bigger pitch, 3½ minutes, 1.875× coins. The green bubble shows the coin multiplier for your mode, pitch and difficulty.</p>'],
+ ['Leagues and tournaments','<p>Volta and Classical each have five divisions (Amateur → Legendary). Ten clubs, nine rounds, top three promoted, bottom three relegated. A top-three finish earns a World Club Championship place (64-club knockout). There are also the Sunday Cup, the Grand Tournament, friendlies, challenges and skill games.</p>'],
+ ['Online multiplayer','<p><b>Ranked</b>: matched with a real person of similar rating. Ten placement matches give your first rank (Bronze → Silver → Gold → Platinum → Diamond → Champion → Legendary), then wins earn RP and losses cost RP. Volta and Classical are ranked separately. Seasons last a month; rewards come from your best rank.</p><p><b>Friendly</b>: matched with anyone choosing Friendly, no RP. <b>Host / Join</b>: a private match with a 4-letter code.</p><p>Both players control their own team; the host\'s laptop runs the match. You both need the same version of the game.</p>'],
+ ['Rewards','<p>Coins for every match (more for wins, goals, harder difficulty and bigger pitches). Training Tokens equal to your goal difference in a win. Club Legacy XP from every match, with a reward at every level, plus a Club Token. Challenges, achievements, league seasons, cups and Ranked promotions pay out too.</p>']];
+let helpPg=0;
+function renderHelp(){const h=$('help');h.innerHTML=`<div class="hbox" role="dialog" aria-label="Help"><div class="hnav">${HELP.map(([t],i)=>`<button data-hp="${i}" aria-pressed="${i===helpPg}">${i+1}. ${t}</button>`).join('')}<button data-hp="tut" class="btn">Replay tutorial</button></div>
+  <div class="hmain"><h3>${HELP[helpPg][0]}</h3><div class="htext">${HELP[helpPg][1]}</div><div class="hfoot"><button class="ghost" data-hprev="1" ${helpPg?'':'disabled'}>Previous</button><span>${helpPg+1} / ${HELP.length}</span><button class="go" data-hnext="1">${helpPg<HELP.length-1?'Next':'Done'}</button></div></div>
+  <button class="ghost hx" data-hx="1" aria-label="Close help">Close</button></div>`;h.hidden=false}
+function openHelp(pg){if(pg!=null)helpPg=pg;renderHelp();if(state==='play'&&!NET.on&&!paused)setPause(true)}
+$('help').addEventListener('click',e=>{const t=e.target.closest('button');if(e.target.id==='help'){$('help').hidden=true;return}if(!t)return;const d=t.dataset;
+  if(d.hp==='tut'){$('help').hidden=true;tutStart()}else if(d.hp){helpPg=+d.hp;renderHelp()}else if(d.hprev){helpPg=Math.max(0,helpPg-1);renderHelp()}else if(d.hnext){if(helpPg<HELP.length-1){helpPg++;renderHelp()}else $('help').hidden=true}else if(d.hx)$('help').hidden=true});
+for(const id of ['helpbtn','helpbtn2','helpbtn3'])$(id).onclick=()=>openHelp();
+
+// ---------- first-time tutorial ----------
+/* Eight steps with the relevant part of the screen highlighted. Step 5 plays a real first match (Volta, Chill, a
+   friendly) with control hints on the pitch; the tutorial picks up again afterwards. Skippable, saved, and replayable
+   from Help. */
+const TUT=[
+ {t:'Welcome to Sunday Kickabout!',d:'Build a club, collect footballers, and win leagues, cups and online matches. This short tour shows you the basics.',sel:'#menu h1'},
+ {t:'Your club',d:'This is your club: tap the name to rename it, pick a kit colour, and keep an eye on your coins and Training Tokens up here.',sel:'.clubbar'},
+ {t:'Your players',d:'The Squad tab shows your line-up. Each card has an overall rating (OVR), a position, a rarity (Bronze up to Icon) and a special ability on X.',sel:'#tab-squad'},
+ {t:'Controls',d:'WASD to move · Shift to pass · hold Space to shoot (W/S to aim) · C slide tackle · E skill move · X special · Q switch player. Help has the full list any time.',sel:'#helpbtn'},
+ {t:'Play your first match',d:'Let’s play! A quick Volta friendly on Chill against an easy side. Press Play below when you’re ready.',sel:'#go',play:1},
+ {t:'Rewards',d:'Every match pays coins, Club Legacy XP and (with a winning margin) Training Tokens. Harder difficulties and bigger pitches pay more.',sel:'#coins'},
+ {t:'Upgrade a player',d:'Club → Development: spend coins to raise a stat, train with Training Tokens, and see exactly how much better each upgrade makes him.',sel:'#tab-club'},
+ {t:'More to explore',d:'Try Classical 9v9, climb the leagues, enter cups, and test yourself online in Ranked, Friendly or a private match. Have fun!',sel:'#tab-online'}];
+function tutStart(){club.tut={step:0,done:false};saveClub();tab='team';renderMenu();tutShow()}
+function tutShow(){const T=club.tut;if(!T||T.done)return;const s=TUT[T.step];if(!s){T.done=true;saveClub();$('tut').hidden=true;tutMark(null);return}
+  const el=$('tut');el.innerHTML=`<div class="tbox"><small>Tutorial · ${T.step+1} of ${TUT.length}</small><h3>${s.t}</h3><p>${s.d}</p><div class="tfoot"><button class="ghost" data-tskip="1">Skip tutorial</button>${T.step?'<button class="ghost" data-tprev="1">Back</button>':''}<button class="go" data-tnext="1">${s.play?'Play':T.step===TUT.length-1?'Finish':'Next'}</button></div></div>`;
+  el.hidden=false;tutMark(s.sel)}
+function tutMark(sel){document.querySelectorAll('.tutmark').forEach(x=>x.classList.remove('tutmark'));if(!sel)return;const t=document.querySelector(sel);if(t){t.classList.add('tutmark');t.scrollIntoView({block:'nearest'})}}
+$('tut').addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const T=club.tut;const d=t.dataset;
+  if(d.tskip){T.done=true;saveClub();$('tut').hidden=true;tutMark(null);toast('Tutorial skipped. Replay it any time from Help.');return}
+  if(d.tprev){T.step=Math.max(0,T.step-1);saveClub();tutShow();return}
+  if(d.tnext){const s=TUT[T.step];T.step++;saveClub();
+    if(s.play){$('tut').hidden=true;tutMark(null);club.tutMatch=1;setGM('volta');club.level='chill';club.comp='friendly';comp='friendly';saveClub();tab='team';renderMenu();$('go').click();return}
+    tutShow()}});
+// in the first match: control hints on the pitch for the first 25 seconds
+function drawTutHints(){if(!club.tutMatch||state!=='play'||NET.on||stT>1500)return;const k=Math.min(1,stT/30);ctx.globalAlpha=k*.95;ctx.fillStyle='rgba(8,14,22,.8)';rr(W/2-300,H-118,600,44,22);ctx.fill();
+  txt(stT<500?'WASD to move · run onto the ball':stT<1000?'Shift to pass · hold Space to shoot, release to strike':'Lost it? Shift or Space near them to steal · C to slide · Q to switch',W/2,H-90,16,C.cream,'center',false);ctx.globalAlpha=1}
+function tutAfterMatch(){if(club.tutMatch){club.tutMatch=0;saveClub();if(club.tut&&!club.tut.done)setTimeout(tutShow,600)}}
+function tutBoot(){if(!club.tut){club.tut={step:0,done:(club.played||0)>0};saveClub()}if(!club.tut.done)setTimeout(tutShow,700)}// players who already have matches behind them aren't shown it
+
 /* ---------- draw ---------- */
 function txt(s,x,y,size,col,align='center',stroke=true){
   ctx.font=`italic 800 ${Math.round(size*1.06)}px "Barlow Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';
@@ -5165,7 +5454,7 @@ function draw(){
   if(NET.on&&state!=='fulltime'&&!(NET.host&&netPrep)&&!(NET.guest&&netLastG&&netLastG.pr)){const rsN=NET.host?(performance.now()<netResumeAt?Math.ceil((netResumeAt-performance.now())/1000):0):netLastG&&+netLastG.rs||0;
     if(netWaiting||netGuestWait){ctx.fillStyle='rgba(20,48,63,.9)';rr(W/2-250,H/2-38,500,76,34);ctx.fill();txt('CONNECTION LOST · MATCH PAUSED',W/2,H/2-8,24,C.sun,'center',false);txt(NET.host?'Waiting for your friend’s laptop to reconnect…':'Reconnecting to the host…',W/2,H/2+18,14,C.cream,'center',false)}
     else if(rsN>0){ctx.fillStyle='rgba(20,48,63,.9)';rr(W/2-200,H/2-38,400,76,34);ctx.fill();txt('BACK ON · RESUMING IN '+rsN,W/2,H/2-6,26,C.mint,'center',false);txt('Both laptops restart together',W/2,H/2+18,13,C.cream,'center',false)}}
-  if(NET.on&&netDiag)drawNetDiag();
+  if(NET.on&&netDiag)drawNetDiag();drawTutHints();
   ctx.restore();
   if(flash>0){ctx.fillStyle=`rgba(255,246,228,${flash*.5})`;ctx.fillRect(0,0,W,H)}
 }
@@ -5349,7 +5638,7 @@ async function netJoinClick(){initAudio();const code=($('net-in').value||'').toU
   netStatus('Joining '+code+'…');$('net-join').disabled=true;const ok=await netJoin(code,'guest');$('net-join').disabled=false;if(!ok)return;netStatus('In room '+code+'. Waiting for the host…');netLobby()}
 const NETOLD='is using a different version of Sunday Kickabout. You both need the same game file: send them this copy (or download theirs) and try again.';
 function netLobby(){if(!nroom||NET.on)return;
-  if(netRole==='host'){const g=netPeer('guest'),bad=g&&+g.presence.pv!==NETPV;$('net-start').hidden=!g||bad;netStatus(bad?`${String(g.presence.club||'Your friend').slice(0,16)} ${NETOLD}`:g?`${String(g.presence.club||'Your friend').slice(0,16)} has joined! Match: ${NETMODES[club.netMode||'volta']}. Hit kick off when you’re both ready.`:'Tell your friend this code. Waiting for them to join…'+netRouteText(),bad)}
+  if(netRole==='host'){const g=netPeer('guest'),bad=g&&+g.presence.pv!==NETPV;if(g&&!bad&&netKind!=='private')mmHostAuto(g);$('net-start').hidden=!g||bad;netStatus(bad?`${String(g.presence.club||'Your friend').slice(0,16)} ${NETOLD}`:g?`${String(g.presence.club||'Your friend').slice(0,16)} has joined! Match: ${NETMODES[club.netMode||'volta']}. Hit kick off when you’re both ready.`:'Tell your friend this code. Waiting for them to join…'+netRouteText(),bad)}
   else if(netRole==='guest'){const h=netPeer('host'),bad=h&&+h.presence.pv!==NETPV;if(bad){netStatus(`${String(h.presence.club||'The host').slice(0,16)} ${NETOLD}`,true);return}netStatus(h?`Connected to ${String(h.presence.club||'the host').slice(0,16)}. Match: ${NETMODES[h.presence.nm]||NETMODES.volta}. Waiting for them to kick off…`:performance.now()-netJoinAt>9000?`Still looking for a host with code ${netCode}. Check the letters, and that the host has pressed Host and kept that screen open.`+netRouteText():`Looking for the host with code ${netCode}…`+netRouteText())}}
 setInterval(()=>{if(nroom&&!NET.on&&state==='menu')netLobby()},1000);
 async function netLeave(){const r=nroom;nroom=null;netCode='';netRole=null;netPrep=null;netRdyAt=0;if(NET.on){NET.on=NET.host=NET.guest=false;ctrl2=null;RIN=null;netLock=false;comp=club.comp||'cup';netGuest=null;setup()}
@@ -5566,7 +5855,7 @@ function guestBegin(h){setPitch(['volta','classical','expanded'].includes(h.pres
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];charging=false;charge=0;introT=0;paused=false;$('pause').hidden=true;hitT=0;slowT=0;timeScale=1;
   menuEl.hidden=true;edEl.hidden=true;$('pack').hidden=true;cv.focus();state='play';stT=0;S.whistle(1);netLastSnapAt=performance.now();netGuestWait=false;netLastEcho=0;netLastG=null;
   gIn.list.length=0;gIn.spaceAt=0;gIn.swTo=-1;gPr.on=false;gPr.i=-1;gEp=-1;gCs=0;gLastN=0;gBlind=false;gHostCh=false;gAttT=0;ctrl=null;
-  if(nroom)nroom.presence({nw:null}).catch(()=>{});netLogAdd('joined match '+netGotMatch+' · '+PITCH);netApply(h.presence.g,true)}
+  if(nroom)nroom.presence({nw:null}).catch(()=>{});netLogAdd('joined match '+netGotMatch+' · '+PITCH);mmGuestBegan();netApply(h.presence.g,true)}
 function netApply(g,snap){if(!g||!Array.isArray(g.p))return;
   gLastN=Math.max(gLastN,+g.n||0);gIn.ack=Math.max(gIn.ack,+g.ack||0);
   const epNew=(+g.ep||0)!==gEp;if(epNew){gEp=+g.ep||0;gPr.on=false}// the host moved everyone (kick-off): start again from its positions
@@ -5667,7 +5956,8 @@ function netEndMatch(){const wasGuest=NET.guest;if(wasGuest)netDoneMatch=netGotM
   NET.on=NET.host=NET.guest=false;ctrl2=null;RIN=null;netLock=false;netPrep=null;netRdyAt=0;netResumeAt=0;netGuestBlind=false;c2pend=null;RS={x:0,y:0,charging:false,charge:0,pend:null};
   comp=club.comp||'cup';netGuest=null;charging=false;gPr.on=false;gIn.list.length=0;gIn.spaceAt=0;
   if(nroom&&!wasGuest)nroom.presence({m:0,g:null,r:null}).catch(()=>{});
-  setup();tab='online';showMenu();renderMenu();netLobby()}
+  const mres=netMM&&netMM.result;if(netKind!=='private'){netLeave();netKind='private';netMM=null}
+  setup();tab='online';showMenu();renderMenu();netLobby();if(mres&&mres.reveal)rankReveal(mres.fam)}
 // in the room between matches, the joining player's latest team goes to the host
 function netSquadRefresh(){if(netRole!=='guest'||!nroom||NET.on)return;const sq=netMyTeam(false),csq=netMyTeam(true),cu=netCustom(),key=JSON.stringify([sq,csq,cu,club.name,club.kit]);
   if(key!==netSqKey){netSqKey=key;nroom.presence({sq,csq,cu,club:(club.name||'My Club').slice(0,16),kit:club.kit}).catch(()=>{})}}
@@ -5721,7 +6011,7 @@ $('bulk-save').onclick=()=>{let n=0;
   applyNames();try{localStorage.setItem('kickabout-names',JSON.stringify(NAMES))}catch(e){}cloudPush();$('bulk-paste').value='';
   renderMenu();bulkRender();toast(n?`Saved ${n} name${n>1?'s':''}.`:'No names changed.')};
 $('bulk-clear').onclick=()=>{if(!Object.keys(NAMES).length){toast('Everyone already has their card name.');return}NAMES={};applyNames();try{localStorage.setItem('kickabout-names','{}')}catch(e){}cloudPush();renderMenu();bulkRender();toast('All names reset.')};
-renderMenu();cloudInit();
+renderMenu();cloudInit();tutBoot();if(club.reg)setTimeout(regPublish,3000);
 let last=performance.now();
 function hitStop(f){if(!RM&&!NET.on)hitT=Math.max(hitT,f)}
 // Every frame starts from a clean drawing state, and one bad frame can never stop the game: errors are caught and the

@@ -119,6 +119,10 @@ let NAMES={};try{NAMES=JSON.parse(localStorage.getItem('kickabout-names')||'{}')
 for(const p of PLAYERS){p.name0=p.name;p.short0=p.short;if(NAMES[p.id]){p.name=NAMES[p.id];p.short=NAMES[p.id].split(' ').pop().toUpperCase().slice(0,10)}}
 const ROSTER=PLAYERS,STARTERS=PLAYERS.filter(p=>['dave','leon','gaz'].includes(p.id)),MID=[];
 const BUDGET=470;
+// Your Player's training: 23 sessions of +8 points (470 → 650). Prices climb steadily from 400 coins to exactly 75,000
+// for the last session (before any Coaching Staff discount).
+const MYTRAIN_N=Math.ceil((650-BUDGET)/8),myTrainIx=()=>clamp(Math.ceil(((custom.budget||BUDGET)-BUDGET)/8),0,MYTRAIN_N-1),
+  myTrainCost=i=>i>=MYTRAIN_N-1?75000:Math.round(400*Math.pow(75000/400,i/(MYTRAIN_N-1))/50)*50,myTrainBase=()=>myTrainCost(myTrainIx());
 let custom={id:'custom',name:'Your Name',short:'NAME',num:99,tag:'Created player',pace:.75,shot:.75,fin:.7,skill:.7,pass:.7,tackle:.5,str:.6,sk:'roulette',sp:'curler',celeb:0,skin:SKINS[1],hair:HAIRS[0],isCustom:true};
 try{const c=JSON.parse(localStorage.getItem('kickabout-custom')||'null');if(c&&c.name)custom={...custom,...c,isCustom:true}}catch(e){}
 function natPos(p){if(p.pos)return p.pos;const d=p.tackle*1.6+p.str*.6,m=p.pass*1.3+p.skill*.7,a=(p.shot+p.fin)*.8+p.pace*.3;return d>=m&&d>=a?'DEF':m>=a?'MID':'ATT'}
@@ -379,7 +383,7 @@ function setGM(g){if(g===GM)return;club.compBy=club.compBy||{};club.compBy[GM]=c
 function renderMenu(){
   careerInit();applyNames();
   for(const k of ['team','squad','club','online'])$('tab-'+k).setAttribute('aria-selected',tab===k);
-  $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';
+  $('sec-team').hidden=tab!=='team';$('sec-squad').hidden=tab!=='squad';$('sec-club').hidden=tab!=='club';$('sec-online').hidden=tab!=='online';if(tab==='online')renderOnlinePlus();
   $('sec-packs').hidden=!(tab==='club'&&ctab==='packs');$('sec-coll').hidden=!(tab==='club'&&ctab==='coll');
   comp=club.comp||'league';if(!COMPS[GM].includes(compKey())){comp=club.comp='league'}
   document.querySelectorAll('.lvl button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lv===(club.level||'normal')?'true':'false'));
@@ -418,7 +422,7 @@ function renderMenu(){
   $('benchctl').innerHTML=`<span class="hint" style="margin:0">${benchList.length} players · best for the selected ${slots[selSlot]?slots[selSlot].r:''} spot first</span>`+(benchList.length>36?`<button class="ghost" data-benchall="1">${benchAll?'Show fewer':'Show all '+benchList.length}</button>`:'');
   $('bench').innerHTML=(benchAll?benchList:benchList.slice(0,36)).map(p=>{const at=q.s.indexOf(p.id);return cardHTML(p,{pickable:true,inteam:at>=0,badge:at>=0?slots[at].r[0]:'',
     extra:!p.isCustom?renameUI(p,'bench'):
-      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${club.coins<coachCost(400)||(custom.budget||BUDGET)>=650?'disabled':''}>Train +8 pts · ${priceTag(400)}</button>`:''})}).join('');
+      p.isCustom?`<button class="edit" data-edit="1">Edit player</button> <button class="buy" data-train="1" ${(custom.budget||BUDGET)>=650||club.coins<coachCost(myTrainBase())?'disabled':''}>${(custom.budget||BUDGET)>=650?'Fully trained':`Train +8 pts · ${priceTag(myTrainBase())} (session ${myTrainIx()+1}/${MYTRAIN_N})`}</button>`:''})}).join('');
   renderSquadExtras();
   // packs
   $('packs').innerHTML=PACKS.map(k=>{const free=(k.id==='silver'&&club.gift)||((club.free||{})[k.id]>0);const so=scoutOdds(k.odds),sc=depFx('scout')&&so!==k.odds,od=Object.entries(so).filter(e=>e[1]).map(([t,v])=>`${TIERS[t].name} ${v}%`).join(' · ')+(sc?` (scouting +${depFx('scout')}%)`:'');
@@ -510,7 +514,7 @@ $('market').addEventListener('keydown',renameKey);
 $('bench').addEventListener('click',e=>{
   if(renameClick(e,'bench'))return;
   if(e.target.closest('[data-edit]')){openEditor();return}
-  const tr=e.target.closest('[data-train]');if(tr){if(club.coins>=coachCost(400)){const was=ovr(custom),gain=Math.min(8,650-(custom.budget||BUDGET));club.coins-=coachCost(400);custom.budget=(custom.budget||BUDGET)+gain;autoSpend(custom,gain);const now=ovr(custom);try{localStorage.setItem('kickabout-custom',JSON.stringify(custom))}catch(e){}saveClub();S.skill(2);renderMenu();showUpgrade(was,now);openEditor()}return}
+  const tr=e.target.closest('[data-train]');if(tr){const price=coachCost(myTrainBase());if((custom.budget||BUDGET)<650&&club.coins>=price){const was=ovr(custom),gain=Math.min(8,650-(custom.budget||BUDGET));club.coins-=price;custom.budget=(custom.budget||BUDGET)+gain;autoSpend(custom,gain);const now=ovr(custom);try{localStorage.setItem('kickabout-custom',JSON.stringify(custom))}catch(e){}saveClub();S.skill(2);renderMenu();showUpgrade(was,now);openEditor()}return}
   const c=e.target.closest('.card[data-id]');if(c){lastSlotClick=-1;placePlayer(c.dataset.id)}});
 $('bench').addEventListener('keydown',e=>{if(renameKey(e))return;
   const c=e.target.closest('.card[data-id]');if(c&&e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();placePlayer(c.dataset.id)}});

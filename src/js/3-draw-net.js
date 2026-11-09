@@ -276,7 +276,7 @@ function draw(){
   if(NET.on&&state!=='fulltime'&&!(NET.host&&netPrep)&&!(NET.guest&&netLastG&&netLastG.pr)){const rsN=NET.host?(performance.now()<netResumeAt?Math.ceil((netResumeAt-performance.now())/1000):0):netLastG&&+netLastG.rs||0;
     if(netWaiting||netGuestWait){ctx.fillStyle='rgba(20,48,63,.9)';rr(W/2-250,H/2-38,500,76,34);ctx.fill();txt('CONNECTION LOST · MATCH PAUSED',W/2,H/2-8,24,C.sun,'center',false);txt(NET.host?'Waiting for your friend’s laptop to reconnect…':'Reconnecting to the host…',W/2,H/2+18,14,C.cream,'center',false)}
     else if(rsN>0){ctx.fillStyle='rgba(20,48,63,.9)';rr(W/2-200,H/2-38,400,76,34);ctx.fill();txt('BACK ON · RESUMING IN '+rsN,W/2,H/2-6,26,C.mint,'center',false);txt('Both laptops restart together',W/2,H/2+18,13,C.cream,'center',false)}}
-  if(NET.on&&netDiag)drawNetDiag();
+  if(NET.on&&netDiag)drawNetDiag();drawTutHints();
   ctx.restore();
   if(flash>0){ctx.fillStyle=`rgba(255,246,228,${flash*.5})`;ctx.fillRect(0,0,W,H)}
 }
@@ -460,7 +460,7 @@ async function netJoinClick(){initAudio();const code=($('net-in').value||'').toU
   netStatus('Joining '+code+'…');$('net-join').disabled=true;const ok=await netJoin(code,'guest');$('net-join').disabled=false;if(!ok)return;netStatus('In room '+code+'. Waiting for the host…');netLobby()}
 const NETOLD='is using a different version of Sunday Kickabout. You both need the same game file: send them this copy (or download theirs) and try again.';
 function netLobby(){if(!nroom||NET.on)return;
-  if(netRole==='host'){const g=netPeer('guest'),bad=g&&+g.presence.pv!==NETPV;$('net-start').hidden=!g||bad;netStatus(bad?`${String(g.presence.club||'Your friend').slice(0,16)} ${NETOLD}`:g?`${String(g.presence.club||'Your friend').slice(0,16)} has joined! Match: ${NETMODES[club.netMode||'volta']}. Hit kick off when you’re both ready.`:'Tell your friend this code. Waiting for them to join…'+netRouteText(),bad)}
+  if(netRole==='host'){const g=netPeer('guest'),bad=g&&+g.presence.pv!==NETPV;if(g&&!bad&&netKind!=='private')mmHostAuto(g);$('net-start').hidden=!g||bad;netStatus(bad?`${String(g.presence.club||'Your friend').slice(0,16)} ${NETOLD}`:g?`${String(g.presence.club||'Your friend').slice(0,16)} has joined! Match: ${NETMODES[club.netMode||'volta']}. Hit kick off when you’re both ready.`:'Tell your friend this code. Waiting for them to join…'+netRouteText(),bad)}
   else if(netRole==='guest'){const h=netPeer('host'),bad=h&&+h.presence.pv!==NETPV;if(bad){netStatus(`${String(h.presence.club||'The host').slice(0,16)} ${NETOLD}`,true);return}netStatus(h?`Connected to ${String(h.presence.club||'the host').slice(0,16)}. Match: ${NETMODES[h.presence.nm]||NETMODES.volta}. Waiting for them to kick off…`:performance.now()-netJoinAt>9000?`Still looking for a host with code ${netCode}. Check the letters, and that the host has pressed Host and kept that screen open.`+netRouteText():`Looking for the host with code ${netCode}…`+netRouteText())}}
 setInterval(()=>{if(nroom&&!NET.on&&state==='menu')netLobby()},1000);
 async function netLeave(){const r=nroom;nroom=null;netCode='';netRole=null;netPrep=null;netRdyAt=0;if(NET.on){NET.on=NET.host=NET.guest=false;ctrl2=null;RIN=null;netLock=false;comp=club.comp||'cup';netGuest=null;setup()}
@@ -677,7 +677,7 @@ function guestBegin(h){setPitch(['volta','classical','expanded'].includes(h.pres
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];charging=false;charge=0;introT=0;paused=false;$('pause').hidden=true;hitT=0;slowT=0;timeScale=1;
   menuEl.hidden=true;edEl.hidden=true;$('pack').hidden=true;cv.focus();state='play';stT=0;S.whistle(1);netLastSnapAt=performance.now();netGuestWait=false;netLastEcho=0;netLastG=null;
   gIn.list.length=0;gIn.spaceAt=0;gIn.swTo=-1;gPr.on=false;gPr.i=-1;gEp=-1;gCs=0;gLastN=0;gBlind=false;gHostCh=false;gAttT=0;ctrl=null;
-  if(nroom)nroom.presence({nw:null}).catch(()=>{});netLogAdd('joined match '+netGotMatch+' · '+PITCH);netApply(h.presence.g,true)}
+  if(nroom)nroom.presence({nw:null}).catch(()=>{});netLogAdd('joined match '+netGotMatch+' · '+PITCH);mmGuestBegan();netApply(h.presence.g,true)}
 function netApply(g,snap){if(!g||!Array.isArray(g.p))return;
   gLastN=Math.max(gLastN,+g.n||0);gIn.ack=Math.max(gIn.ack,+g.ack||0);
   const epNew=(+g.ep||0)!==gEp;if(epNew){gEp=+g.ep||0;gPr.on=false}// the host moved everyone (kick-off): start again from its positions
@@ -778,7 +778,8 @@ function netEndMatch(){const wasGuest=NET.guest;if(wasGuest)netDoneMatch=netGotM
   NET.on=NET.host=NET.guest=false;ctrl2=null;RIN=null;netLock=false;netPrep=null;netRdyAt=0;netResumeAt=0;netGuestBlind=false;c2pend=null;RS={x:0,y:0,charging:false,charge:0,pend:null};
   comp=club.comp||'cup';netGuest=null;charging=false;gPr.on=false;gIn.list.length=0;gIn.spaceAt=0;
   if(nroom&&!wasGuest)nroom.presence({m:0,g:null,r:null}).catch(()=>{});
-  setup();tab='online';showMenu();renderMenu();netLobby()}
+  const mres=netMM&&netMM.result;if(netKind!=='private'){netLeave();netKind='private';netMM=null}
+  setup();tab='online';showMenu();renderMenu();netLobby();if(mres&&mres.reveal)rankReveal(mres.fam)}
 // in the room between matches, the joining player's latest team goes to the host
 function netSquadRefresh(){if(netRole!=='guest'||!nroom||NET.on)return;const sq=netMyTeam(false),csq=netMyTeam(true),cu=netCustom(),key=JSON.stringify([sq,csq,cu,club.name,club.kit]);
   if(key!==netSqKey){netSqKey=key;nroom.presence({sq,csq,cu,club:(club.name||'My Club').slice(0,16),kit:club.kit}).catch(()=>{})}}
@@ -832,7 +833,7 @@ $('bulk-save').onclick=()=>{let n=0;
   applyNames();try{localStorage.setItem('kickabout-names',JSON.stringify(NAMES))}catch(e){}cloudPush();$('bulk-paste').value='';
   renderMenu();bulkRender();toast(n?`Saved ${n} name${n>1?'s':''}.`:'No names changed.')};
 $('bulk-clear').onclick=()=>{if(!Object.keys(NAMES).length){toast('Everyone already has their card name.');return}NAMES={};applyNames();try{localStorage.setItem('kickabout-names','{}')}catch(e){}cloudPush();renderMenu();bulkRender();toast('All names reset.')};
-renderMenu();cloudInit();
+renderMenu();cloudInit();tutBoot();if(club.reg)setTimeout(regPublish,3000);
 let last=performance.now();
 function hitStop(f){if(!RM&&!NET.on)hitT=Math.max(hitT,f)}
 // Every frame starts from a clean drawing state, and one bad frame can never stop the game: errors are caught and the

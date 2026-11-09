@@ -342,6 +342,40 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
 .soon b{font-family:var(--display);font-weight:400;font-size:28px;color:var(--sun)}
 .cabinet{display:flex;flex-wrap:wrap;gap:8px}.troph{border:1px solid var(--line);border-radius:12px;padding:6px 10px;background:#12303e;font-size:12px;text-align:center;min-width:110px}.troph b{display:block;font-size:24px}
 .welcome{border:1px solid var(--mint);color:var(--mint)}
+
+/* online: modes, ranks, placement ring, matchmaking, leaderboards, help, tutorial */
+.olmodes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%}
+.olm{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 8px;border-radius:16px;border:1px solid var(--line);background:var(--ground-2);color:var(--cream);cursor:pointer;font:inherit}
+.olm b{font-family:var(--display);font-weight:400;font-size:22px}.olm small{color:var(--muted)}.olm .olic{font-size:26px}
+.olm[aria-pressed="true"]{border-color:var(--sun);box-shadow:0 0 0 2px rgba(255,209,102,.35);background:linear-gradient(180deg,#1f4256,#183544)}
+.olfmt{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;margin:10px 0}.olfmt .lab{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--muted)}
+.olfmt button{font:inherit;font-weight:800;font-size:13px;border:1px solid var(--line);background:var(--ground-2);color:var(--muted);padding:6px 12px;border-radius:999px;cursor:pointer}.olfmt button[aria-pressed="true"]{background:var(--cream);color:var(--ground)}
+.olpanel{border:1px solid var(--line);border-radius:16px;background:var(--ground-2);padding:14px;text-align:left}.olpanel h3{margin:0 0 6px;font-family:var(--display);font-weight:400;color:var(--sun)}
+.olpanel.rk{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.rkright{flex:1;min-width:240px}
+.pring{position:relative;width:150px;height:150px}.pring svg{transform:rotate(-90deg)}.pr-bg{fill:none;stroke:#3a4652;stroke-width:10}
+.pr-fg{fill:none;stroke:#5fe3ff;stroke-width:10;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(95,227,255,.8));transition:stroke-dashoffset 1.1s cubic-bezier(.3,.7,.3,1)}
+.pr-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.pr-in b{font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:.04em;color:#c9d2da}
+.pr-lab{text-align:center;margin:4px 0 0;font-weight:800;color:var(--cream);width:150px}
+.rkb{--s:64px;width:var(--s);height:calc(var(--s)*1.1);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;vertical-align:middle;clip-path:polygon(50% 0,100% 18%,92% 72%,50% 100%,8% 72%,0 18%);background:linear-gradient(160deg,var(--c),var(--c2));color:#1b1205;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.rkb i{font-style:normal;font-size:calc(var(--s)*.22)}.rkb b{font-size:calc(var(--s)*.13);font-weight:900;letter-spacing:.03em}.rkb.un{background:linear-gradient(160deg,#9aa4ad,#55606a);color:#222}
+.rkb.leg{background:linear-gradient(160deg,#ffe27a,#ff8a1f 50%,#d2321e);animation:leg 1.8s ease-in-out infinite alternate}@keyframes leg{from{filter:drop-shadow(0 0 4px rgba(255,140,40,.6))}to{filter:drop-shadow(0 0 14px rgba(255,90,30,.95))}}
+.rkladder{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.rkst{display:flex;flex-direction:column;align-items:center;opacity:.55}.rkst.on{opacity:1}.rkst small{font-size:10px;color:var(--muted)}
+.mmsearch{display:flex;gap:14px;align-items:center;margin-top:10px;padding:12px;border-radius:14px;background:#0f2a37;border:1px solid var(--mint)}.mmsearch p{margin:2px 0}
+.mmspin{width:34px;height:34px;border-radius:50%;border:4px solid rgba(127,224,180,.25);border-top-color:var(--mint);animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+#ol-board{margin-top:14px}.lbhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.lbhead h3{margin:0;font-family:var(--display);font-weight:400;color:var(--sun)}.lbt tr.me{background:rgba(255,209,102,.12)}
+.ovl{position:fixed;inset:0;z-index:60;background:rgba(5,10,16,.72);display:flex;align-items:center;justify-content:center;padding:16px}.ovl[hidden]{display:none}
+.sqbox,.hbox{position:relative;max-width:900px;width:100%;max-height:88vh;overflow:auto;background:var(--ground-2);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:left;color:var(--cream)}
+.sqbox h3,.hmain h3{margin:0 0 6px;font-family:var(--display);font-weight:400;color:var(--sun);font-size:24px}.sqx,.hx{position:absolute;top:10px;right:10px}
+.sqv{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:10px}.sqc{display:flex;flex-direction:column;border-radius:10px;padding:8px;background:#12303e;border-left:4px solid var(--tc,#888)}.sqc b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--sun)}.sqc small{color:var(--muted)}
+.rkrv{text-align:center;color:var(--cream);display:flex;flex-direction:column;align-items:center;gap:8px;animation:pb .4s ease-out}.rkrv h2{font-family:var(--display);font-weight:400;font-size:46px;margin:0}.rkrvb{animation:rv 1.2s .9s both cubic-bezier(.2,1.4,.4,1)}@keyframes rv{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
+.hbox{display:grid;grid-template-columns:220px 1fr;gap:16px}.hnav{display:flex;flex-direction:column;gap:4px}.hnav button{font:inherit;text-align:left;padding:7px 10px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer}
+.hnav button[aria-pressed="true"]{background:#12303e;border-color:var(--sun);color:var(--cream)}.hmain{min-height:300px;display:flex;flex-direction:column}.htext{flex:1;line-height:1.5}.hfoot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radius:6px;background:#0d2230;border:1px solid var(--line);font:700 12px var(--body);text-align:center}
+@media (max-width:640px){.hbox{grid-template-columns:1fr}.hnav{flex-direction:row;flex-wrap:wrap}.olmodes{grid-template-columns:1fr}}
+.helpb{color:var(--sun)!important;border-color:var(--sun)!important}
+.tutbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:55;max-width:520px;width:calc(100% - 32px)}.tutbar[hidden]{display:none}
+.tbox{background:#0f2a37;border:2px solid var(--sun);border-radius:16px;padding:14px;color:var(--cream);box-shadow:0 10px 30px rgba(0,0,0,.5)}.tbox h3{margin:2px 0 4px;font-family:var(--display);font-weight:400;color:var(--sun)}.tbox small{color:var(--muted)}.tfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+.tutmark{outline:3px solid var(--sun)!important;outline-offset:3px;box-shadow:0 0 0 6px rgba(255,209,102,.25)!important;border-radius:10px;animation:tm 1s ease-in-out infinite alternate}@keyframes tm{to{outline-color:rgba(255,209,102,.4)}}
 </style>
 
 <div class="stage">
@@ -352,7 +386,7 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
     <div class="clubbar">
       <label for="club-name" style="display:flex;align-items:center;gap:6px">CLUB<input type="text" id="club-name" maxlength="14"></label>
       <div class="sw" id="club-kit" aria-label="Kit colour"></div>
-      <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button><button class="res ctkp" id="ctkp" title="Club Tokens (Club Development)"></button>
+      <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button><button class="res ctkp" id="ctkp" title="Club Tokens (Club Development)"></button><button class="res helpb" id="helpbtn3" title="How everything works">? Help</button>
     </div>
     <div class="tabs" role="tablist"><button role="tab" id="tab-team" aria-selected="true">Play</button><button role="tab" id="tab-squad" aria-selected="false">Squad</button><button role="tab" id="tab-club" aria-selected="false">Club</button><button role="tab" id="tab-online" aria-selected="false">Online</button></div>
     <p class="result" id="result" hidden></p>
@@ -410,16 +444,19 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
       <p class="hint" style="margin-top:10px">Every pack shows you three players of one rarity and you sign one. All packs are bought with coins you earn by playing: no real money, ever. Signing a player you already own keeps the duplicate for Exchanges.</p>
     </section>
     <section id="sec-online" hidden style="width:100%">
-      <div class="online">
+      <div id="ol-plus"></div>
+      <div id="ol-host" hidden><div class="online">
         <div class="ocard"><h3>Host a match</h3><p class="hint">Pick the match, then press Host. You get a 4-letter code; your friend types it on their laptop.</p>
           <div class="forms" id="net-mode" role="group" aria-label="Match type"></div>
           <button class="go" id="net-host">Host</button><div class="ncode" id="net-code" aria-live="polite"></div><button class="go" id="net-start" hidden>Kick off</button></div>
         <div class="ocard"><h3>Join a match</h3><p class="hint">Got a code from a friend? Type it here.</p>
           <div class="row"><input type="text" id="net-in" maxlength="4" placeholder="CODE" autocomplete="off" aria-label="Match code"><button class="go" id="net-join">Join</button></div></div>
       </div>
-      <p class="toast" id="net-status" aria-live="polite"></p>
       <p class="hint" id="net-note"></p>
       <p class="hint">You each play with your own team and line-up (your Volta line-up for Volta, your Classical line-up for Classical), and you both see yourself attacking left to right. After Kick off both laptops load the match and confirm they’re ready before a 3-2-1 countdown. No penalties: a draw is a draw. Coins: 60 for a win, 30 for a draw, 15 for a loss (Classical 1.5×).</p>
+      </div>
+      <p class="toast" id="net-status" aria-live="polite"></p>
+      <div id="ol-board" class="panel"></div>
     </section>
     <section id="sec-coll" hidden style="width:100%">
       <h3 class="sec-title">Collection <span class="hint" id="collect-count"></span></h3>
@@ -458,7 +495,7 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
   <div class="menu" id="pause" hidden><div class="menu-inner">
     <h1>Paused</h1>
     <p class="hint">Take a breather. Leaving ends the match with no coins. Forfeiting counts as a 0–3 defeat in your cup or tournament run.</p>
-    <div class="row"><button class="go" id="resume">Resume</button><button class="ghost" id="leave">Leave match</button><button class="ghost" id="forfeit">Forfeit</button><button class="ghost" id="fixscr2">Fix screen</button><button class="ghost" id="fullscr2">Full screen</button></div>
+    <div class="row"><button class="go" id="resume">Resume</button><button class="ghost" id="leave">Leave match</button><button class="ghost" id="forfeit">Forfeit</button><button class="ghost" id="fixscr2">Fix screen</button><button class="ghost" id="fullscr2">Full screen</button><button class="ghost" id="helpbtn2">Help</button></div>
   </div></div>
   <div class="editor" id="editor" hidden><div class="ed-inner">
     <h2>Create your player</h2>
@@ -491,9 +528,10 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
   <span><kbd>1</kbd>–<kbd>6</kbd> celebration</span>
   <span><button class="mute" id="mute">Sound on (M)</button></span>
   <span><button class="mute" id="fixscr" title="Use this if the screen ever goes black or freezes">Fix screen (G)</button></span>
-  <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span>
+  <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span><span><button class="mute helpb" id="helpbtn" title="How everything works">HELP</button></span>
 </div>
 
+<div id="sqview" class="ovl" hidden></div><div id="rkreveal" class="ovl" hidden></div><div id="help" class="ovl" hidden></div><div id="tut" class="tutbar" hidden></div>
 <script>/*@GAME*/</script>
 
 </body></html>

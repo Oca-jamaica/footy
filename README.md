@@ -34,6 +34,22 @@ multipliers or caps. Every Club Legacy level pays exactly 1 Club Token. Club Tok
 departments (Fanbase, Coaching Staff, Training Facilities, Stadium, Scouting, Commercial), levels 1–5, for
 5,000 / 10,000 / 20,000 / 35,000 coins plus 1 Club Token per level.
 
+
+**Online modes:** Ranked, Friendly and Host / Join. Ranked and Friendly find a real opponent automatically (same match type
+and pitch; Ranked by similar rating, widening the longer you wait; never an AI). Ten placement matches set your first rank
+(Bronze → Silver → Gold → Platinum → Diamond → Champion → Legendary); after that wins earn Ranked Points and losses cost
+them, by Elo, so beating a stronger player is worth more. Volta and Classical are ranked separately. Seasons are calendar
+months: rewards for your best rank, then points move part of the way back to the middle. Leaving a Ranked match counts
+as a loss. Friendly pays normal online coins (a quarter after 8 a day). Leaderboards: Global clubs and Ranked (ordered by
+results only), with a read-only View Squad.
+
+**What needs a server:** matchmaking and the leaderboards run over the same free public relays as online play, with no
+server of our own. Each club's rating lives in its own save, and leaderboard profiles are retained messages on public
+relays: the game checks every profile it reads and nobody can change someone else's club, but a determined player could
+publish a fake profile or edit their own save, and a relay may forget retained profiles. A proper, cheat-proof ladder
+needs a small backend (a database plus an authoritative match-result service: e.g. a managed database like Supabase or
+Firebase with server-side functions, or a small Node server) and a paid TURN relay for the strictest networks.
+
 **To play:** open `sunday-kickabout.html` in Chrome, Safari or Edge.
 
 ## Editing
