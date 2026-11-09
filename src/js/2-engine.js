@@ -654,7 +654,7 @@ function solveCurl(x,y,a0,spd,curl,vz,gx,ty){let lo=a0-.6,hi=a0+.6;const f=a=>{c
   let flo=f(lo),fhi=f(hi);if(!(flo*fhi<0))return a0;
   for(let i=0;i<22;i++){const m=(lo+hi)/2,fm=f(m);if(isNaN(fm))return a0;if(fm*flo<=0){hi=m;fhi=fm}else{lo=m;flo=fm}}return (lo+hi)/2}
 function shoot(p,type,ch,aim=null){if(p.team===1&&!hum(p))aiStat.aiShots++;if(NET.on)netKickLog(p,'shot',type,ch);
-  const gx=goalX(p.team),att=p.team===0?1:-1,fin=p.st.fin,pow=p.st.shot,fz=(fire>0&&p.team===0)?1.1:1;
+  const gx=goalX(p.team),att=p.team===0?1:-1,fin=p.st.fin,pow=p.st.shot,fz=(fire>0&&p.team===0&&!NET.on)?1.1:1;// online, ON FIRE is for show only, for both sides
   let ty=aim;
   // no aim assist: the ball goes exactly where you're facing
   if(ty==null&&Math.cos(p.dir)*att>.2)ty=B.y+Math.tan(p.dir)*(gx-B.x);
@@ -923,7 +923,7 @@ function topSpeed(p){
   if(p.anim==='shield')s*=.55;
   if(p.ghost>0)s*=1.1;
   if((B.lobTo===p||B.graceTo===p)&&B.lobThrough)s*=1.15;
-  if(fire>0&&p.team===0)s*=1.07;
+  if(fire>0&&p.team===0&&!NET.on)s*=1.07;
   return s;
 }
 function steer(p,tx,ty,spd,dt){

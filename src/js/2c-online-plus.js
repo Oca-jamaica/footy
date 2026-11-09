@@ -95,20 +95,20 @@ async function mmConnect(){if(mm.cl.length)return;const M=await loadMqtt();if(!M
 const mmSubbed=c=>{c.__topic=mmTopic()};
 function mmPub(sub,obj){const s=JSON.stringify(obj);for(const c of mm.cl)if(c.connected)try{c.publish(mmTopic()+sub,s,{qos:0})}catch(e){}}
 function mmMsg(tp,d){if(!mm.on||!d||typeof d!=='object')return;const parts=tp.split('/'),kind=parts[parts.length-2];
-  if(kind==='q'){const id=String(d.id||'');if(!/^[a-z0-9]{8,16}$/.test(id)||id===mm.id||+d.pv!==NETPV)return;mm.seen.set(id,{id,r:clamp(+d.r||MMR0,0,4000),n:String(d.n||'').slice(0,16),at:performance.now(),busy:!!d.busy})}
+  if(kind==='q'){const id=String(d.id||'');if(!/^[a-z0-9]{8,16}$/.test(id)||id===mm.id||+d.pv!==NETPV)return;mm.seen.set(id,{id,r:clamp(+d.r||MMR0,0,4000),n:String(d.n||'').slice(0,16),mg:nameOk(String(d.mg||'')),at:performance.now(),busy:!!d.busy})}
   else if(kind==='o'){const from=String(d.from||'');if(!/^[a-z0-9]{8,16}$/.test(from))return;
     if(d.acc){if(mm.offer&&mm.offer.to===from&&d.code===mm.offer.code)mmGo('host',mm.offer)}// they accepted our offer
     else if(!mm.offer&&from<mm.id&&typeof d.code==='string'&&/^[A-Z]{6}$/.test(d.code)){const ok=mm.kind!=='ranked'||Math.abs(clamp(+d.r||MMR0,0,4000)-mmRating())<=mmWindow()+60;
-      if(ok){const o={to:from,code:d.code,r:clamp(+d.r||MMR0,0,4000),n:String(d.n||'').slice(0,16)},acc={from:mm.id,acc:1,code:d.code,r:mmRating(),n:club.name};
+      if(ok){const o={to:from,code:d.code,r:clamp(+d.r||MMR0,0,4000),n:String(d.n||'').slice(0,16),mg:nameOk(String(d.mg||''))},acc={from:mm.id,acc:1,code:d.code,r:mmRating(),n:club.name,mg:club.mgr||''};
         // say yes a few times (messages can be lost), keeping the matchmaking connection open a moment so they actually go
         mmPub('/o/'+from,acc);const pub=mm.cl.slice(),tp=mmTopic()+'/o/'+from;for(const ms of [400,900,1500])setTimeout(()=>{for(const c of pub)if(c.connected)try{c.publish(tp,JSON.stringify(acc),{qos:0})}catch(e){}},ms);mmGo('guest',o)}}}}
 const mmRating=()=>rkState().fam[famOf(mm.fmt)].mmr;
 function mmTick(){if(!mm.on)return;const now=performance.now();for(const [k,v] of mm.seen)if(now-v.at>4000)mm.seen.delete(k);
-  mmPub('/q/'+mm.id,{id:mm.id,r:mmRating(),n:(club.name||'Club').slice(0,16),pv:NETPV,busy:!!mm.offer});
+  mmPub('/q/'+mm.id,{id:mm.id,r:mmRating(),n:(club.name||'Club').slice(0,16),mg:club.mgr||'',pv:NETPV,busy:!!mm.offer});
   if(mm.offer&&now-mm.offer.at>4000)mm.offer=null;// no answer: try someone else
   if(!mm.offer){const W=mmWindow(),me=mmRating();let best=null;for(const v of mm.seen.values()){if(v.busy||v.id<mm.id)continue;const d=Math.abs(v.r-me);if(d<=W&&(!best||d<Math.abs(best.r-me)))best=v}
     // the lower id makes the offer, with a fresh 6-letter room code
-    if(best){const code=Array.from({length:6},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[(Math.random()*23)|0]).join('');mm.offer={to:best.id,code,r:best.r,n:best.n,at:now};mmPub('/o/'+best.id,{from:mm.id,code,r:me,n:club.name})}}
+    if(best){const code=Array.from({length:6},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[(Math.random()*23)|0]).join('');mm.offer={to:best.id,code,r:best.r,n:best.n,mg:best.mg,at:now};mmPub('/o/'+best.id,{from:mm.id,code,r:me,n:club.name,mg:club.mgr||''})}}
   const i=$('mm-info');if(i)i.textContent=mmInfo()}
 async function mmStart(kind){if(mm.on||NET.on)return;if(nroom)await netLeave();initAudio();
   mm.on=true;mm.kind=kind;mm.fmt=NETMODES[club.netMode]?club.netMode:'volta';mm.id=Math.random().toString(36).slice(2,12).padEnd(10,'0');mm.t0=performance.now();mm.seen.clear();mm.offer=null;
@@ -118,7 +118,7 @@ function mmStop(msg){if(!mm.on&&!mm.cl.length)return;clearInterval(mm.timer);mm.
   const cl=mm.cl;mm.cl=[];setTimeout(()=>{for(const c of cl)try{c.end(false)}catch(e){}},2500);if(msg)netStatus(msg);renderOnlinePlus()}
 // paired: one hosts, one joins, through the normal online code
 async function mmGo(role,o){const kind=mm.kind,fmt=mm.fmt;mmStop('');netKind=kind;netMM={role,code:o.code,oppId:o.to,oppMmr:o.r,oppName:o.n,fam:famOf(fmt),fmt,at:performance.now(),started:false};
-  club.netMode=fmt;renderNetModes();netStatus(`Opponent found: ${o.n||'a player'}. Connecting…`);netLogAdd('paired as '+role+' with '+o.n);
+  club.netMode=fmt;renderNetModes();netStatus(`Opponent found: ${o.n||'a player'}${o.mg?' ('+o.mg+')':''}. Connecting…`);netLogAdd('paired as '+role+' with '+o.n);
   await netJoin(o.code,role);
   // if they never turn up, go back to searching rather than wait forever
   setTimeout(()=>{if(netMM&&netMM.code===o.code&&!netMM.started&&!NET.on){netLeave();netKind='private';const k=netMM.fmt;netMM=null;club.netMode=k;netStatus('The opponent didn’t connect. Searching again…');mmStart(kind)}},25000)}
@@ -146,16 +146,16 @@ const REG='sundaykickabout/clubs1/p/';
 function regProfile(){const R=rkState(),g0=GM;const lin=(cl)=>{GM=cl?'classical':'volta';const q=sq(),f=FORMS[q.f];const ps=q.s.map((id,i)=>{const p=byId(id);return p?[String(p.name).slice(0,16),f[i]?f[i].r:natPos(p),effOvr(p),tier(p),SPECIALS[p.sp]?SPECIALS[p.sp].name:'',ablOf(p.id),lvlOf(p.id)]:null}).filter(Boolean);const r=teamRating(q);return{f:q.f,r,p:ps}};
   let v,c;try{v=lin(false);c=lin(true)}finally{GM=g0}
   const fam=f=>{const F=R.fam[f];return{rp:F.placed?F.rp:0,pl:F.pl,pd:F.placed?1:0,ix:F.placed?rankIx(F.rp):-1,w:F.w,d:F.d,l:F.l}};
-  return{v:1,id:club.reg.id,n:String(club.name||'My Club').slice(0,20),b:String(club.badge||'⚽').slice(0,4),k:club.kit,t:Date.now(),pl:club.played||0,rk:{volta:fam('volta'),classical:fam('classical')},sq:{volta:v,classical:c}}}
+  return{v:1,id:club.reg.id,n:String(club.name||'My Club').slice(0,20),mg:String(club.mgr||'').slice(0,16),b:String(club.badge||'⚽').slice(0,4),k:club.kit,t:Date.now(),pl:club.played||0,rk:{volta:fam('volta'),classical:fam('classical')},sq:{volta:v,classical:c}}}
 let regCl=[],regTimer=null,regBoard=new Map(),regLoading=false;
 async function regConnect(){if(regCl.length)return regCl;const M=await loadMqtt();if(!M)return[];
   for(const u0 of RELAYS()){const U=typeof u0==='string'?{url:u0}:u0;let c;try{c=M.connect(U.url,{clientId:'skreg_'+Math.random().toString(36).slice(2,10),keepalive:30,connectTimeout:8000,reconnectPeriod:5000,clean:true,...(U.username?{username:U.username,password:U.password}:{})})}catch(e){continue}
-    c.on('message',(tp,buf)=>{try{regIn(JSON.parse(new TextDecoder().decode(buf)))}catch(e){}});c.on('connect',()=>c.subscribe(REG+'+',{qos:0}));c.on('error',()=>{});regCl.push(c)}return regCl}
+    c.on('message',(tp,buf)=>{if(tp.startsWith(ACCT_T)){acctMsg(tp,buf);return}try{regIn(JSON.parse(new TextDecoder().decode(buf)))}catch(e){}});c.on('connect',()=>c.subscribe(REG+'+',{qos:0}));c.on('error',()=>{});regCl.push(c)}return regCl}
 // only well-formed, believable profiles get onto the board
 function regIn(d){if(!d||d.v!==1||!/^[a-z0-9]{10,16}$/.test(String(d.id)))return;const num=(x,a,b)=>Number.isFinite(+x)?clamp(+x,a,b):a;
   const fam=f=>{const r=d.rk&&d.rk[f]||{};const rp=num(r.rp,0,5000),pd=r.pd?1:0;return{rp:pd?rp:0,pl:num(r.pl,0,10),pd,ix:pd?rankIx(rp):-1,w:num(r.w,0,1e5)|0,d:num(r.d,0,1e5)|0,l:num(r.l,0,1e5)|0}};
   const lin=s=>{if(!s||!Array.isArray(s.p))return{f:'',r:0,p:[]};return{f:String(s.f||'').slice(0,8),r:num(s.r,0,99)|0,p:s.p.slice(0,9).filter(Array.isArray).map(x=>[String(x[0]||'').slice(0,16),String(x[1]||'').slice(0,4),num(x[2],1,99)|0,['bronze','silver','gold','special','icon'].includes(x[3])?x[3]:'bronze',String(x[4]||'').slice(0,16),num(x[5],1,10)|0,num(x[6],0,8)|0])}};
-  const p={id:String(d.id),n:String(d.n||'Club').slice(0,20),b:String(d.b||'⚽').slice(0,4),k:/^#[0-9a-f]{6}$/i.test(d.k)?d.k:'#888888',t:num(d.t,0,9e15),pl:num(d.pl,0,1e6)|0,rk:{volta:fam('volta'),classical:fam('classical')},sq:{volta:lin(d.sq&&d.sq.volta),classical:lin(d.sq&&d.sq.classical)}};
+  const p={id:String(d.id),n:String(d.n||'Club').slice(0,20),mg:String(d.mg||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,16),b:String(d.b||'⚽').slice(0,4),k:/^#[0-9a-f]{6}$/i.test(d.k)?d.k:'#888888',t:num(d.t,0,9e15),pl:num(d.pl,0,1e6)|0,rk:{volta:fam('volta'),classical:fam('classical')},sq:{volta:lin(d.sq&&d.sq.volta),classical:lin(d.sq&&d.sq.classical)}};
   const old=regBoard.get(p.id);if(!old||p.t>=old.t)regBoard.set(p.id,p);if(!regLoading)renderBoards()}
 async function regPublish(){if(!club.reg)return;const cl=await regConnect(),s=JSON.stringify(regProfile());
   for(const c of cl){const go=()=>{try{c.publish(REG+club.reg.id,s,{qos:0,retain:true})}catch(e){}};if(c.connected)go();else c.once('connect',go)}}
@@ -179,10 +179,11 @@ function renderBoards(){const el=$('ol-board');if(!el)return;const me=club.reg&&
     <button class="btn" data-lbload="1">Refresh</button></div>
     <p class="hint">${lbTab==='ranked'?'Ordered by competitive results only (Ranked Points), never by squad strength.':'Every club playing Sunday Kickabout, whatever its rank. Yours is added automatically and kept up to date.'} Shared through public relays: profiles are checked, but this isn't a secure server, so treat it as a friendly board rather than an official ranking.${regLoading?' Loading…':''}</p>
     <div class="ltwrap"><table class="lt lbt"><tr><th>#</th><th>Club</th><th>Team</th><th>Rank</th><th>RP</th><th>W-D-L</th><th>Played</th><th></th></tr>
-    ${rows.slice(0,100).map((p,i)=>{const t=p.rk[fam];return `<tr class="${p.id===me?'me':''}"><td>${i+1}</td><td><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}</td><td>${p.sq[fam].r||'–'}</td><td>${t.pd?rankBadgeHTML(t.ix,24,false)+' '+RANKS[t.ix].n:`<span class="hint">Unranked ${t.pl}/10</span>`}</td><td>${t.pd?t.rp.toLocaleString():'–'}</td><td>${t.w}-${t.d}-${t.l}</td><td>${p.pl}</td><td><button class="btn" data-vsq="${p.id}">View squad</button></td></tr>`}).join('')||`<tr><td colspan="8" class="hint">${regLoading?'Loading…':'No clubs yet. Press Refresh, or put your club on the board.'}</td></tr>`}</table></div>`}
+    ${rows.slice(0,100).map((p,i)=>{const t=p.rk[fam];return `<tr class="${p.id===me?'me':''}"><td>${i+1}</td><td><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}${p.mg?`<small class="lbmg">${esc(p.mg)}</small>`:''}</td><td>${p.sq[fam].r||'–'}</td><td>${t.pd?rankBadgeHTML(t.ix,24,false)+' '+RANKS[t.ix].n:`<span class="hint">Unranked ${t.pl}/10</span>`}</td><td>${t.pd?t.rp.toLocaleString():'–'}</td><td>${t.w}-${t.d}-${t.l}</td><td>${p.pl}</td><td><button class="btn" data-vsq="${p.id}">View squad</button></td></tr>`}).join('')||`<tr><td colspan="8" class="hint">${regLoading?'Loading…':'No clubs yet. Press Refresh, or put your club on the board.'}</td></tr>`}</table></div>`}
 function regInFromMine(){const raw=regProfile();regIn(raw);const p=regBoard.get(raw.id);return p}
 function viewSquad(id){const p=regBoard.get(id);if(!p)return;const box=$('sqview');const lin=(s,t)=>`<h4>${t} · ${esc(s.f||'')} · team ${s.r||'–'}</h4><div class="sqv">${s.p.map(x=>`<div class="sqc t-${x[3]}"><b>${x[2]}</b><span>${esc(x[0])}</span><small>${esc(x[1])} · ${TIERS[x[3]].name}</small><small>${x[4]?esc(x[4])+' Lv '+x[5]:''}${x[6]?' · player Lv '+x[6]:''}</small></div>`).join('')||'<p class="hint">No line-up shared.</p>'}</div>`;
   box.innerHTML=`<div class="sqbox" role="dialog" aria-label="Squad"><button class="ghost sqx" data-sqx="1">Close</button><h3><span class="kitdot" style="background:${p.k}"></span> ${esc(p.b)} ${esc(p.n)}</h3>
+    <p class="sqmg">Manager: <b>${p.mg?esc(p.mg):'not given'}</b></p>
     <p class="hint">Read-only. Volta ${p.rk.volta.pd?RANKS[p.rk.volta.ix].n+' '+p.rk.volta.rp+' RP':'unranked'} · Classical ${p.rk.classical.pd?RANKS[p.rk.classical.ix].n+' '+p.rk.classical.rp+' RP':'unranked'}</p>${lin(p.sq.volta,'Volta')}${lin(p.sq.classical,'Classical')}</div>`;box.hidden=false}
 document.addEventListener('click',e=>{const t=e.target.closest('#ol-board button,#sqview [data-sqx]');if(!t)return;const d=t.dataset;
   if(d.lbt){lbTab=d.lbt;renderBoards()}else if(d.lbf){lbFam=d.lbf;renderBoards()}else if(d.lbload){regLoadedAt=performance.now();regLoad()}else if(d.vsq)viewSquad(d.vsq);else if(d.sqx)$('sqview').hidden=true});
@@ -206,6 +207,7 @@ const HELP=[
  ['Game modes','<p><b>Volta 5v5</b>: fast football in a cage, 2 minutes, 1× coins.</p><p><b>Classical Standard 9v9</b>: full pitch, 3 minutes, 1.5× coins. <b>Classical Expanded</b>: a bigger pitch, 3½ minutes, 1.875× coins. The green bubble shows the coin multiplier for your mode, pitch and difficulty.</p>'],
  ['Leagues and tournaments','<p>Volta and Classical each have five divisions (Amateur → Legendary). Ten clubs, nine rounds, top three promoted, bottom three relegated. A top-three finish earns a World Club Championship place (64-club knockout). There are also the Sunday Cup, the Grand Tournament, friendlies, challenges and skill games.</p>'],
  ['Online multiplayer','<p><b>Ranked</b>: matched with a real person of similar rating. Ten placement matches give your first rank (Bronze → Silver → Gold → Platinum → Diamond → Champion → Legendary), then wins earn RP and losses cost RP. Volta and Classical are ranked separately. Seasons last a month; rewards come from your best rank.</p><p><b>Friendly</b>: matched with anyone choosing Friendly, no RP. <b>Host / Join</b>: a private match with a 4-letter code.</p><p>Both players control their own team; the host\'s laptop runs the match. You both need the same version of the game.</p>'],
+ ['Your name and saving','<p>Your name (tap it at the top of the menu to change it) is shown next to your club on the leaderboard, in View Squad and to your opponent online, so everyone can see whose team is whose.</p><p><b>Save your progress with email</b> (optional): create an account with an email and password, then log in with the same two on any other device to carry on. It saves by itself after every change. Your save is locked on your device with your password before it is stored, and your email and password never leave the device. There is no password reset, so keep the password safe; the save code under Club works as a backup.</p>'],
  ['Rewards','<p>Coins for every match (more for wins, goals, harder difficulty and bigger pitches). Training Tokens equal to your goal difference in a win. Club Legacy XP from every match, with a reward at every level, plus a Club Token. Challenges, achievements, league seasons, cups and Ranked promotions pay out too.</p>']];
 let helpPg=0;
 function renderHelp(){const h=$('help');h.innerHTML=`<div class="hbox" role="dialog" aria-label="Help"><div class="hnav">${HELP.map(([t],i)=>`<button data-hp="${i}" aria-pressed="${i===helpPg}">${i+1}. ${t}</button>`).join('')}<button data-hp="tut" class="btn">Replay tutorial</button></div>
@@ -244,4 +246,4 @@ $('tut').addEventListener('click',e=>{const t=e.target.closest('button');if(!t)r
 function drawTutHints(){if(!club.tutMatch||state!=='play'||NET.on||stT>1500)return;const k=Math.min(1,stT/30);ctx.globalAlpha=k*.95;ctx.fillStyle='rgba(8,14,22,.8)';rr(W/2-300,H-118,600,44,22);ctx.fill();
   txt(stT<500?'WASD to move · run onto the ball':stT<1000?'Shift to pass · hold Space to shoot, release to strike':'Lost it? Shift or Space near them to steal · C to slide · Q to switch',W/2,H-90,16,C.cream,'center',false);ctx.globalAlpha=1}
 function tutAfterMatch(){if(club.tutMatch){club.tutMatch=0;saveClub();if(club.tut&&!club.tut.done)setTimeout(tutShow,600)}}
-function tutBoot(){if(!club.tut){club.tut={step:0,done:(club.played||0)>0};saveClub()}if(!club.tut.done)setTimeout(tutShow,700)}// players who already have matches behind them aren't shown it
+function tutBoot(){if(!club.tut){club.tut={step:0,done:(club.played||0)>0};saveClub()}if(!club.tut.done&&club.mgr)setTimeout(tutShow,700)}// players who already have matches behind them aren't shown it

@@ -374,6 +374,13 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
 kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radius:6px;background:#0d2230;border:1px solid var(--line);font:700 12px var(--body);text-align:center}
 @media (max-width:640px){.hbox{grid-template-columns:1fr}.hnav{flex-direction:row;flex-wrap:wrap}.olmodes{grid-template-columns:1fr}}
 .helpb{color:var(--sun)!important;border-color:var(--sun)!important}
+.res.mgr{cursor:pointer;color:var(--cream);font-family:var(--body);font-weight:800;font-size:13px;padding:4px 12px}.res.mgr::before{content:"\25CF ";color:var(--mint);font-size:10px}
+.lbmg{display:block;font-size:11px;color:var(--muted);margin-left:18px}.sqmg{margin:0 0 6px;color:var(--cream)}.sqmg b{color:var(--mint)}
+.pbox{max-width:560px;display:flex;flex-direction:column;gap:8px}.pfl{display:flex;flex-direction:column;gap:4px;font-weight:800;font-size:13px;color:var(--muted)}.pfl input{font-size:17px}
+.pfrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.pfgo{font-size:15px;padding:6px 18px}.pacct{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}.pacct h4{margin:0 0 6px;color:var(--sun)}.pacct h4 small{color:var(--muted);font-weight:600}
+.pfin{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pfin input{font-family:var(--body);font-weight:700;font-size:15px;background:var(--ground-2);color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+.pfound{border:1px solid var(--sun);border-radius:12px;padding:10px;margin-bottom:8px;background:#12303e}.pfound p{margin:4px 0}
+@media (max-width:520px){.pfin{grid-template-columns:1fr}}
 .tutbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:55;max-width:520px;width:calc(100% - 32px)}.tutbar[hidden]{display:none}
 .tbox{background:#0f2a37;border:2px solid var(--sun);border-radius:16px;padding:14px;color:var(--cream);box-shadow:0 10px 30px rgba(0,0,0,.5)}.tbox h3{margin:2px 0 4px;font-family:var(--display);font-weight:400;color:var(--sun)}.tbox small{color:var(--muted)}.tfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
 .tutmark{outline:3px solid var(--sun)!important;outline-offset:3px;box-shadow:0 0 0 6px rgba(255,209,102,.25)!important;border-radius:10px;animation:tm 1s ease-in-out infinite alternate}@keyframes tm{to{outline-color:rgba(255,209,102,.4)}}
@@ -385,7 +392,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
   <div class="menu" id="menu"><div class="menu-inner">
     <h1>Sunday Kickabout</h1>
     <div class="clubbar">
-      <label for="club-name" style="display:flex;align-items:center;gap:6px">CLUB<input type="text" id="club-name" maxlength="14"></label>
+      <button class="res mgr" id="mgrpill" title="Your profile"></button><label for="club-name" style="display:flex;align-items:center;gap:6px">CLUB<input type="text" id="club-name" maxlength="14"></label>
       <div class="sw" id="club-kit" aria-label="Kit colour"></div>
       <span class="coins" id="coins"></span><span class="res tt" id="tt" title="Training Tokens"></span><span class="res cp" id="cp" title="Club Points"></span><button class="res leg" id="legpill" title="Club Legacy"></button><button class="res ctkp" id="ctkp" title="Club Tokens (Club Development)"></button><button class="res helpb" id="helpbtn3" title="How everything works">? Help</button>
     </div>
@@ -532,7 +539,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
   <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span><span><button class="mute helpb" id="helpbtn" title="How everything works">HELP</button></span>
 </div>
 
-<div id="sqview" class="ovl" hidden></div><div id="rkreveal" class="ovl" hidden></div><div id="help" class="ovl" hidden></div><div id="tut" class="tutbar" hidden></div>
+<div id="prof" class="ovl" hidden></div><div id="sqview" class="ovl" hidden></div><div id="rkreveal" class="ovl" hidden></div><div id="help" class="ovl" hidden></div><div id="tut" class="tutbar" hidden></div>
 <script>/*@GAME*/</script>
 
 </body></html>

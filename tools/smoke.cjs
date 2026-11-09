@@ -5,6 +5,9 @@ const {chromium}=require('playwright');const path=require('path');
   const b=await chromium.launch();const pg=await b.newPage({viewport:{width:1200,height:900}});
   const errs=[];pg.on('pageerror',e=>errs.push(String(e)));pg.on('console',m=>{if(m.type()==='error'&&!/fonts|ERR_|net::|Failed to load/.test(m.text()))errs.push(m.text())});
   await pg.goto('file://'+path.resolve('sunday-kickabout.html'));await pg.waitForTimeout(800);
+  // a new player is asked for their name first
+  await pg.screenshot({path:out+'/welcome.png'});await pg.fill('#pf-name','Smoke Test');await pg.click('[data-pf="go"]');await pg.waitForTimeout(500);
+  await pg.evaluate(()=>{const t=document.getElementById('tut');if(t)t.hidden=true});
   await pg.screenshot({path:out+'/menu.png'});
   await pg.click('#go');await pg.waitForTimeout(900);await pg.screenshot({path:out+'/intro.png'});await pg.keyboard.press('Space');await pg.waitForTimeout(600);
   await pg.keyboard.down('KeyD');await pg.waitForTimeout(1500);await pg.keyboard.down('Space');await pg.waitForTimeout(500);await pg.keyboard.up('Space');

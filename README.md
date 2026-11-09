@@ -11,7 +11,14 @@ game file. There is one match, run on the host's laptop: it decides possession, 
 and the result. The joining laptop sends every press numbered and re-sent until the host confirms it, and the host runs
 it through exactly the same code as its own player's presses (a pass or shot pressed as the ball is arriving is held
 for up to 0.3 s and done the moment it arrives). The joining laptop moves its own footballer straight away while he's
-simply running, and the host follows that; tackles, knocks, skills and the ball are the host's. A match only starts once
+simply running (and starts its own lunges and slides the instant they're pressed), and the host follows that; whether a
+tackle wins the ball, knocks, skills and the ball are the host's. Everything else on the joining laptop is drawn from the
+host's time-stamped updates a few tens of milliseconds behind, gliding between two real updates rather than guessing
+ahead, so late or bunched-up packets don't make anything twitch; a loose ball near your footballer is eased into the
+present so passes reach your feet on time, and goals and the full-time whistle land when the ball does on that screen.
+Online matches add their own punch on both laptops (camera punches, speed lines, slam-in calls like WHAT A SAVE! and
+EQUALISER!, stadium strobes and confetti) and a VS card with both clubs and managers before kick-off. These only change
+what's drawn; online, ON FIRE is for show for both players and gives no boost. A match only starts once
 the joining laptop has loaded the same match, its presses are reaching the host and it is receiving the host's updates.
 Connections: a direct WebRTC link (PeerJS's public signalling, with Google STUN and PeerJS's public TURN relay for strict
 routers) and public MQTT relays over secure websockets, all tried at once; the freshest route carries the match. If the
@@ -47,6 +54,17 @@ months: rewards for your best rank, then points move part of the way back to the
 as a loss. Friendly pays normal online coins (a quarter after 8 a day). Leaderboard tab (next to Online): every club is on it automatically and kept up to date; Global clubs and Ranked
 (ordered by results only), with a read-only View Squad.
 
+**Your name and saving with email:** the first time the game opens it asks for your name (the manager), which is shown
+next to your club on the leaderboard, in View Squad, in matchmaking and on the VS card online. Tap your name at the top
+to change it. Logging in with an email and password is optional: progress then saves automatically and loads on any
+other device with the same email and password (it asks first if that device has progress of its own, and won't
+overwrite a newer copy from another device without asking). There's no server of our own, so the save is locked on your
+device (PBKDF2 + AES-GCM, from your email and password) and the locked copy is kept as a retained message on the same
+public relays; your email and password never leave the device and the relays only see scrambled data. No email is sent,
+so there's no address check and no password reset, and a public relay could clear the copy, so the device's own save
+and the save code under Club stay as backups. A proper account system (verified email, password reset) needs a backend
+such as Supabase or Firebase Auth.
+
 **What needs a server:** matchmaking and the leaderboards run over the same free public relays as online play, with no
 server of our own. Each club's rating lives in its own save, and leaderboard profiles are retained messages on public
 relays: the game checks every profile it reads and nobody can change someone else's club, but a determined player could
@@ -65,6 +83,9 @@ The game is split up so it's easier to work on:
 - `src/js/1b-career.js` – the generated player database, upgrades, evolutions, leagues, World Club Championship, challenges, achievements, Club Legacy, exchanges, cosmetics and their screens
 - `src/js/2-engine.js` – pitch sizes, camera, stadium, players, physics, AI
 - `src/js/2b-penalties.js` – the penalty shoot-out
+- `src/js/2c-online-plus.js` – Ranked/Friendly matchmaking, ranks, leaderboards, help and tutorial
+- `src/js/2d-online-juice.js` – online-only impact effects (both laptops)
+- `src/js/2e-account.js` – your name and the optional email login
 - `src/js/3-draw-net.js` – HUD, screens, online play, main loop
 - `vendor/` – PeerJS 1.5.4 and MQTT.js 5.10.1 (unchanged npm builds, used for online play)
 

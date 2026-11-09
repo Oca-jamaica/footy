@@ -187,7 +187,7 @@ function applyNames(){for(const p of PLAYERS){const ins=typeof inspOf==='functio
   if(NAMES[p.id]){p.name=NAMES[p.id];p.short=NAMES[p.id].split(' ').pop().toUpperCase().slice(0,10)}
   else if(realOn()&&ins[0]){p.name=ins[0];p.short=shortOf(ins[0],ins[1])}
   else{p.name=p.name0;p.short=p.short0}}}
-function cloudPush(){if(!cloud)return;clearTimeout(cloudTm);cloudTm=setTimeout(async()=>{if(cloudBusy){cloudPush();return}cloudBusy=true;
+function cloudPush(){try{acctPush()}catch(e){}if(!cloud)return;clearTimeout(cloudTm);cloudTm=setTimeout(async()=>{if(cloudBusy){cloudPush();return}cloudBusy=true;
   try{await cloud.set(snapshotSave())}catch(e){if(e&&e.code==='unavailable')setTimeout(cloudPush,4000)}cloudBusy=false},1500)}
 async function cloudInit(){try{
   const cl=window.claude;if(!cl||!cl.use)return;const [db,user]=await Promise.all([cl.use('db'),cl.use('user')]);if(!db||!user)return;
@@ -396,7 +396,7 @@ function renderMenu(){
   else{$('diff-note').textContent=`${LV().name}: ${LV().note} Coins ×${+(DIFFS[diffKey].coin*LV().coin).toFixed(2)}.`;const c=club.cup,tro=(club.trophies||{})[c.tier]||0;
    $('cup').innerHTML=`<div class="cup-head"><b>${CUPS[c.tier]}</b><span>${tro?'\u{1F3C6} ×'+tro+' won':'Win three in a row to lift the trophy'}</span></div><div class="rounds">`+ROUNDS.map((r,i)=>{const o=OPPS[c.opps[i]],st=i<c.res.length?(c.res[i]?'won':'lost'):i===c.round&&c.alive?'now':'';
      return `<div class="rnd ${st}" style="--k:${o[1]}"><i>${r.toUpperCase()}</i><em>${esc(o[0])}</em>${st==='won'?'<b>WON</b>':st==='lost'?'<b>KNOCKED OUT</b>':st==='now'?'<b style="color:var(--sun)">NEXT</b>':''}</div>`}).join('')+`</div>`}
-  $('club-name').value=club.name;{const el=$('coins');el.textContent=club.coins.toLocaleString();if(shownCoins!=null&&club.coins!==shownCoins){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}shownCoins=club.coins}
+  $('club-name').value=club.name;try{acctPill()}catch(e){}{const el=$('coins');el.textContent=club.coins.toLocaleString();if(shownCoins!=null&&club.coins!==shownCoins){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}shownCoins=club.coins}
   res();$('tt').textContent=club.tt;$('cp').textContent=club.cp.toLocaleString();$('legpill').textContent='Legacy Lv '+((club.leg||{}).lvl||0);ctkSync();$('ctkp').textContent=ctk();
   $('club-kit').innerHTML=[...KITS,...(cosOwned('kit_gold')?['#d4af37']:[])].map(c=>`<button type="button" style="background:${c}" aria-label="Kit colour" aria-pressed="${club.kit===c}" data-c="${c}"></button>`).join('');
   if(club.welcome){resultEl.hidden=false;resultEl.textContent=club.welcome;delete club.welcome;saveClub()}
