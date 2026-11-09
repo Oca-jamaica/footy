@@ -1220,32 +1220,32 @@ function carrierAI(p,dt){
       for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir0,run=m.vx*dir0,d=dist(p,m);if(fwd<30||run<1.2||d>520*PSC||m.x*dir0<ll-50)continue;
         if(isOffside(m,p))continue;const lead={x:m.x+dir0*90,y:m.y+m.vy*20};if(laneBlocked(p,lead,22,p.team))continue;const sc=run+fwd/150-Math.abs(m.y-MY)/300;if(sc>tb){tb=sc;tm=m}}
       if(tm&&Math.hypot(tm.x-gx,tm.y-MY)<dG+60){pass(p,tm,true);if(p.team===1)aiStat.through++;return}}
-    if(dG<(DF.range+40)*(CL()?cStyle(p.team).shoot:1)*(XF>1?(CL()?1.3*PSC:1.2):1)){const open=!laneBlocked(p,{x:gx,y:MY},18,p.team);
+    if(dG<(DF.range+40)*1.15*(CL()?cStyle(p.team).shoot:1)*(XF>1?(CL()?1.3*PSC:1.2):1)){const open=!laneBlocked(p,{x:gx,y:MY},18,p.team);
       // shooting lane blocked: a smarter side squares it to a team-mate with a clear sight of goal
-      if(!open&&Math.random()<.15+.6*IQ){let sm=null,sd=1e9;for(const m of outfield(p.team)){if(m===p)continue;const md=Math.hypot(m.x-gx,m.y-MY);if(md<dG+40&&md<sd&&openness(m)>40&&!laneBlocked(m,{x:gx,y:MY},18,p.team)&&!laneBlocked(p,m,20,p.team)){sd=md;sm=m}}if(sm){pass(p,sm);if(p.team===1)aiStat.square++;return}}const ch=(open?.7:.26)*DF.shoot*(dG<230?1.9:1)*(ndd<30?.7:1)*LV().ai*XF;if(Math.random()<ch){aiShoot(p,dG);return}}
+      if(!open&&Math.random()<.15+.6*IQ){let sm=null,sd=1e9;for(const m of outfield(p.team)){if(m===p)continue;const md=Math.hypot(m.x-gx,m.y-MY);if(md<dG+40&&md<sd&&openness(m)>40&&!laneBlocked(m,{x:gx,y:MY},18,p.team)&&!laneBlocked(p,m,20,p.team)){sd=md;sm=m}}if(sm){pass(p,sm);if(p.team===1)aiStat.square++;return}}const ch=(open?.7:.26)*DF.shoot*(dG<230?1.9:1)*(ndd<30?.7:1)*LV().ai*XF*1.3;if(Math.random()<ch){aiShoot(p,dG);return}}
     if(Math.abs(p.x-gx)<120){const m=bestMate(p);if(m&&Math.random()<.5){pass(p,m);return}aiShoot(p,dG);return}// never dribble into the byline
-    if(CL()&&Math.random()<.45+.55*cIQ(p.team)){const sty=cStyle(p.team),IQc=cIQ(p.team),ev=cPassEval(p,IQc,sty,true);
+    if(CL()&&Math.random()<.3+.35*cIQ(p.team)){const sty=cStyle(p.team),IQc=cIQ(p.team),ev=cPassEval(p,IQc,sty,true);
       let ahead=1e9;for(const q of defs)if((q.x-p.x)*dir0>-10&&Math.abs(q.y-p.y)<120)ahead=Math.min(ahead,dist(q,p));
-      const keep=Math.min(ahead,220)/220*1.3-(ndd<50?.6:ndd<90?.25:0)+(dG<DF.range+80?.3:0);
+      const keep=Math.min(ahead,220)/220*1.6-(ndd<50?.45:ndd<90?.15:0)+(dG<DF.range+160?.55:0)+.35;// attacking sides back themselves to beat a man
       if(ev&&ev.v>keep+lerp(.35,.05,IQc)/sty.pass){const m=ev.m,thr=m.vx*dir0>1.2&&m.x*dir0>lastLine(1-p.team,dir0)-60&&!isOffside(m,p);pass(p,m,thr);if(thr&&p.team===1)aiStat.through++;return}}
-    if(ndd<44*(XF>1?1.4:1)){const m=bestMate(p);if(m&&Math.random()<.5*DF.press*XF){pass(p,m);return}
+    if(nd&&ndd<115*(XF>1?1.25:1)&&p.skillCd<=0&&!p.anim&&Math.random()<Math.min(1,(.7+DF.press*.3)*XF)){doSkill(p);if(p.skillCd>0){p.skillCd*=XF>1?.5:.75;return}}
+    if(ndd<44*(XF>1?1.4:1)){const m=bestMate(p);if(m&&Math.random()<.28*DF.press*XF){pass(p,m);return}
 }
     // on the big pitch the ball does the work: find a team-mate further up who's free and play it forward
     if(PITCH!=='volta'&&dG>DF.range){const dir=Math.sign(gx-p.x);let fm=null,fs=-1e9;
       for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir,d=dist(p,m);if(fwd<50||d>560*PSC)continue;const o=openness(m);if(o<38||laneBlocked(p,m,24,p.team))continue;
         const sc=fwd/140+o/70-d/700+(Math.abs(m.y-MY)<(FY1-FY0)*.25?.3:0);if(sc>fs){fs=sc;fm=m}}
-      if(fm&&Math.random()<(ndd<110?.65:.32)*(.8+DF.press*.3)*tacOf(p.team).pass*XF){pass(p,fm);return}
+      if(fm&&Math.random()<(ndd<110?.38:.14)*(.8+DF.press*.3)*tacOf(p.team).pass*XF){pass(p,fm);return}
       // a long ball over the top or across to a forward who's got away from his man (more of these on the Expanded pitch)
       if(!fm||Math.random()<.4){let lm=null,ls=-1e9;for(const m of outfield(p.team)){if(m===p)continue;const fwd=(m.x-p.x)*dir,d=dist(p,m);if(fwd<200||d>760*PSC||d<220)continue;const o=openness(m);if(o<45)continue;const sc=fwd/200+o/60;if(sc>ls){ls=sc;lm=m}}
-        if(lm&&Math.random()<(.18+(PSC-1)*.5)*tacOf(p.team).pass*cStyle(p.team).long){const T=clamp(dist(p,lm)/7.5,38,78);lobTo(p,lm,lm.x+dir*45+lm.vx*T*.5,lm.y+lm.vy*T*.5,T,false);B.pass.chip=true;pop('LONG BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,15,50);return}}
+        if(lm&&Math.random()<(.1+(PSC-1)*.35)*tacOf(p.team).pass*cStyle(p.team).long){const T=clamp(dist(p,lm)/7.5,38,78);lobTo(p,lm,lm.x+dir*45+lm.vx*T*.5,lm.y+lm.vy*T*.5,T,false);B.pass.chip=true;pop('LONG BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,15,50);return}}
       // switch it to the far side when the near side is crowded
-      if(ndd<120&&Math.random()<.25){const far=outfield(p.team).filter(m=>m!==p&&Math.abs(m.y-p.y)>(FY1-FY0)*.4&&openness(m)>45&&!laneBlocked(p,m,24,p.team));if(far.length){pass(p,pick(far));return}}}
+      if(ndd<120&&Math.random()<.12){const far=outfield(p.team).filter(m=>m!==p&&Math.abs(m.y-p.y)>(FY1-FY0)*.4&&openness(m)>45&&!laneBlocked(p,m,24,p.team));if(far.length){pass(p,pick(far));return}}}
     // their own skill move when someone closes them down
     if(nd&&ndd<95*(XF>1?1.35:1)&&p.skillCd<=0&&!p.anim&&Math.random()<(.55+DF.press*.3)*XF){doSkill(p);if(p.skillCd>0){if(XF>1)p.skillCd*=.5;return}}
-    if(nd&&ndd<80&&(p.blungeCd||0)<=0&&!p.anim&&Math.random()<.45){const side=Math.sin(angDiff(Math.atan2(nd.y-p.y,nd.x-p.x),p.dir))>0?-1:1,a=p.dir+side*.75;push(p,a,7.4,13,{a:p.dir,spd:6,T:10});p.blungeCd=BLUNGE_CD*1.4;S.swoosh();grass(p.x,p.y,5);return}
+    if(nd&&ndd<100&&(p.blungeCd||0)<=0&&!p.anim&&Math.random()<.6){const side=Math.sin(angDiff(Math.atan2(nd.y-p.y,nd.x-p.x),p.dir))>0?-1:1,a=p.dir+side*.75;push(p,a,7.4,13,{a:p.dir,spd:6,T:10});p.blungeCd=BLUNGE_CD*1.4;S.swoosh();grass(p.x,p.y,5);return}
     if(p.spCd<=0&&aiSpecial(p,dG,ndd))return;
     if(Math.abs(p.y-MY)>(FY1-FY0)*.15&&Math.abs(p.x-gx)<460&&Math.random()<.4&&outfield(p.team).some(m=>m!==p&&Math.hypot(gx-m.x,MY-m.y)<300)){p.dir=Math.atan2(MY-p.y,gx-p.x);cross(p);return}
-    if(Math.random()<.05){const m=bestMate(p);if(m&&m.x<p.x-50){pass(p,m);return}}
   }
   const dir=Math.sign(gx-p.x)||1;
   // head for the edge of the box (not the byline), drifting central
