@@ -7,13 +7,16 @@ A football game in a single HTML file, with two modes:
   Standard and Expanded (about 1.37× bigger each way, for long balls and build-up play).
 
 Online works in all three (Volta, Classical Standard, Classical Expanded). Both laptops need the same version of the
-game file. The host picks the match; the match only starts once the joining laptop has loaded it, its controls are
-reaching the host and it is receiving the match, then a 3-2-1 countdown. Each player controls their own team: the
-joining player's footballer runs on their own laptop, and whenever their team wins the ball the host hands that
-footballer to them (the host's AI never plays the ball for them). Messages go over every working route at once (direct
-WebRTC link, Claude room, public relays); the freshest route carries the match and a stalled one is dropped within a
-fraction of a second. If the connection really drops, both screens pause with a clear message and restart together
-after a short countdown.
+game file. There is one match, run on the host's laptop: it decides possession, passes, shots, tackles, goals, the clock
+and the result. The joining laptop sends every press numbered and re-sent until the host confirms it, and the host runs
+it through exactly the same code as its own player's presses (a pass or shot pressed as the ball is arriving is held
+for up to 0.3 s and done the moment it arrives). The joining laptop moves its own footballer straight away while he's
+simply running, and the host follows that; tackles, knocks, skills and the ball are the host's. A match only starts once
+the joining laptop has loaded the same match, its presses are reaching the host and it is receiving the host's updates.
+Connections: a direct WebRTC link (PeerJS's public signalling, with Google STUN and PeerJS's public TURN relay for strict
+routers) and public MQTT relays over secure websockets, all tried at once; the freshest route carries the match. If the
+connection really drops, both screens pause and restart together. After the final whistle both stay in the room for a
+rematch. Press N during an online match for connection details.
 
 Each mode has its own five-division league (Amateur, Division 3, 2, 1, Legendary: 10 clubs, 9 rounds (everyone plays everyone once), top 3 up, bottom 3 down)
 and its own World Club Championship (64-club knockout, earned with a top-3 finish). Coins, players, upgrades and cosmetics are shared.

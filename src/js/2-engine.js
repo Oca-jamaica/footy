@@ -478,7 +478,7 @@ function openness(p){let m=999;for(const q of players)if(q.team!==p.team)m=Math.
 
 /* ---------- input ---------- */
 const keys={};
-const K=c=>!!keys[c];
+const K=c=>!!keys[c];const MOVEK=new Set(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight']);
 const inX=()=>RIN?RIN.x:(K('KeyD')?1:0)-(K('ArrowLeft')||K('KeyA')?1:0),inY=()=>RIN?RIN.y:(K('KeyS')?1:0)-(K('KeyW')?1:0);
 goBtn.onclick=startMatch;
 let paused=false;
@@ -498,6 +498,7 @@ addEventListener('keydown',e=>{
   keys[c]=true;if(e.repeat)return;
   if(c==='KeyM'){setMute(!muted);return}
   if(c==='KeyG'){fixScreen();return}
+  if(c==='KeyN'&&NET.on){netDiag=!netDiag;return}// online connection details
   if(NET.guest){guestKey(c);return}
   if(state==='play'){
     const p=ctrl;if(!p)return;playKey(p,c);
@@ -508,7 +509,7 @@ addEventListener('keydown',e=>{
   }else if(state==='replay'){if(c==='Space')kickoff(1)}
   else if(state==='concede'){if(c==='Space'&&stT>60)kickoff(0)}
   else if(state==='pens'&&pen)penKey(c);
-  else if(state==='fulltime'){if(c==='Space'&&stT>60){netLeave();showMenu()}}
+  else if(state==='fulltime'){if(c==='Space'&&stT>60){if(NET.on)netEndMatch();else{netLeave();showMenu()}}}
 });
 // one button press for whoever is in control. The host runs this for the guest's player too.
 function playKey(p,c){
@@ -524,7 +525,7 @@ function playKey(p,c){
     if(c==='KeyX'||c==='ArrowDown')doSpecial(p);
 }
 function playRelease(p){charging=false;if(state==='play'&&p&&canStrike(p)){if(p.aimY!=null)p.dir=Math.atan2(p.aimY-B.y,goalX(p.team)-B.x);p.quickShot=charge<.4;const w=sweetW(p);p.perfectShot=Math.abs(charge-SWEET)<=w/2;p.overShot=Math.max(0,charge-1);shoot(p,'normal',Math.max(Math.min(charge,1),.5),p.aimY);p.quickShot=false;p.perfectShot=false;p.overShot=0}if(p)p.aimY=null}
-addEventListener('keyup',e=>{keys[e.code]=false;if(NET.guest){if(e.code==='Space')guestKey('SpaceUp');return}
+addEventListener('keyup',e=>{keys[e.code]=false;if(NET.guest){if(e.code==='Space')guestKey('SpaceUp');else if(MOVEK.has(e.code))netGuestPush(true);return}
   if(state==='pens'&&pen){penKeyUp(e.code);return}
   if(e.code==='Space'&&charging)playRelease(ctrl)});// a quick tap still gets a decent strike
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;charging=false});
@@ -610,7 +611,7 @@ function kick(p,a,spd,vz){B.claimBy=null;B.kickN=(B.kickN||0)+1;if(NET.host&&p.t
   B.owner=null;B.vx=Math.cos(a)*spd;B.vy=Math.sin(a)*spd;B.vz=vz;B.z=Math.max(B.z,1);B.lockBy=p;B.lockT=14;B.curl=0;B.knuckle=0;B.rocket=false;B.shot=null;B.pass=null;
   B.x=p.x+Math.cos(a)*14;B.y=p.y+Math.sin(a)*14;
 }
-function pass(p,to,through=false,assist=1){
+function pass(p,to,through=false,assist=1){if(NET.on)netKickLog(p,through?'through':'pass',to?players.indexOf(to):-1,0);
   const ps=p.st.pass??.65,att=p.team===0?1:-1;
   const lead=through?28:10+dist(p,to)/35;
   let tx=to.x+to.vx*lead+(through?att*90:0),ty=to.y+to.vy*lead;
@@ -636,7 +637,7 @@ function passTarget(p){
 function humanPass(p){
   const m=passTarget(p);
   if(m)pass(p,m,false,.96);
-  else{const a=p.dir+rnd(-1,1)*.04*(1.2-p.st.pass);kick(p,a,9.5,.4);B.pass={from:p,to:null,through:false};S.pass();
+  else{if(NET.on)netKickLog(p,'pass',-1,0);const a=p.dir+rnd(-1,1)*.04*(1.2-p.st.pass);kick(p,a,9.5,.4);B.pass={from:p,to:null,through:false};S.pass();
     if(p.team===0)passFx={x0:p.x,y0:p.y,x1:p.x+Math.cos(a)*220,y1:p.y+Math.sin(a)*220,t0:t}}
 }
 function bestMate(p){
@@ -652,7 +653,7 @@ function curlCross(x,y,a,spd,curl,vz,gx){let vx=Math.cos(a)*spd,vy=Math.sin(a)*s
 function solveCurl(x,y,a0,spd,curl,vz,gx,ty){let lo=a0-.6,hi=a0+.6;const f=a=>{const c=curlCross(x,y,a,spd,curl,vz,gx);return c==null?NaN:c-ty};
   let flo=f(lo),fhi=f(hi);if(!(flo*fhi<0))return a0;
   for(let i=0;i<22;i++){const m=(lo+hi)/2,fm=f(m);if(isNaN(fm))return a0;if(fm*flo<=0){hi=m;fhi=fm}else{lo=m;flo=fm}}return (lo+hi)/2}
-function shoot(p,type,ch,aim=null){
+function shoot(p,type,ch,aim=null){if(NET.on)netKickLog(p,'shot',type,ch);
   const gx=goalX(p.team),att=p.team===0?1:-1,fin=p.st.fin,pow=p.st.shot,fz=(fire>0&&p.team===0)?1.1:1;
   let ty=aim;
   // no aim assist: the ball goes exactly where you're facing
@@ -776,7 +777,7 @@ function lobTo(p,m,tx,ty,T,through){
   if(p.team===0&&!m.keeper)ctrl=m}
 // A lofted cross: to the best-placed teammate (ideally one in the box), or into space if nobody's there.
 // Their keeper sometimes comes and claims it; at the far end a defender may head it clear.
-function cross(p){const att=p.team===0?1:-1,gx=goalX(p.team);let best=null,bs=-1e9;
+function cross(p){if(NET.on)netKickLog(p,'cross',-1,0);const att=p.team===0?1:-1,gx=goalX(p.team);let best=null,bs=-1e9;
   for(const m of outfield(p.team)){if(m===p)continue;const d=dist(p,m);if(d<90||d>720*PSC)continue;const ad=Math.abs(angDiff(Math.atan2(m.y-p.y,m.x-p.x),p.dir));if(ad>1.25)continue;
     const sc=-ad*1.1-Math.hypot(gx-m.x,MY-m.y)/260+(m.role==='att'?.3:0)+((m.x-p.x)*att>0?.2:0);if(sc>bs){bs=sc;best=m}}
   if(!best){kick(p,p.dir,8.5,4.2);B.pass={from:p,to:null,through:false};S.pass();return}
@@ -1542,7 +1543,7 @@ function updateConcede(dt){
 }
 let koT=-999;
 const koGrace=pl=>t-koT<80&&B.owner&&B.owner.team!==pl.team;
-function kickoff(team){koT=t;
+function kickoff(team){koT=t;if(NET.host)netEpoch++;
   players.forEach(p=>{
     if(p.keeper){p.x=p.team?FX1-16:FX0+16;p.y=MY}
     else{const fx=Math.min(.44,p.slot.x*.8+.04);p.x=p.team===0?FX0+fx*(FX1-FX0):FX1-fx*(FX1-FX0);p.y=FY0+(FY1-FY0)*p.slot.y}
@@ -1634,7 +1635,8 @@ function update(dt){
   // kick-off only once both laptops are really ready: the joining laptop has loaded the match, its controls are reaching
   // the host, and it is receiving the host's snapshots. No timed fallback: a match never starts with someone missing.
   if(NET.host&&netPrep){const now=performance.now(),g=netPeer('guest');t+=dt;updateCam(dt);
-    const P=g&&g.presence,fresh=!!P&&now-netGuestAt<800,loaded=!!P&&+P.rdy===netMatch,ctl=!!RME&&RME.m===netMatch&&now-RME.at<800&&RME.an>=netPrep.n0;
+    const P=g&&g.presence,fresh=!!P&&now-netGuestAt<800,same=!P||!Array.isArray(P.rdi)||(P.rdi[0]===PITCH&&+P.rdi[1]===players.length),loaded=!!P&&+P.rdy===netMatch&&same,ctl=!!RME&&RME.m===netMatch&&now-RME.at<800&&RME.an>=netPrep.n0;
+    netPrep.bad=!same;
     netPrep.ck=[fresh,loaded,fresh&&loaded&&ctl];
     if(!netPrep.go&&fresh&&loaded&&ctl)netPrep.go=now;
     if(netPrep.go&&now-netGuestAt>1500)netPrep.go=0;// they dropped out during the countdown: wait for them again
@@ -1650,7 +1652,7 @@ function update(dt){
     if(NET.host)netGuestPre(dt);
     for(const p of players)tickPlayer(p,dt);
     if(ctrl){if(ctrl.stun>0){ctrl.stun-=dt;ctrl.vx*=.85;ctrl.vy*=.85}else humanUpdate(ctrl,dt)}
-    if(NET.host&&ctrl2&&!netV2){if(ctrl2.stun>0){ctrl2.stun-=dt;ctrl2.vx*=.85;ctrl2.vy*=.85}else{const q=ctrl2;withP2(()=>humanUpdate(q,dt))}}
+    if(NET.host&&ctrl2&&!netV2){if(ctrl2.stun>0){ctrl2.stun-=dt;ctrl2.vx*=.85;ctrl2.vy*=.85}else{const q=ctrl2;withP2(()=>humanUpdate(q,dt))}netPendTick();netGuestFollow(dt)}
     {const _t=performance.now();teamAI(0,dt);teamAI(1,dt);keeperUpdate(keeperOf(0),dt);keeperUpdate(keeperOf(1),dt);PS('ai',_t)}
     if(ctrl)autoSwitch(dt);if(NET.host&&ctrl2&&!netV2)autoSwitchT(dt,1);
     for(const p of players){p.x+=p.vx*dt;p.y+=p.vy*dt;
