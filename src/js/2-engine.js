@@ -463,7 +463,9 @@ muteBtn.onclick=()=>{initAudio();setMute(!muted)};
 function pop(text,x,y,col=C.cream,size=20,z=52){
   // if another fresh pop is already right here, stack this one above it so both stay readable
   for(let k=0;k<4&&pops.some(q=>q.life>38&&Math.abs(q.x-x)<85&&Math.abs(q.y-(y+30))<45&&Math.abs(q.z-z)<15);k++)z+=17;
-  pops.push({text,x,y:y+30,z,col,size,life:70})}
+  // small grey asides ('read it', 'whiff'...) stay smaller and go sooner, so the pitch isn't cluttered with them
+  const minor=col===C.muted;if(minor&&pops.some(q=>q.col===C.muted&&q.life>20&&Math.abs(q.x-x)<70&&Math.abs(q.y-(y+30))<50))return;// one aside at a time in one place
+  pops.push({text,x,y:y+30,z,col,size:minor?Math.round(size*.85):size,life:minor?46:70})}
 function burst(x,y,n,cols,spd=6,grav=.12,size=[4,8]){const q=P(x,y,14);burstS(q.x,q.y,n,cols,spd,grav,size)}
 function burstS(x,y,n,cols,spd=6,grav=.12,size=[4,8]){if(QLV)n=Math.ceil(n*(1-QLV*.3));for(let i=0;i<n;i++){const a=rnd(0,6.283),s=rnd(1,spd);parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-rnd(0,3),g:grav,life:rnd(60,120),max:120,c:pick(cols),w:rnd(size[0],size[1]),h:rnd(3,6),r:rnd(0,6),vr:rnd(-.3,.3)})}}
 function grass(wx,wy,n){const q=P(wx,wy);const x=q.x,y=q.y;for(let i=0;i<n;i++)parts.push({x,y,vx:rnd(-2,2),vy:rnd(-2,1),g:.08,life:rnd(15,30),max:30,c:'#3f8a4a',w:2,h:2,r:0,vr:0})}

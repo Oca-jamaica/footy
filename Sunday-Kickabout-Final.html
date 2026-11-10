@@ -84,7 +84,8 @@ canvas:focus-visible{box-shadow:inset 0 0 0 3px var(--sun)}
 .bulk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
 .bulk label{display:grid;gap:2px;font-size:12px;font-weight:800;color:var(--muted)}
 .bulk input,#bulk-paste{font:inherit;font-size:14px;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--ground-2);color:var(--cream);width:100%;box-sizing:border-box}
-.clubbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.clubbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+@media (min-width:900px){.clubbar #club-name{width:150px}}/* keeps the club bar (Help included) on one line on a laptop */
 .coins{display:inline-block;font-family:var(--display);font-size:20px;color:var(--sun);font-variant-numeric:tabular-nums}
 .coins::before{content:"";display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--sun);box-shadow:inset 0 0 0 3px #c99a2e;margin-right:6px;vertical-align:-1px}
 .sec-title{margin:6px 0 0;font-family:var(--display);font-weight:400;font-size:20px;color:var(--cream);align-self:flex-start}
@@ -243,6 +244,14 @@ input[type=range]{accent-color:var(--sun);width:100%;min-width:0}
 .ghost{font-family:var(--body);font-weight:800;font-size:14px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 16px;cursor:pointer}
 .keys{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;max-width:1100px;font-size:13px;color:var(--muted)}
 .keys span{display:inline-flex;align-items:center;gap:5px}
+/* the controls list stays tucked away behind "Controls" (open for a new player's first matches); the bar under the game
+   fades back while you play and comes back when you point at it */
+.keylist{display:none;flex-basis:100%;flex-wrap:wrap;gap:8px 18px;justify-content:center;padding-top:4px;border-top:1px solid var(--line)}
+.keys.open .keylist{display:flex}
+.keys{transition:opacity .3s}body.playing .keys{opacity:.35}body.playing .keys:hover,body.playing .keys:focus-within{opacity:1}
+/* switching tabs: the new section eases in */
+.menu section:not([hidden]){animation:rise .22s ease-out}
+@media (prefers-reduced-motion:reduce){.menu section:not([hidden]),.menu:not([hidden]) .menu-inner{animation:none}}
 kbd{font-family:var(--body);font-weight:800;font-size:12px;background:var(--ground-2);color:var(--cream);border:1px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:1px 6px}
 .mute{font-family:var(--body);font-weight:700;font-size:13px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 12px;cursor:pointer}
 @media (max-width:560px){.ed-grid{grid-template-columns:1fr}}
@@ -546,6 +555,11 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
   </div></div>
 </div>
 <div class="keys">
+  <span><button class="mute" id="ctrlsbtn" aria-expanded="false" aria-controls="keylist">Controls</button></span>
+  <span><button class="mute" id="mute">Sound on (M)</button></span>
+  <span><button class="mute" id="fixscr" title="Use this if the screen ever goes black or freezes">Fix screen (G)</button></span>
+  <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span><span><button class="mute helpb" id="helpbtn" title="How everything works">HELP</button></span>
+  <div class="keylist" id="keylist">
   <span><kbd>WASD</kbd> move</span>
   <span><kbd>Space</kbd> hold to shoot, <kbd>W</kbd>/<kbd>S</kbd> to aim</span>
   <span><kbd>Shift</kbd> pass · <b>no ball? Space or Shift = steal</b></span>
@@ -557,9 +571,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
   <span><kbd>Q</kbd> switch (automatic now)</span>
   <span><kbd>Esc</kbd> pause / leave</span>
   <span><kbd>1</kbd>–<kbd>6</kbd> celebration</span>
-  <span><button class="mute" id="mute">Sound on (M)</button></span>
-  <span><button class="mute" id="fixscr" title="Use this if the screen ever goes black or freezes">Fix screen (G)</button></span>
-  <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span><span><button class="mute helpb" id="helpbtn" title="How everything works">HELP</button></span>
+  </div>
 </div>
 
 <div id="prof" class="ovl" hidden></div><div id="sqview" class="ovl" hidden></div><div id="opsdlg" class="ovl" hidden></div><div id="rkreveal" class="ovl" hidden></div><div id="help" class="ovl" hidden></div><div id="tut" class="tutbar" hidden></div>
@@ -812,15 +824,19 @@ const DKEYS=['beginner','easy','normal','hard','legend'];
 // Hard can push an opponent past Legend: the numbers carry on from Normal → Hard → Legend, within sensible limits
 const DFCAP={spd:[1.5,3.15],tackle:[0,.8],react:[5,40],dive:[1,3.7],shoot:[0,1.1],err:[3,40],press:[0,1.35],range:[100,345],read:[0,.34],gk:[.7,1.42]};
 const DFCAPX={spd:[1.5,3.35],tackle:[0,.92],react:[3,40],dive:[1,4],shoot:[0,1.25],err:[2,40],press:[0,1.5],range:[100,370],read:[0,.42],gk:[.7,1.55]};
+// the numbers for one point on the scale (beyond Legend they carry on, within limits)
+function dfAt(x,X){
+  if(x>4){const L=DIFFS.legend,Hd=DIFFS.hard,o={...L};for(const key in L)if(typeof L[key]==='number'&&key!=='coin'){const v=L[key]+(L[key]-Hd[key])*(x-4)*1.15,c=(X?DFCAPX:DFCAP)[key];o[key]=c?clamp(v,c[0],c[1]):v}if(X)o.slide=true;return o}
+  const lo=DIFFS[DKEYS[Math.floor(x)]],hi=DIFFS[DKEYS[Math.ceil(x)]],f=x-Math.floor(x);
+  if(!f)return lo;const o={...lo};for(const key in lo)if(typeof lo[key]==='number')o[key]=lo[key]+(hi[key]-lo[key])*f;else o[key]=f>=.5?hi[key]:lo[key];return o}
 const levelDF=k=>{const L=LV(),X=L.extreme;let b=DKEYS.indexOf(k);
   // above Chill, weak sides still put up a fight: the bottom of the range is lifted a little
   if(L.shift>=0&&b<2)b+=(2-b)*.25;
-  let x=clamp(b+L.shift+(L.half||0),0,X?8:6);
-  // Extreme: whoever the opponent is, they play at (nearly) the very top level
-  if(X)x=Math.max(x,7.6);
-  if(x>4){const L=DIFFS.legend,Hd=DIFFS.hard,o={...L};for(const key in L)if(typeof L[key]==='number'&&key!=='coin'){const v=L[key]+(L[key]-Hd[key])*(x-4)*1.15,c=(X?DFCAPX:DFCAP)[key];o[key]=c?clamp(v,c[0],c[1]):v}if(X)o.slide=true;return o}
-  const lo=DIFFS[DKEYS[Math.floor(x)]],hi=DIFFS[DKEYS[Math.ceil(x)]],f=x-Math.floor(x);
-  if(!f)return lo;const o={...lo};for(const key in lo)if(typeof lo[key]==='number')o[key]=lo[key]+(hi[key]-lo[key])*f;else o[key]=f>=.5?hi[key]:lo[key];return o};
+  const x=clamp(b+L.shift+(L.half||0),0,X?8:6);
+  // Extreme: whoever the opponent is, their outfield players play at (nearly) the very top level; their goalkeeper stays
+  // at the opponent's own level (reactions, diving, handling), so Extreme keepers stay beatable as before
+  if(X&&x<7.6){const o=dfAt(7.6,X),kp=dfAt(x,X);o.react=kp.react;o.dive=kp.dive;o.gk=kp.gk;return o}
+  return dfAt(x,X)};
 const CELEBS=['KNEE SLIDE','SIUUU','ROBOT','AIRPLANE','BACKFLIP','CALM DOWN'];
 // announcer lines for named goals (also spoken aloud when sound is on)
 const ANN={'SCREAMER':['FROM ABSOLUTELY MILES!','HE HAS LEATHERED IT!'],'TOP BINS':['RIGHT IN THE TOP CORNER!','WHERE THE OWL SLEEPS!'],'CURLER':['BENT IT LIKE A BANANA!','WHAT A CURLER!'],
@@ -3356,7 +3372,9 @@ muteBtn.onclick=()=>{initAudio();setMute(!muted)};
 function pop(text,x,y,col=C.cream,size=20,z=52){
   // if another fresh pop is already right here, stack this one above it so both stay readable
   for(let k=0;k<4&&pops.some(q=>q.life>38&&Math.abs(q.x-x)<85&&Math.abs(q.y-(y+30))<45&&Math.abs(q.z-z)<15);k++)z+=17;
-  pops.push({text,x,y:y+30,z,col,size,life:70})}
+  // small grey asides ('read it', 'whiff'...) stay smaller and go sooner, so the pitch isn't cluttered with them
+  const minor=col===C.muted;if(minor&&pops.some(q=>q.col===C.muted&&q.life>20&&Math.abs(q.x-x)<70&&Math.abs(q.y-(y+30))<50))return;// one aside at a time in one place
+  pops.push({text,x,y:y+30,z,col,size:minor?Math.round(size*.85):size,life:minor?46:70})}
 function burst(x,y,n,cols,spd=6,grav=.12,size=[4,8]){const q=P(x,y,14);burstS(q.x,q.y,n,cols,spd,grav,size)}
 function burstS(x,y,n,cols,spd=6,grav=.12,size=[4,8]){if(QLV)n=Math.ceil(n*(1-QLV*.3));for(let i=0;i<n;i++){const a=rnd(0,6.283),s=rnd(1,spd);parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-rnd(0,3),g:grav,life:rnd(60,120),max:120,c:pick(cols),w:rnd(size[0],size[1]),h:rnd(3,6),r:rnd(0,6),vr:rnd(-.3,.3)})}}
 function grass(wx,wy,n){const q=P(wx,wy);const x=q.x,y=q.y;for(let i=0;i<n;i++)parts.push({x,y,vx:rnd(-2,2),vy:rnd(-2,1),g:.08,life:rnd(15,30),max:30,c:'#3f8a4a',w:2,h:2,r:0,vr:0})}
@@ -6808,6 +6826,12 @@ $('fixscr').onclick=fixScreen;$('fixscr2').onclick=()=>{setPause(false);fixScree
 function toggleFull(){const st=document.querySelector('.stage'),fs=document.fullscreenElement||document.webkitFullscreenElement;
   try{if(fs)(document.exitFullscreen||document.webkitExitFullscreen).call(document);else(st.requestFullscreen||st.webkitRequestFullscreen).call(st)}catch(e){toast('Full screen isn’t available here.')}cv.focus()}
 $('fullscr').onclick=toggleFull;$('fullscr2').onclick=toggleFull;
+// the controls list under the game: open for your first few matches, then tucked behind "Controls" (your choice is kept)
+{const k=document.querySelector('.keys'),b=$('ctrlsbtn');let saved=null;try{saved=localStorage.getItem('kickabout-keys')}catch(e){}
+  const set=v=>{k.classList.toggle('open',v);b.setAttribute('aria-expanded',String(v));b.textContent=v?'Hide controls':'Controls'};
+  set(saved==null?(club.played||0)<3:saved==='1');b.onclick=()=>{const v=!k.classList.contains('open');set(v);try{localStorage.setItem('kickabout-keys',v?'1':'0')}catch(e){}}}
+// while a match is on (menus hidden), the page knows it, so the bar under the game can step back
+new MutationObserver(()=>document.body.classList.toggle('playing',menuEl.hidden)).observe(menuEl,{attributes:true,attributeFilter:['hidden']});
 const fsLabel=()=>{const on=!!(document.fullscreenElement||document.webkitFullscreenElement);$('fullscr').textContent=on?'Exit full screen (V)':'Full screen (V)';$('fullscr2').textContent=on?'Exit full screen':'Full screen'};
 document.addEventListener('fullscreenchange',fsLabel);document.addEventListener('webkitfullscreenchange',fsLabel);
 window.__kick={errs:()=>loopErrs,bsrc:()=>gBallSrc,acct:{v1:async(e,pw)=>{const d=await acctDerive(e,pw,1),keep=acct;acct={k:d.k};const s=await acctSeal(snapshotSave());acct=keep;for(const c of await regConnect()){const go=()=>c.publish(ACCT_T+d.id,s,{qos:1,retain:true});if(c.connected)go();else c.once('connect',go)}return d.id},st:()=>acct&&{...acct,k:'-'},fetch:()=>acct?acctFetch(acct.id,acct.k).then(r=>({ok:r.ok,at:r.sv&&r.sv.at,coins:r.sv&&r.sv.club.coins})):null},oj:()=>({on:!!(OJ.slam||OJ.z>.002||OJ.vig>0||OJ.lines.length||OJ.strobe>0),slam:OJ.slam&&OJ.slam.text,style:Math.round(style),hype:Math.round(hype),fire:Math.round(fire),chain}),dbg:{scout:{band:t=>{const s=scoutBand(t);return s&&{n:s.n,cut:s.cut,pHigh:s.pHigh}},odds:(t,b)=>{const L=scoutLevelOdds(t,b);return L&&{pHigh:L.pHigh,sum:L.w.reduce((a,x)=>a+x,0)}},anchor:(t,b)=>scoutAnchor(t,b),deal:t=>dealHardPick(t).map(p=>({id:p.id,ovr:ovr(p),tier:tier(p)})),roll:o=>rollTier(o),depFx:k=>depFx(k)},gdTokens:(a,b)=>gdTokens(a,b),ttCalc:()=>ttCalc,tPick:p=>throughPick(p),isOff:(m,p)=>isOffside(m,p),doThrough:p=>doThrough(p),aiStat:()=>aiStat,shotLog:()=>aiShotLog.slice(),earnNote:()=>earnNote,cv:()=>({rollTier,ABTIER,sweepPlan,kSkill,byId,upOf,UPCAP,EVO,XPL,STATMAX,tier,depBuy,depLv,depFx,ctk,ctkSync,maxPlan,statMax,upPreview,playStatsX,scoutLevelOdds,matchPay,gdTokens,legacyXP,upBuy,ablBuy,coachCost,upCost,effOvr,cdSecs,spCdOf,PACKS,legNeed,trainDo,evoDo,evoNeed,ovr}),snapSize:()=>JSON.stringify(netSnapOf()).length,prep:()=>!!netPrep,allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p),look:p.look,skin:p.skin})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,netEpoch:()=>{netEpoch++},forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,FY0,FY1,MY,MIDX,GY0,GY1,BOX,BOXH,PITCH}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},net:()=>({stat:netStat,log:netLogBuf.slice(-40),c2:{seq:c2seq,rme:RME&&{idx:RME.idx,on:RME.on,age:Math.round(performance.now()-RME.at)}},gcs:gCs,wait:netWaiting,gwait:netGuestWait,routes:{...netRoutes},prefer:nroom&&nroom.prefer?nroom.prefer.kind:null,gm:{on:gPr.on,seq:gIn.seq,ack:gIn.ack,pending:gIn.list.filter(e=>e[0]>gIn.ack).length,wait:netGuestWait,rtt:netRtt},RSp:RS&&RS.pend?RS.pend.k:null,RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};

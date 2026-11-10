@@ -67,7 +67,8 @@ canvas:focus-visible{box-shadow:inset 0 0 0 3px var(--sun)}
 .bulk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
 .bulk label{display:grid;gap:2px;font-size:12px;font-weight:800;color:var(--muted)}
 .bulk input,#bulk-paste{font:inherit;font-size:14px;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--ground-2);color:var(--cream);width:100%;box-sizing:border-box}
-.clubbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.clubbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+@media (min-width:900px){.clubbar #club-name{width:150px}}/* keeps the club bar (Help included) on one line on a laptop */
 .coins{display:inline-block;font-family:var(--display);font-size:20px;color:var(--sun);font-variant-numeric:tabular-nums}
 .coins::before{content:"";display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--sun);box-shadow:inset 0 0 0 3px #c99a2e;margin-right:6px;vertical-align:-1px}
 .sec-title{margin:6px 0 0;font-family:var(--display);font-weight:400;font-size:20px;color:var(--cream);align-self:flex-start}
@@ -226,6 +227,14 @@ input[type=range]{accent-color:var(--sun);width:100%;min-width:0}
 .ghost{font-family:var(--body);font-weight:800;font-size:14px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 16px;cursor:pointer}
 .keys{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;max-width:1100px;font-size:13px;color:var(--muted)}
 .keys span{display:inline-flex;align-items:center;gap:5px}
+/* the controls list stays tucked away behind "Controls" (open for a new player's first matches); the bar under the game
+   fades back while you play and comes back when you point at it */
+.keylist{display:none;flex-basis:100%;flex-wrap:wrap;gap:8px 18px;justify-content:center;padding-top:4px;border-top:1px solid var(--line)}
+.keys.open .keylist{display:flex}
+.keys{transition:opacity .3s}body.playing .keys{opacity:.35}body.playing .keys:hover,body.playing .keys:focus-within{opacity:1}
+/* switching tabs: the new section eases in */
+.menu section:not([hidden]){animation:rise .22s ease-out}
+@media (prefers-reduced-motion:reduce){.menu section:not([hidden]),.menu:not([hidden]) .menu-inner{animation:none}}
 kbd{font-family:var(--body);font-weight:800;font-size:12px;background:var(--ground-2);color:var(--cream);border:1px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:1px 6px}
 .mute{font-family:var(--body);font-weight:700;font-size:13px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 12px;cursor:pointer}
 @media (max-width:560px){.ed-grid{grid-template-columns:1fr}}
@@ -529,6 +538,11 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
   </div></div>
 </div>
 <div class="keys">
+  <span><button class="mute" id="ctrlsbtn" aria-expanded="false" aria-controls="keylist">Controls</button></span>
+  <span><button class="mute" id="mute">Sound on (M)</button></span>
+  <span><button class="mute" id="fixscr" title="Use this if the screen ever goes black or freezes">Fix screen (G)</button></span>
+  <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span><span><button class="mute helpb" id="helpbtn" title="How everything works">HELP</button></span>
+  <div class="keylist" id="keylist">
   <span><kbd>WASD</kbd> move</span>
   <span><kbd>Space</kbd> hold to shoot, <kbd>W</kbd>/<kbd>S</kbd> to aim</span>
   <span><kbd>Shift</kbd> pass · <b>no ball? Space or Shift = steal</b></span>
@@ -540,9 +554,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 6px;margin:0 2px;border-radi
   <span><kbd>Q</kbd> switch (automatic now)</span>
   <span><kbd>Esc</kbd> pause / leave</span>
   <span><kbd>1</kbd>–<kbd>6</kbd> celebration</span>
-  <span><button class="mute" id="mute">Sound on (M)</button></span>
-  <span><button class="mute" id="fixscr" title="Use this if the screen ever goes black or freezes">Fix screen (G)</button></span>
-  <span><button class="mute" id="fullscr" title="Fill the whole screen">Full screen (V)</button></span><span><button class="mute helpb" id="helpbtn" title="How everything works">HELP</button></span>
+  </div>
 </div>
 
 <div id="prof" class="ovl" hidden></div><div id="sqview" class="ovl" hidden></div><div id="opsdlg" class="ovl" hidden></div><div id="rkreveal" class="ovl" hidden></div><div id="help" class="ovl" hidden></div><div id="tut" class="tutbar" hidden></div>
