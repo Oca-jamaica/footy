@@ -791,11 +791,15 @@ function cross(p){if(NET.on)netKickLog(p,'cross',-1,0);const att=p.team===0?1:-1
   for(const m of outfield(p.team)){if(m===p)continue;const d=dist(p,m);if(d<90||d>720*PSC)continue;const ad=Math.abs(angDiff(Math.atan2(m.y-p.y,m.x-p.x),p.dir));if(ad>1.25)continue;
     const sc=-ad*1.1-Math.hypot(gx-m.x,MY-m.y)/260+(m.role==='att'?.3:0)+((m.x-p.x)*att>0?.2:0);if(sc>bs){bs=sc;best=m}}
   if(!best){kick(p,p.dir,8.5,4.2);B.pass={from:p,to:null,through:false};S.pass();return}
-  const T=clamp(dist(p,best)/7,32,58);airN.cross++;
-  lobTo(p,best,best.x+best.vx*T*.65+att*22,best.y+best.vy*T*.65,T,false);B.pass.cross=true;
+  const cd=dist(p,best);
+  // a long ball booted to a team-mate standing alone, far beyond their defence: offside (crosses into the box are never)
+  if(cd>420*PSC&&clearOffside(best,p)){pop('CROSS',p.x,p.y-34,p.team===0?C.cream:C.coral,15,50);offsideCall(p,best);return}
+  // long crosses are less exact the longer they are (worse passers more so)
+  const T=clamp(cd/7,32,58),er=Math.max(0,cd-180)*.07*(1.35-(p.st.pass??.65));airN.cross++;
+  lobTo(p,best,best.x+best.vx*T*.65+att*22+rnd(-er,er),best.y+best.vy*T*.65+rnd(-er,er),T,false);B.pass.cross=true;
   pop('CROSS',p.x,p.y-34,p.team===0?C.cream:C.coral,15,50);
   const k=keeperOf(1-p.team),lx=B.lobX,ly=B.lobY;
-  if(!noKeep()&&Math.abs(lx-goalX(p.team))<115&&Math.abs(ly-MY)<130&&Math.random()<(k.team===0||pvp()?.42:.3*DF.gk))B.claimBy=k;
+  if(!noKeep()&&Math.abs(lx-goalX(p.team))<115&&Math.abs(ly-MY)<130&&Math.random()<(k.team===0||pvp()?.5:.38*DF.gk))B.claimBy=k;
   if(best.team===1&&best!==ctrl2&&Math.hypot(gx-lx,MY-ly)<340&&Math.random()<.65)best.volley=true}
 // First-time strike on a ball in the air: a header if it's high, a volley if it's low. W/S picks the corner.
 let airN={volley:0,header:0,claim:0,clear:0,cross:0};
@@ -810,6 +814,13 @@ const attackSpot=team=>{const gx=goalX(team);return{x:gx-Math.sign(gx-MIDX)*SPOT
 function isOffside(m,p){if(!m||m.team!==p.team||m.keeper)return false;const dir=Math.sign(goalX(p.team)-MIDX),depth=q=>(q.x-MIDX)*dir;
   if(depth(m)<=0||depth(m)<=depth(B)+2)return false;
   const ds=players.filter(q=>q.team!==p.team).map(depth).sort((a,b)=>b-a);return depth(m)>(ds[1]??-1e9)+4}
+// Offside only for clear goal-hanging: the receiver is in their half, well past the ball and well beyond their last
+// outfield defender, with no defender anywhere near him. Anything close is play-on (so normal runs and crosses into the
+// box are never flagged); it stops a Through Ball or long cross being launched to a man standing alone.
+function clearOffside(m,p){if(!m||m.team!==p.team||m.keeper)return false;const dir=Math.sign(goalX(p.team)-MIDX),depth=q=>(q.x-MIDX)*dir;
+  const defs=players.filter(q=>q.team!==p.team&&!q.keeper);if(!defs.length||depth(m)<=0||depth(m)<depth(B)+60*PSC)return false;
+  const last=Math.max(...defs.map(depth));if(depth(m)<last+110*PSC)return false;
+  return defs.every(q=>dist(q,m)>200*PSC)}
 // the flag goes up: the defending side restarts with the ball where the offside player was
 function offsideCall(p,m){const def=players.filter(q=>q.team!==p.team&&!q.keeper&&q.stun<=0),k=keeperOf(1-p.team);
   let t2=def.length?def.reduce((a,b)=>dist(a,m)<dist(b,m)?a:b):k;if(!t2)t2=k;
@@ -822,15 +833,14 @@ function offsideCall(p,m){const def=players.filter(q=>q.team!==p.team&&!q.keeper
    rather than on the penalty spot, and the runner gets no speed boost (no turbo burst, no extra top speed or
    acceleration); he runs at his own pace and sprint.
    Defending is kept fair: nobody can take it while it's above their reach (a slide only once it's at the grass), and a
-   defender who gets to where it lands can win it. THROUGH_OFFSIDE puts back the offside check (off: the first version
-   had none). */
+   defender who gets to where it lands can win it. Offside: only clear goal-hanging is flagged (clearOffside); THROUGH_OFFSIDE switches to the full rule. */
 const THROUGH_T=60,THROUGH_OFFSIDE=false;
 // where it lands: just outside the edge of their penalty area, in line with the goal (on every pitch, either direction)
 const thruSpot=team=>{const gx=goalX(team);return{x:gx-Math.sign(gx-MIDX)*(BOX+10),y:MY}};
 function throughPick(p){const sp=thruSpot(p.team);let m=null;
   for(const q of outfield(p.team))if(q!==p&&(!m||dist(q,sp)<dist(m,sp)))m=q;return m}
 function doThrough(p){if(B.owner!==p)return false;const sp=thruSpot(p.team),m=throughPick(p);if(!m)return false;
-  if(THROUGH_OFFSIDE&&isOffside(m,p)){pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);offsideCall(p,m);return true}
+  if((THROUGH_OFFSIDE?isOffside(m,p):clearOffside(m,p))){pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);offsideCall(p,m);return true}
   if(NET.on)netKickLog(p,'through',players.indexOf(m),0);
   lobTo(p,m,sp.x,sp.y,THROUGH_T,true);pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
 // how high a defender can take a dropping through ball: standing, about head-to-chest height for a good defender (it
@@ -1426,7 +1436,7 @@ function aiSpecial(p,dG,ndd){const sp=p.st.sp,def=SPECIALS[sp];if(!def)return fa
     const k=keeperOf(1-p.team),gx=goalX(p.team),ty=sp==='chip'?MY+rnd(-18,18):(k.y>MY?GY0+12:GY1-12);
     p.spCd=spCdOf(p)*1.5;p.dir=Math.atan2(ty-B.y,gx-B.x);pop(def.name,p.x,p.y-34,C.coral,20,70);S.special();shoot(p,sp,.85,ty);return true}
   if(sp==='turbo'&&ndd>70&&Math.random()<.4){p.spCd=spCdOf(p)*1.5;p.turbo=150;pop('TURBO',p.x,p.y-34,C.coral,16);return false}
-  if(sp==='through'&&dG<620&&Math.random()<.35&&(!THROUGH_OFFSIDE||!isOffside(throughPick(p),p))&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}
+  if(sp==='through'&&dG<620&&Math.random()<.35&&!(THROUGH_OFFSIDE?isOffside(throughPick(p),p):clearOffside(throughPick(p),p))&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}
   if(sp==='lob'&&Math.random()<.3&&doLob(p)){p.spCd=spCdOf(p)*1.5;return true}
   if(sp==='onetwo'&&ndd<90&&Math.random()<.5&&doOneTwo(p)){p.spCd=def.cd*1.5;return true}
   if(sp==='ghost'&&ndd<85&&Math.random()<.5&&doGhost(p)){p.spCd=def.cd*1.5;return false}
@@ -1607,6 +1617,12 @@ function ballUpdate(dt,live){
   const fr=B.z>0?Math.pow(.996,1/aK):B.curl?.992:hr('ice')?.994:weather==='rain'?.988:.984;B.vx*=Math.pow(fr,dt);B.vy*=Math.pow(fr,dt);
   const wasAir=B.z>0;
   if(B.z>0||B.vz>0){B.vz-=(B.knuckle?.34:.25)/(aK*aK)*dt;B.z+=B.vz*dt;if(B.z<0){B.z=0;if(B.vz<-1.8){tone(110,.07,'sine',Math.min(.16,-B.vz*.03),0,.6);grass(B.x,B.y,3)}B.vz=Math.abs(B.vz)>1.2?-B.vz*.45:0;if(B.vz>0){B.curl*=.4;B.knuckle=0}}}
+  // a cross is contested in the air as it drops: a defender who has got near it can head it away (more often the closer he
+  // is compared with the striker, and the better he defends), so a cross into a crowded box isn't a free header
+  if(B.lobTo&&B.pass&&B.pass.cross&&!B.pass.contested&&B.vz<0&&B.z<56){const m=B.lobTo;let d=null;
+    for(const q of outfield(1-m.team))if(q.stun<=0&&q.fall<=0&&dist(q,B)<48&&(!d||dist(q,B)<dist(d,B)))d=q;
+    if(d){B.pass.contested=true;if(Math.random()<clamp(.38+(dist(m,B)-dist(d,B))/60+((d.st.tackle??.6)-.6)*.5,.15,.7)){B.lobTo=null;m.lobRun=null;m.volley=false;B.claimBy=null;
+      const a=Math.atan2(MY-B.y,MIDX-B.x)+rnd(-.6,.6);d.hjump=18;airN.clear++;kick(d,a,9,3.4);pop('HEADED CLEAR',d.x,d.y-40,d.team===0?C.mint:C.muted,16,50);S.tap()}}}
   if(B.lobTo&&B.claimBy&&B.z<44&&dist(B.claimBy,B)<30&&B.claimBy.stun<=0){const k=B.claimBy;B.claimBy=null;airN.claim++;give(k);k.hold=40;pop('CLAIMED',k.x,k.y-34,C.cream,17,60);S.save()}
   else if(B.lobTo&&B.lobTo.volley&&B.vz<0&&B.z<54&&B.z>2&&dist(B.lobTo,B)<44&&B.lobTo.stun<=0)airStrike(B.lobTo);
   // a chip pass is contested as it drops into reach: a defender who's got there can win it

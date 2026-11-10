@@ -75,7 +75,14 @@ more goals in every 100 than before, and still clearly harder than Hard.
 level, every opponent rating is lifted to a high floor and then +12 (past 99 if need be), and Volta Extreme is as hard
 as Classical Extreme (the difficulty test holds Volta to the same goal target). Their goalkeeper stays at the
 opponent's own level, so the slightly weaker Extreme keeper from before is kept. Above Chill, weak teams are lifted a
-little (level and ratings), so they're still a game. **Tap-ins:** close in, in front of goal, the aim is kept inside
+little (level and ratings), so they're still a game. **Offside** is only called for clear goal-hanging: a Through Ball, or a long ball crossed from far away (over about
+420 px), to a team-mate who is well beyond the last defender (110 px or more) with no defender within 200 px of him. The
+flag goes up and the defending side gets the ball. Normal runs and crosses into the box are never offside.
+**Crosses (F)** are no longer a free header: as a cross drops, a defender who has got near it can head it clear (more
+often the closer he is than the striker, and the better he defends), long crosses are a little less exact, and
+keepers claim a few more. Measured with one defender marking the striker: the striker won 27-30 of 30 crosses before,
+13-18 of 30 now; unmarked strikers still get them.
+**Tap-ins:** close in, in front of goal, the aim is kept inside
 the posts and the strike is steadier (and a first-time finish there isn't treated as rushed), so a striker no longer
 sidefoots a tap-in wide; the computer gets this on Hard and Extreme only.
 
