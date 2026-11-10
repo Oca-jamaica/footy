@@ -774,7 +774,7 @@ function lobTo(p,m,tx,ty,T,through){
   const d=Math.hypot(tx-B.x,ty-B.y),a=Math.atan2(ty-B.y,tx-B.x),sum=(1-Math.pow(.996,T))/.004;
   B.vx=Math.cos(a)*d/sum;B.vy=Math.sin(a)*d/sum;B.vz=.25*T/2;B.z=1;B.lockT=T;
   B.pass={from:p,to:m,through:!!through,lob:true};B.lobTo=m;B.lobX=tx;B.lobY=ty;B.lobThrough=!!through;
-  m.lobRun={x:tx,y:ty};m.turbo=Math.max(m.turbo||0,T+25);p.dir=a;S.pass();
+  m.lobRun={x:tx,y:ty};if(!through)m.turbo=Math.max(m.turbo||0,T+25);p.dir=a;S.pass();// a Through Ball's runner gets no speed burst
   if(p.team===0&&!m.keeper)ctrl=m}
 // A lofted cross: to the best-placed teammate (ideally one in the box), or into space if nobody's there.
 // Their keeper sometimes comes and claims it; at the far end a defender may head it clear.
@@ -808,23 +808,19 @@ function offsideCall(p,m){const def=players.filter(q=>q.team!==p.team&&!q.keeper
   const s2=t2.team===0?1:-1;B.x=clamp(t2.x+s2*12,FX0+10,FX1-10);B.y=t2.y;give(t2);if(t2.keeper)t2.hold=40;
   pop('OFFSIDE!',m.x,m.y-40,C.coral,26,80);S.whistle(1);if(m.team===0)S.aww();
   for(const q of players)if(q.team===p.team&&!q.keeper)q.lobRun=null}
-/* The Through Ball special: played into the space just ahead of the best-placed runner (not always to the penalty spot),
-   and only within a sensible range, so it can't be launched from your own half for a guaranteed goal. If the runner is
-   offside, it's a free kick to the other side. Its flight takes THROUGH_SLOW (5) times as long as it used to: the ball
-   follows exactly the same arc and lands on exactly the same spot, it just hangs in the air longer (its own clock runs
-   slower while it's airborne: speeds / 5, gravity / 25, air drag spread over 5x the frames), so defenders and keepers
-   have time to read where it will come down. Ordinary passes and other specials are untouched. */
-const THROUGH_T=66,THROUGH_SLOW=5;
-function throughPick(p){const dir=Math.sign(goalX(p.team)-MIDX);let m=null,bs=-1e9;
-  for(const q of outfield(p.team)){if(q===p)continue;const fwd=(q.x-p.x)*dir,d=dist(q,p);if(fwd<-40||d>620*PSC)continue;const sc=fwd/200+(q.vx*dir)*.4-Math.abs(q.y-MY)/400-d/900;if(sc>bs){bs=sc;m=q}}return m}
-function doThrough(p){if(B.owner!==p)return false;const gx=goalX(p.team),dir=Math.sign(gx-MIDX),m=throughPick(p);
-  if(!m){if(p.team===0||hum(p))pop('nobody to play it to',p.x,p.y-34,C.muted,14);return false}
-  if(isOffside(m,p)){pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);offsideCall(p,m);return true}
-  const lead=150*PSC,tx=clamp(m.x+dir*lead,FX0+40,FX1-40),stop=gx-dir*SPOT,txx=dir>0?Math.min(tx,stop):Math.max(tx,stop),ty=m.y+(MY-m.y)*.25;
+/* The Through Ball special, exactly as in the very first version of the game: lofted over everyone onto the penalty
+   spot, landing after one second (60 frames), for the team-mate nearest that spot. The only change from then: the
+   runner gets no speed boost (no turbo burst, no extra top speed or acceleration); he runs at his own pace and sprint.
+   Defending is kept fair: nobody can take it while it's above their reach (a slide only once it's at the grass), and a
+   defender who gets to where it lands can win it. THROUGH_OFFSIDE puts back the offside check (off: the first version
+   had none). */
+const THROUGH_T=60,THROUGH_OFFSIDE=false;
+function throughPick(p){const sp=attackSpot(p.team);let m=null;
+  for(const q of outfield(p.team))if(q!==p&&(!m||dist(q,sp)<dist(m,sp)))m=q;return m}
+function doThrough(p){if(B.owner!==p)return false;const sp=attackSpot(p.team),m=throughPick(p);if(!m)return false;
+  if(THROUGH_OFFSIDE&&isOffside(m,p)){pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);offsideCall(p,m);return true}
   if(NET.on)netKickLog(p,'through',players.indexOf(m),0);
-  lobTo(p,m,txx,ty,THROUGH_T,true);airSlow(THROUGH_SLOW);B.lockT=THROUGH_T*THROUGH_SLOW;pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
-// slow a ball's flight down by k without changing its path: it then lands where it would have, k times later
-function airSlow(k){B.vx/=k;B.vy/=k;B.vz/=k;B.airK=k}
+  lobTo(p,m,sp.x,sp.y,THROUGH_T,true);pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
 // how high a defender can take a dropping through ball: standing, about head-to-chest height for a good defender (it
 // depends on his defending); sliding, only once it's at the grass
 const thruReach=p=>(p.slide||p.aiSlide>0||p.inter)?5:6+10*clamp(p.st.tackle??.6,0,1);
@@ -933,7 +929,6 @@ function topSpeed(p){
   else if(p.knockT>0)s*=KNOCK[4];// knock-on: explode after the ball
   if(p.anim==='shield')s*=.55;
   if(p.ghost>0)s*=1.1;
-  if((B.lobTo===p||B.graceTo===p)&&B.lobThrough)s*=1.15;
   if(fire>0&&p.team===0&&!NET.on)s*=1.07;
   return s;
 }
@@ -974,7 +969,6 @@ function humanUpdate(p,dt){
   const cur=Math.hypot(p.vx,p.vy);
   if((ax||ay)&&p.anim!=='drag'&&p.anim!=='shield'){const a=Math.atan2(ay,ax),turn=(B.owner===p?.17:.24)+(cur<1.5?.12:0);p.dir+=angDiff(a,p.dir)*Math.min(1,turn*dt)}
   const sp=topSpeed(p);
-  if((B.lobTo===p||B.graceTo===p)&&B.lobThrough&&(ax||ay)){p.vx+=(ax*sp-p.vx)*Math.min(1,.35*dt);p.vy+=(ay*sp-p.vy)*Math.min(1,.35*dt)}
   if(p.anim==='elastico'){p.vx*=.92;p.vy*=.92}
   else{
     // gentle acceleration, firmer braking, and a sharp plant when you cut back the other way
@@ -1182,7 +1176,7 @@ function teamAI(team,dt){
     if(p.stun>0){p.stun-=dt;p.vx*=.9;p.vy*=.9;continue}
     if(kickT>0){steer(p,p.x,p.y,0,dt);continue}
     if(p===owner&&p.wallTo){p.wallT-=dt;p.vx*=.8;p.vy*=.8;if(p.wallT<=0){const r=p.wallTo;p.wallTo=null;pass(p,r,true);B.pass.wall=true}continue}
-    if(p.lobRun&&(B.lobTo===p||B.graceTo===p)){steer(p,p.lobRun.x,p.lobRun.y,topSpeed(p)*1.3,dt);continue}
+    if(p.lobRun&&(B.lobTo===p||B.graceTo===p)){steer(p,p.lobRun.x,p.lobRun.y,topSpeed(p)*(B.lobThrough?1:1.3),dt);continue}
     if(p.push&&p.push.T<=0&&p.push.next){const n=p.push.next;p.push={...n,max:n.T,next:null}}
     if(p.push&&p.push.T>0){const k=p.push.T/p.push.max,sp=p.push.spd*(.45+.55*k);p.vx=Math.cos(p.push.a)*sp;p.vy=Math.sin(p.push.a)*sp;p.push.T-=dt;
       if(p.anim!=='roul'&&p.anim!=='drag')p.dir+=angDiff(p.push.a,p.dir)*Math.min(1,.12*dt);continue}
@@ -1420,7 +1414,7 @@ function aiSpecial(p,dG,ndd){const sp=p.st.sp,def=SPECIALS[sp];if(!def)return fa
     const k=keeperOf(1-p.team),gx=goalX(p.team),ty=sp==='chip'?MY+rnd(-18,18):(k.y>MY?GY0+12:GY1-12);
     p.spCd=spCdOf(p)*1.5;p.dir=Math.atan2(ty-B.y,gx-B.x);pop(def.name,p.x,p.y-34,C.coral,20,70);S.special();shoot(p,sp,.85,ty);return true}
   if(sp==='turbo'&&ndd>70&&Math.random()<.4){p.spCd=spCdOf(p)*1.5;p.turbo=150;pop('TURBO',p.x,p.y-34,C.coral,16);return false}
-  if(sp==='through'&&dG<620&&Math.random()<.35&&!isOffside(throughPick(p),p)&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}
+  if(sp==='through'&&dG<620&&Math.random()<.35&&(!THROUGH_OFFSIDE||!isOffside(throughPick(p),p))&&doThrough(p)){p.spCd=spCdOf(p)*1.5;return true}
   if(sp==='lob'&&Math.random()<.3&&doLob(p)){p.spCd=spCdOf(p)*1.5;return true}
   if(sp==='onetwo'&&ndd<90&&Math.random()<.5&&doOneTwo(p)){p.spCd=def.cd*1.5;return true}
   if(sp==='ghost'&&ndd<85&&Math.random()<.5&&doGhost(p)){p.spCd=def.cd*1.5;return false}
@@ -1501,7 +1495,7 @@ function sweepPlan(k){const gx=k.team===0?FX0:FX1,s=k.team===0?1:-1,sk=kSkill(k)
   let firstAtt=1e9;
   for(const q of pts){if(q.z>(B.lobTo?60:24)&&!(B.lobTo&&q===pts[pts.length-1]))continue;
     const ax=(q.x-gx)*s;if(ax>zoneX||Math.abs(q.y-MY)>zoneY||ax<14)continue;
-    let tA=1e9;for(const o of opp){const boost=(B.lobTo===o||B.graceTo===o)&&B.lobThrough?1.15:1;tA=Math.min(tA,runT(o,q.x,q.y,topSpeed(o)*boost,3))}
+    let tA=1e9;for(const o of opp){tA=Math.min(tA,runT(o,q.x,q.y,topSpeed(o),3))}
     let tD=1e9;for(const m of mates)tD=Math.min(tD,runT(m,q.x,q.y,topSpeed(m),5));
     firstAtt=Math.min(firstAtt,tA);
     const tK=runT(k,q.x,q.y,rate,lagK),arrive=Math.max(q.i,tK);
@@ -1615,7 +1609,7 @@ function ballUpdate(dt,live){
     if(d&&Math.random()<win){B.lobTo=null;m.lobRun=null;m.volley=false;const a=Math.atan2(MY-B.y,MIDX-B.x)+rnd(-.6,.6);d.hjump=18;airN.clear++;kick(d,a,9,3.4);pop('CLEARED',d.x,d.y-40,d.team===0?C.mint:C.muted,16,50);S.tap()}}
   if(wasAir&&B.z<=0)B.airK=0;
   if(B.lobTo&&wasAir&&B.z<=0){const m=B.lobTo;B.lobTo=null;m.lobRun=null;m.volley=false;
-    if(dist(m,B)<(B.lobThrough?44:58)&&m.stun<=0){give(m);if(m.team===0)ctrl=m;else if(NET.host)setCtrl2(m)}else{const th=B.lobThrough;B.vx*=th?0:.15;B.vy*=th?0:.15;B.vz=0;B.graceTo=m;B.graceT=th?75:40;m.lobRun={x:B.x,y:B.y}}}
+    if(dist(m,B)<(B.lobThrough?72:58)&&m.stun<=0){give(m);if(m.team===0)ctrl=m;else if(NET.host)setCtrl2(m)}else{const th=B.lobThrough;B.vx*=th?0:.15;B.vy*=th?0:.15;B.vz=0;B.graceTo=m;B.graceT=th?75:40;m.lobRun={x:B.x,y:B.y}}}
   if(B.graceT>0){B.graceT-=dt;if(B.graceT<=0||B.owner){if(B.graceTo)B.graceTo.lobRun=null;B.graceTo=null}}
   if(B.y<FY0+6){B.y=FY0+6;B.vy=Math.abs(B.vy)*.7}
   if(B.y>FY1-6){B.y=FY1-6;B.vy=-Math.abs(B.vy)*.7}

@@ -43,15 +43,16 @@ departments (Fanbase, Coaching Staff, Training Facilities, Stadium, Scouting, Co
 5,000 / 10,000 / 20,000 / 35,000 coins plus 1 Club Token per level.
 
 
-**Through Ball (special):** the original Through Ball: the same choice of runner (the best-placed team-mate going
-forward, scored on how far up the pitch he is, his run and how open he is), the same offside check, the same lofted arc
-and the same landing spot just ahead of him. The only change is the flight: it spends five times as long in the air
-(about 5½ s instead of about 1 s) on exactly the same path, and still lands where it always did (measured: same peak, same
-landing point, never short). While it's high nobody can touch it and slide tackles at it don't count; defenders read
-where it will come down, get there if they can, and contest it as it drops (the winner depends on who is closer and on
-tackling); a slide only works once the ball is low enough, and keepers deal with it as before. Cooldowns are unchanged:
-25 s at level 1 down to 7 s at level 10, 10 levels, same coin prices, 2 Training Tokens per level. `THROUGH_SLOW` in
-`src/js/2-engine.js` is the slow-down factor.
+**Through Ball (special):** exactly as in the very first version of the game (commit `7d282e9`): lofted over everyone
+onto the penalty spot, landing after one second (60 frames, peak height 110), for the team-mate nearest that spot. The
+one change: the runner gets no speed boost. The first version gave him a turbo burst, 1.5× top speed and faster
+acceleration (about 2.1× his normal speed, 2.8× when the computer ran him); now he runs at his own pace and sprint like
+any other player. Defending stays fair: nobody can take it while it's above their reach, a slide only works once it's
+at the grass, a defender who gets to the spot first can win it, and keepers behave as before. The offside check added
+later isn't part of the first version, so it's off (`THROUGH_OFFSIDE` in `src/js/2-engine.js` turns it back on).
+Classical pitches didn't exist in the first version; there it lands on that pitch's penalty spot, so a runner far from
+the box usually won't get there first. Cooldowns are unchanged: 25 s at level 1 down to 7 s at level 10, 10 levels, same
+coin prices, 2 Training Tokens per level.
 
 **Computer's attack (Classical pitches):** the ball carrier weighs shooting, passing (to feet, into a runner's stride,
 across goal, switches, long balls, crosses), dribbling into the most open lane, taking a man on, or keeping it, by how
