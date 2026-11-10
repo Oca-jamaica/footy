@@ -55,13 +55,15 @@ async function cell(b,gm,lv){const pg=await b.newPage();
       swarmedPct:+(tot.swarmF/Math.max(1,tot.carryF)*100).toFixed(1),passPct:Math.round(tot.pOk/Math.max(1,tot.pOk+tot.pLost)*100),slides:+(tot.sl/n).toFixed(1),keeperBeaten:Math.round(gk.g/Math.max(1,gk.n)*100),errs:K.errs()}},[N,gm,lv]);
   await pg.close();return r}
 (async()=>{const b=await chromium.launch();const res={};
-  const jobs=[];for(const gm of MODES)for(const lv of LEVELS)jobs.push([gm,lv]);
+  // ONLY=expanded/normal,volta/chill runs just those (the full table and order checks need every cell)
+  const ONLY=(process.env.ONLY||'').split(',').filter(Boolean);
+  const jobs=[];for(const gm of MODES)for(const lv of LEVELS)if(!ONLY.length||ONLY.includes(gm+'/'+lv))jobs.push([gm,lv]);
   // four at a time
   for(let i=0;i<jobs.length;i+=4)await Promise.all(jobs.slice(i,i+4).map(async([gm,lv])=>{res[gm+'/'+lv]=await cell(b,gm,lv)}));
   await b.close();
   const cols=[['aiGoals','their goals'],['yourGoals','your goals'],['secsPerTackle','secs on ball per tackle'],['swarmedPct','swarmed %'],['passPct','your passes %'],['slides','their slides'],['keeperBeaten','keeper beaten %']];
   console.log('mode/level'.padEnd(20)+cols.map(c=>c[1].padStart(c[1].length+2)).join(''));
-  for(const gm of MODES)for(const lv of LEVELS){const r=res[gm+'/'+lv];console.log((gm+'/'+lv).padEnd(20)+cols.map(c=>String(r[c[0]]).padStart(c[1].length+2)).join('')+(r.errs?'  ERRORS '+r.errs:''))}
+  for(const gm of MODES)for(const lv of LEVELS){const r=res[gm+'/'+lv];if(!r)continue;console.log((gm+'/'+lv).padEnd(20)+cols.map(c=>String(r[c[0]]).padStart(c[1].length+2)).join('')+(r.errs?'  ERRORS '+r.errs:''))}
   if(OUT)fs.writeFileSync(OUT,JSON.stringify(res,null,1));
   if(!CHECK)return;
   const T=JSON.parse(fs.readFileSync(path.join(__dirname,'difficulty-targets.json'),'utf8'));let fail=0;
@@ -70,6 +72,6 @@ async function cell(b,gm,lv){const pg=await b.newPage();
   for(const [cellName,rules] of Object.entries(T.cells||{})){for(const ck of Object.keys(res).filter(n=>match(cellName,n))){const r=res[ck];if(!r)continue;
     for(const [k,[op,v]] of Object.entries(rules)){const x=r[k],ok=op==='<='?x<=v:op==='>='?x>=v:op==='=='?x===v:true;if(!ok){fail++;console.log('FAIL',ck,k,x,op,v)}}}}
   // Chill, Medium and Hard must stay in order (easier levels: fewer of their goals, fewer slides)
-  for(const gm of MODES){const L=LEVELS.slice(0,3).map(l=>res[gm+'/'+l]);
+  for(const gm of MODES){const L=LEVELS.slice(0,3).map(l=>res[gm+'/'+l]);if(L.some(x=>!x))continue;
     for(const [k,dirn,slack] of T.order||[]){for(let i=0;i+1<L.length;i++){const a=L[i][k],b2=L[i+1][k];if(dirn==='up'?a>b2+slack:a<b2-slack){fail++;console.log('FAIL order',gm,k,LEVELS[i],a,LEVELS[i+1],b2)}}}}
   console.log(fail?`${fail} difficulty check(s) failed`:'all difficulty checks passed');process.exitCode=fail?1:0})();
