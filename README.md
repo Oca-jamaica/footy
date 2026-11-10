@@ -16,6 +16,12 @@ tackle wins the ball, knocks, skills and the ball are the host's. Everything els
 host's time-stamped updates a few tens of milliseconds behind, gliding between two real updates rather than guessing
 ahead, so late or bunched-up packets don't make anything twitch; a loose ball near your footballer is eased into the
 present so passes reach your feet on time, and goals and the full-time whistle land when the ball does on that screen.
+**The joining player's controls feel immediate:** their own passes and shots are shown on their screen the instant they
+press (the host still does the real kick and the ball blends into it), the host sends the match every frame on a direct
+link (about 1 KB a frame), and the joining laptop keeps only a small smoothing buffer when updates arrive steadily.
+Measured in two browsers with 40 ms of delay added each way: the joining player's pass shows on their screen in ~9 ms
+(was ~150 ms), and the host's moves arrive after the network delay plus ~25-40 ms. Press N in a match to see whether
+you're on a direct link or a relay; a relay is slower, so the game always tries the direct link first.
 Online matches add their own punch on both laptops (camera punches, speed lines, slam-in calls like WHAT A SAVE! and
 EQUALISER!, stadium strobes and confetti) and a VS card with both clubs and managers before kick-off. These only change
 what's drawn; online, ON FIRE is for show for both players and gives no boost. A match only starts once
@@ -64,6 +70,14 @@ behind. Volta keeps its previous attacking play. Keepers on both sides react 10%
 **Extreme** only, the computer's keeper is about 5–10% weaker (slightly slower to react, slightly less sure at full
 stretch and in one-on-ones, and a little more likely to spill a hard shot); measured on a fixed set of shots, about 3
 more goals in every 100 than before, and still clearly harder than Hard.
+
+**Extreme** is for veterans: whoever the opponent is, even a poor side, their outfield players play at (nearly) the top
+level, every opponent rating is lifted to a high floor and then +12 (past 99 if need be), and Volta Extreme is as hard
+as Classical Extreme (the difficulty test holds Volta to the same goal target). Their goalkeeper stays at the
+opponent's own level, so the slightly weaker Extreme keeper from before is kept. Above Chill, weak teams are lifted a
+little (level and ratings), so they're still a game. **Tap-ins:** close in, in front of goal, the aim is kept inside
+the posts and the strike is steadier (and a first-time finish there isn't treated as rushed), so a striker no longer
+sidefoots a tap-in wide; the computer gets this on Hard and Extreme only.
 
 **Chill and Medium** are much easier than before, by how the computer plays, never by slowing your footballers: on
 Chill it presses less and later, keeps its distance, rarely tackles or slides, gets caught out by passes, passes and
