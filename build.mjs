@@ -12,9 +12,9 @@ const keyFile=process.env.OPS_KEYS||'server/public-keys.json';let keys=null;
 if(keyFile!=='none'&&existsSync(keyFile)){const k=JSON.parse(readFileSync(keyFile,'utf8'));const ok=s=>typeof s==='string'&&/^[A-Za-z0-9+/]{86}[A-Za-z0-9+/=]{2}$/.test(s)&&Buffer.from(s,'base64').length===65&&Buffer.from(s,'base64')[0]===4;
   if(!ok(k.sig)||!ok(k.enc)||Object.keys(k).some(x=>!['v','sig','enc','created'].includes(x)))throw new Error(keyFile+' must hold only the two public keys');keys={v:1,sig:k.sig,enc:k.enc}}
 const build=new Date().toISOString().slice(0,10);
-const game=js.replace('/*@OPSKEYS*/null',()=>JSON.stringify(keys)).replace("/*@BUILD*/'dev'",()=>JSON.stringify(build));
+const game=js.replace('/*@OPSKEYS*/null',()=>JSON.stringify(keys)).replace("/*@BUILD*/'dev'",()=>JSON.stringify(build)).replace('/*@KEEPSAVES*/false',()=>process.env.KEEP_SAVES==='1'?'true':'false');
 out=out.replace('/*@GAME*/',()=>safe(game));
 // sunday-kickabout.html is the working copy; Sunday-Kickabout-Final.html is the same game, named for sharing
 const files=(process.env.OUT||'sunday-kickabout.html,Sunday-Kickabout-Final.html').split(',');
 for(const f of files)writeFileSync(f,out);
-console.log('built',files.join(', '),(out.length/1024).toFixed(0)+' KB',keys?'· dashboard link on ('+keyFile+')':'· dashboard link off (no public keys)');
+console.log('built'+(process.env.KEEP_SAVES==='1'?' (keeps test-version progress)':''),files.join(', '),(out.length/1024).toFixed(0)+' KB',keys?'· dashboard link on ('+keyFile+')':'· dashboard link off (no public keys)');

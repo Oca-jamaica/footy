@@ -127,7 +127,14 @@ let custom={id:'custom',name:'Your Name',short:'NAME',num:99,tag:'Created player
 // Release reset: progress from the test versions (saves without this stamp) doesn't carry over; everyone starts fresh.
 // The old save is set aside under its own key (not used by the game) rather than deleted.
 const SAVE_EPOCH=2;
-const saveOk=c=>!!c&&(c.epoch|0)>=SAVE_EPOCH;
+// KEEP_SAVES is switched on only in a separately built copy (KEEP_SAVES=1 node build.mjs) that keeps everyone's progress
+// from the test versions. In that copy, a test-version save that the release copy set aside on this device is put back.
+const KEEP_SAVES=/*@KEEPSAVES*/false;
+const saveOk=c=>!!c&&(KEEP_SAVES||(c.epoch|0)>=SAVE_EPOCH);
+if(KEEP_SAVES)try{const old=localStorage.getItem('kickabout-club-test-version');if(old&&JSON.parse(old)){const cur=localStorage.getItem('kickabout-club'),cu=localStorage.getItem('kickabout-custom');
+  if(cur)localStorage.setItem('kickabout-club-release-version',cur);if(cu)localStorage.setItem('kickabout-custom-release-version',cu);
+  localStorage.setItem('kickabout-club',old);const oc=localStorage.getItem('kickabout-custom-test-version');if(oc)localStorage.setItem('kickabout-custom',oc);else localStorage.removeItem('kickabout-custom');
+  localStorage.removeItem('kickabout-club-test-version');localStorage.removeItem('kickabout-custom-test-version')}}catch(e){}
 try{const raw=localStorage.getItem('kickabout-club'),c=JSON.parse(raw||'null');if(c&&!saveOk(c)){localStorage.setItem('kickabout-club-test-version',raw);const cu=localStorage.getItem('kickabout-custom');if(cu)localStorage.setItem('kickabout-custom-test-version',cu);localStorage.removeItem('kickabout-club');localStorage.removeItem('kickabout-custom')}}catch(e){}
 try{const c=JSON.parse(localStorage.getItem('kickabout-custom')||'null');if(c&&c.name)custom={...custom,...c,isCustom:true}}catch(e){}
 function natPos(p){if(p.pos)return p.pos;const d=p.tackle*1.6+p.str*.6,m=p.pass*1.3+p.skill*.7,a=(p.shot+p.fin)*.8+p.pace*.3;return d>=m&&d>=a?'DEF':m>=a?'MID':'ATT'}

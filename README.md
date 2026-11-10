@@ -141,6 +141,11 @@ refused, the leaderboard is a fresh board, and online play uses a new version nu
 play the release (both screens say you need the same game file). `SAVE_EPOCH` in `src/js/1-data-menu.js` is the stamp:
 raise it to reset everyone again in a future release.
 
+**Keep-progress copy:** `KEEP_SAVES=1 OUT=Sunday-Kickabout-Keep-Progress.html node build.mjs` builds the same game with
+the reset switched off. It loads test-version saves, save codes and cloud copies as they are. If the release copy already
+set a test-version save aside in that browser, the keep-progress copy puts it back once (keeping the release club
+aside under `kickabout-club-release-version`). It plays online with the release copy.
+
 **AI dribbling:** the computer's ball carrier only tries skill moves and side-steps when he's facing forward (and seldom
 in his own half), and when shielding he never runs back towards his own goal. Measured with you pressing: time spent
 running backwards with the ball 21-23% -> 7-12%, forward progress roughly doubled on the Classical pitches.
