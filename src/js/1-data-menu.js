@@ -247,7 +247,12 @@ const DKEYS=['beginner','easy','normal','hard','legend'];
 // Hard can push an opponent past Legend: the numbers carry on from Normal → Hard → Legend, within sensible limits
 const DFCAP={spd:[1.5,3.15],tackle:[0,.8],react:[5,40],dive:[1,3.7],shoot:[0,1.1],err:[3,40],press:[0,1.35],range:[100,345],read:[0,.34],gk:[.7,1.42]};
 const DFCAPX={spd:[1.5,3.35],tackle:[0,.92],react:[3,40],dive:[1,4],shoot:[0,1.25],err:[2,40],press:[0,1.5],range:[100,370],read:[0,.42],gk:[.7,1.55]};
-const levelDF=k=>{const X=LV().extreme,x=clamp(DKEYS.indexOf(k)+LV().shift+(LV().half||0),0,X?8:6);
+const levelDF=k=>{const L=LV(),X=L.extreme;let b=DKEYS.indexOf(k);
+  // above Chill, weak sides still put up a fight: the bottom of the range is lifted a little
+  if(L.shift>=0&&b<2)b+=(2-b)*.25;
+  let x=clamp(b+L.shift+(L.half||0),0,X?8:6);
+  // Extreme: whoever the opponent is, they play at (nearly) the very top level
+  if(X)x=Math.max(x,7.6);
   if(x>4){const L=DIFFS.legend,Hd=DIFFS.hard,o={...L};for(const key in L)if(typeof L[key]==='number'&&key!=='coin'){const v=L[key]+(L[key]-Hd[key])*(x-4)*1.15,c=(X?DFCAPX:DFCAP)[key];o[key]=c?clamp(v,c[0],c[1]):v}if(X)o.slide=true;return o}
   const lo=DIFFS[DKEYS[Math.floor(x)]],hi=DIFFS[DKEYS[Math.ceil(x)]],f=x-Math.floor(x);
   if(!f)return lo;const o={...lo};for(const key in lo)if(typeof lo[key]==='number')o[key]=lo[key]+(hi[key]-lo[key])*f;else o[key]=f>=.5?hi[key]:lo[key];return o};
