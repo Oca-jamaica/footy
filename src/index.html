@@ -317,6 +317,43 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
 .bcol{display:grid;gap:4px;align-content:start}.bcol>b{font-family:var(--display);font-weight:400;font-size:15px;color:var(--sun)}
 .bm{font-size:12px;background:#12303e;border-radius:6px;padding:3px 6px;display:grid;gap:1px}.bm.me{outline:1px solid var(--sun)}
 .bm span{display:flex;justify-content:space-between;gap:6px}.bm .w{color:var(--mint);font-weight:800}.bm .l{color:var(--muted)}
+/* Icon Cup: always on show; a quiet locked tab until the Icon Division title is won, then platinum and gold */
+.diff .icontab{display:inline-flex;align-items:center;gap:6px}
+.icontab .ico{width:14px;height:14px;flex:none}
+.diff .icontab.shut{border-style:dashed;color:#9fb0b8;background:rgba(255,255,255,.03)}
+.diff .icontab.shut[aria-pressed="true"]{background:var(--ground-2);color:var(--cream);border:1px solid var(--muted)}
+.diff .icontab.open{color:#3a2c08;border-color:#f3dc8a;background:linear-gradient(135deg,#ffffff 0%,#e4e8ee 34%,#f6e3a6 68%,#d4af37 100%);animation:iconglow 2.6s ease-in-out infinite alternate}
+.diff .icontab.open[aria-pressed="true"]{outline:2px solid #fff3c4;outline-offset:2px}
+.diff .icontab.open:hover[aria-pressed="false"]{color:#1f1604;border-color:#fff3c4}
+.icontab em{font-style:normal;font-size:10px;letter-spacing:.08em;background:#231a03;color:#ffe08a;border-radius:999px;padding:1px 7px;animation:throb .7s ease-in-out infinite alternate}
+@keyframes iconglow{from{box-shadow:0 0 4px rgba(243,220,138,.35)}to{box-shadow:0 0 16px rgba(243,220,138,.85),0 0 2px #fff}}
+.icup{border-radius:14px;padding:16px;display:grid;gap:10px}
+.icup h4{margin:0;font-family:var(--display);font-weight:400;font-size:26px;letter-spacing:.04em}
+.icup h5{margin:0 0 6px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.icup p{margin:0}
+.icup.shut{border:1px dashed var(--line);background:rgba(255,255,255,.02);text-align:center;justify-items:center}
+.icup.shut .icup-ic .ico{width:44px;height:44px;color:#7f939c}
+.icup.shut h4{color:#cfd6da}
+.icup-sub{color:var(--muted);font-weight:700}
+.icup-prize b{color:#f3dc8a;font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:.02em}
+.icup-prize em{font-style:normal;font-size:11px;color:var(--mint);border:1px solid var(--mint);border-radius:999px;padding:0 6px;margin-left:4px}
+.icup-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;text-align:left;width:100%;margin-top:4px}
+.icup-cols p{font-size:13px;margin:0 0 6px;color:var(--cream)}
+.icup-path{margin:0;padding-left:20px;font-size:13px;color:var(--muted);display:grid;gap:3px}
+.icup-path li.done{color:var(--mint)}.icup-path li.done::marker{content:'✓  '}
+.icup-path li.here{color:var(--cream)}.icup-path li.here b{color:var(--sun)}
+.icup-path li.goal{color:#f3dc8a;font-weight:800}
+.icup.open{border:1px solid rgba(243,220,138,.65);background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(228,232,238,.06) 40%,rgba(212,175,55,.16));animation:iconglow 3.2s ease-in-out infinite alternate}
+.icup-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.icup-head>.ico{width:38px;height:38px;color:#f3dc8a;filter:drop-shadow(0 0 6px rgba(243,220,138,.6))}
+.icup-head h4{background:linear-gradient(180deg,#ffffff,#d9dee6 55%,#f3dc8a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.icup-head span{font-size:13px;color:var(--muted);font-weight:700}
+.icup-head .icup-prize{margin-left:auto}
+.icup-side{font-size:13px;color:var(--cream)}
+.icup-new{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-radius:10px;padding:8px 12px;color:#2a1f04;background:linear-gradient(135deg,#ffffff,#f6e3a6 55%,#d4af37);animation:popin .5s ease-out}
+.icup-new .ico{width:22px;height:22px}.icup-new b{font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:.08em}.icup-new span{font-size:13px;font-weight:700}
+.prize span.iconprize{color:#f3dc8a;border-color:rgba(243,220,138,.6)}
+@media (prefers-reduced-motion:reduce){.diff .icontab.open,.icup.open,.icontab em,.icup-new{animation:none}}
 .prize{display:flex;flex-wrap:wrap;gap:6px}.prize span{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted)}.prize span.got{color:var(--mint);border-color:var(--mint)}
 .tactics{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;width:100%}
 .tactics .lab{margin-bottom:3px}

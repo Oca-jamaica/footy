@@ -255,7 +255,9 @@ const LEVELS={chill:{shift:-1,ai:.9,bite:.62,coin:.8,name:'Chill',note:'Relaxed 
   normal:{shift:0,half:.8,ai:1.22,bite:.3,coin:1,name:'Medium',note:'A fair game. They mark your runners, sometimes cut out a pass, and still bite on a sharp cut now and then.'},
   hard:{shift:2.6,ai:1.75,bite:.04,coin:1.8,boost:.07,name:'Hard',note:'A genuine challenge: opponents beyond Legend level who track your runs, block passing lanes, time their through balls and almost never bite. Keepers sweep up behind. 1.8× coins.'},
   extreme:{shift:4.2,ai:2.1,bite:0,coin:2.5,boost:.12,extreme:true,name:'Extreme',note:'For veterans only: whoever you face, even a poor side plays at the very top level, +12 on every opponent (past 99), near-instant reactions, relentless pressing and slide tackles, and elite decisions: they cut out loose passes, counter in numbers, pick the open corner and never bite. 2.5× coins.'}};
-const LV=()=>NET.on?{shift:0,ai:1,bite:.3,coin:1,name:'Online'}:LEVELS[club.level]||LEVELS.normal;
+// the Icon Cup is always played at the hardest level, whatever difficulty is chosen
+const lvKey=()=>!NET.on&&comp==='icon'?'extreme':club.level;
+const LV=()=>NET.on?{shift:0,ai:1,bite:.3,coin:1,name:'Online'}:LEVELS[lvKey()]||LEVELS.normal;
 const DKEYS=['beginner','easy','normal','hard','legend'];
 // Hard can push an opponent past Legend: the numbers carry on from Normal → Hard → Legend, within sensible limits
 const DFCAP={spd:[1.5,3.15],tackle:[0,.8],react:[5,40],dive:[1,3.7],shoot:[0,1.1],err:[3,40],press:[0,1.35],range:[100,345],read:[0,.34],gk:[.7,1.42]};
@@ -400,8 +402,8 @@ function renderTour(){
 
 const renameUI=(p,where)=>renaming===p.id&&renameIn===where?`<div class="rn"><input type="text" id="rn-input" maxlength="16" value="${esc(NAMES[p.id]||p.name)}" aria-label="Player name"><button class="buy" data-rn-save="${p.id}">Save</button>${NAMES[p.id]?`<button class="edit" data-rn-reset="${p.id}">Reset</button>`:''}</div>`:`<button class="edit" data-rename="${p.id}">Rename</button>`;
 let ctab='coll',lgView='table',benchAll=false,cmpIds=[],upId=null;const collF={q:'',r:'all',pos:'all',own:'owned',sort:'ovr',page:0};
-const COMPS={volta:['league','wcc','easy','tour','friendly','chal','skill'],classical:['league','wcc','easy','friendly']};
-const COMPN={league:'League',wcc:'World Club Championship',easy:'Sunday Cup',tour:'Grand Tournament',friendly:'Friendly',chal:'Challenges',skill:'Skill games'};
+const COMPS={volta:['league','wcc','easy','icon','tour','friendly','chal','skill'],classical:['league','wcc','easy','icon','friendly']};
+const COMPN={league:'League',wcc:'World Club Championship',easy:'Sunday Cup',icon:'Icon Cup',tour:'Grand Tournament',friendly:'Friendly',chal:'Challenges',skill:'Skill games'};
 const compKey=()=>comp==='cup'?'easy':comp;
 // switching game mode swaps the line-up, the league season and the competition you were looking at
 function setGM(g){if(g===GM)return;club.compBy=club.compBy||{};club.compBy[GM]=club.comp;cupSwap(GM,g);GM=g;club.gm=g;club.comp=club.compBy[g]||'league';
@@ -414,13 +416,13 @@ function renderMenu(){
   comp=club.comp||'league';if(!COMPS[GM].includes(compKey())){comp=club.comp='league'}
   document.querySelectorAll('.lvl button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lv===(club.level||'normal')?'true':'false'));
   renderModes();
-  $('comps').innerHTML=COMPS[GM].map(c=>`<button data-d="${c}" aria-pressed="${compKey()===c}">${COMPN[c]}</button>`).join('');
+  $('comps').innerHTML=COMPS[GM].map(c=>c==='icon'?iconTabHTML():`<button data-d="${c}" aria-pressed="${compKey()===c}">${COMPN[c]}</button>`).join('');
   if(!club.cup||club.cup.tier!==diffKey)newCup(diffKey);
-  if(comp==='league')renderLeague();else if(comp==='wcc')renderWcc();
+  if(comp==='league')renderLeague();else if(comp==='wcc')renderWcc();else if(comp==='icon')renderIcon();
   else if(comp==='friendly')renderFriendly();else if(comp==='chal')renderChal();else if(comp==='skill')renderSkill();
   else if(comp==='tour'){if(!club.tour)newTour();$('diff-note').textContent=`${LV().name}: ${LV().note} 16 clubs, straight knockout. Four wins to lift the trophy.`;renderTour()}
   else{$('diff-note').textContent=`${LV().name}: ${LV().note} Coins ×${+(DIFFS[diffKey].coin*LV().coin).toFixed(2)}.`;const c=club.cup,tro=(club.trophies||{})[c.tier]||0;
-   $('cup').innerHTML=`<div class="cup-head"><b>${CUPS[c.tier]}</b><span>${tro?'\u{1F3C6} ×'+tro+' won':'Win three in a row to lift the trophy'}</span></div><div class="rounds">`+ROUNDS.map((r,i)=>{const o=OPPS[c.opps[i]],st=i<c.res.length?(c.res[i]?'won':'lost'):i===c.round&&c.alive?'now':'';
+   $('cup').innerHTML=`<div class="cup-head"><b>${CUPS[c.tier]}</b><span>${tro?'\u{1F3C6} ×'+tro+' won':'Win three in a row to lift the trophy'}</span></div>${c.tier==='easy'&&inIconDiv()?`<div class="prize"><span class="iconprize">Icon Division prize for winning it: ${ICON_SUNDAY.toLocaleString()} coins</span></div>`:''}<div class="rounds">`+ROUNDS.map((r,i)=>{const o=OPPS[c.opps[i]],st=i<c.res.length?(c.res[i]?'won':'lost'):i===c.round&&c.alive?'now':'';
      return `<div class="rnd ${st}" style="--k:${o[1]}"><i>${r.toUpperCase()}</i><em>${esc(o[0])}</em>${st==='won'?'<b>WON</b>':st==='lost'?'<b>KNOCKED OUT</b>':st==='now'?'<b style="color:var(--sun)">NEXT</b>':''}</div>`}).join('')+`</div>`}
   $('club-name').value=club.name;try{acctPill()}catch(e){}{const el=$('coins');el.textContent=club.coins.toLocaleString();if(shownCoins!=null&&club.coins!==shownCoins){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}shownCoins=club.coins}
   res();$('tt').textContent=club.tt;$('cp').textContent=club.cp.toLocaleString();$('legpill').textContent='Legacy Lv '+((club.leg||{}).lvl||0);ctkSync();$('ctkp').textContent=ctk();
@@ -455,7 +457,7 @@ function renderMenu(){
     return `<button class="packbtn t-${k.id==='premium'||k.id==='elite'?'special':k.id}" data-pack="${k.id}" ${!free&&club.coins<k.cost?'disabled':''}><b>${k.name}</b><span>${k.d}</span><span style="color:var(--tc)">Odds: ${od}</span><em>${free?`FREE${(club.free||{})[k.id]>1?' ×'+club.free[k.id]:''}`:k.cost.toLocaleString()+' coins'}</em></button>`}).join('');
   if(tab==='club')renderClub();
   const canFill=ownedPlayers().length>=4;
-  goBtn.disabled=!canFill;goBtn.textContent=goText();
+  goBtn.disabled=!canFill||(comp==='icon'&&!iconUnlocked());goBtn.textContent=goText();
 }
 const renderRoster=renderMenu;let shownCoins=null;
 function toast(m){$('toast').textContent=m}
@@ -608,7 +610,7 @@ $('pack-done').onclick=()=>{$('pack').hidden=true;renderMenu()};
 $('club-name').addEventListener('input',e=>{club.name=e.target.value.slice(0,14)||'My Club';saveClub()});
 $('club-kit').onclick=e=>{const c=e.target.dataset.c;if(c){club.kit=c;saveClub();renderMenu()}};
 document.querySelectorAll('.lvl button').forEach(b=>b.onclick=()=>{club.level=b.dataset.lv;saveClub();renderMenu()});
-$('comps').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;if(['friendly','chal','skill','tour','league','wcc'].includes(b.dataset.d)){club.comp=b.dataset.d;saveClub();renderMenu();return}club.comp='cup';if(b.dataset.d!==diffKey&&club.cup&&club.cup.round>0&&!cupOver())toast(`Left the ${CUPS[club.cup.tier]}. Your run there has ended.`);diffKey=b.dataset.d;DF=DIFFS[diffKey];try{localStorage.setItem('kickabout-diff',diffKey)}catch(e){}renderMenu()});
+$('comps').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;if(['friendly','chal','skill','tour','league','wcc','icon'].includes(b.dataset.d)){club.comp=b.dataset.d;saveClub();renderMenu();return}club.comp='cup';if(b.dataset.d!==diffKey&&club.cup&&club.cup.round>0&&!cupOver())toast(`Left the ${CUPS[club.cup.tier]}. Your run there has ended.`);diffKey=b.dataset.d;DF=DIFFS[diffKey];try{localStorage.setItem('kickabout-diff',diffKey)}catch(e){}renderMenu()});
 $('benchctl').addEventListener('click',e=>{if(e.target.closest('[data-benchall]')){benchAll=!benchAll;renderMenu()}});
 
 /* ---------- editor ---------- */

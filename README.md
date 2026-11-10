@@ -31,8 +31,21 @@ routers) and public MQTT relays over secure websockets, all tried at once; the f
 connection really drops, both screens pause and restart together. After the final whistle both stay in the room for a
 rematch. Press N during an online match for connection details.
 
-Each mode has its own five-division league (Amateur, Division 3, 2, 1, Legendary: 10 clubs, 9 rounds (everyone plays everyone once), top 3 up, bottom 3 down)
+Each mode has its own six-division league (Amateur, Division 3, 2, 1, Legendary, Icon: 10 clubs, 9 rounds (everyone plays everyone once), top 3 up, bottom 3 down)
 and its own World Club Championship (64-club knockout, earned with a top-3 finish). Coins, players, upgrades and cosmetics are shared.
+In the **Icon Division** (reached with a top-3 finish in the Legendary Division) winning the World Club Championship pays
+200,000 coins and winning the Sunday Cup 30,000.
+
+**Icon Cup**, the endgame tournament: its tab sits next to the Sunday Cup and the World Club Championship from the start,
+locked (a quiet tab with a padlock; clicking it shows "Icon Cup Locked — Unlock after winning Icon Division", the
+500,000-coin prize, the format and how far you are along the path). It unlocks only when you **win the Icon Division
+title** (finish 1st; 2nd or 3rd doesn't count), separately for Volta and Classical, and stays unlocked for good: the unlock
+(`club.iconCup[mode]`) is written once and nothing clears it (relegation, a new season, losing or winning the cup).
+Unlocked, the tab turns platinum and gold with a soft glow and an UNLOCKED badge until you first open it. You play
+short-handed against 99-rated Icon sides at the hardest AI level, whatever difficulty you've chosen: **Volta 3 v 5** and
+**Classical 4 v 9** (your keeper plus your two or three highest-rated players from the line-up). Sixteen clubs, knockout
+(Round of 16, quarter-finals, semi-finals, final; level games go to penalties). Winning the final pays **500,000 coins**,
+once per tournament, every time you win the whole thing; then a new draw starts.
 
 Difficulty: **Chill** (green), **Medium** (yellow), **Hard** (red), **Extreme** (fire). On the Classical pitches the computer plays
 as a team: one defender gets goal-side and times his tackle, a second covers, others block the obvious pass and track

@@ -5,9 +5,11 @@ const OPPNAMES=['BAKER','MORALES','DIXON','OKONJO','FERRIS','LUND','PEREIRA','HO
 let oppSeed=0;
 function setup(){oppSeed=(Math.random()*OPPNAMES.length)|0;
   const o={pace:.7,shot:.72,fin:.6,skill:.55,pass:.65,tackle:.6,str:.6,sk:'roulette',sp:'curler'},gk={pace:.5,shot:.6,fin:.6,skill:.3,pass:.65,tackle:.5,str:.8,sk:'shield',sp:'turbo'};
-  const q=sq(),slots=FORMS[q.f],n=slots.length;if(q.s.filter(Boolean).length<n){const keep=q.s.slice();autoPick(q);keep.forEach((id,i)=>{if(id&&!q.s.includes(id))q.s[i]=id})}
+  const q=sq();if(q.s.filter(Boolean).length<FORMS[q.f].length){const keep=q.s.slice();autoPick(q);keep.forEach((id,i)=>{if(id&&!q.s.includes(id))q.s[i]=id})}
+  // Icon Cup: short-handed, your keeper plus your two (Volta) or three (Classical) highest-rated players
+  const icon=comp==='icon'&&!NET.on&&OPP.icon,side=icon?iconSide(q):{slots:FORMS[q.f],ids:q.s},slots=side.slots,n=slots.length;
   const chem=NET.on?0:chemOf(q)*.0002;
-  const mine=q.s.map((id,i)=>{let p=byId(id)||STARTERS[i%3];p=playStats(p);if(chem){p={...p};for(const [k] of STATK)p[k]=Math.min(Math.max(.99,p[k]),p[k]+chem)}const f=posFit(natPos(p),slots[i].r);
+  const mine=side.ids.map((id,i)=>{let p=byId(id)||STARTERS[i%3];p=playStats(p);if(chem){p={...p};for(const [k] of STATK)p[k]=Math.min(Math.max(.99,p[k]),p[k]+chem)}const f=posFit(natPos(p),slots[i].r);
     if(f>=1)return p;const c={...p};for(const [k] of STATK)c[k]=p[k]*f;return c});
   const avg={};for(const [k] of STATK)avg[k]=clamp(mine.reduce((a,p)=>a+p[k],0)/mine.length+OPP.off,.3,.99);Object.assign(o,avg);// opponents get stronger each round
   const keys=FORM_KEYS[PITCH!=='volta'?'classical':'volta'],oppF=OPP.form&&keys.includes(OPP.form)?OPP.form:pick(keys),oslots=FORMS[oppF];
@@ -15,7 +17,7 @@ function setup(){oppSeed=(Math.random()*OPPNAMES.length)|0;
   const LOOKS=[['short',0,0,1.02],['buzz',0,1,1],['curly',0,0,.97],['quiff',0,0,1.04],['afro',0,1,.98],['bald',0,0,1.05],['bun',0,0,1.01],['mohawk','#e8cf7a',0,.99]];
   const NUMS=n>4?[2,5,4,6,8,7,11,9]:[4,8,10,9];
   players=[];
-  mine.forEach((st,i)=>{const p=mk(0,i,st,KIT(),0,0);p.slot=slots[i];p.role=q.att===i?'att':q.cap===i?'cap':null;players.push(p)});
+  mine.forEach((st,i)=>{const p=mk(0,i,st,KIT(),0,0);p.slot=slots[i];p.role=icon?null:q.att===i?'att':q.cap===i?'cap':null;players.push(p)});
   players.push(mk(0,n,{...gk,...keeperStats(0),short:'GK',num:1,skin:'#c98f63',hair:'#3b2a22'},C.mint,FX0+16,MY,true));
   if(NET.host&&netGuest)netGuestTeam();
   else if(OPP.club!=null&&comp==='tour'){
@@ -26,13 +28,13 @@ function setup(){oppSeed=(Math.random()*OPPNAMES.length)|0;
   const OSK=['stepover','elastico','burst','dragback','fakeshot','roulette','shield'],OSP=['rocket','through','knuckle','lob','turbo','slide','curler'],sh=(oppSeed*3)%7;
   // league and championship sides have a real strength of their own; the others are pitched against your team's average
   const SHP={DEF:['cb','fb','ballcb','wingback'],MID:['b2b','playmaker','destroyer'],ATT:['finisher','speed','dribbler','power']};
-  oslots.forEach((sl,i)=>{let st={...o};if(OPP.str!=null){const r=Math.round(clamp(OPP.str*100+rnd(-4,4),35,98)),v=statsFor(r,pick(SHP[sl.r]));STATK.forEach(([k],j)=>st[k]=v[j])}
+  oslots.forEach((sl,i)=>{let st={...o};if(OPP.str!=null){const r=OPP.icon?99:Math.round(clamp(OPP.str*100+rnd(-4,4),35,98)),v=statsFor(r,pick(SHP[sl.r]));STATK.forEach(([k],j)=>st[k]=v[j])}
     const p=mk(1,n+1+i,{...st,sk:OSK[(sh+i*2)%7],sp:sl.r==='DEF'?pick(['slide','lob','turbo']):OSP[(sh+i*3)%7],look:LOOKS[(i+oppSeed)%LOOKS.length],num:NUMS[i],short:OPPNAMES[(oppSeed+i*7)%OPPNAMES.length],name:OPPNAMES[(oppSeed+i*7)%OPPNAMES.length],skin:looks[(i+oppSeed)%looks.length][0],hair:looks[(i+oppSeed)%looks.length][1]},OPP.kit,0,0);p.slot=sl;players.push(p)})}
   // Hard and Extreme: every opponent is genuinely better than their card. Above Chill, weak sides are lifted to a floor
   // first (Medium .58, Hard .66, Extreme .84), so even a poor team is a game; on Extreme they can go past 99 too.
-  {const fl={normal:.58,hard:.66,extreme:.84}[club.level]||0,bo=LV().boost||0,cap=LV().extreme?1.1:.99;
+  {const ic=comp==='icon',fl=ic?0:{normal:.58,hard:.66,extreme:.84}[club.level]||0,bo=ic?0:LV().boost||0,cap=LV().extreme&&!ic?1.1:.99;
    if((fl||bo)&&!NET.on)for(const p of players)if(p.team===1){p.st={...p.st};for(const [k] of STATK)p.st[k]=Math.min(cap,Math.max(+p.st[k]||.6,fl)+bo)}}
-  players.push(mk(1,2*n+1,{...gk,...keeperStats(1),num:1,skin:'#f2c9a0',hair:'#d9a441'},C.sun,FX1-16,MY,true));
+  players.push(mk(1,players.length,{...gk,...keeperStats(1),num:1,skin:'#f2c9a0',hair:'#d9a441'},C.sun,FX1-16,MY,true));
 }
 setup();
 /* ---------- camera + projection ---------- */
@@ -505,7 +507,10 @@ addEventListener('keydown',e=>{
   if(c==='KeyN'&&NET.on){netDiag=!netDiag;return}// online connection details
   if(NET.guest){guestKey(c);return}
   if(state==='play'){
-    const p=ctrl;if(!p)return;playKey(p,c);
+    const p=ctrl;if(!p)return;
+    // online: a skill pressed just before the ball reaches you is held until it's at your feet (as for your friend)
+    if(NET.on&&(c==='KeyE'||c==='ArrowUp')&&B.owner!==p&&ballComing(p)){hostSkPend={t};return}
+    playKey(p,c);
     if(c==='Tab'||c==='KeyQ')switchPlayer(true);
   }else if(state==='goal'){
     if(/^Digit[1-6]$/.test(c)&&stT<220){celebType=+c.slice(5)-1;scorer.rot=0;scorer.jump=0;S.skill(1);pop(CELEBS[celebType],scorer.x,scorer.y-36,C.sun,20)}
@@ -574,11 +579,13 @@ function startMatch(){matchSerial++;ttCalc=null;
   else if(comp==='wcc'){const W=wccOf();if(!W||!wMy(W)){renderMenu();return}const x=wMy(W),o=wTeam(W,x.a==='me'?x.b:x.a);
     OPP={name:o.name.toUpperCase(),kit:o.kit,off:0,str:o.str,form:o.form,tac:{push:1.1,pass:1.15,press:1.1},final:W.round===5};cupEvent=null;eventText=null}
   else if(comp==='friendly'||comp==='chal'||comp==='skill'){const pool=OPPS.filter(o=>!kitClash(o[1],club.kit)),o=pick(pool.length?pool:OPPS);OPP={name:o[0].toUpperCase(),kit:o[1],off:comp==='chal'?0:-.02};cupEvent=null;eventText=null}
+  else if(comp==='icon'){if(!iconUnlocked()){renderMenu();return}const I=icupOf();if(!I||I.done){newIcup(GM);renderMenu();return}const x=iMy(I),o=iTeam(I,x.a==='me'?x.b:x.a);
+    OPP={name:o.name.toUpperCase(),kit:o.kit,off:0,str:.99,icon:true,form:o.form,tac:{push:1.15,pass:1.2,press:1.15},final:I.round===3};cupEvent=null;eventText=null}
   else if(comp==='tour'){if(tourOver()){newTour();renderMenu();return}const m=myMatch(),oi=m.a===ME?m.b:m.a;OPP={name:CLUBS[oi][0].toUpperCase(),kit:clubKit(oi),off:0,club:oi};cupEvent=null;eventText=null}
   else{if(cupOver()){newCup(diffKey);renderMenu();return}
   {const o=OPPS[club.cup.opps[club.cup.round]];OPP={name:o[0].toUpperCase(),kit:o[1],off:ROFF[club.cup.round]};cupEvent=null;eventText=null}}
   initAudio();if(ac&&ac.state==='suspended')ac.resume();
-  DF=levelDF(comp==='tour'?tourDF(OPP.club):comp==='league'?DIVS[lgOf().div].df:comp==='wcc'?(OPP.str>.9?'legend':'hard'):diffKey);setup();players.forEach(p=>{if(p.team===1)p.spCd=rnd(140,380)});hat=null;score=[0,0];mercy=false;clock=PITCH==='volta'?120:PITCH==='expanded'?210:180;style=0;shownStyle=0;hype=0;fire=0;streak=0;
+  DF=levelDF(comp==='tour'?tourDF(OPP.club):comp==='league'?DIVS[lgOf().div].df:comp==='wcc'?(OPP.str>.9?'legend':'hard'):comp==='icon'?'legend':diffKey);setup();players.forEach(p=>{if(p.team===1)p.spCd=rnd(140,380)});hat=null;score=[0,0];mercy=false;clock=PITCH==='volta'?120:PITCH==='expanded'?210:180;style=0;shownStyle=0;hype=0;fire=0;streak=0;
   stats={shots:0,on:0,skills:0,passes:0,tackles:0};parts=[];pops=[];
   menuEl.hidden=true;edEl.hidden=true;cv.focus();kickoff(0);modeStart();matchRatings=null;
   introT=SG||state!=='play'?0:INTRO;
@@ -588,7 +595,7 @@ function showMenu(left=false){
   state='menu';menuEl.hidden=false;tutAfterMatch();
   const pw=pen&&pen.winner!=null?pen.winner:null;const r=score[0]>score[1]?'You won':score[0]<score[1]?'You lost':pw===0?'Won on penalties':pw===1?'Lost on penalties':'Draw';
   resultEl.hidden=false;resultEl.textContent=`Last match: ${r} ${score[0]}–${score[1]} · ${style.toLocaleString()} style pts`+(true?` · +${earned} coins`:` · best ${best.toLocaleString()}`);
-  if((comp==='league'||comp==='wcc')&&eventText&&!left)resultEl.textContent=eventText+' · '+resultEl.textContent;
+  if((comp==='league'||comp==='wcc'||comp==='icon')&&eventText&&!left)resultEl.textContent=eventText+' · '+resultEl.textContent;
   else if(cupEvent==='champion')resultEl.textContent=`\u{1F3C6} ${comp==='tour'?'Grand Tournament':CUPS[club.cup.tier]} champions! `+resultEl.textContent;
   if(left){earned=0;resultEl.textContent=`Left the match at ${score[0]}–${score[1]}. No worries, go again whenever.`}
   if(comp==='skill'&&SG&&SG.msg&&!left)resultEl.textContent=`${SGAMES[SG.k].name}: ${SG.msg}${SG.best?' (new best!)':''} · +${earned} coins`;
@@ -731,6 +738,24 @@ function pushDir(p,lateral){
 }
 function push(p,a,spd,frames,next=null){p.push={a,spd,T:frames,max:frames,next}}
 let KNOCK=[7.6,16,7.4,30,1.6];
+/* The footwork of each skill move: its animation, push and any turn. doSkill uses it and then decides who the move
+   beats; the joining laptop uses it to show its own player's skill the instant it's pressed, so both move him the same
+   way. Returns what the move picked: the man it spins round, the defender it shields from, the old facing, the side. */
+function skillMove(p,sk){
+  switch(sk){
+    case 'stepover':p.anim='step';p.animT=p.animMax=22;push(p,p.dir,6.4,14);return null;
+    case 'roulette':{p.anim='roul';p.animT=p.animMax=30;let q=null;
+      for(const o of outfield(1-p.team)){const d=dist(p,o);if(d<85&&Math.cos(angDiff(Math.atan2(o.y-p.y,o.x-p.x),p.dir))>0&&(!q||d<dist(p,q)))q=o}
+      const sd=q?(Math.sin(angDiff(Math.atan2(q.y-p.y,q.x-p.x),p.dir))>0?-1:1):(pushDir(p,true)>p.dir?1:-1);
+      push(p,p.dir+sd*1.25,5,14,{a:p.dir-sd*.35,spd:6,T:16});return q}
+    case 'rainbow':p.anim='rainbow';p.animT=p.animMax=30;return null;
+    case 'elastico':{p.anim='elastico';p.animT=p.animMax=14;const a=pushDir(p,true),sd=Math.sign(angDiff(a,p.dir))||1;push(p,p.dir+sd*1.5,9,8,{a:p.dir+sd*.2,spd:6.8,T:14});return null}
+    case 'burst':p.knockT=95;push(p,p.dir,KNOCK[2],KNOCK[3]);return null;
+    case 'dragback':{p.anim='drag';p.animT=p.animMax=12;const d0=p.dir,sd=Math.sign(angDiff(pushDir(p,true),p.dir))||1;p.dir+=Math.PI;push(p,p.dir,5.2,11,{a:p.dir-sd*1.3,spd:6,T:14});return d0}
+    case 'shield':{p.anim='shield';p.animT=p.animMax=56;let nd=null;for(const q of outfield(1-p.team))if(!nd||dist(q,p)<dist(nd,p))nd=q;
+      p.shieldFrom=nd&&dist(nd,p)<140?nd:null;p.dir=p.shieldFrom?Math.atan2(p.y-nd.y,p.x-nd.x):p.dir+Math.PI;p.vx*=.3;p.vy*=.3;return nd}
+    case 'fakeshot':{p.anim='fake';p.animT=p.animMax=16;const a=pushDir(p,true),sd=Math.sign(angDiff(a,p.dir))||1;p.vx*=.25;p.vy*=.25;push(p,p.dir+sd*1.35,7.2,12,{a:p.dir+sd*.55,spd:6.4,T:14});return sd}}
+  return null}
 function doSkill(p){if(p.team===1&&!hum(p))aiStat.aiSkills++;
   const sk=p.st.sk,def=SKILLS[sk];
   if(!def||p.skillCd>0||p.stam<def.stam||p.anim||p.stun>0||B.owner!==p)return;
@@ -738,37 +763,32 @@ function doSkill(p){if(p.team===1&&!hum(p))aiStat.aiSkills++;
   const near=nearAny(p,75);
   switch(sk){
     case 'stepover':{// WRONG-FOOT: everyone close in front freezes leaning the wrong way; you just keep going
-      p.anim='step';p.animT=p.animMax=22;push(p,p.dir,6.4,14);let n=0;
+      skillMove(p,sk);let n=0;
       for(const q of outfield(1-p.team)){if(dist(p,q)>95||Math.cos(angDiff(Math.atan2(q.y-p.y,q.x-p.x),p.dir))<-.2)continue;
         if(Math.random()<beatsChance(p,.42)){q.lungeDir=p.dir+(Math.random()<.5?1.4:-1.4);whiff(q,48,p,false);q.vx*=.5;q.vy*=.5;n++;if(p.team===0)pop('WRONG-FOOTED',q.x,q.y-30,C.coral,18,70)}
         else if(q.team===1){q.shadow=30;q.shadowOf=p}}
       if(n&&p.team===0)slowmo(14,.4);landed(p,n,15,'STEP-OVER');if(!n&&near)pop('read it',p.x,p.y-30,C.muted,15);break}
     case 'roulette':{// SPIN ROUND: always gets you past the one man in front, and he spins with you
-      p.anim='roul';p.animT=p.animMax=30;let q=null;
-      for(const o of outfield(1-p.team)){const d=dist(p,o);if(d<85&&Math.cos(angDiff(Math.atan2(o.y-p.y,o.x-p.x),p.dir))>0&&(!q||d<dist(p,q)))q=o}
-      const sd=q?(Math.sin(angDiff(Math.atan2(q.y-p.y,q.x-p.x),p.dir))>0?-1:1):(pushDir(p,true)>p.dir?1:-1);
-      push(p,p.dir+sd*1.25,5,14,{a:p.dir-sd*.35,spd:6,T:16});
+      const q=skillMove(p,sk);
       if(q){q.stun=Math.max(q.stun,46);q.whiff=q.whiffMax=46;q.vx*=.2;q.vy*=.2;q.anim='roul';q.animT=q.animMax=30;if(p.team===0){pop('SPUN HIM',q.x,q.y-30,C.coral,20,70);slowmo(12,.45)}landed(p,1,20,'ROULETTE')}
       break}
     case 'rainbow':{// OVER HIS HEAD: flick it over the defender and run onto it
-      p.anim='rainbow';p.animT=p.animMax=30;const tx=p.x+Math.cos(p.dir)*125,ty=p.y+Math.sin(p.dir)*125;lobTo(p,p,tx,ty,30,false);B.pass=null;
+      skillMove(p,sk);const tx=p.x+Math.cos(p.dir)*125,ty=p.y+Math.sin(p.dir)*125;lobTo(p,p,tx,ty,30,false);B.pass=null;
       let n=0;for(const q of outfield(1-p.team)){if(dist(p,q)>95||Math.cos(angDiff(Math.atan2(q.y-p.y,q.x-p.x),p.dir))<.2)continue;q.stun=Math.max(q.stun,34);q.vx*=.3;q.vy*=.3;n++;if(p.team===0)pop('OVER HIS HEAD',q.x,q.y-30,C.coral,18,70)}
       landed(p,n,25,'RAINBOW FLICK');break}
     case 'elastico':{// ANKLE BREAKER: violent side-snap; the man in front goes down
-      p.anim='elastico';p.animT=p.animMax=14;{const a=pushDir(p,true),sd=Math.sign(angDiff(a,p.dir))||1;push(p,p.dir+sd*1.5,9,8,{a:p.dir+sd*.2,spd:6.8,T:14})}
+      skillMove(p,sk);
       const n=fool(p,68,.5,true,30);landed(p,n,18,'ELASTICO');if(!n&&near)pop('read it',p.x,p.y-30,C.muted,15);break}
-    case 'burst':{p.burstNear=near;p.burstT=t;kick(p,p.dir,KNOCK[0],.3);B.lockT=KNOCK[1];p.knockT=95;push(p,p.dir,KNOCK[2],KNOCK[3]);if(p.team===0){pop('KNOCK-ON',p.x,p.y-30,C.mint,16);burst(p.x,p.y,8,[C.mint,C.cream],3,.05,[3,5])}break}
+    case 'burst':{p.burstNear=near;p.burstT=t;kick(p,p.dir,KNOCK[0],.3);B.lockT=KNOCK[1];skillMove(p,sk);if(p.team===0){pop('KNOCK-ON',p.x,p.y-30,C.mint,16);burst(p.x,p.y,8,[C.mint,C.cream],3,.05,[3,5])}break}
     case 'dragback':{// MATADOR: stop dead and pull it back; anyone charging at you sails past
-      p.anim='drag';p.animT=p.animMax=12;const d0=p.dir;{const sd=Math.sign(angDiff(pushDir(p,true),p.dir))||1;p.dir+=Math.PI;push(p,p.dir,5.2,11,{a:p.dir-sd*1.3,spd:6,T:14})}
+      const d0=skillMove(p,sk);
       let n=0;for(const q of outfield(1-p.team)){if(dist(p,q)>85||Math.cos(angDiff(Math.atan2(q.y-p.y,q.x-p.x),d0))<0)continue;
         if(Math.random()<beatsChance(p,.5)){q.lungeDir=Math.atan2(p.y-q.y,p.x-q.x);whiff(q,46,p,true);n++}}
       landed(p,n,12,'DRAG-BACK');break}
-    case 'shield':{p.anim='shield';p.animT=p.animMax=56;let nd=null;for(const q of outfield(1-p.team))if(!nd||dist(q,p)<dist(nd,p))nd=q;
-      p.shieldFrom=nd&&dist(nd,p)<140?nd:null;p.dir=p.shieldFrom?Math.atan2(p.y-nd.y,p.x-nd.x):p.dir+Math.PI;p.vx*=.3;p.vy*=.3;
+    case 'shield':{const nd=skillMove(p,sk);
       pop('SHIELD',p.x,p.y-30,C.sun,17);if(p.team===0&&p.shieldFrom&&dist(nd,p)<80){addStyle(8,p.x,p.y,'TURNED HIS BACK')}break}
-    case 'fakeshot':{p.anim='fake';p.animT=p.animMax=16;
-      // plant like you're about to strike, then chop it hard across your body
-      const a=pushDir(p,true),sd=Math.sign(angDiff(a,p.dir))||1;p.vx*=.25;p.vy*=.25;push(p,p.dir+sd*1.35,7.2,12,{a:p.dir+sd*.55,spd:6.4,T:14});
+    case 'fakeshot':{// plant like you're about to strike, then chop it hard across your body
+      const sd=skillMove(p,sk);
       const n=fool(p,85,.38,true,30);
       const k=keeperOf(1-p.team),gx=goalX(p.team);if(Math.hypot(p.x-gx,p.y-MY)<340&&k.stun<=0){k.stun=26;k.y=clamp(k.y-sd*16,GY0+4,GY1-4);k.diving=true;if(p.team===0)pop('KEEPER BOUGHT IT',k.x,k.y-34,C.sun,18)}
       landed(p,n,18,'FAKE SHOT');if(!n&&near)pop('read it',p.x,p.y-30,C.muted,15);S.kick(.2);break}
@@ -905,7 +925,7 @@ function startLunge(p){if(koGrace(p)){pop('let them kick off',p.x,p.y-30,C.muted
 // Ball lunge: a sharp burst with the ball glued to your feet, for shifting away from a defender
 function ballLunge(p){if(p.blungeCd>0||p.stam<6||p.anim||p.stun>0)return;p.blungeCd=BLUNGE_CD;p.stam-=6;
   const ix=inX(),iy=inY(),a=(ix||iy)?Math.atan2(iy,ix):p.dir;push(p,a,7.4,13);p.lungeT=13;S.swoosh();grass(p.x,p.y,5)}
-function tackle(def,car){
+function tackle(def,car,seen){// seen: online, where the joining player's screen showed the carrier when he went in (netSeenBall)
   if(car.keeper){def.tackleCd=30;def.lunge=0;return}
   if((car.ghost>0||car.anim==='bike')&&!def.inter){def.slide=false;def.aiSlide=0;def.aiLunge=0;def.lunge=0;whiff(def,46,car,true);return}
   def.tackleCd=def.team===1&&!hum(def)?75/DF.press:48;
@@ -916,7 +936,7 @@ function tackle(def,car){
   if(shielded&&!def.inter){def.slide=false;def.aiSlide=0;def.aiLunge=0;if(car.anim==='shield'){def.stun=30;if(car.team===0)addStyle(8,car.x,car.y,'BOUNCED OFF')}else whiff(def,48,car,true);return}
   const tk=def.st.tackle??.6,str=car.st.str??.6;
   // Where is the tackler relative to the carrier? In front of the ball = clean tackle; from behind = you have to go through them.
-  const front=Math.cos(angDiff(Math.atan2(def.y-car.y,def.x-car.x),car.dir));
+  const front=seen?Math.cos(angDiff(Math.atan2(def.y-seen.cy,def.x-seen.cx),car.dir)):Math.cos(angDiff(Math.atan2(def.y-car.y,def.x-car.x),car.dir));
   const mySlide=def.slide&&(def.team===0||hum(def));
   const pos=front>.35?1:front>-.25?(mySlide?.9:def.slide?.8:.55):(mySlide?.5:def.slide?.4:.12);
   let ch;
@@ -930,7 +950,7 @@ function tackle(def,car){
   if(!def.inter)ch*=pos;
   if(Math.random()<ch){
     if(def.team===1){if(def.slide)aiStat.slWon++;else aiStat.tkWon++}
-    give(def);car.stun=def.slide?40:22;S.tackle();
+    give(def);if(seen&&dist(def,B)>40){B.x=def.x+Math.cos(def.dir)*12;B.y=def.y+Math.sin(def.dir)*12;B.vx=B.vy=0}car.stun=def.slide?40:22;S.tackle();
     if(def.team===0){def.mT=(def.mT||0)+1;stats.tackles++;addHype(10);addStyle(def.slide||def.inter?20:10,def.x,def.y,def.inter?'INTERCEPTED':def.slide?'SLIDE TACKLE':'WON IT');ctrl=def;if(def.slide){shake=Math.max(shake,RM?0:5);slowmo(12,.45)}}
     else if(car.team===0){pop(def.slide?'SLID IN':'dispossessed',car.x,car.y-30,C.muted,15)}
   }else{if(def.slide)def.stun=60;else whiff(def,40,car,false);
@@ -963,19 +983,24 @@ function faceVel(p,dt){const sp=Math.hypot(p.vx,p.vy);if(sp>.4)p.dir+=angDiff(Ma
 
 function humanUpdate(p,dt){
   let ax=inX(),ay=inY();const l=Math.hypot(ax,ay);if(l){ax/=l;ay/=l}
-  if(p.lunge>0){p.lunge-=dt;const toBall=Math.atan2(B.y-p.y,B.x-p.x),a=!p.slide&&!p.inter?p.lungeDir+angDiff(toBall,p.lungeDir)*.65:p.slide?p.dir+angDiff(toBall,p.dir)*Math.min(1,.16*dt):toBall;
-    const s=p.inter?9:p.slide?8*(p.lunge>6?1:.6):(p.lunge>5?6.4:2.6);p.vx=Math.cos(a)*s;p.vy=Math.sin(a)*s;p.dir=a;if((p.slide||p.inter)&&t%2<1)grass(p.x,p.y,1);
+  if(p.lunge>0){p.lunge-=dt;const sb=netSeenBall(p),toBall=sb?Math.atan2(sb.y-p.y,sb.x-p.x):Math.atan2(B.y-p.y,B.x-p.x),a=!p.slide&&!p.inter?p.lungeDir+angDiff(toBall,p.lungeDir)*.65:p.slide?p.dir+angDiff(toBall,p.dir)*Math.min(1,.16*dt):toBall;
+    const s=p.inter?9:p.slide?8*(p.lunge>6?1:.6):(p.lunge>5?6.4:2.6);p.vx=Math.cos(a)*s;p.vy=Math.sin(a)*s;p.dir=a;
+    // judged on what the joining player saw: the carrier's body (where it was then) blocks the way, as it would here
+    if(sb){const nx=p.x+p.vx*dt-sb.cx,ny=p.y+p.vy*dt-sb.cy,nd=Math.hypot(nx,ny);if(nd<24&&nd>0){const k=24/nd;p.vx=(sb.cx+nx*k-p.x)/Math.max(.2,dt);p.vy=(sb.cy+ny*k-p.y)/Math.max(.2,dt)}}if((p.slide||p.inter)&&t%2<1)grass(p.x,p.y,1);
     const car=B.owner&&B.owner.team!==p.team&&!B.owner.keeper?B.owner:null;
-    if(car&&!p.slide&&!p.inter&&dist(p,B)<23){
+    // online, the joining player's lunge also counts when it reached the ball where his own screen showed it (netSeenBall)
+    const reach=r=>dist(p,B)<r||(!!sb&&!!car&&Math.hypot(p.x-sb.x,p.y-sb.y)<r&&dist(p,car)<sb.lim);
+    if(car&&!p.slide&&!p.inter&&reach(23)){
       // your lunge: catch the ball and it's yours, the carrier is dazed. Only a skill move mid-feint gets out of it.
       const feint=(car.push&&car.push.T>0)||car.anim==='shield'||car.ghost>0||car.anim==='bike',spin=(car.anim==='roul'||car.anim==='rainbow')&&car.animT>car.animMax*.45;
       if(feint||spin){p.lunge=0;whiff(p,40,null,false);p.locked=40;pop('dodged',car.x,car.y-30,C.muted,15)}
-      else{give(p);p.mT=(p.mT||0)+1;car.stun=60;car.vx*=.2;car.vy*=.2;p.lunge=0;p.tackleCd=LUNGE_CD;S.tackle();shake=Math.max(shake,RM?0:4);if(p.team===0){stats.tackles++;addHype(10);addStyle(15,p.x,p.y)}pop('STOLEN!  +15',p.x,p.y-48,C.mint,28,70);hitStop(4);S.ooh();slowmo(12,.35);flash=RM?0:.25}}
-    else if(car&&(dist(p,B)<(p.slide?28:p.inter?24:23)||(p.slide&&dist(p,car)<30))){tackle(p,car)}
+      else{const far=dist(p,B)>=23;give(p);if(far){B.x=p.x+Math.cos(p.dir)*12;B.y=p.y+Math.sin(p.dir)*12;B.vx=B.vy=0}// won on what the joining player saw: the ball comes to his feet
+        p.mT=(p.mT||0)+1;car.stun=60;car.vx*=.2;car.vy*=.2;p.lunge=0;p.tackleCd=LUNGE_CD;S.tackle();shake=Math.max(shake,RM?0:4);if(p.team===0){stats.tackles++;addHype(10);addStyle(15,p.x,p.y)}pop('STOLEN!  +15',p.x,p.y-48,C.mint,28,70);hitStop(4);S.ooh();slowmo(12,.35);flash=RM?0:.25}}
+    else if(car&&(reach(p.slide?28:p.inter?24:23)||(p.slide&&(dist(p,car)<30||(!!sb&&Math.hypot(p.x-sb.cx,p.y-sb.cy)<30&&dist(p,car)<sb.lim))))){tackle(p,car,sb&&dist(p,B)>=(p.slide?28:23)&&!(p.slide&&dist(p,car)<30)?sb:null)}
     else if(!B.owner&&dist(p,B)<(p.slide?28:22)&&!(B.lobThrough&&B.lobTo&&B.lobTo.team!==p.team&&B.z>=thruReach(p))){if(p.slide){give(p);ctrl=p;B.vx=B.vy=0}p.lunge=0;p.slide=false;p.inter=false}
     if(p.lunge<=0&&p.slide){p.slide=false;p.stun=48;pop('up you get',p.x,p.y-28,C.muted,13)}
     if(p.lunge<=0&&!p.slide&&!p.inter&&B.owner!==p){whiff(p,30,null,false);p.locked=30;pop('whiff',p.x,p.y-28,C.muted,13)}// whiff: stuck in the lunge for a second
-    if(p.lunge<=0)p.inter=false;
+    if(p.lunge<=0){p.inter=false;p.lagOff=0}
     return}
   if(B.lobTo===p||B.graceTo===p){const tx=(B.lobTo===p?B.lobX:B.x)-p.x,ty=(B.lobTo===p?B.lobY:B.y)-p.y,l=Math.hypot(tx,ty);if(l>5){ax=ax*.15+tx/l*.85;ay=ay*.15+ty/l*.85;const al=Math.hypot(ax,ay)||1;ax/=al;ay/=al}else{ax=0;ay=0}}
   else if(B.pass&&B.pass.to===p&&!B.owner&&Math.hypot(B.vx,B.vy)>1.5){
@@ -1020,14 +1045,14 @@ const aiShotLog=[];const wonT=[-999,-999],aiStat={icpt:0,icptWon:0,through:0,squ
    Hard and Extreme are unchanged. tools/difficulty.cjs measures each level against tools/difficulty-targets.json. */
 const EASE={chill:{icpt:.55,spd:.86,react:30,press:.68,gap:16,cover:1.8,tackle:.22,win:60,room:105,slide:.08,read:.3,gk:.8,gkReact:1.5,gkErr:1.6,spill:.12,shotErr:1.9,passErr:2.4,decide:1.8,wobble:55,chaos:2.4},
   normal:{icpt:.74,spd:.93,react:24,press:.76,gap:10,cover:1.45,tackle:.36,win:45,room:85,slide:.4,read:.65,gk:.9,gkReact:1.2,gkErr:1.25,spill:.06,shotErr:1.4,passErr:1.6,decide:1.3,wobble:28,chaos:1.5}};
-const EZ=()=>pvp()||SG?null:EASE[club.level]||null;
+const EZ=()=>pvp()||SG?null:EASE[lvKey()]||null;
 const ez=(k,d=1)=>{const e=EZ();return e?e[k]:d};
 // the computer's outfield players on Chill/Medium (offline only)
 const ezP=p=>p.team===1&&!p.keeper&&!hum(p)&&!!EZ();
 // whether he's committing to tackles right now: decided afresh every half second, so on Chill/Medium a defender often
 // just jockeys instead of diving in the moment you take a heavy touch (decided every 1 s on Chill, 0.75 s on Medium)
 const ezGate=p=>{if(p.team!==1||!EZ())return true;if(t-(p.ezAt??-99)>ez('win',30)){p.ezAt=t;p.ezOk=Math.random()<ez('tackle')}return p.ezOk};
-function aiIQ(team){if(pvp())return .55;if(team===0)return .6;const b={chill:.15,normal:.42,hard:.72,extreme:.95}[club.level]??.42;return clamp(b+(DF.read||0)*.35-.04,0,1)}
+function aiIQ(team){if(pvp())return .55;if(team===0)return .6;const b={chill:.15,normal:.42,hard:.72,extreme:.95}[lvKey()]??.42;return clamp(b+(DF.read||0)*.35-.04,0,1)}
 const lastLine=(team,dir)=>{let v=-1e9;for(const q of outfield(team))v=Math.max(v,q.x*dir);return v};// deepest outfield player of `team`, measured along dir
 // the open spot near a target: tries a few nearby points and keeps the one furthest from the opposition
 function openSpot(p,tx,ty,att,r){let best={x:tx,y:ty},bv=-1;const opp=outfield(1-p.team);
@@ -1050,7 +1075,7 @@ const CSTY={possession:{n:'Possession',press:.95,line:.5,pass:1.3,long:.5,width:
 const CL=()=>PITCH!=='volta';
 function cStyle(team){if(team===0||NET.on)return CSTY.neutral;if(!OPP.style){const k=['possession','counter','press','direct','wide'];let h=7;for(const ch of String(OPP.name||''))h=(h*31+ch.charCodeAt(0))>>>0;OPP.style=k[h%k.length]}return CSTY[OPP.style]||CSTY.neutral}
 // decision quality on the big pitches: Chill .3, Medium .58, Hard .82, Extreme 1 (a little higher in the top divisions)
-function cIQ(team){if(pvp()||team===0)return .6;const b={chill:.3,normal:.58,hard:.82,extreme:1}[club.level]??.58;return clamp(b+(DF.read||0)*.3-.03,0,1)}
+function cIQ(team){if(pvp()||team===0)return .6;const b={chill:.3,normal:.58,hard:.82,extreme:1}[lvKey()]??.58;return clamp(b+(DF.read||0)*.3-.03,0,1)}
 const lerp=(a,b,k)=>a+(b-a)*k;
 // how loose his next touch will be in f frames (the same rhythm the tackle formula uses)
 const looseAt=(o,f)=>{const psp=Math.hypot(o.vx||0,o.vy||0),amp=clamp(psp/2.6,0,1)*(17-(o.st.skill??.6)*12);return amp*Math.max(0,Math.sin((o.touchPh||0)+psp*.085*f))/17};
@@ -1836,6 +1861,11 @@ function awardCoins0(){earned=0;shownEarned=0;earnNote='';
     else if(out&&out.won){cupEvent='advance';eventText=`Through to the ${WROUNDS[W.round]}!`+(out.prize?` +${out.prize.toLocaleString()} prize`:'');grant({cp:20*W.round})}
     else{cupEvent='out';eventText=`Knocked out of the World Club Championship. ${wTeam(W,W.champ).name} won it.`}
     saveClub();return}
+  if(comp==='icon'){const I=icupOf(),out=I?icupRecord(I,score[0],score[1],pw):null;const base=won?200:40;earned=matchPay(won?'Win':'Defeat',base,score[0]*15,LV().coin,out&&out.prize||0);club.coins+=earned;club.played=(club.played||0)+1;
+    if(out&&out.champ){stat('icon_'+GM);club.trophies=club.trophies||{};club.trophies['icon_'+GM]=(club.trophies['icon_'+GM]||0)+1;grant({cp:500,tt:15});cupEvent='champion';eventText=`ICON CUP CHAMPIONS! +${(out.prize||0).toLocaleString()} coins and the Icon Cup`}
+    else if(out&&out.won){cupEvent='advance';eventText=`Through to the ${IROUNDS[I.round]} of the Icon Cup!`;grant({cp:40*I.round})}
+    else if(out){cupEvent='out';eventText=`Knocked out of the Icon Cup. ${iTeam(I,I.champ).name} won it.`}
+    saveClub();return}
   if(comp==='friendly'){earned=matchPay('Friendly',Math.round((r+style/25)*.5),Math.round(score[0]*7.5),LV().coin);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText=levelUps.length?'LEVEL UP! '+levelUps.join(' · '):null;saveClub();return}
   if(comp==='tour'&&club.tour&&!tourOver()){const T=club.tour,m=myMatch(),meA=m.a===ME;
     Object.assign(m,{sa:meA?score[0]:score[1],sb:meA?score[1]:score[0],pen:pw!==null,w:won?ME:(meA?m.b:m.a)});m.up=won&&clubRating(meA?m.b:m.a)>teamRating()+3;
@@ -1846,7 +1876,9 @@ function awardCoins0(){earned=0;shownEarned=0;earnNote='';
   if(club.cup&&!cupOver()){const c=club.cup;c.res.push(won);
     if(won){bonus=RBONUS[c.round];c.round++;if(c.round>=3){club.trophies=club.trophies||{};club.trophies[c.tier]=(club.trophies[c.tier]||0)+1;cupEvent='champion'}else cupEvent='advance'}
     else{c.alive=false;cupEvent='out'}}
-  earned=matchPay(won?'Win':score[0]===score[1]?'Draw':'Defeat',Math.round(r+style/25),score[0]*15,DIFFS[diffKey].coin*LV().coin,Math.round(bonus*DIFFS[diffKey].coin*LV().coin*MM()));club.coins+=earned;club.played=(club.played||0)+1;saveClub()}
+  const iconSun=cupEvent==='champion'&&club.cup&&club.cup.tier==='easy'&&inIconDiv();
+  earned=matchPay(won?'Win':score[0]===score[1]?'Draw':'Defeat',Math.round(r+style/25),score[0]*15,DIFFS[diffKey].coin*LV().coin,iconSun?ICON_SUNDAY:Math.round(bonus*DIFFS[diffKey].coin*LV().coin*MM()));
+  if(iconSun)earnNote=`Icon Division Sunday Cup prize: ${ICON_SUNDAY.toLocaleString()} coins`;club.coins+=earned;club.played=(club.played||0)+1;saveClub()}
 /* ---------- main update ---------- */
 // timers, animations and trails for one player, every frame
 function tickPlayer(p,dt){if(p.locked>0)p.locked-=dt;if(p.caughtT>0)p.caughtT-=dt;if(p.fall>0){p.fall-=dt;p.vx*=.9;p.vy*=.9}if(p.tackleCd>0)p.tackleCd-=dt;if(p.skillCd>0)p.skillCd-=dt;if(p.spCd>0)p.spCd-=dt;if(p.slideCd>0)p.slideCd-=dt;if(p.blungeCd>0)p.blungeCd-=dt;if(p.turbo>0)p.turbo-=dt;if(p.whiff>0)p.whiff-=dt;
@@ -1942,6 +1974,6 @@ function update(dt){
   {let w=0;for(let i=0;i<pops.length;i++){const p=pops[i];p.z+=.6*dt;p.life-=dt;if(p.life>0)pops[w++]=p}pops.length=w}
   if(shake>0)shake=Math.max(0,shake-.6*dt);if(flash>0)flash=Math.max(0,flash-.05*dt);netShake=netShake.map(n=>Math.max(0,n-dt));
   shownStyle+=(style-shownStyle)*Math.min(1,.08*dt);if(Math.abs(style-shownStyle)<.5)shownStyle=style;
-  if(NET.host)netPublish();
+  if(NET.host){netHistAdd();netHostPendTick();netPublish()}
 }
 

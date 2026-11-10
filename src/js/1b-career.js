@@ -230,9 +230,12 @@ function grant(r,why){if(!r)return'';const c=res(),bits=[];
   if(r.xp)legacyXP(r.xp);
   return bits.join(' · ')}
 
-/* ===== leagues: five divisions per mode, ten clubs, home and away ===== */
+/* ===== leagues: six divisions per mode, ten clubs, home and away ===== */
+// the Icon Division sits above the Legendary Division: the strongest league sides in the game, reached by finishing in
+// the top three of the Legendary Division. Winning its title unlocks the Icon Cup (see below).
 const DIVS=[{n:'Amateur Division',s:[.5,.6],df:'beginner',mul:1},{n:'Division 3',s:[.58,.68],df:'easy',mul:1.5},{n:'Division 2',s:[.66,.76],df:'normal',mul:2.2},
-  {n:'Division 1',s:[.74,.84],df:'hard',mul:3.2},{n:'Legendary Division',s:[.82,.93],df:'legend',mul:4.5}];
+  {n:'Division 1',s:[.74,.84],df:'hard',mul:3.2},{n:'Legendary Division',s:[.82,.93],df:'legend',mul:4.5},{n:'Icon Division',s:[.9,.98],df:'legend',mul:6.5}];
+const ICON_DIV=5;
 const FINISH=[1500,1100,850,650,520,420,340,260,180,120];// coins for where you finish, times the division multiplier
 const TOWNS=['Brackwater','Fenmoor','Kestrel Bay','Oakhollow','Redcliffe','Stonebridge','Marlow Vale','Ashgrove','Cinder Hill','Dunmore','Eastwick','Foxley','Granton','Hawkshead','Ironvale',
   'Juniper','Kingsmere','Larkspur','Millbrook','Northgate','Orchard Park','Pembury','Quarrytown','Rookwood','Saltmarsh','Thornbury','Upton Cross','Valemouth','Westholm','Yarrow','Bramblewick','Coldharbour'];
@@ -267,8 +270,10 @@ function lgRecord(L,gf,ga){const f=myFixture(L);if(!f)return;f.r=f.h==='me'?[gf,
 function seasonEnd(L){if(L.paid)return null;L.paid=true;const m=GM,T=lgTable(L),pos=T.findIndex(r=>r.id==='me')+1,me=T[pos-1],D=DIVS[L.div],out=[];
   let coins=Math.round(FINISH[pos-1]*D.mul*MM()/10)*10,cp=Math.round((11-pos)*6*D.mul);const tt=pos<=3?3:1;
   if(pos===1){coins+=Math.round(2000*MM());club.trophies=club.trophies||{};club.trophies['lg_'+m+'_'+L.div]=(club.trophies['lg_'+m+'_'+L.div]||0)+1;out.push(`CHAMPIONS of the ${D.n}!`);stat('titles',1)}
-  const promo=pos<=3&&L.div<4,releg=pos>=8&&L.div>0;
-  if(promo){coins+=Math.round(750*MM());out.push(`Promoted to ${DIVS[L.div+1].n}`);stat('promos_'+m,1);if(L.div+1===4)stat('legend_'+m,1)}
+  const top=DIVS.length-1,promo=pos<=3&&L.div<top,releg=pos>=8&&L.div>0;
+  if(promo){coins+=Math.round(750*MM());out.push(`Promoted to ${DIVS[L.div+1].n}`);stat('promos_'+m,1);if(L.div+1===4)stat('legend_'+m,1);if(L.div+1===ICON_DIV)stat('icondiv_'+m,1)}
+  // champions of the Icon Division: the Icon Cup opens for this mode, for good (second or third doesn't count)
+  if(pos===1&&L.div===ICON_DIV){const was=iconUnlocked(m);iconUnlock(m,L.season);out.push(was?'Icon Division champions again!':'ICON CUP UNLOCKED!')}
   if(releg)out.push(`Relegated to ${DIVS[L.div-1].n}`);
   if(me.l===0)stat('unbeaten',1);
   const spon=500*(depLv('comm')-1);if(spon){coins+=spon;out.push(`Sponsor payment +${spon}`)}
@@ -277,7 +282,7 @@ function seasonEnd(L){if(L.paid)return null;L.paid=true;const m=GM,T=lgTable(L),
   // a top-three finish earns a place in next season's World Club Championship
   const W=wccOf(m);if(W&&!W.done)wccClose(m);
   if(pos<=3){club.wcc=club.wcc||{};club.wcc[m]=newWcc(m,L.season+1);out.push('Qualified for the World Club Championship!')}
-  L.summary={pos,coins,cp,tt,lines:out,got,next:clamp(L.div+(promo?1:releg?-1:0),0,4)};
+  L.summary={pos,coins,cp,tt,lines:out,got,next:clamp(L.div+(promo?1:releg?-1:0),0,top)};
   achCheck();saveClub();return L.summary}
 function lgNext(m=GM){const L=lgOf(m);if(!L||!L.done)return;const s=L.summary||{next:L.div};newSeason(m,s.next,L.season+1)}
 
@@ -316,9 +321,50 @@ function wccRecord(W,gf,ga,pw){const x=wMy(W);if(!x)return null;const meA=x.a===
   if(!won){W.alive=false;W.exit=W.round;wSimRound(W);if(W.round>=5){W.champ=W.rounds[5][0].w;W.done=true}else{W.round++;while(!W.done){wSimRound(W);if(W.round>=5){W.champ=W.rounds[5][0].w;W.done=true}else W.round++}}return{won:false}}
   wSimRound(W);const reached=W.round+1;// 1 = R32 ... 5 = final, 6 = champions
   let prize=0;if(W.round>=5){W.done=true;W.champ='me'}
-  const key=W.round>=5?6:reached;if(!W.paid[key]){W.paid[key]=true;prize=Math.round(WPRIZE[key]*MM())}
+  const key=W.round>=5?6:reached;if(!W.paid[key]){W.paid[key]=true;prize=key===6?wccWinPrize():Math.round(WPRIZE[key]*MM())}
   if(!W.done)W.round++;
   return{won:true,prize,champ:W.done,reached:key}}
+
+// winning the World Club Championship and the Sunday Cup is worth far more to an Icon Division club
+const ICON_WCC=200000,ICON_SUNDAY=30000;
+const inIconDiv=(m=GM)=>{const L=(club.lg||{})[m];return!!L&&L.div===ICON_DIV};
+const wccWinPrize=()=>inIconDiv()?ICON_WCC:Math.round(WPRIZE[6]*MM());
+
+/* ===== the Icon Cup: the endgame tournament =====
+   Always on show next to the other cups, but locked until you win the Icon Division title (finish first) in that mode.
+   The unlock is stored in club.iconCup[mode].at the moment the title is won and nothing ever clears it: relegation, a
+   new season, losing or winning the Icon Cup all leave it alone. Volta and Classical are unlocked separately.
+   You play short-handed against 99-rated Icon sides at the game's hardest AI level: Volta 3 v 5 and Classical 4 v 9
+   (your keeper plus the two or three highest-rated players in your line-up). Sixteen clubs, straight knockout: Round of
+   16, quarter-finals, semi-finals, final; level games go to penalties. Winning the final pays 500,000 coins, every time
+   you win the whole thing (once per tournament); then a new draw starts. */
+const ICUP_PRIZE=500000,IROUNDS=['Round of 16','Quarter-finals','Semi-finals','Final'];
+const ICLUBS=[['Pantheon FC','#f4f1ea'],['Olympus Athletic','#d4af37'],['Hall of Fame XI','#2f2f3a'],['Platinum Stars','#cfd8e3'],['Golden Boot FC','#ffd166'],['Legends United','#8e8ff0'],
+  ['Crown Jewels','#b06cf0'],['Diamond Dynamo','#4fb3ff'],['Eternal Eleven','#e8475f'],['Maestro City','#1f8a70'],['Dream Ballers','#ff9ecb'],['Golden Generation','#d9965f'],
+  ['Titan Rovers','#3f8fd8'],['Zenith Sporting','#5fc79a'],['Immortals FC','#ff6f59'],['Summit Albion','#b94a2c'],['Halo Wanderers','#f4f1ea']];
+// your short-handed side's positions (the keeper is extra): Volta two outfield, Classical three
+const ICON_FORMS={volta:[{r:'DEF',x:.27,y:.5},{r:'ATT',x:.56,y:.5}],classical:[{r:'DEF',x:.2,y:.5},{r:'MID',x:.4,y:.5},{r:'ATT',x:.6,y:.5}]};
+const ICON_SIZE={volta:'3 v 5',classical:'4 v 9'};
+const iconUnlocked=(m=GM)=>!!(club.iconCup&&club.iconCup[m]&&club.iconCup[m].at);
+function iconUnlock(m,season){club.iconCup=club.iconCup||{};const u=club.iconCup[m]=club.iconCup[m]||{};if(!u.at){u.at=Date.now();u.season=season;u.fresh=true}}
+const icupOf=(m=GM)=>(club.icup||{})[m]||null;
+function newIcup(m=GM){const n=((icupOf(m)||{}).n||0)+1;
+  const pool=ICLUBS.map((c,i)=>({id:'i'+i,name:c[0],kit:kitClash(c[1],club.kit)?pick(KITPOOL.filter(k=>!kitClash(k,club.kit))):c[1],str:.99,form:pick(FORM_KEYS[m])})).sort(()=>Math.random()-.5).slice(0,15);
+  const slots=['me',...pool.map(c=>c.id)].sort(()=>Math.random()-.5),r0=[];for(let i=0;i<16;i+=2)r0.push({a:slots[i],b:slots[i+1]});
+  club.icup=club.icup||{};club.icup[m]={n,clubs:pool,rounds:[r0],round:0,alive:true,done:false,paid:false,champ:null};saveClub();return club.icup[m]}
+const iTeam=(I,id)=>id==='me'?{id:'me',name:club.name||'My Club',kit:club.kit,str:teamRating()/100}:I.clubs.find(c=>c.id===id);
+const iMy=I=>I&&I.alive&&!I.done?I.rounds[I.round].find(x=>x.a==='me'||x.b==='me'):null;
+function iSimRound(I){const R=I.rounds[I.round];for(const x of R)if(!x.w){let [a,b]=simScore(iTeam(I,x.a).str,iTeam(I,x.b).str);x.sa=a;x.sb=b;if(a===b){x.pen=true;x.w=Math.random()<.5?x.a:x.b}else x.w=a>b?x.a:x.b}
+  if(I.round<3&&I.rounds.length===I.round+1){const nx=[];for(let i=0;i<R.length;i+=2)nx.push({a:R[i].w,b:R[i+1].w});I.rounds.push(nx)}}
+// your result goes in; knocked out, the rest of the cup plays itself out
+function icupRecord(I,gf,ga,pw){const x=iMy(I);if(!x)return null;const meA=x.a==='me',won=gf>ga||pw===0;
+  x.sa=meA?gf:ga;x.sb=meA?ga:gf;x.pen=pw!=null;x.w=won?'me':(meA?x.b:x.a);iSimRound(I);
+  if(!won){I.alive=false;I.exit=I.round;while(I.round<3){I.round++;iSimRound(I)}I.champ=I.rounds[3][0].w;I.done=true;return{won:false}}
+  if(I.round>=3){I.done=true;I.champ='me';let prize=0;if(!I.paid){I.paid=true;prize=ICUP_PRIZE}return{won:true,champ:true,prize}}
+  I.round++;return{won:true,champ:false,prize:0}}
+// your two (Volta) or three (Classical) for the Icon Cup: the highest-rated players in your line-up, each put where he fits best
+function iconSide(q,m=GM){const F=ICON_FORMS[m==='classical'?'classical':'volta'],left=q.s.filter(Boolean).map(byId).filter(Boolean).sort((a,b)=>effOvr(b)-effOvr(a)).slice(0,F.length),out=[];
+  for(const sl of F){let k=left.findIndex(p=>natPos(p)===sl.r);if(k<0)k=0;out.push(left.splice(k,1)[0]||null)}return{slots:F,ids:out.map(p=>p?p.id:null)}}
 
 /* ===== club records ===== */
 const stat=(k,n=1)=>{club.st=club.st||{};club.st[k]=(club.st[k]||0)+n};
@@ -452,6 +498,7 @@ function careerInit(){ctkSync();for(const m of ['volta','classical']){const L=(c
 /* ===== menus ===== */
 function goText(){
   if(comp==='league'){const L=lgOf();if(!L)return'Start the season';if(L.done)return'See the season review';const f=myFixture(L),o=lgTeam(L,f.h==='me'?f.a:f.h);return`Round ${L.round+1}: ${f.h==='me'?'vs':'at'} ${o.name}`}
+  if(comp==='icon'){if(!iconUnlocked())return'Icon Cup locked';const I=icupOf();if(!I||I.done)return'Enter the Icon Cup';const x=iMy(I),o=iTeam(I,x.a==='me'?x.b:x.a);return`${IROUNDS[I.round]} vs ${o.name}`}
   if(comp==='wcc'){const W=wccOf();if(!W)return'Not qualified yet';if(W.done||!W.alive)return W.champ==='me'?'Champions!':'Knocked out';const x=wMy(W),o=wTeam(W,x.a==='me'?x.b:x.a);return`${WROUNDS[W.round]} vs ${o.name}`}
   return comp==='friendly'?'Play a friendly':comp==='chal'?`Try: ${CHALS.find(c=>c.id===chalId()).name}`:comp==='skill'?`Play ${SGAMES[sgId()].name}`:comp==='tour'?(tourOver()?'Enter a new tournament':`Play ${TROUNDS[club.tour.round].replace(/s$/,'').toLowerCase()} vs ${clubName(myMatch().a===ME?myMatch().b:myMatch().a)}`):cupOver()?(club.cup.alive?'Defend the trophy':'Enter the cup again'):`Play ${ROUNDS[club.cup.round].toLowerCase()} vs ${OPPS[club.cup.opps[club.cup.round]][0]}`}
 const fmtX=x=>{const v=+x.toFixed(3);return Number.isInteger(v)?v.toFixed(1):String(v)};
@@ -486,14 +533,39 @@ function renderLeague(){let L=lgOf();if(!L)L=newSeason(GM,0,1);const D=DIVS[L.di
 function renderWcc(){const W=wccOf();
   if(!W){$('diff-note').textContent='Finish in the top three of your league to qualify. The championship is played during the following season.';
     $('cup').innerHTML=`<div class="cup-head"><b>World Club Championship</b><span>Not qualified yet</span></div><div class="panel"><p>64 of the world’s best clubs, straight knockout, played during the season after you qualify. Opponents are much stronger than league sides, and the final is against one of the top seeds.</p>
-    <div class="prize">${WROUNDS.slice(1).map((r,i)=>`<span>Reach ${r}: ${Math.round(WPRIZE[i+1]*MM()).toLocaleString()}</span>`).join('')}<span>Win it: ${Math.round(WPRIZE[6]*MM()).toLocaleString()} + Elite Pack + trophy + exclusive cosmetic</span></div></div>`;return}
+    <div class="prize">${WROUNDS.slice(1).map((r,i)=>`<span>Reach ${r}: ${Math.round(WPRIZE[i+1]*MM()).toLocaleString()}</span>`).join('')}<span>Win it: ${wccWinPrize().toLocaleString()} + Elite Pack + trophy + exclusive cosmetic${inIconDiv()?' (Icon Division prize)':''}</span></div></div>`;return}
   const st=W.done?(W.champ==='me'?'You are world champions!':`Won by ${esc(wTeam(W,W.champ).name)}`):W.alive?`Next: ${WROUNDS[W.round]}`:'Knocked out';
   $('diff-note').textContent=`World Club Championship for season ${W.season}. Knockout: level games go to penalties. ${GM==='classical'?'Classical prizes are 1.5×.':''}`;
   const cols=W.rounds.map((R,ri)=>{const list=ri<2?R.filter(x=>x.a==='me'||x.b==='me'||x.w==='me'||ri>=W.round-0&&false):R;const mine=R.filter(x=>x.a==='me'||x.b==='me');
     const shown=ri<=1?[...mine,...R.filter(x=>!mine.includes(x)).slice(0,ri===0?5:7)]:R;
     return `<div class="bcol"><b>${WROUNDS[ri]}</b>${shown.map(x=>{const nm=id=>esc(wTeam(W,id).name),cl=id=>x.w?(x.w===id?'w':'l'):'';
       return `<div class="bm ${x.a==='me'||x.b==='me'?'me':''}"><span class="${cl(x.a)}">${nm(x.a)}<em>${x.w?x.sa:''}</em></span><span class="${cl(x.b)}">${nm(x.b)}<em>${x.w?x.sb:''}${x.pen?' p':''}</em></span></div>`}).join('')}${ri<=1&&R.length>shown.length?`<span class="hint" style="font-size:11px">+ ${R.length-shown.length} more ties</span>`:''}</div>`}).join('');
-  $('cup').innerHTML=`<div class="cup-head"><b>World Club Championship</b><span>${st}</span></div><div class="prize">${WROUNDS.slice(1).map((r,i)=>`<span class="${W.paid[i+1]?'got':''}">${r}: ${Math.round(WPRIZE[i+1]*MM()).toLocaleString()}</span>`).join('')}<span class="${W.paid[6]?'got':''}">Champions: ${Math.round(WPRIZE[6]*MM()).toLocaleString()}</span></div><div class="bracket">${cols}</div>`}
+  $('cup').innerHTML=`<div class="cup-head"><b>World Club Championship</b><span>${st}</span></div><div class="prize">${WROUNDS.slice(1).map((r,i)=>`<span class="${W.paid[i+1]?'got':''}">${r}: ${Math.round(WPRIZE[i+1]*MM()).toLocaleString()}</span>`).join('')}<span class="${W.paid[6]?'got':''}">Champions: ${wccWinPrize().toLocaleString()}${inIconDiv()?' (Icon Division prize)':''}</span></div><div class="bracket">${cols}</div>`}
+// the Icon Cup tab: always shown next to the other cups. Locked, it previews the competition and shows the way to
+// unlock it; unlocked, it's platinum and gold with the draw, the prize and your side.
+const LOCK_SVG='<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 10.5V7.5a4.5 4.5 0 0 1 9 0v3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><rect x="4.5" y="10" width="15" height="11" rx="2.6" fill="currentColor"/></svg>';
+const CROWN_SVG='<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5l4.6 3.8L12 4.5l4.4 7.8L21 8.5l-2.1 10.5H5.1z" fill="currentColor"/><rect x="5" y="19.6" width="14" height="2" rx="1" fill="currentColor"/></svg>';
+function iconTabHTML(){const u=iconUnlocked(),f=u&&club.iconCup[GM].fresh;
+  return `<button data-d="icon" class="icontab ${u?'open':'shut'}" aria-pressed="${compKey()==='icon'}" title="${u?'Icon Cup: the endgame tournament':'Icon Cup locked: unlock after winning Icon Division'}">${u?CROWN_SVG:LOCK_SVG}<span>Icon Cup</span>${f?'<em>UNLOCKED</em>':''}</button>`}
+function renderIcon(){const m=GM==='classical'?'classical':'volta',u=iconUnlocked(m),size=ICON_SIZE[m],L=lgOf(m),div=L?L.div:0,won=(club.trophies||{})['icon_'+m]||0;
+  const fmt=m==='classical'?'Classical, 4 v 9: your keeper and your three highest-rated players against nine 99-rated Icons.':'Volta, 3 v 5: your keeper and your two highest-rated players against five 99-rated Icons.';
+  if(!u){$('diff-note').textContent='Icon Cup Locked — Unlock after winning Icon Division.';
+    const steps=DIVS.map((D,i)=>`<li class="${i<div?'done':i===div?'here':''}">${D.n}${i===div?' <b>· you are here</b>':''}</li>`).join('')+`<li class="goal">Win the Icon Division title (finish 1st)</li>`;
+    $('cup').innerHTML=`<div class="icup shut"><div class="icup-ic">${LOCK_SVG}</div><h4>ICON CUP — LOCKED</h4><p class="icup-sub">Unlock after winning Icon Division</p><p class="icup-prize">Winning prize: <b>500,000 coins</b></p>
+      <div class="icup-cols"><div><h5>How to unlock it (${m==='classical'?'Classical':'Volta'})</h5><ol class="icup-path">${steps}</ol><p class="hint">Second or third in the Icon Division isn’t enough: only the title opens it. Once it’s open it stays open, even if you’re relegated. Volta and Classical unlock separately.</p></div>
+      <div><h5>The competition</h5><p>${fmt}</p><p>Sixteen clubs, straight knockout: ${IROUNDS.join(', ')}. Level games go to penalties.</p><p>Always played at the game’s hardest level, whatever difficulty you’ve chosen.</p><p><b>500,000 coins</b> every time you win it.</p></div></div></div>`;return}
+  let I=icupOf(m);if(!I)I=newIcup(m);
+  const fresh=!!club.iconCup[m].fresh;
+  const st=I.done?(I.champ==='me'?'ICON CUP CHAMPIONS!':`Won by ${esc(iTeam(I,I.champ).name)}`):I.alive?`Next: ${IROUNDS[I.round]}`:'Knocked out';
+  $('diff-note').textContent=`Icon Cup · ${fmt} Always the hardest level. Level games go to penalties.`;
+  const side=iconSide(sq(),m),names=side.ids.map(id=>id&&byId(id)?esc(byId(id).short||byId(id).name):'(nobody)');
+  const cols=I.rounds.map((R,ri)=>`<div class="bcol"><b>${IROUNDS[ri]}</b>${R.map(x=>{const nm=id=>esc(iTeam(I,id).name),cl=id=>x.w?(x.w===id?'w':'l'):'';
+      return `<div class="bm ${x.a==='me'||x.b==='me'?'me':''}"><span class="${cl(x.a)}">${nm(x.a)}<em>${x.w?x.sa:''}</em></span><span class="${cl(x.b)}">${nm(x.b)}<em>${x.w?x.sb:''}${x.pen?' p':''}</em></span></div>`}).join('')}</div>`).join('');
+  $('cup').innerHTML=`<div class="icup open${fresh?' fresh':''}">${fresh?`<div class="icup-new">${CROWN_SVG}<b>UNLOCKED</b><span>Icon Division champions: the Icon Cup is open to you for good.</span></div>`:''}
+    <div class="icup-head">${CROWN_SVG}<div><h4>ICON CUP</h4><span>${st}${won?` · won ×${won}`:''}</span></div><p class="icup-prize">Winning prize <b>500,000 coins</b>${I.paid?' <em>won</em>':''}</p></div>
+    <p class="icup-side">Your ${size} side: keeper + ${names.join(' + ')} <span class="hint">(the highest-rated in your line-up; change your line-up on the Squad tab)</span></p>
+    <div class="bracket">${cols}</div></div>`;
+  if(fresh){club.iconCup[m].fresh=false;saveClub();try{confetti('icon')}catch(e){}}}
 $('modes').addEventListener('click',e=>{const pz=e.target.closest('[data-pitch]');if(pz){club.cpitch=pz.dataset.pitch;saveClub();renderMenu();return}const b=e.target.closest('[data-gm]');if(b)setGM(b.dataset.gm)});
 $('cup').addEventListener('click',e=>{const v=e.target.closest('[data-lgv]');if(v){lgView=v.dataset.lgv;renderMenu();return}
   if(e.target.closest('[data-lgnext]')){lgNext();lgView='table';toast('New season, new fixtures. Good luck!');renderMenu()}});
@@ -624,8 +696,9 @@ function cosHTML(){const groups=[['pitch','Pitch'],['theme','Stadium lighting'],
    <div class="lab">CLUB BADGE</div><div class="forms">${BADGES.map(b=>`<button data-badge="${b}" aria-pressed="${(club.badge||'⚽')===b}">${b}</button>`).join('')}</div></div>`+
    groups.map(([k,n])=>`<div class="panel" style="margin-top:8px"><h4>${n}</h4><div class="cosg">${COS.filter(c=>c.k===k).map(c=>{const o=cosOwned(c.id),on=cosOn(k)===c.id;
     return `<div class="ach ${on?'claimed':''}"><b>${c.name}</b>${on?'<span class="flash">In use</span>':o?`<button class="btn" data-cosu="${c.id}">Use</button>`:c.win?'<span class="hint" style="margin:0">Earned through achievements</span>':`<button class="btn gold" data-cosb="${c.id}" ${club.cp<c.cp?'disabled':''}>Buy · ${c.cp} CP</button>`}</div>`}).join('')}</div></div>`).join('')}
-function cabHTML(){const T=club.trophies||{},items=[];for(const m of ['volta','classical'])for(let d=0;d<5;d++)if(T['lg_'+m+'_'+d])items.push([`🏆`,`${DIVS[d].n} (${m==='volta'?'Volta':'Classical'})`,T['lg_'+m+'_'+d]]);
+function cabHTML(){const T=club.trophies||{},items=[];for(const m of ['volta','classical'])for(let d=0;d<DIVS.length;d++)if(T['lg_'+m+'_'+d])items.push([`🏆`,`${DIVS[d].n} (${m==='volta'?'Volta':'Classical'})`,T['lg_'+m+'_'+d]]);
   for(const m of ['volta','classical'])if(T['wcc_'+m])items.push(['🌍',`World Club Champions (${m==='volta'?'Volta':'Classical'})`,T['wcc_'+m]]);
+  for(const m of ['volta','classical'])if(T['icon_'+m])items.push(['👑',`Icon Cup (${m==='volta'?'Volta':'Classical'})`,T['icon_'+m]]);
   for(const k in CUPS)if(T[k])items.push(['🥇',CUPS[k],T[k]]);if(T.tour)items.push(['🏅','Grand Tournament',T.tour]);
   const A=club.ach||{};
   return `<div class="panel"><h4>${club.badge||'⚽'} ${esc(club.name||'My Club')} · Trophy Cabinet</h4><div class="cabinet">${items.map(([e,n,c])=>`<div class="troph"><b>${e}</b>${esc(n)}<br><span class="flash">×${c}</span></div>`).join('')||'<p class="hint">Win something and it lives here forever.</p>'}</div></div>
