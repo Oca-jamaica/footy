@@ -14,7 +14,7 @@ if(keyFile!=='none'&&existsSync(keyFile)){const k=JSON.parse(readFileSync(keyFil
 const build=new Date().toISOString().slice(0,10);
 const game=js.replace('/*@OPSKEYS*/null',()=>JSON.stringify(keys)).replace("/*@BUILD*/'dev'",()=>JSON.stringify(build));
 out=out.replace('/*@GAME*/',()=>safe(game));
-// sunday-kickabout.html is the working copy; Sunday-Kickabout-Shareable.html is the same game, named for sharing
-const files=(process.env.OUT||'sunday-kickabout.html,Sunday-Kickabout-Shareable.html').split(',');
+// sunday-kickabout.html is the working copy; Sunday-Kickabout-Final.html is the same game, named for sharing
+const files=(process.env.OUT||'sunday-kickabout.html,Sunday-Kickabout-Final.html').split(',');
 for(const f of files)writeFileSync(f,out);
 console.log('built',files.join(', '),(out.length/1024).toFixed(0)+' KB',keys?'· dashboard link on ('+keyFile+')':'· dashboard link off (no public keys)');

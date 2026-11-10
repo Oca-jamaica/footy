@@ -593,7 +593,7 @@ const SPECIALS={
   rocket:{name:'ROCKET',cd:1200,d:'Hardest shot in the game. Can burst through the keeper’s hands.'},
   knuckle:{name:'KNUCKLEBALL',cd:1140,d:'Wobbling, dipping strike. Keepers react late.'},
   chip:{name:'CHIP',cd:960,d:'Lob over a keeper who has come off his line.'},
-  through:{name:'THROUGH BALL',cd:900,d:'Floats it over everyone onto the penalty spot after one second, for the team-mate nearest it. He chases it at his own pace, so a defender who gets there first can win it.'},
+  through:{name:'THROUGH BALL',cd:900,d:'Floats it over everyone to the edge of their penalty area after one second, for the team-mate nearest it. He chases it at his own pace, so a defender who gets there first can win it.'},
   bicycle:{name:'BICYCLE KICK',cd:900,d:'Only straight off a teammate’s pass: flip and volley it first time. Very likely to go in.'},
   lob:{name:'CHIP PASS',cd:960,d:'Lofted pass over the defence to your best-placed teammate. Defenders can still attack it as it drops.'},
 
@@ -3696,16 +3696,19 @@ function offsideCall(p,m){const def=players.filter(q=>q.team!==p.team&&!q.keeper
   const s2=t2.team===0?1:-1;B.x=clamp(t2.x+s2*12,FX0+10,FX1-10);B.y=t2.y;give(t2);if(t2.keeper)t2.hold=40;
   pop('OFFSIDE!',m.x,m.y-40,C.coral,26,80);S.whistle(1);if(m.team===0)S.aww();
   for(const q of players)if(q.team===p.team&&!q.keeper)q.lobRun=null}
-/* The Through Ball special, exactly as in the very first version of the game: lofted over everyone onto the penalty
-   spot, landing after one second (60 frames), for the team-mate nearest that spot. The only change from then: the
-   runner gets no speed boost (no turbo burst, no extra top speed or acceleration); he runs at his own pace and sprint.
+/* The Through Ball special, as in the very first version of the game: lofted over everyone, landing after one second
+   (60 frames), for the team-mate nearest where it lands. Changes from then: it lands just outside their penalty area
+   rather than on the penalty spot, and the runner gets no speed boost (no turbo burst, no extra top speed or
+   acceleration); he runs at his own pace and sprint.
    Defending is kept fair: nobody can take it while it's above their reach (a slide only once it's at the grass), and a
    defender who gets to where it lands can win it. THROUGH_OFFSIDE puts back the offside check (off: the first version
    had none). */
 const THROUGH_T=60,THROUGH_OFFSIDE=false;
-function throughPick(p){const sp=attackSpot(p.team);let m=null;
+// where it lands: just outside the edge of their penalty area, in line with the goal (on every pitch, either direction)
+const thruSpot=team=>{const gx=goalX(team);return{x:gx-Math.sign(gx-MIDX)*(BOX+10),y:MY}};
+function throughPick(p){const sp=thruSpot(p.team);let m=null;
   for(const q of outfield(p.team))if(q!==p&&(!m||dist(q,sp)<dist(m,sp)))m=q;return m}
-function doThrough(p){if(B.owner!==p)return false;const sp=attackSpot(p.team),m=throughPick(p);if(!m)return false;
+function doThrough(p){if(B.owner!==p)return false;const sp=thruSpot(p.team),m=throughPick(p);if(!m)return false;
   if(THROUGH_OFFSIDE&&isOffside(m,p)){pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);offsideCall(p,m);return true}
   if(NET.on)netKickLog(p,'through',players.indexOf(m),0);
   lobTo(p,m,sp.x,sp.y,THROUGH_T,true);pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}
@@ -5385,7 +5388,7 @@ $('rkreveal').addEventListener('click',e=>{if(e.target.closest('[data-rkok]'))$(
 const HELP=[
  ['Getting started','<p>Sunday Kickabout is arcade football. Build a club, collect footballers from packs, develop them, and win leagues, cups and online matches.</p><p>Start on the <b>Play</b> tab: pick Volta (5v5) or Classical (9v9), a difficulty and a competition, then press the big orange button.</p>'],
  ['Basic controls','<div class="hkeys"><p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</p><p><kbd>Shift</kbd> pass · without the ball: steal</p><p>Hold <kbd>Space</kbd> to shoot (longer = harder), <kbd>W</kbd>/<kbd>S</kbd> while holding to aim</p><p><kbd>F</kbd> cross · <kbd>C</kbd> slide tackle · <kbd>R</kbd> burst / lunge</p><p><kbd>E</kbd> skill move · <kbd>X</kbd> special ability · <kbd>Q</kbd> switch player</p><p><kbd>Esc</kbd> pause · <kbd>V</kbd> full screen · <kbd>N</kbd> connection details online</p></div><p>Control switches to whoever receives the ball, and to the best-placed defender when you defend.</p>'],
- ['Special abilities','<p>Every footballer has a special on <kbd>X</kbd>: Through Ball, Curler, Knuckleball, Rocket, Bicycle Kick, Interceptor, Turbo, Chip Pass or Chip. After using it, it recharges (the ring on the HUD).</p><p>Each footballer\'s special has 10 levels (Club → Special Abilities). Every level costs coins plus 2 Training Tokens and shortens the cooldown: Through Ball 25 s → 7 s, the shots and Interceptor 20 s → 5 s, Turbo and the chips 10 s → 3.5 s.</p><p><b>Through Ball</b> floats the ball over everyone onto the penalty spot, where it lands after one second, for the team-mate nearest that spot. He chases it at his own normal pace (no speed boost), so it works best when your striker is already near the box. Nobody can touch it while it’s high and a slide only works once it’s down, but a defender who gets to the spot first can win it.</p>'],
+ ['Special abilities','<p>Every footballer has a special on <kbd>X</kbd>: Through Ball, Curler, Knuckleball, Rocket, Bicycle Kick, Interceptor, Turbo, Chip Pass or Chip. After using it, it recharges (the ring on the HUD).</p><p>Each footballer\'s special has 10 levels (Club → Special Abilities). Every level costs coins plus 2 Training Tokens and shortens the cooldown: Through Ball 25 s → 7 s, the shots and Interceptor 20 s → 5 s, Turbo and the chips 10 s → 3.5 s.</p><p><b>Through Ball</b> floats the ball over everyone to just outside their penalty area, where it lands after one second, for the team-mate nearest that spot. He chases it at his own normal pace (no speed boost), so it works best when your striker is already near the box. Nobody can touch it while it’s high and a slide only works once it’s down, but a defender who gets to the spot first can win it.</p>'],
  ['Player collection','<p>Open packs in Club → Packs. Each pack shows three footballers of one rarity and you sign one. Rarities: Bronze, Silver, Gold, Special and Icon (the very best). Odds are printed on every pack. Duplicates can be exchanged.</p>'],
  ['Player development','<p>Club → Development. Footballers gain XP from matches (or training with Training Tokens: the cost per 100 XP rises from 2 to 20 tokens as they level up). Levels unlock upgrade points (+1 to a stat for coins) and every two levels add +1 to their five best stats. Evolutions add more. The screen shows the current and maximum achievable OVR and exactly what each upgrade does.</p><p>There’s no 99 cap: the very best footballers can be developed past 99, up to their own maximum potential (Messi, for example, can reach 106). When a footballer has nothing left to gain, his card says <b>MAX POTENTIAL REACHED</b>.</p><p>Your Player (the footballer you create) trains +8 points at a time; prices climb to 75,000 coins for the last session.</p>'],
  ['Club development','<p>Club → Club Development: six departments, levels 1 to 5, paid with coins plus Club Tokens (one per Club Legacy level).</p><p>Fanbase: more match coins. Coaching Staff: up to 20% off every coin cost for training and abilities. Training Facilities: more XP. Stadium: bigger crowd and a small coin bonus. Scouting: a better chance of a top-rated footballer within each pack’s rarity (+2.5% per level after the first, up to +10%); it never changes the chance of a rarer card. Commercial: more objective coins and sponsor money.</p>'],
@@ -5674,7 +5677,7 @@ $('prof').addEventListener('input',e=>{if(e.target.id==='pf-club')e.target.datas
      public key, so only the server can read it. It never contains an email, password, room code or location. Live
      status can be switched off in your profile. */
 const OPSK={"v":1,"sig":"BGs/lFU6FORb94vMzALEvYtZrzc+MOX1c3Oew0mkynnN3bLw5SjNI8OLWg2/MpITlVHATLAdvgPLbWaW0hxGEaw=","enc":"BKw3dRGhy6m/eX+K32tWAd7UaYz91Ps8cRt4tQbZ02c1do9srIjSE5aQATXJFKSAbJN3GFzqOwz1pwoXziS2BaM="};
-const GAMEVER="2026-11-09";
+const GAMEVER="2026-11-10";
 const OPS_T='sundaykickabout/ops1/',OPS_CTL=OPS_T+'ctl';
 const OPS_WHY={cheating:'cheating',name:'an offensive name',abuse:'abuse or harassment',other:'breaking the rules'};
 const ops={on:!!(OPSK&&OPSK.sig&&OPSK.enc&&window.crypto&&crypto.subtle),ready:null,sid:'',n:0,sigK:null,aesK:null,eph:'',seq:0,h:'',hOf:'',

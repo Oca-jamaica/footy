@@ -109,7 +109,7 @@ outgoing connections, to the same public relays the game uses, so it works from 
    ```
 
 5. If you made new keys, rebuild the game from the repository's root folder. This writes `sunday-kickabout.html` and
-   `Sunday-Kickabout-Shareable.html` with the new public keys:
+   `Sunday-Kickabout-Final.html` with the new public keys:
 
    ```bash
    node build.mjs

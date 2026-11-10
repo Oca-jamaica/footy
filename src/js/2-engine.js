@@ -808,16 +808,19 @@ function offsideCall(p,m){const def=players.filter(q=>q.team!==p.team&&!q.keeper
   const s2=t2.team===0?1:-1;B.x=clamp(t2.x+s2*12,FX0+10,FX1-10);B.y=t2.y;give(t2);if(t2.keeper)t2.hold=40;
   pop('OFFSIDE!',m.x,m.y-40,C.coral,26,80);S.whistle(1);if(m.team===0)S.aww();
   for(const q of players)if(q.team===p.team&&!q.keeper)q.lobRun=null}
-/* The Through Ball special, exactly as in the very first version of the game: lofted over everyone onto the penalty
-   spot, landing after one second (60 frames), for the team-mate nearest that spot. The only change from then: the
-   runner gets no speed boost (no turbo burst, no extra top speed or acceleration); he runs at his own pace and sprint.
+/* The Through Ball special, as in the very first version of the game: lofted over everyone, landing after one second
+   (60 frames), for the team-mate nearest where it lands. Changes from then: it lands just outside their penalty area
+   rather than on the penalty spot, and the runner gets no speed boost (no turbo burst, no extra top speed or
+   acceleration); he runs at his own pace and sprint.
    Defending is kept fair: nobody can take it while it's above their reach (a slide only once it's at the grass), and a
    defender who gets to where it lands can win it. THROUGH_OFFSIDE puts back the offside check (off: the first version
    had none). */
 const THROUGH_T=60,THROUGH_OFFSIDE=false;
-function throughPick(p){const sp=attackSpot(p.team);let m=null;
+// where it lands: just outside the edge of their penalty area, in line with the goal (on every pitch, either direction)
+const thruSpot=team=>{const gx=goalX(team);return{x:gx-Math.sign(gx-MIDX)*(BOX+10),y:MY}};
+function throughPick(p){const sp=thruSpot(p.team);let m=null;
   for(const q of outfield(p.team))if(q!==p&&(!m||dist(q,sp)<dist(m,sp)))m=q;return m}
-function doThrough(p){if(B.owner!==p)return false;const sp=attackSpot(p.team),m=throughPick(p);if(!m)return false;
+function doThrough(p){if(B.owner!==p)return false;const sp=thruSpot(p.team),m=throughPick(p);if(!m)return false;
   if(THROUGH_OFFSIDE&&isOffside(m,p)){pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);offsideCall(p,m);return true}
   if(NET.on)netKickLog(p,'through',players.indexOf(m),0);
   lobTo(p,m,sp.x,sp.y,THROUGH_T,true);pop('THROUGH BALL',p.x,p.y-34,p.team===0?C.sun:C.coral,20,70);return true}

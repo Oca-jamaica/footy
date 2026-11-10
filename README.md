@@ -43,16 +43,16 @@ departments (Fanbase, Coaching Staff, Training Facilities, Stadium, Scouting, Co
 5,000 / 10,000 / 20,000 / 35,000 coins plus 1 Club Token per level.
 
 
-**Through Ball (special):** exactly as in the very first version of the game (commit `7d282e9`): lofted over everyone
-onto the penalty spot, landing after one second (60 frames, peak height 110), for the team-mate nearest that spot. The
-one change: the runner gets no speed boost. The first version gave him a turbo burst, 1.5× top speed and faster
-acceleration (about 2.1× his normal speed, 2.8× when the computer ran him); now he runs at his own pace and sprint like
-any other player. Defending stays fair: nobody can take it while it's above their reach, a slide only works once it's
-at the grass, a defender who gets to the spot first can win it, and keepers behave as before. The offside check added
-later isn't part of the first version, so it's off (`THROUGH_OFFSIDE` in `src/js/2-engine.js` turns it back on).
-Classical pitches didn't exist in the first version; there it lands on that pitch's penalty spot, so a runner far from
-the box usually won't get there first. Cooldowns are unchanged: 25 s at level 1 down to 7 s at level 10, 10 levels, same
-coin prices, 2 Training Tokens per level.
+**Through Ball (special):** the very first version's Through Ball (commit `7d282e9`) with two changes. It's lofted over
+everyone, lands after one second (60 frames, peak height 110) and goes to the team-mate nearest where it lands. Change
+1: it lands just outside the opponent's penalty area, 10 px beyond the box line in line with the goal, instead of on the
+penalty spot (Volta 185 px from goal instead of 135; Classical Standard 250 instead of 150; Classical Expanded 310
+instead of 165), whichever way you're attacking. Change 2: the runner gets no speed boost. The first version gave him a
+turbo burst, 1.5× top speed and faster acceleration (about 2.1× his normal speed); now he runs at his own pace like any
+other player. Defending stays fair: nobody can take it while it's above their reach, a slide only works once it's at
+the grass, a defender who gets there first can win it, and keepers behave as before. The offside check added later
+isn't part of the first version, so it's off (`THROUGH_OFFSIDE` in `src/js/2-engine.js` turns it back on). Cooldowns
+are unchanged: 25 s at level 1 down to 7 s at level 10, 10 levels, same coin prices, 2 Training Tokens per level.
 
 **Computer's attack (Classical pitches):** the ball carrier weighs shooting, passing (to feet, into a runner's stride,
 across goal, switches, long balls, crosses), dribbling into the most open lane, taking a man on, or keeping it, by how
@@ -113,7 +113,7 @@ publish a fake profile or edit their own save, and a relay may forget retained p
 needs a small backend (a database plus an authoritative match-result service: e.g. a managed database like Supabase or
 Firebase with server-side functions, or a small Node server) and a paid TURN relay for the strictest networks.
 
-**To play:** open `Sunday-Kickabout-Shareable.html` (or `sunday-kickabout.html`, the same file) in Chrome, Safari,
+**To play:** open `Sunday-Kickabout-Final.html` (or `sunday-kickabout.html`, the same file) in Chrome, Safari,
 Edge or Firefox. It's the complete game in one file: send it to friends and they can play offline straight away and
 online against each other over the internet. If the online services can't be reached (no internet, or a network that
 blocks them) the game says so after about 12 seconds and keeps trying; single-player always works.
@@ -145,7 +145,7 @@ The game is split up so it's easier to work on:
 - `server/` – the private developer dashboard (not part of the game file)
 - `vendor/` – PeerJS 1.5.4 and MQTT.js 5.10.1 (unchanged npm builds, used for online play)
 
-After editing, rebuild the single file (it writes `sunday-kickabout.html` and `Sunday-Kickabout-Shareable.html`, with
+After editing, rebuild the single file (it writes `sunday-kickabout.html` and `Sunday-Kickabout-Final.html`, with
 the dashboard's public keys from `server/public-keys.json`):
 
 ```bash
