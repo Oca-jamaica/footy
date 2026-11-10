@@ -309,7 +309,7 @@ function drawNetDiag(){const now=performance.now(),ok=Object.keys(netRoutes).fil
 // online health counters (read by the tests; cheap enough to keep)
 const netStat={aiKick1:0,hostSw:0,pendF:0,pausedF:0,routeSw:0,oldSnap:0,oldMe:0};
 // NETPV: online protocol version. Both laptops must run the same version of the game to play each other.
-const NETQUIET=2000,NETRESUME=2000,NETPV=5;
+const NETQUIET=2000,NETRESUME=2000,NETPV=6;// 6: the release (test versions can't join, so nobody brings their old squad online)
 /* Who the joining player controls. The joining laptop decides when IT switches (Q, auto-switch, its own pass) and says so
    in every movement message. The host decides when the ball reaches one of the joining player's footballers some other
    way (interception, tackle, keeper's throw, kick-off, a lofted ball dropping to him): that decision is numbered and sent
@@ -926,6 +926,7 @@ $('save-copy').onclick=async()=>{const code=saveCode(),box=$('save-code');box.va
 $('save-load').onclick=()=>{const raw=($('save-code').value||'').trim().replace(/\s+/g,'');let sv=null;
   try{sv=JSON.parse(b64d(raw.replace(/^SK1:/,'')))}catch(e){}
   if(!sv||!sv.club||!Array.isArray(sv.club.owned)){$('save-note').textContent='That doesn’t look like a save code. Copy the whole thing and try again.';$('save-note').style.color='var(--coral)';return}
+  if(!saveOk(sv.club)){$('save-note').textContent='That save code is from a test version before the release. Everyone starts fresh in this version, so it can’t be loaded.';$('save-note').style.color='var(--coral)';return}
   try{localStorage.setItem('kickabout-club-before-load',JSON.stringify(snapshotSave()))}catch(e){}
   club={...club,...sv.club};loadClubFrom(JSON.parse(JSON.stringify(sv.club)));NAMES={...(sv.names||{})};applyNames();
   if(sv.custom&&sv.custom.name)custom={...custom,...sv.custom,isCustom:true};best=Math.max(best,+sv.best||0);

@@ -134,6 +134,17 @@ publish a fake profile or edit their own save, and a relay may forget retained p
 needs a small backend (a database plus an authoritative match-result service: e.g. a managed database like Supabase or
 Firebase with server-side functions, or a small Node server) and a paid TURN relay for the strictest networks.
 
+**Release reset:** this release starts everyone from scratch. A save from the test versions (anything without the
+release stamp) isn't loaded: the club starts fresh with a nickname prompt, starter squad and no ranks (the old save is
+set aside in the browser under `kickabout-club-test-version`, not used). Old save codes and old cloud-account copies are
+refused, the leaderboard is a fresh board, and online play uses a new version number (6), so a test-version copy can't
+play the release (both screens say you need the same game file). `SAVE_EPOCH` in `src/js/1-data-menu.js` is the stamp:
+raise it to reset everyone again in a future release.
+
+**AI dribbling:** the computer's ball carrier only tries skill moves and side-steps when he's facing forward (and seldom
+in his own half), and when shielding he never runs back towards his own goal. Measured with you pressing: time spent
+running backwards with the ball 21-23% -> 7-12%, forward progress roughly doubled on the Classical pitches.
+
 **To play:** open `Sunday-Kickabout-Final.html` (or `sunday-kickabout.html`, the same file) in Chrome, Safari,
 Edge or Firefox. It's the complete game in one file: send it to friends and they can play offline straight away and
 online against each other over the internet. If the online services can't be reached (no internet, or a network that

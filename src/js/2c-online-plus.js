@@ -146,7 +146,7 @@ function onlineLeft(){if(netKind==='ranked'&&netMM&&(netMM.started||NET.on)&&!ne
    ranks and records, and your two line-ups (names, positions, ratings, rarities, specials). Nothing personal. It is
    re-published after every online match and when your team changes, as a retained message on the public relays, so
    anyone who opens the leaderboard sees the latest copy. Profiles that don't look right are ignored. */
-const REG='sundaykickabout/clubs1/p/';
+const REG='sundaykickabout/clubs2/p/';// a fresh board for the release (clubs1 was the test versions')
 function regProfile(){const R=rkState(),g0=GM;const lin=(cl)=>{GM=cl?'classical':'volta';const q=sq(),f=FORMS[q.f];const ps=q.s.map((id,i)=>{const p=byId(id);return p?[String(p.name).slice(0,16),f[i]?f[i].r:natPos(p),effOvr(p),tier(p),SPECIALS[p.sp]?SPECIALS[p.sp].name:'',ablOf(p.id),lvlOf(p.id)]:null}).filter(Boolean);const r=teamRating(q);return{f:q.f,r,p:ps}};
   let v,c;try{v=lin(false);c=lin(true)}finally{GM=g0}
   const fam=f=>{const F=R.fam[f];return{rp:F.placed?F.rp:0,pl:F.pl,pd:F.placed?1:0,ix:F.placed?rankIx(F.rp):-1,w:F.w,d:F.d,l:F.l}};

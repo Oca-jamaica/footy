@@ -125,6 +125,7 @@ outgoing connections, to the same public relays the game uses, so it works from 
 | `SECRETS_FILE` | `secrets/keys.json` | The private keys. |
 | `DATA_DIR` | `data/` | Accounts, stored state and the audit log. |
 | `RELAYS` | the game's five public relays | Comma-separated `wss://` URLs. |
+| `MM_VERSION` | `6` | The game's online version (the matchmaking queues it watches). |
 
 To use it from your phone or another computer, put it behind HTTPS. Either give it a certificate with `TLS_CERT` and
 `TLS_KEY`, or run it behind a reverse proxy such as Caddy with `TRUST_PROXY=1`. Keep the authenticator code switched on.

@@ -43,7 +43,7 @@ async function acctFetch(id,k,v=2,wait=4500){const cl=await regConnect();if(!cl.
   for(const c of cl){const sub=()=>{try{c.subscribe(tp,{qos:1})}catch(e){}};if(c.connected)sub();else c.once('connect',sub)}
   const t0=performance.now();await new Promise(r=>{const iv=setInterval(()=>{const n=performance.now();if(n-t0>wait||(w.first&&n-w.first>1500)){clearInterval(iv);r()}},100)});
   for(const c of cl)try{c.unsubscribe(tp)}catch(e){}acctWait.delete(id);
-  let best=null,ats=[];for(const s of w.list){const sv=await acctOpen(s,k);if(sv){ats.push(+sv.at||0);if(!best||(+sv.at||0)>(+best.at||0))best=sv}}
+  let best=null,ats=[];for(const s of w.list){const sv=await acctOpen(s,k);if(sv&&saveOk(sv.club)){ats.push(+sv.at||0);/* copies from the test versions are ignored */if(!best||(+sv.at||0)>(+best.at||0))best=sv}}
   return{ok:cl.some(c=>c.connected),sv:best,ats,relays:cl.filter(c=>c.connected).length}}
 const svKey=sv=>JSON.stringify([sv.club,sv.names||{},sv.custom||{}]);let acctKey='';
 // save to the account, but only if something changed, and never over a newer copy another device saved meanwhile

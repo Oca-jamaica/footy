@@ -26,8 +26,8 @@ const E=process.env;
 const DEFAULT_RELAYS=['wss://mqtt.eclipseprojects.io:443/mqtt','wss://public:public@public.cloud.shiftr.io','wss://broker.hivemq.com:8884/mqtt','wss://broker.emqx.io:8084/mqtt','wss://test.mosquitto.org:8081'];
 const CFG={host:E.HOST||'127.0.0.1',port:+(E.PORT||8787),secrets:E.SECRETS_FILE||path.join(__dirname,'secrets','keys.json'),data:E.DATA_DIR||path.join(__dirname,'data'),
   tlsCert:E.TLS_CERT,tlsKey:E.TLS_KEY,trustProxy:E.TRUST_PROXY==='1',relays:(E.RELAYS?E.RELAYS.split(',').map(s=>s.trim()).filter(Boolean):DEFAULT_RELAYS),
-  ns:E.TOPIC_NS||'sundaykickabout',mm:E.MM_VERSION||'5',ctlEvery:+(E.CTL_EVERY_MS||60000)};
-const T_TEL=`${CFG.ns}/ops1/t/`,T_CTL=`${CFG.ns}/ops1/ctl`,T_REG=`${CFG.ns}/clubs1/p/`,T_MM=`${CFG.ns}/mm${CFG.mm}/`;
+  ns:E.TOPIC_NS||'sundaykickabout',mm:E.MM_VERSION||'6',ctlEvery:+(E.CTL_EVERY_MS||60000)};
+const T_TEL=`${CFG.ns}/ops1/t/`,T_CTL=`${CFG.ns}/ops1/ctl`,T_REG=`${CFG.ns}/clubs2/p/`,T_MM=`${CFG.ns}/mm${CFG.mm}/`;
 const isLoop=h=>h==='127.0.0.1'||h==='::1'||h==='localhost';
 const secure=!!(CFG.tlsCert&&CFG.tlsKey);
 if(!isLoop(CFG.host)&&!secure&&!CFG.trustProxy){console.error(`Refusing to listen on ${CFG.host} without HTTPS. Set TLS_CERT and TLS_KEY, or run behind an HTTPS reverse proxy with TRUST_PROXY=1, or keep HOST=127.0.0.1.`);process.exit(1)}

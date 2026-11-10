@@ -1354,10 +1354,12 @@ function cCarrier(p,dt){const team=p.team,gx=goalX(team),dir=Math.sign(gx-MIDX),
           if(bd.keep>.85&&bd.clear>110&&(p.blungeCd||0)<=0&&!p.anim&&p.stam>20&&Math.random()<.5){push(p,bd.a,7.4,13,{a:bd.a,spd:6,T:10});p.blungeCd=BLUNGE_CD*1.4;S.swoosh();grass(p.x,p.y,5)}
           else if(bd.keep>.8&&bd.clear>150&&p.st.sp==='turbo'&&p.spCd<=0)aiSpecial(p,dG,ndd)},'dribble')}
     // 5. take his man on: one defender right in front and a skill ready
-    if(nd&&ndd<120&&(nd.x-p.x)*dir>-15&&p.skillCd<=0&&!p.anim){const sk=p.st.skill??.6,pb=clamp(.45+.45*sk-.2*((nd.st.tackle??.6)-.6)+(DF.skills===false?-.2:0),.15,.9),fx=p.x+dir*120*Math.sqrt(PSC);
+    if(nd&&ndd<120&&(nd.x-p.x)*dir>-15&&p.skillCd<=0&&!p.anim&&Math.cos(p.dir)*dir>.25&&((p.x-MIDX)*dir>0||Math.random()<.3)){const sk=p.st.skill??.6,pb=clamp(.45+.45*sk-.2*((nd.st.tackle??.6)-.6)+(DF.skills===false?-.2:0),.15,.9),fx=p.x+dir*120*Math.sqrt(PSC);
       add(pb*cThreat(p,fx,p.y+(MY-p.y)*.2)-(1-pb)*lossHere*.6+.012,()=>{doSkill(p)},'skill')}
     // 6. keep it: shield or turn away and wait for a run
-    add(cThreat(p,p.x,p.y)*(ndd<40?.45:ndd<80?.62:.72)-(ndd<40?lossHere*.3:0),()=>{const a=nd&&ndd<120?Math.atan2(p.y-nd.y,p.x-nd.x):Math.atan2(MY-p.y,gx-p.x);p.cGo={x:clamp(p.x+Math.cos(a)*60,FX0+40,FX1-40),y:clamp(p.y+Math.sin(a)*60,FY0+40,FY1-40),T:14}},'keep');
+    add(cThreat(p,p.x,p.y)*(ndd<40?.45:ndd<80?.62:.72)-(ndd<40?lossHere*.3:0),()=>{let a=nd&&ndd<120?Math.atan2(p.y-nd.y,p.x-nd.x):Math.atan2(MY-p.y,gx-p.x);
+      // shielding never means running back towards his own goal: away from the presser sideways, a touch forward
+      if(Math.cos(a)*dir<0)a=Math.atan2((p.y>=(nd?nd.y:MY)?1:-1)*.9,dir*.45);p.cGo={x:clamp(p.x+Math.cos(a)*60,FX0+40,FX1-40),y:clamp(p.y+Math.sin(a)*60,FY0+40,FY1-40),T:14}},'keep');
     // other specials (one-two, ghost, chip pass, bicycle...) now and then, as before
     if(p.spCd<=0&&!['curler','rocket','knuckle','chip'].includes(p.st.sp)&&Math.random()<.25&&aiSpecial(p,dG,ndd))return;
     // pick: his best option of each kind (best pass, best dribble...) goes forward, then the best kind usually wins, but not
@@ -1393,7 +1395,10 @@ function carrierAI(p,dt){
       let ahead=1e9;for(const q of defs)if((q.x-p.x)*dir0>-10&&Math.abs(q.y-p.y)<120)ahead=Math.min(ahead,dist(q,p));
       const keep=Math.min(ahead,220)/220*1.6-(ndd<50?.45:ndd<90?.15:0)+(dG<DF.range+160?.55:0)+.35;// attacking sides back themselves to beat a man
       if(ev&&ev.v>keep+lerp(.35,.05,IQc)/sty.pass){const m=ev.m,thr=m.vx*dir0>1.2&&m.x*dir0>lastLine(1-p.team,dir0)-60&&!isOffside(m,p);pass(p,m,thr);if(thr&&p.team===1)aiStat.through++;return}}
-    if(nd&&ndd<115*(XF>1?1.25:1)&&p.skillCd<=0&&!p.anim&&Math.random()<Math.min(1,(.7+DF.press*.3)*XF)){doSkill(p);if(p.skillCd>0){p.skillCd*=XF>1?.5:.75;return}}
+    // skills only going forward: a carrier facing his own goal turns and drives on instead, and in his own half he
+    // mostly passes or dribbles rather than showboating (no more spinning about on his own side)
+    const fwdFace=Math.cos(p.dir)*dir0>.25,ownHalf=(p.x-MIDX)*dir0<0,skillOk=fwdFace&&(!ownHalf||Math.random()<.3);
+    if(nd&&ndd<115*(XF>1?1.25:1)&&skillOk&&p.skillCd<=0&&!p.anim&&Math.random()<Math.min(1,(.7+DF.press*.3)*XF)){doSkill(p);if(p.skillCd>0){p.skillCd*=XF>1?.5:.75;return}}
     if(ndd<44*(XF>1?1.4:1)){const m=bestMate(p);if(m&&Math.random()<.28*DF.press*XF){pass(p,m);return}
 }
     // on the big pitch the ball does the work: find a team-mate further up who's free and play it forward
@@ -1407,8 +1412,8 @@ function carrierAI(p,dt){
       // switch it to the far side when the near side is crowded
       if(ndd<120&&Math.random()<.12){const far=outfield(p.team).filter(m=>m!==p&&Math.abs(m.y-p.y)>(FY1-FY0)*.4&&openness(m)>45&&!laneBlocked(p,m,24,p.team));if(far.length){pass(p,pick(far));return}}}
     // their own skill move when someone closes them down
-    if(nd&&ndd<95*(XF>1?1.35:1)&&p.skillCd<=0&&!p.anim&&Math.random()<(.55+DF.press*.3)*XF){doSkill(p);if(p.skillCd>0){if(XF>1)p.skillCd*=.5;return}}
-    if(nd&&ndd<100&&(p.blungeCd||0)<=0&&!p.anim&&Math.random()<.6){const side=Math.sin(angDiff(Math.atan2(nd.y-p.y,nd.x-p.x),p.dir))>0?-1:1,a=p.dir+side*.75;push(p,a,7.4,13,{a:p.dir,spd:6,T:10});p.blungeCd=BLUNGE_CD*1.4;S.swoosh();grass(p.x,p.y,5);return}
+    if(nd&&ndd<95*(XF>1?1.35:1)&&skillOk&&p.skillCd<=0&&!p.anim&&Math.random()<(.55+DF.press*.3)*XF){doSkill(p);if(p.skillCd>0){if(XF>1)p.skillCd*=.5;return}}
+    if(nd&&ndd<100&&skillOk&&(p.blungeCd||0)<=0&&!p.anim&&Math.random()<.6){const side=Math.sin(angDiff(Math.atan2(nd.y-p.y,nd.x-p.x),p.dir))>0?-1:1,a=p.dir+side*.75;push(p,a,7.4,13,{a:p.dir,spd:6,T:10});p.blungeCd=BLUNGE_CD*1.4;S.swoosh();grass(p.x,p.y,5);return}
     if(p.spCd<=0&&aiSpecial(p,dG,ndd))return;
     if(Math.abs(p.y-MY)>(FY1-FY0)*.15&&Math.abs(p.x-gx)<460&&Math.random()<.4&&outfield(p.team).some(m=>m!==p&&Math.hypot(gx-m.x,MY-m.y)<300)){p.dir=Math.atan2(MY-p.y,gx-p.x);cross(p);return}
   }

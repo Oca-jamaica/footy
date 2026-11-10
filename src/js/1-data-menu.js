@@ -124,6 +124,11 @@ const BUDGET=470;
 const MYTRAIN_N=Math.ceil((650-BUDGET)/8),myTrainIx=()=>clamp(Math.ceil(((custom.budget||BUDGET)-BUDGET)/8),0,MYTRAIN_N-1),
   myTrainCost=i=>i>=MYTRAIN_N-1?75000:Math.round(400*Math.pow(75000/400,i/(MYTRAIN_N-1))/50)*50,myTrainBase=()=>myTrainCost(myTrainIx());
 let custom={id:'custom',name:'Your Name',short:'NAME',num:99,tag:'Created player',pace:.75,shot:.75,fin:.7,skill:.7,pass:.7,tackle:.5,str:.6,sk:'roulette',sp:'curler',celeb:0,skin:SKINS[1],hair:HAIRS[0],isCustom:true};
+// Release reset: progress from the test versions (saves without this stamp) doesn't carry over; everyone starts fresh.
+// The old save is set aside under its own key (not used by the game) rather than deleted.
+const SAVE_EPOCH=2;
+const saveOk=c=>!!c&&(c.epoch|0)>=SAVE_EPOCH;
+try{const raw=localStorage.getItem('kickabout-club'),c=JSON.parse(raw||'null');if(c&&!saveOk(c)){localStorage.setItem('kickabout-club-test-version',raw);const cu=localStorage.getItem('kickabout-custom');if(cu)localStorage.setItem('kickabout-custom-test-version',cu);localStorage.removeItem('kickabout-club');localStorage.removeItem('kickabout-custom')}}catch(e){}
 try{const c=JSON.parse(localStorage.getItem('kickabout-custom')||'null');if(c&&c.name)custom={...custom,...c,isCustom:true}}catch(e){}
 function natPos(p){if(p.pos)return p.pos;const d=p.tackle*1.6+p.str*.6,m=p.pass*1.3+p.skill*.7,a=(p.shot+p.fin)*.8+p.pace*.3;return d>=m&&d>=a?'DEF':m>=a?'MID':'ATT'}
 const allPlayers=()=>[...PLAYERS,custom];
@@ -161,6 +166,7 @@ function loadClubFrom(c){if(c&&c.cup&&!Array.isArray(c.cup.opps))delete c.cup;if
   for(const q of club.csquads)q.s=q.s.map(id=>id&&(known.has(id)||club.owned.includes(id))?id:null);
   club.coins+=refund}}
 try{loadClubFrom(JSON.parse(localStorage.getItem('kickabout-club')||'null'))}catch(e){}
+club.epoch=SAVE_EPOCH;
 // Volta (5-a-side) and Classical (9-a-side) each keep their own line-ups, picked from the one shared collection
 let GM=club.gm==='classical'?'classical':'volta';
 const sqList=()=>GM==='classical'?club.csquads:club.squads;
