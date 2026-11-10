@@ -21,13 +21,13 @@
 //   RELAYS                         comma-separated relay URLs (wss://user:pass@host/path); defaults to the game's list
 'use strict';
 const http=require('node:http'),https=require('node:https'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-const C=require('./lib/opscrypto');
+const C=require('./lib/opscrypto');const MK=require('./lib/market');
 const E=process.env;
 const DEFAULT_RELAYS=['wss://mqtt.eclipseprojects.io:443/mqtt','wss://public:public@public.cloud.shiftr.io','wss://broker.hivemq.com:8884/mqtt','wss://broker.emqx.io:8084/mqtt','wss://test.mosquitto.org:8081'];
 const CFG={host:E.HOST||'127.0.0.1',port:+(E.PORT||8787),secrets:E.SECRETS_FILE||path.join(__dirname,'secrets','keys.json'),data:E.DATA_DIR||path.join(__dirname,'data'),
   tlsCert:E.TLS_CERT,tlsKey:E.TLS_KEY,trustProxy:E.TRUST_PROXY==='1',relays:(E.RELAYS?E.RELAYS.split(',').map(s=>s.trim()).filter(Boolean):DEFAULT_RELAYS),
   ns:E.TOPIC_NS||'sundaykickabout',mm:E.MM_VERSION||'6',ctlEvery:+(E.CTL_EVERY_MS||60000)};
-const T_TEL=`${CFG.ns}/ops1/t/`,T_CTL=`${CFG.ns}/ops1/ctl`,T_REG=`${CFG.ns}/clubs2/p/`,T_MM=`${CFG.ns}/mm${CFG.mm}/`;
+const T_TEL=`${CFG.ns}/ops1/t/`,T_CTL=`${CFG.ns}/ops1/ctl`,T_REG=`${CFG.ns}/clubs2/p/`,T_MM=`${CFG.ns}/mm${CFG.mm}/`,T_MKT=`${CFG.ns}/mkt1/`;
 const isLoop=h=>h==='127.0.0.1'||h==='::1'||h==='localhost';
 const secure=!!(CFG.tlsCert&&CFG.tlsKey);
 if(!isLoop(CFG.host)&&!secure&&!CFG.trustProxy){console.error(`Refusing to listen on ${CFG.host} without HTTPS. Set TLS_CERT and TLS_KEY, or run behind an HTTPS reverse proxy with TRUST_PROXY=1, or keep HOST=127.0.0.1.`);process.exit(1)}
@@ -113,6 +113,7 @@ function onTelemetry(topic,buf){if(buf.length>32000)return;const sid=topic.slice
   else if(d.k==='prob'){if(!allow('prob:'+(me.rid||sid),d.auto?3:6,3600e3))return;
     const errs=Array.isArray(d.errs)?d.errs.slice(0,6).map(x=>str(x,240)):[];
     S.problems.push({id:rid6(),at:t,from:me,auto:!!d.auto,cat:oneOf(d.cat,['bug','online','performance','account','other'],'other'),txt:txt(d.txt,800),info:{ver:str(d.ver,24),st:oneOf(d.st,ST,''),md:oneOf(d.md,MD,''),rt:str(d.rt,16),errs},status:'open'});saveSoon()}
+  else if(d.k==='mkt'){if(mk)mk.handle(d,{...me,h})}
   else if(d.k==='app'){if(!allow('app:'+(me.rid||sid),3,24*3600e3))return;
     const s=S.susp.find(x=>x.status==='active'&&x.id===d.sus&&((h&&x.h===h)||(me.rid&&x.rid===me.rid)));if(!s)return;
     if(s.appeal&&s.appeal.status==='pending')return;if(s.appeal&&t-(s.appeal.decidedAt||0)<24*3600e3)return;
@@ -156,6 +157,23 @@ const relays=CFG.relays.map(u0=>{let url;try{url=new URL(u0)}catch(e){console.er
     else if(tp===T_CTL&&buf.toString()!==ctlMsg&&now()-(r.fixAt||0)>10000){r.fixAt=now();publishCtl(r)}}catch(e){}});
   return r});
 ctlChanged();setInterval(ctlChanged,CFG.ctlEvery).unref();
+
+// ---------------------------------------------------------------- transfer market (lib/market.js is the referee)
+// listings, the index of active listings and each player's results are signed and retained on every relay
+function pubAll(topic,msg){for(const r of relays)if(r.c.connected)r.c.publish(topic,msg,{qos:1,retain:true},()=>{})}
+const mkPending={idx:null,out:new Map()};
+const mk=MK.create(S,{now,audit,allow,save:saveSoon,
+  suspended:(rid,h)=>S.susp.some(x=>suspActive(x)&&((rid&&x.rid===rid)||(h&&x.h&&x.h===h))),
+  publishListing:v=>pubAll(T_MKT+'l/'+v.lid,C.signControl(KEYS,{k:'mkl',ts:now(),l:v})),
+  clearListing:lid=>pubAll(T_MKT+'l/'+lid,''),
+  // bunched up: several changes in a moment go out as one message
+  publishOutbox:mid=>{if(mkPending.out.has(mid))return;mkPending.out.set(mid,setTimeout(()=>{mkPending.out.delete(mid);pubAll(T_MKT+'u/'+mid,C.signControl(KEYS,{k:'mko',mid,ts:now(),recs:mk.outbox(mid)}))},150))},
+  publishIndex:()=>{if(mkPending.idx)return;mkPending.idx=setTimeout(()=>{mkPending.idx=null;mkIndex()},150)}});
+function mkIndex(){pubAll(T_MKT+'idx',C.signControl(KEYS,{k:'mki',ts:now(),open:1,ids:mk.index()}))}
+function mkRepublish(){const a=mk.all();for(const v of a.listings)pubAll(T_MKT+'l/'+v.lid,C.signControl(KEYS,{k:'mkl',ts:now(),l:v}));for(const m of a.outboxes)pubAll(T_MKT+'u/'+m,C.signControl(KEYS,{k:'mko',mid:m,ts:now(),recs:mk.outbox(m)}));mkIndex()}
+// the index goes out every 30 s (that's how games know the market is open); everything else every 5 minutes
+setInterval(()=>{mk.tick();mkIndex()},30000).unref();setInterval(mkRepublish,300000).unref();
+for(const r of relays)r.c.on('connect',()=>setTimeout(mkRepublish,500));
 
 // ---------------------------------------------------------------- admins and sessions
 let adminsCache={at:0,d:null};
@@ -228,6 +246,8 @@ async function api(req,res,url,s){const m=req.method,p=url.pathname;
     if(p==='/api/problems')return{problems:S.problems.slice(-500).reverse()};
     if(p==='/api/suspensions')return{suspensions:S.susp.slice(-500).reverse().map(pub).map(x=>({...x,active:suspActive(x)}))};
     if(p==='/api/corrections')return{corrections:S.grants.slice(-500).reverse().map(pub)};
+    if(p==='/api/market'){const t=now();return{listings:mk.active().sort((a,b)=>b.at-a.at).slice(0,500).map(l=>({...mk.view(l),left:Math.max(0,Math.round((l.exp-t)/60000))})),
+      sales:mk.M.txs.slice(-300).reverse(),stats:{active:mk.active().length,sold24h:mk.M.txs.filter(x=>t-x.at<864e5).length,coins24h:mk.M.txs.filter(x=>t-x.at<864e5).reduce((a,x)=>a+x.price,0)}}}
     if(p==='/api/audit')return{entries:auditMem.slice(-int(url.searchParams.get('n')||300,1,2000)).reverse(),chain:auditVerify()};
     throw new Bad(404,'Not found')}
   if(m!=='POST')throw new Bad(405,'Method not allowed');
@@ -261,6 +281,9 @@ async function api(req,res,url,s){const m=req.method,p=url.pathname;
     if(mm[2]==='lift'){x.status='lifted';x.liftedAt=t;x.liftedBy=s.user;if(x.appeal&&x.appeal.status==='pending')Object.assign(x.appeal,{status:'accepted',decidedAt:t,by:s.user,note:reason})}
     else{if(!x.appeal||x.appeal.status!=='pending')throw new Bad(409,'There’s no appeal waiting.');Object.assign(x.appeal,{status:'rejected',decidedAt:t,by:s.user,note:reason})}
     audit(s,mm[2]==='lift'?'suspension-lift':'appeal-reject',x.rid,{id:x.id,club:x.nm,appeal:x.appeal?x.appeal.status:null},reason);ctlChanged();return{ok:true,suspension:pub(x)}}
+  if((mm=/^\/api\/market\/([0-9a-f]{12})\/remove$/.exec(p))){need(s,'moderate');const reason=reasonOf(b);
+    const l=mk.remove(mm[1],str(b.msg,140)||'Taken off the market by a moderator.');if(!l)throw new Bad(409,'That listing isn’t on the market any more.');
+    audit(s,'market-remove',l.rid||l.lid,{lid:l.lid,player:l.card.id,price:l.price,seller:l.nm},reason);return{ok:true}}
   if(p==='/api/correction'){need(s,'admin');const reason=reasonOf(b);const rid=String(b.rid||'');if(!RID.test(rid))throw new Bad(400,'Pick a club');
     const c=S.clubs[rid];if(!c||!c.hs||!c.hs.length)throw new Bad(409,'This club’s game hasn’t reported in to the server yet (or the player turned live status off), so a correction can’t reach it.');
     if(c.hs.length>1)throw new Bad(409,'More than one game save has claimed this club, so a correction can’t be targeted safely.');

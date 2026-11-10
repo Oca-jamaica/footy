@@ -22,6 +22,16 @@ link (about 1 KB a frame), and the joining laptop keeps only a small smoothing b
 Measured in two browsers with 40 ms of delay added each way: the joining player's pass shows on their screen in ~9 ms
 (was ~150 ms), and the host's moves arrive after the network delay plus ~25-40 ms. Press N in a match to see whether
 you're on a direct link or a relay; a relay is slower, so the game always tries the direct link first.
+**Skill moves and lunges for the joining player:** skill moves and the R burst start on the joining player's own screen
+the instant they're pressed, with exactly the host's footwork (the host still decides who they beat); a skill pressed
+just before a pass arrives is held for up to 0.3 s and done when the ball is at your feet (for both players). The
+joining player sees the host's match a little in the past, so their lunges and slides are judged on the host against
+what their screen showed at that moment (the host keeps a short history of the ball and the carrier and rewinds up to
+0.45 s); the carrier's body is rewound too, so going through the back of a man who's already past still fails, just as
+it does for the host. Measured in two browsers with 60 ms added each way (a 166 ms round trip): the joining player's
+skill now shows on their own screen in ~17 ms (was ~168 ms); lunges on a sprinting carrier win 10/10 for both players
+(the joining player's used to win 0 of 8); late lunges fail 0/10 for both; with 100 ms each way, sprinting-carrier
+lunges are 10/10 for both and late ones 0/10 for both.
 Online matches add their own punch on both laptops (camera punches, speed lines, slam-in calls like WHAT A SAVE! and
 EQUALISER!, stadium strobes and confetti) and a VS card with both clubs and managers before kick-off. These only change
 what's drawn; online, ON FIRE is for show for both players and gives no boost. A match only starts once
@@ -46,6 +56,41 @@ short-handed against 99-rated Icon sides at the hardest AI level, whatever diffi
 **Classical 4 v 9** (your keeper plus your two or three highest-rated players from the line-up). Sixteen clubs, knockout
 (Round of 16, quarter-finals, semi-finals, final; level games go to penalties). Winning the final pays **500,000 coins**,
 once per tournament, every time you win the whole thing; then a new draw starts.
+
+**Transfer market** (Club → Transfer Market): **Browse Market** shows players other managers are selling (name, rarity,
+rating, position, level, all seven stats with their development, price, seller, time left) with filters for price,
+rarity and rating; **My Listings** lets you change a price or cancel; **Sell Players** lists a player at your own price
+(100 to 10,000,000 coins, for three days) or sells him **instantly to the game for 50% of his original purchase price**.
+Every action asks for confirmation. A listed player is locked: out of your line-ups, can't play, be developed or be
+sold again until he's sold, cancelled or the listing ends. Buying takes the coins into escrow at once; they come back if
+the purchase is refused.
+
+*Original purchase price* is the price of the pack the player was signed from, recorded when you sign him: an Icon
+from the 50,000-coin Icon Pack sells instantly for 25,000; a player from the 5,000-coin Premium Gold Pack for 2,500;
+from the 2,000-coin Gold Pack for 1,000. Players who didn't come from a pack (your starters, rewards, anyone signed
+before this version) count at their rarity's own pack price (Bronze 250, Silver 750, Gold 2,000, Special 12,500, Icon
+50,000). The original price travels with the player when he's sold on the market, so a player bought for 200,000 coins
+still sells to the game for half his *pack* price, never half the 200,000: buying on the market and selling back to the
+game can't create coins. Your created player and Wes can't be sold.
+
+How each transaction is validated: the developer's dashboard server (`server/lib/market.js`) is the market's referee,
+and the game only acts on its results, which are signed with the server's private key (the game ignores anything
+unsigned or forged; tested). Requests travel encrypted to the server. Each save has a random market secret (only its
+hash is used as an id), so only that save can list, re-price, cancel or buy as itself. The server applies requests one at
+a time and checks: the request is new (each has a random id and happens once, however many relays deliver it, and
+replays are refused); no more than 30 requests a minute; the club isn't suspended; a sensible price (whole coins, 100 to
+10,000,000); at most 10 listings per save and the same player can't be listed twice; only the seller can re-price or
+cancel, and only while the listing is active; a buy must match the current price exactly (a price changed meanwhile is
+refused, not charged), can't be your own listing (same save or same club), and only the first valid buy wins: every
+other buyer is refused and refunded, so a player is never sold twice or duplicated. Requests a save is still waiting on
+are checked after a few seconds: any the server never received are voided for good (so they can't apply late) and the
+coins come back. Listings expire after three days. Sales, cancellations and moderator removals go in the dashboard's
+audit log; moderators can take a listing down from the dashboard's Transfer market tab (the player goes back). On each
+device, a player bought arrives with his development checked against the game's own limits. Because the game has no
+central account server, coins and squads live on each device: the game itself refuses to list a player you don't own
+or to buy without the coins, but a deliberately modified copy of the game could still cheat its own balance. The
+market only opens while the developer's dashboard server is running (the game shows *Market open* / *closed*);
+instant sales always work.
 
 Difficulty: **Chill** (green), **Medium** (yellow), **Hard** (red), **Extreme** (fire). On the Classical pitches the computer plays
 as a team: one defender gets goal-side and times his tackle, a second covers, others block the obvious pass and track

@@ -178,7 +178,8 @@ club.epoch=SAVE_EPOCH;
 let GM=club.gm==='classical'?'classical':'volta';
 const sqList=()=>GM==='classical'?club.csquads:club.squads;
 const sq=()=>GM==='classical'?club.csquads[club.cactive||0]:club.squads[club.active];
-const ownedPlayers=()=>club.owned.map(id=>byId(id)).filter(Boolean).sort((a,b)=>effOvr(b)-effOvr(a));
+// a player on the transfer market is locked: not available for line-ups, matches or development until he's sold or back
+const ownedPlayers=()=>club.owned.filter(id=>!mktLocked(id)).map(id=>byId(id)).filter(Boolean).sort((a,b)=>effOvr(b)-effOvr(a));
 function slotRating(id,i,q=sq()){const p=byId(id);if(!p)return 0;return Math.round(effOvr(p)*posFit(natPos(p),FORMS[q.f][i].r))}
 function teamRating(q=sq()){const v=q.s.map((id,i)=>slotRating(id,i,q)).filter(Boolean);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/q.s.length):0}
 function autoPick(q=sq()){
@@ -428,7 +429,7 @@ function renderMenu(){
   res();$('tt').textContent=club.tt;$('cp').textContent=club.cp.toLocaleString();$('legpill').textContent='Legacy Lv '+((club.leg||{}).lvl||0);ctkSync();$('ctkp').textContent=ctk();
   $('club-kit').innerHTML=[...KITS,...(cosOwned('kit_gold')?['#d4af37']:[])].map(c=>`<button type="button" style="background:${c}" aria-label="Kit colour" aria-pressed="${club.kit===c}" data-c="${c}"></button>`).join('');
   if(club.welcome){resultEl.hidden=false;resultEl.textContent=club.welcome;delete club.welcome;saveClub()}
-  const q=sq();q.s=q.s.map(id=>id&&club.owned.includes(id)?id:null);
+  const q=sq();q.s=q.s.map(id=>id&&club.owned.includes(id)&&!mktLocked(id)?id:null);
   // pitch
   const slots=FORMS[q.f];
   const top=x=>(79-(x-.18)/.45*60).toFixed(1)+'%';
@@ -585,7 +586,7 @@ function openPack(id){
       $('pack-note').textContent='Pick one player to sign. The other two walk away.';
       slots.forEach((slot,j)=>{slot.classList.add('pickme');slot.tabIndex=0;slot.setAttribute('role','button');slot.setAttribute('aria-label','Sign '+res[j].p.name);
         const choose=()=>{if(slots.some(x=>x.classList.contains('chosen')))return;const {p,dup}=res[j];
-          if(dup){club.dupes=club.dupes||{};club.dupes[p.id]=(club.dupes[p.id]||0)+1}else{club.owned.push(p.id);careerSigned(p)}saveClub();
+          if(dup){club.dupes=club.dupes||{};club.dupes[p.id]=(club.dupes[p.id]||0)+1}else{club.owned.push(p.id);club.paid=club.paid||{};club.paid[p.id]=k.cost;careerSigned(p)}saveClub();
           slots.forEach((x,m)=>{x.classList.remove('pickme');x.removeAttribute('tabindex');x.classList.add(m===j?'chosen':'gone')});
           S.goal();confetti(tier(p));
           $('pack-note').textContent=dup?`You already had ${p.name}. The duplicate is kept for Exchanges (or quick-sell it for ${TIERS[tier(p)].sell} coins in Club → Exchanges).`:`${p.name} signed! Put them in your line-up on the Squad tab.`;

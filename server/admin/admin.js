@@ -35,7 +35,7 @@ function confirmAction({title,lines,danger,password,fields}){return new Promise(
 async function act(path,body,opts){const c=await confirmAction(opts);if(!c)return null;try{const r=await api(path,{...body,...c});flash('Done: '+opts.title);await render();return r}catch(e){flash(e.message,true);return null}}
 
 // ---------------------------------------------------------------- views
-const TABS=[['overview','Overview'],['live','Players & matches'],['clubs','Clubs'],['reports','Reports'],['problems','Problems'],['susp','Suspensions & appeals'],['corr','Corrections'],['ops','Maintenance & announcements'],['audit','Audit log']];
+const TABS=[['overview','Overview'],['live','Players & matches'],['clubs','Clubs'],['reports','Reports'],['problems','Problems'],['susp','Suspensions & appeals'],['corr','Corrections'],['market','Transfer market'],['ops','Maintenance & announcements'],['audit','Audit log']];
 let counts={};
 function nav(){const n=$('#tabs');n.textContent='';for(const [k,l] of TABS){const c=k==='reports'?counts.reports:k==='problems'?counts.problems:k==='susp'?counts.appeals:0;
   n.append(h('button',{'aria-pressed':String(TAB===k),onclick:()=>show(k)},l,c?h('span',{class:'n'},c):null))}}
@@ -44,6 +44,15 @@ async function render(){clearTimeout(timer);const v=$('#view');let out;
   try{out=await VIEWS[TAB]()}catch(e){out=h('p',{class:'mute'},e.message)}
   v.textContent='';v.append(out);if(TAB==='overview'||TAB==='live')timer=setTimeout(render,5000)}
 const VIEWS={
+  // the transfer market: what's on sale, what sold; a moderator can take a listing down (the player goes back to the seller)
+  async market(){const d=await api('/api/market'),coins=n=>Number(n||0).toLocaleString();
+    return h('div',{},
+      h('p',{},`${d.stats.active} players on the market · ${d.stats.sold24h} sold in the last 24 h (${coins(d.stats.coins24h)} coins changed hands).`),
+      h('h3',{},'On the market'),
+      table(['Player','Rarity','Price','Seller','Listed','Ends in',''],d.listings.map(l=>[l.card.id,l.card.rar,coins(l.price),clubLink(l.rid,l.nm+(l.mg?' ('+l.mg+')':'')),ago(l.at),dur(l.left*60),
+        can('moderator')?h('button',{class:'ghost',onclick:()=>act(`/api/market/${l.lid}/remove`,{},{title:'Take this listing off the market',lines:[`Player ${l.card.id} (${l.card.rar}) for ${coins(l.price)} coins`,`Seller: ${l.nm||'?'}`,'The player goes back to the seller’s club the next time their game is online.']})},'Take off'):'']),'Nothing on the market right now.'),
+      h('h3',{},'Recent sales'),
+      table(['When','Player','Price','Seller','Buyer'],d.sales.map(x=>[when(x.at),`${x.player} (${x.rar})`,coins(x.price),clubLink(x.seller.rid,x.seller.nm||'?'),clubLink(x.buyer.rid,x.buyer.nm||'?')]),'No sales yet.'))},
   async overview(){const s=await api('/api/state');counts=s.open;nav();const up=s.relays.filter(r=>r.up).length;
     return h('div',{},
       s.maint.on?h('p',{class:'panel'},chip('Maintenance mode is ON','bad'),' ',s.maint.msg):null,

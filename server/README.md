@@ -16,6 +16,11 @@ see it.
   queue right now.
 - **Private lobbies**, the **club directory** (the same data as the in-game leaderboard), and **recent online results**,
   which both laptops report so you can see when they agree.
+- **Transfer market.** This server is the market's referee: every listing, price change, cancellation and purchase from
+  the game arrives here encrypted, is checked and applied one at a time, and the result goes back signed (see
+  `lib/market.js` for every check). The Transfer market tab shows what's on sale and recent sales. The market is only
+  open while this server is running; while it's off, players see *Market closed* and anything they were waiting on is
+  refunded or returned once it's back. Run `node market.test.js` to check the referee's rules.
 
 **Act (each action needs a reason and a tick-box confirmation, and is written to the audit log):**
 
@@ -26,6 +31,7 @@ see it.
 | Suspend a club from online play (1–365 days), lift it, accept or reject an appeal | moderator, admin | yes, to suspend |
 | Maintenance mode on or off (blocks new online matches; single-player is never affected) | admin | yes |
 | Progression correction: add or remove a player's coins or Training Tokens | admin | yes |
+| Take a transfer-market listing down (the player goes back to the seller) | moderator, admin | no |
 | Look at everything (including the audit log) | viewer, moderator, admin | |
 
 What players see:

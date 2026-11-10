@@ -598,7 +598,7 @@ function renderClub(){achCheck();const cs=chState(),chDot=[...cs.d.map(x=>[x,DAI
   const B0=$('club-body');B0.innerHTML='';
   if(ctab==='coll')renderCollection();else if(ctab==='upg')B0.innerHTML=devHTML();else if(ctab==='abil')B0.innerHTML=ablHTML();else if(ctab==='dept')B0.innerHTML=deptHTML();else if(ctab==='chal')B0.innerHTML=chalHTML();else if(ctab==='ach')B0.innerHTML=achHTML();
   else if(ctab==='legacy')B0.innerHTML=legHTML();else if(ctab==='exch')B0.innerHTML=exchHTML();else if(ctab==='cos')B0.innerHTML=cosHTML();else if(ctab==='cab')B0.innerHTML=cabHTML();
-  else if(ctab==='market')B0.innerHTML=`<div class="soon"><b>Transfer Market</b><p>Coming soon.</p><p class="hint">Buy the exact footballer you want for a fixed coin price, with search and a wishlist. Not open yet: keep saving those coins.</p></div>`}
+  else if(ctab==='market'){B0.innerHTML=mktHTML();mktDraw();mktSub(true);if(mktWaiting().length)mktSync()}}
 $('ctabs').addEventListener('click',e=>{const b=e.target.closest('[data-ct]');if(b){ctab=b.dataset.ct;renderMenu()}});
 function renderCollection(){const F=collF,own=new Set(club.owned);
   $('collect-count').textContent=`${club.owned.length} of ${PLAYERS.length+1} collected`;
@@ -612,7 +612,7 @@ function renderCollection(){const F=collF,own=new Set(club.owned);
   const RI=r=>RAR.indexOf(r);const sv=p=>own.has(p.id)?effOvr(p):ovr(p);const sorts={ovr:(a,b)=>sv(b)-sv(a),rar:(a,b)=>RI(tier(b))-RI(tier(a))||ovr(b)-ovr(a),pos:(a,b)=>natPos(a).localeCompare(natPos(b))||ovr(b)-ovr(a),up:(a,b)=>upSpent(b.id)+evoOf(b.id).st*5-upSpent(a.id)-evoOf(a.id).st*5||ovr(b)-ovr(a),name:(a,b)=>a.name.localeCompare(b.name)};
   list.sort(sorts[F.sort]||sorts.ovr);const per=24,pages=Math.max(1,Math.ceil(list.length/per));F.page=clamp(F.page,0,pages-1);
   $('market').innerHTML=list.slice(F.page*per,F.page*per+per).map(p=>{const o=own.has(p.id);
-    const h=cardHTML(o?p:{...p,name:NAMES[p.id]||p.name},{nolv:!o,extra:o?`<div class="cact">${p.isCustom?'':`<button data-upg="${p.id}">Upgrade</button>`}<button data-cmp="${p.id}" aria-pressed="${cmpIds.includes(p.id)}">Compare</button>${(club.dupes||{})[p.id]?`<span class="hint" style="margin:0">+${club.dupes[p.id]} duplicate</span>`:''}</div>`+renameUI(p,'coll'):`<span class="owned" style="color:var(--muted)">Found in packs</span>`});
+    const h=cardHTML(o?p:{...p,name:NAMES[p.id]||p.name},{nolv:!o,extra:o?`<div class="cact">${p.isCustom?'':`<button data-upg="${p.id}">Upgrade</button>`}<button data-cmp="${p.id}" aria-pressed="${cmpIds.includes(p.id)}">Compare</button>${mktLocked(p.id)?'<span class="mktag">On the transfer market</span>':''}${(club.dupes||{})[p.id]?`<span class="hint" style="margin:0">+${club.dupes[p.id]} duplicate</span>`:''}</div>`+renameUI(p,'coll'):`<span class="owned" style="color:var(--muted)">Found in packs</span>`});
     return o?h:h.replace('class="card ','class="card locked ')}).join('')||'<p class="hint">Nobody matches.</p>';
   $('pager').innerHTML=pages>1?`<button class="ghost" data-pg="-1" ${F.page?'':'disabled'}>‹ Prev</button><span>Page ${F.page+1} of ${pages} · ${list.length} players</span><button class="ghost" data-pg="1" ${F.page<pages-1?'':'disabled'}>Next ›</button>`:`<span>${list.length} players</span>`;
   const C2=cmpIds.map(byId).filter(Boolean);

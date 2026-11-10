@@ -334,6 +334,36 @@ table.lt tr.up td:first-child{box-shadow:inset 3px 0 var(--mint)}table.lt tr.dow
 .bcol{display:grid;gap:4px;align-content:start}.bcol>b{font-family:var(--display);font-weight:400;font-size:15px;color:var(--sun)}
 .bm{font-size:12px;background:#12303e;border-radius:6px;padding:3px 6px;display:grid;gap:1px}.bm.me{outline:1px solid var(--sun)}
 .bm span{display:flex;justify-content:space-between;gap:6px}.bm .w{color:var(--mint);font-weight:800}.bm .l{color:var(--muted)}
+/* transfer market */
+.mk{display:grid;gap:10px}
+.mkhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}.mkhead>b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--sun)}
+.mkon{color:var(--mint);font-weight:800;font-size:13px}.mkoff{color:var(--muted);font-weight:700;font-size:13px}
+.mktabs{display:flex;gap:6px;flex-wrap:wrap}
+.mktabs button{font-family:var(--body);font-weight:800;font-size:14px;border:1px solid var(--line);background:var(--ground-2);color:var(--muted);padding:6px 14px;border-radius:999px;cursor:pointer}
+.mktabs button[aria-selected="true"]{background:var(--cream);color:var(--ground);border-color:var(--cream)}
+.mktabs em{font-style:normal;background:var(--coral);color:#fff;border-radius:999px;padding:0 6px;font-size:11px;margin-left:4px}
+.mkmsg{margin:0;min-height:1.2em;font-size:13px;color:var(--sun);font-weight:700}
+.mkask{border:1px solid var(--sun);border-radius:12px;padding:10px 12px;background:rgba(255,209,102,.08);display:grid;gap:8px}.mkask p{margin:0}.mkask div{display:flex;gap:8px;flex-wrap:wrap}
+.mkfilt{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:end}
+.mkfilt label{display:grid;gap:3px;font-size:12px;color:var(--muted);font-weight:700}
+.mkfilt input,.mkfilt select,.mkprc input{background:var(--ground-2);color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:14px;width:120px;max-width:100%}
+.mkfilt select{width:auto}
+.mklist{display:grid;gap:8px}
+.mkrow{display:grid;grid-template-columns:minmax(170px,1.2fr) minmax(220px,2fr) minmax(170px,1.1fr);gap:10px;align-items:center;background:#12303e;border:1px solid var(--line);border-left:4px solid var(--tc,var(--line));border-radius:10px;padding:8px 10px}
+.mkrow.t-bronze{--tc:#cd7f32}.mkrow.t-silver{--tc:#c8d0d8}.mkrow.t-gold{--tc:#ffd166}.mkrow.t-special{--tc:#8e8ff0}.mkrow.t-icon{--tc:#f3dc8a}
+.mkp{display:flex;align-items:center;gap:10px}.mkp span{display:grid}.mkp small{color:var(--muted);font-size:12px}
+.mko{font-family:var(--display);font-weight:400;font-size:26px;color:var(--tc,var(--cream));min-width:40px;text-align:center}
+.mkst{display:flex;flex-wrap:wrap;gap:4px}.mkst span{font-size:12px;background:rgba(255,255,255,.05);border-radius:6px;padding:2px 6px;font-weight:800;color:var(--cream)}.mkst i{font-style:normal;color:var(--muted);font-weight:700;margin-right:3px}
+.mkr{display:grid;gap:4px;justify-items:end;text-align:right}.mkr small{color:var(--muted);font-size:12px}
+.mkprice{font-family:var(--display);font-weight:400;font-size:19px;color:var(--sun)}
+.mktag{font-size:12px;font-weight:800;color:var(--sun);border:1px solid rgba(255,209,102,.5);border-radius:999px;padding:1px 8px}
+.mkno{color:var(--coral)!important}
+.mkprc{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.mkopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.mkopt{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;align-content:start}.mkopt h4{margin:0}.mkopt .mkprc{justify-content:flex-start}
+.mkbig{font-family:var(--display);font-size:26px;color:var(--sun);margin:0}
+.mkh{margin:8px 0 0}.mkhist{margin:0;padding-left:18px;font-size:13px;color:var(--muted)}
+@media (max-width:720px){.mkrow{grid-template-columns:1fr}.mkr{justify-items:start;text-align:left}.mkprc{justify-content:flex-start}}
 /* Icon Cup: always on show; a quiet locked tab until the Icon Division title is won, then platinum and gold */
 .diff .icontab{display:inline-flex;align-items:center;gap:6px}
 .icontab .ico{width:14px;height:14px;flex:none}
@@ -792,7 +822,8 @@ club.epoch=SAVE_EPOCH;
 let GM=club.gm==='classical'?'classical':'volta';
 const sqList=()=>GM==='classical'?club.csquads:club.squads;
 const sq=()=>GM==='classical'?club.csquads[club.cactive||0]:club.squads[club.active];
-const ownedPlayers=()=>club.owned.map(id=>byId(id)).filter(Boolean).sort((a,b)=>effOvr(b)-effOvr(a));
+// a player on the transfer market is locked: not available for line-ups, matches or development until he's sold or back
+const ownedPlayers=()=>club.owned.filter(id=>!mktLocked(id)).map(id=>byId(id)).filter(Boolean).sort((a,b)=>effOvr(b)-effOvr(a));
 function slotRating(id,i,q=sq()){const p=byId(id);if(!p)return 0;return Math.round(effOvr(p)*posFit(natPos(p),FORMS[q.f][i].r))}
 function teamRating(q=sq()){const v=q.s.map((id,i)=>slotRating(id,i,q)).filter(Boolean);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/q.s.length):0}
 function autoPick(q=sq()){
@@ -1042,7 +1073,7 @@ function renderMenu(){
   res();$('tt').textContent=club.tt;$('cp').textContent=club.cp.toLocaleString();$('legpill').textContent='Legacy Lv '+((club.leg||{}).lvl||0);ctkSync();$('ctkp').textContent=ctk();
   $('club-kit').innerHTML=[...KITS,...(cosOwned('kit_gold')?['#d4af37']:[])].map(c=>`<button type="button" style="background:${c}" aria-label="Kit colour" aria-pressed="${club.kit===c}" data-c="${c}"></button>`).join('');
   if(club.welcome){resultEl.hidden=false;resultEl.textContent=club.welcome;delete club.welcome;saveClub()}
-  const q=sq();q.s=q.s.map(id=>id&&club.owned.includes(id)?id:null);
+  const q=sq();q.s=q.s.map(id=>id&&club.owned.includes(id)&&!mktLocked(id)?id:null);
   // pitch
   const slots=FORMS[q.f];
   const top=x=>(79-(x-.18)/.45*60).toFixed(1)+'%';
@@ -1199,7 +1230,7 @@ function openPack(id){
       $('pack-note').textContent='Pick one player to sign. The other two walk away.';
       slots.forEach((slot,j)=>{slot.classList.add('pickme');slot.tabIndex=0;slot.setAttribute('role','button');slot.setAttribute('aria-label','Sign '+res[j].p.name);
         const choose=()=>{if(slots.some(x=>x.classList.contains('chosen')))return;const {p,dup}=res[j];
-          if(dup){club.dupes=club.dupes||{};club.dupes[p.id]=(club.dupes[p.id]||0)+1}else{club.owned.push(p.id);careerSigned(p)}saveClub();
+          if(dup){club.dupes=club.dupes||{};club.dupes[p.id]=(club.dupes[p.id]||0)+1}else{club.owned.push(p.id);club.paid=club.paid||{};club.paid[p.id]=k.cost;careerSigned(p)}saveClub();
           slots.forEach((x,m)=>{x.classList.remove('pickme');x.removeAttribute('tabindex');x.classList.add(m===j?'chosen':'gone')});
           S.goal();confetti(tier(p));
           $('pack-note').textContent=dup?`You already had ${p.name}. The duplicate is kept for Exchanges (or quick-sell it for ${TIERS[tier(p)].sell} coins in Club → Exchanges).`:`${p.name} signed! Put them in your line-up on the Squad tab.`;
@@ -1861,7 +1892,7 @@ function renderClub(){achCheck();const cs=chState(),chDot=[...cs.d.map(x=>[x,DAI
   const B0=$('club-body');B0.innerHTML='';
   if(ctab==='coll')renderCollection();else if(ctab==='upg')B0.innerHTML=devHTML();else if(ctab==='abil')B0.innerHTML=ablHTML();else if(ctab==='dept')B0.innerHTML=deptHTML();else if(ctab==='chal')B0.innerHTML=chalHTML();else if(ctab==='ach')B0.innerHTML=achHTML();
   else if(ctab==='legacy')B0.innerHTML=legHTML();else if(ctab==='exch')B0.innerHTML=exchHTML();else if(ctab==='cos')B0.innerHTML=cosHTML();else if(ctab==='cab')B0.innerHTML=cabHTML();
-  else if(ctab==='market')B0.innerHTML=`<div class="soon"><b>Transfer Market</b><p>Coming soon.</p><p class="hint">Buy the exact footballer you want for a fixed coin price, with search and a wishlist. Not open yet: keep saving those coins.</p></div>`}
+  else if(ctab==='market'){B0.innerHTML=mktHTML();mktDraw();mktSub(true);if(mktWaiting().length)mktSync()}}
 $('ctabs').addEventListener('click',e=>{const b=e.target.closest('[data-ct]');if(b){ctab=b.dataset.ct;renderMenu()}});
 function renderCollection(){const F=collF,own=new Set(club.owned);
   $('collect-count').textContent=`${club.owned.length} of ${PLAYERS.length+1} collected`;
@@ -1875,7 +1906,7 @@ function renderCollection(){const F=collF,own=new Set(club.owned);
   const RI=r=>RAR.indexOf(r);const sv=p=>own.has(p.id)?effOvr(p):ovr(p);const sorts={ovr:(a,b)=>sv(b)-sv(a),rar:(a,b)=>RI(tier(b))-RI(tier(a))||ovr(b)-ovr(a),pos:(a,b)=>natPos(a).localeCompare(natPos(b))||ovr(b)-ovr(a),up:(a,b)=>upSpent(b.id)+evoOf(b.id).st*5-upSpent(a.id)-evoOf(a.id).st*5||ovr(b)-ovr(a),name:(a,b)=>a.name.localeCompare(b.name)};
   list.sort(sorts[F.sort]||sorts.ovr);const per=24,pages=Math.max(1,Math.ceil(list.length/per));F.page=clamp(F.page,0,pages-1);
   $('market').innerHTML=list.slice(F.page*per,F.page*per+per).map(p=>{const o=own.has(p.id);
-    const h=cardHTML(o?p:{...p,name:NAMES[p.id]||p.name},{nolv:!o,extra:o?`<div class="cact">${p.isCustom?'':`<button data-upg="${p.id}">Upgrade</button>`}<button data-cmp="${p.id}" aria-pressed="${cmpIds.includes(p.id)}">Compare</button>${(club.dupes||{})[p.id]?`<span class="hint" style="margin:0">+${club.dupes[p.id]} duplicate</span>`:''}</div>`+renameUI(p,'coll'):`<span class="owned" style="color:var(--muted)">Found in packs</span>`});
+    const h=cardHTML(o?p:{...p,name:NAMES[p.id]||p.name},{nolv:!o,extra:o?`<div class="cact">${p.isCustom?'':`<button data-upg="${p.id}">Upgrade</button>`}<button data-cmp="${p.id}" aria-pressed="${cmpIds.includes(p.id)}">Compare</button>${mktLocked(p.id)?'<span class="mktag">On the transfer market</span>':''}${(club.dupes||{})[p.id]?`<span class="hint" style="margin:0">+${club.dupes[p.id]} duplicate</span>`:''}</div>`+renameUI(p,'coll'):`<span class="owned" style="color:var(--muted)">Found in packs</span>`});
     return o?h:h.replace('class="card ','class="card locked ')}).join('')||'<p class="hint">Nobody matches.</p>';
   $('pager').innerHTML=pages>1?`<button class="ghost" data-pg="-1" ${F.page?'':'disabled'}>‹ Prev</button><span>Page ${F.page+1} of ${pages} · ${list.length} players</span><button class="ghost" data-pg="1" ${F.page<pages-1?'':'disabled'}>Next ›</button>`:`<span>${list.length} players</span>`;
   const C2=cmpIds.map(byId).filter(Boolean);
@@ -5544,7 +5575,7 @@ function regProfile(){const R=rkState(),g0=GM;const lin=(cl)=>{GM=cl?'classical'
 let regCl=[],regTimer=null,regBoard=new Map(),regLoading=false;
 async function regConnect(){if(regCl.length)return regCl;const M=await loadMqtt();if(!M)return[];
   for(const u0 of RELAYS()){const U=typeof u0==='string'?{url:u0}:u0;let c;try{c=M.connect(U.url,{clientId:'skreg_'+Math.random().toString(36).slice(2,10),keepalive:30,connectTimeout:8000,reconnectPeriod:5000,clean:true,...(U.username?{username:U.username,password:U.password}:{})})}catch(e){continue}
-    c.on('message',(tp,buf)=>{if(tp.startsWith(ACCT_T)||tp.startsWith(ACCT_T2)){acctMsg(tp,buf);return}if(tp===OPS_CTL){opsCtl(buf);return}try{regIn(JSON.parse(new TextDecoder().decode(buf)))}catch(e){}});c.on('connect',()=>c.subscribe(ops.on?[REG+'+',OPS_CTL]:REG+'+',{qos:0}));c.on('error',()=>{});regCl.push(c)}return regCl}
+    c.on('message',(tp,buf)=>{if(tp.startsWith(ACCT_T)||tp.startsWith(ACCT_T2)){acctMsg(tp,buf);return}if(tp===OPS_CTL){opsCtl(buf);return}if(tp.startsWith(MKT_T)){mktMsg(tp,buf);return}try{regIn(JSON.parse(new TextDecoder().decode(buf)))}catch(e){}});c.on('connect',()=>c.subscribe(ops.on?[REG+'+',OPS_CTL]:REG+'+',{qos:0}));c.on('error',()=>{});regCl.push(c)}return regCl}
 // only well-formed, believable profiles get onto the board
 function regIn(d){if(!d||d.v!==1||!/^[a-z0-9]{10,16}$/.test(String(d.id)))return;const num=(x,a,b)=>Number.isFinite(+x)?clamp(+x,a,b):a;
   const fam=f=>{const r=d.rk&&d.rk[f]||{};const rp=num(r.rp,0,5000),pd=r.pd?1:0;return{rp:pd?rp:0,pl:num(r.pl,0,10),pd,ix:pd?rankIx(rp):-1,w:num(r.w,0,1e5)|0,d:num(r.d,0,1e5)|0,l:num(r.l,0,1e5)|0}};
@@ -5602,6 +5633,7 @@ const HELP=[
  ['Club development','<p>Club → Club Development: six departments, levels 1 to 5, paid with coins plus Club Tokens (one per Club Legacy level).</p><p>Fanbase: more match coins. Coaching Staff: up to 20% off every coin cost for training and abilities. Training Facilities: more XP. Stadium: bigger crowd and a small coin bonus. Scouting: a better chance of a top-rated footballer within each pack’s rarity (+2.5% per level after the first, up to +10%); it never changes the chance of a rarer card. Commercial: more objective coins and sponsor money.</p>'],
  ['Game modes','<p><b>Volta 5v5</b>: fast football in a cage, 2 minutes, 1× coins.</p><p><b>Classical Standard 9v9</b>: full pitch, 3 minutes, 1.5× coins. <b>Classical Expanded</b>: a bigger pitch, 3½ minutes, 1.875× coins. The green bubble shows the coin multiplier for your mode, pitch and difficulty.</p><p><b>Difficulty</b>: <b>Chill</b> is relaxed (opponents press less, tackle rarely and miss more), <b>Medium</b> is a fair game that’s still on your side, <b>Hard</b> is a genuine challenge and <b>Extreme</b> is for experts. Harder levels pay more coins.</p>'],
  ['Leagues and tournaments','<p>Volta and Classical each have six divisions (Amateur → Legendary → Icon). Ten clubs, nine rounds, top three promoted, bottom three relegated. A top-three finish earns a World Club Championship place (64-club knockout). There are also the Sunday Cup, the Grand Tournament, friendlies, challenges and skill games. In the Icon Division, winning the World Club Championship pays 200,000 coins and the Sunday Cup 30,000.</p><p><b>Icon Cup</b>: the endgame. It’s always on show next to the other cups, but stays locked until you win the Icon Division title (finish first; second or third isn’t enough). Once won it stays unlocked for good in that mode, even after relegation; Volta and Classical unlock separately. You play short-handed against 99-rated Icon sides at the hardest level: Volta 3 v 5, Classical 4 v 9 (your keeper plus your two or three highest-rated players). Sixteen clubs, knockout (Round of 16, quarter-finals, semi-finals, final). Win the final for 500,000 coins, every time you win it.</p>'],
+ ['Transfer market','<p>Club → <b>Transfer Market</b>. <b>Browse Market</b>: players other managers are selling, with rarity, rating, stats and price; filter by price, rarity and rating, and buy for coins. <b>My Listings</b>: change the price or cancel. <b>Sell Players</b>: list a player at your own price (100 to 10,000,000 coins, for three days), or sell him straight to the game for half his original price (the price of the pack he came from: an Icon from a 50,000-coin Icon Pack sells for 25,000).</p><p>The market is run by the developer’s server: it handles every sale one at a time, so a player can only be sold once, and the game only accepts its signed results. A listed player can’t play until he’s sold or back. When you buy, the coins are held until the sale is confirmed, and come back if it isn’t. If you’re offline when your player sells, the coins arrive next time. A bought player keeps his development and his original price. The market is only open while the developer’s server is running.</p>'],
  ['Online multiplayer','<p><b>Ranked</b>: matched with a real person of similar rating. Ten placement matches give your first rank (Bronze → Silver → Gold → Platinum → Diamond → Champion → Legendary), then wins earn RP and losses cost RP. Volta and Classical are ranked separately. Seasons last a month; rewards come from your best rank.</p><p><b>Friendly</b>: matched with anyone choosing Friendly, no RP. <b>Host / Join</b>: a private match with a 4-letter code.</p><p>Both players control their own team; the host\'s laptop runs the match. You both need the same version of the game.</p><p>If the game can’t reach the online services (no internet, or a school or work network that blocks them) it says so instead of waiting for ever, and keeps trying. Everything offline still works.</p>'],
  ['Nickname and saving','<p>A nickname is all you need to play (tap it at the top of the menu to change it). It is shown next to your club on the leaderboard, in View Squad, in matchmaking and to your opponent online.</p><p><b>Saved on this device</b>: always, automatically, in this browser. Clearing the browser\'s data, a private window, or another browser or device won\'t have it.</p><p><b>SAVE YOUR ACCOUNT</b> (optional): add an email and password to keep a locked copy of your progress online, then log in with the same two on another device to carry on. It saves by itself after every change and each save is read back before it counts. Your progress is locked on your device with your password, and your email and password never leave the device or appear anywhere public. There is no password reset, so keep the password safe; the save code under Club works as a backup.</p>'],
  ['Rewards','<p>Coins for every match (more for wins, goals, harder difficulty and bigger pitches). Training Tokens for half your winning margin, rounded down (win 2-0 or 3-1: 1 token; 4-0: 2; 1-0 or a draw: none). Club Legacy XP from every match, with a reward at every level, plus a Club Token. Challenges, achievements, league seasons, cups and Ranked promotions pay out too.</p>']];
@@ -6006,6 +6038,210 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-ops],[data
   else if(d.opsd==='x')$('opsdlg').hidden=true;else if(d.opsd==='send')opsDlgSend()});
 function opsBoot(){if(!ops.on)return;
   HELP.push(['Live status, reports and appeals','<p>This copy of the game is linked to its developer’s dashboard. While you play it sends a small encrypted status every 20 seconds: your nickname, club name and public club id, what you’re doing (menus, a match against the computer, searching, a private lobby or an online match with its score), the difficulty and the game version. Only the developer can read it. It never includes your email, password, room codes or location. Turn it off in your profile (tap your nickname) whenever you like.</p><p><b>Report</b> a club from View Squad, or your last online opponent from the Online tab. <b>Report a problem</b> from the Online tab or your profile. The developer can post announcements, pause online play for maintenance, suspend a club from online play (single-player always works, and you can appeal from the Online tab) and correct coins or Training Tokens. The game only obeys messages signed by the developer’s own key, so nobody else can do any of this.</p>']);opsInit();setInterval(()=>{opsHB(false);opsErrs();if((ops.maint||ops.ann.length)&&!opsFresh())opsBar()},5000);setTimeout(()=>opsHB(true),4000);opsBar()}
+
+// ---------- the transfer market ----------
+/* Sell your footballers to other managers for coins, buy theirs, or sell one straight back to the game.
+
+   The developer's dashboard server is the referee (server/lib/market.js). Listing, changing a price, cancelling and
+   buying are requests sent inside the game's encrypted messages; the server applies them one at a time (so a player
+   can only ever be sold once) and sends each result back signed with its private key. This game acts only on signed
+   results, and applies each one once:
+   - selling: the player is locked the moment you list him (out of your line-ups, can't be played, developed or sold
+     again) until he sells (he leaves your club and the price is added to your coins), you cancel, or the listing
+     expires after three days (he's back);
+   - buying: the price leaves your coins straight away and is held while the server decides. Bought: the player joins
+     your club with his development. Refused (someone else was quicker, the price changed, the listing went): the coins
+     come back. A request the server never received is cleared after a few seconds and the coins come back too.
+   If you're offline when your player sells, the coins arrive the next time the game connects.
+
+   Instant sale: straight to the game for half of what the player originally cost, which is the price of the pack he was
+   signed from (an Icon from a 50,000-coin Icon Pack sells for 25,000). Players who didn't come from a pack (your
+   starters, rewards, anyone signed before this version) count at their rarity's own pack price. A player keeps his
+   original price when he's sold on the market, so buying a player and selling him back to the game can't make coins. */
+const MKT_T='sundaykickabout/mkt1/',MKT_MIN=100,MKT_MAX=10000000,MKT_PER=10;
+const PACKOF={bronze:250,silver:750,gold:2000,special:12500,icon:50000};
+const MKS={idxTs:0,idxAt:0,ids:null,L:new Map(),subL:false,mid:'',midOf:'',view:'browse',sel:null,ask:null,msg:'',f:{rar:'all',pmin:'',pmax:'',rmin:'',rmax:'',sort:'new'},cl:new WeakSet(),tick:null};
+const mktRand=n=>opsHex(crypto.getRandomValues(new Uint8Array(n)));
+function mktSt(){const m=club.mkt=club.mkt||{};if(!/^[0-9a-f]{64}$/.test(m.sk||''))m.sk=mktRand(32);
+  m.list=m.list&&typeof m.list==='object'?m.list:{};m.pend=m.pend&&typeof m.pend==='object'?m.pend:{};m.done=Array.isArray(m.done)?m.done:[];m.hist=Array.isArray(m.hist)?m.hist:[];return m}
+async function mktMid(){const m=mktSt();if(!MKS.mid||MKS.midOf!==m.sk){MKS.mid=(await opsSha('sk-mkt1:'+m.sk)).slice(0,16);MKS.midOf=m.sk}return MKS.mid}
+const mktOn=()=>ops.on;
+// open = the server's signed index of listings arrived in the last 90 s (it sends one every 30 s)
+const mktOpen=()=>MKS.idxAt>0&&performance.now()-MKS.idxAt<90000;
+// a listed player is locked: not in your line-ups, can't be played, developed, listed again or sold to the game
+function mktLocked(id){const m=club.mkt;if(!m||!m.list)return false;for(const k in m.list)if(m.list[k].pid===id)return true;return false}
+const origOf=id=>{const p=byId(id),r=p?tier(p):'bronze',v=(club.paid||{})[id];return Number.isFinite(v)&&v>0?v:PACKOF[r]||250};
+const instantOf=id=>Math.floor(origOf(id)/2);
+// the prices a player of this rarity can legitimately have cost (the packs that can give him)
+const origOk=(r,v)=>PACKS.some(k=>k.odds[r]>0&&k.cost===v)||PACKOF[r]===v;
+function mktWhyNot(id){const p=byId(id);if(!p||p.isCustom)return'Your created player can’t be sold.';if(id==='wes')return'Wes is your club’s own player and can’t be sold.';
+  if(!club.owned.includes(id))return'He isn’t in your club.';if(mktLocked(id))return'He’s already on the market.';
+  if(ownedPlayers().length<=4)return'You need at least four other players to keep a team.';return''}
+// a card as it travels: the database player plus his development and original price
+function mktCard(id){const p=byId(id);return{id,rar:tier(p),xp:xpOf(id),up:{...upOf(id)},abl:ablOf(id),evo:evoOf(id).st,orig:origOf(id)}}
+// a card from the market, checked against this game's own rules (rarity from the database; development and original
+// price clamped to what's actually possible for him)
+function mktClean(c){if(!c||typeof c!=='object')return null;const p=byId(String(c.id||''));if(!p||p.isCustom||p.id==='wes')return null;const r=tier(p),n=v=>Math.round(+v)||0;
+  const up={};let left=UPCAP[r];for(const [k] of STATK){const v=clamp(n((c.up||{})[k]),0,Math.min(STATMAX,left));if(v){up[k]=v;left-=v}}
+  return{id:p.id,rar:r,xp:clamp(n(c.xp),0,XPL[XPL.length-1]),up,abl:clamp(n(c.abl)||1,1,ABMAX),evo:clamp(n(c.evo),0,EVO[r].boost.length),orig:origOk(r,n(c.orig))?n(c.orig):PACKOF[r]}}
+// look at a market card as if he were in your club (his development applied), without touching your club
+function withCard(c,fn){const id=c.id,K=['xp','up','abl','evo'],old={};for(const k of K){club[k]=club[k]||{};old[k]=Object.prototype.hasOwnProperty.call(club[k],id)?club[k][id]:undefined}
+  club.xp[id]=c.xp;club.up[id]=c.up;club.abl[id]=c.abl;club.evo[id]={st:c.evo,m:0,g:0,p:0,t:0};
+  try{return fn(byId(id))}finally{for(const k of K){if(old[k]===undefined)delete club[k][id];else club[k][id]=old[k]}}}
+// a player leaves your club; if you still have a spare copy of him, that copy takes his place (back to his base card)
+function mktGone(id){for(const q of [...club.squads,...club.csquads])q.s=q.s.map(x=>x===id?null:x);
+  for(const k of ['xp','up','abl','evo','paid'])if(club[k])delete club[k][id];
+  if((club.dupes||{})[id]>0){club.dupes[id]--;if(!club.dupes[id])delete club.dupes[id];return'spare'}
+  club.owned=club.owned.filter(x=>x!==id);return'gone'}
+// a player you've bought joins your club with his development (as a spare copy if you already have him)
+function mktJoin(c){if(club.owned.includes(c.id)){club.dupes=club.dupes||{};club.dupes[c.id]=(club.dupes[c.id]||0)+1;return'spare'}
+  club.owned.push(c.id);club.xp=club.xp||{};club.up=club.up||{};club.abl=club.abl||{};club.evo=club.evo||{};club.paid=club.paid||{};
+  club.xp[c.id]=c.xp;club.up[c.id]=c.up;club.abl[c.id]=c.abl;club.evo[c.id]={st:c.evo,m:0,g:0,p:0,t:0};club.paid[c.id]=c.orig;try{careerSigned(byId(c.id))}catch(e){}return'new'}
+const mktName=id=>{const p=byId(id);return p?p.name:'that player'};
+function mktNote(t){MKS.msg=t;try{toast(t)}catch(e){}}
+function mktHist(o){const m=mktSt();m.hist.unshift({...o,at:Date.now()});m.hist=m.hist.slice(0,40)}
+
+// ---- talking to the server ----
+async function mktSend(a,data,rq=mktRand(6)){if(!mktOn())return false;const m=mktSt();const ok=await opsSend('mkt',{a,rq,msk:m.sk,...data},true);return ok?rq:false}
+async function mktSub(withListings){if(!mktOn()||!await opsInit())return;const mid=await mktMid(),cl=await regConnect();if(withListings)MKS.subL=true;
+  const topics=[MKT_T+'idx',MKT_T+'u/'+mid,...(MKS.subL?[MKT_T+'l/+']:[])];
+  for(const c of cl){const sub=()=>{try{c.subscribe(topics,{qos:1})}catch(e){}};if(c.connected)sub();if(!MKS.cl.has(c)){MKS.cl.add(c);c.on('connect',()=>{try{c.subscribe([MKT_T+'idx',MKT_T+'u/'+MKS.mid,...(MKS.subL?[MKT_T+'l/+']:[])],{qos:1})}catch(e){}})}}}
+// signed messages from the server (listings, the index, your results); anything else is ignored
+async function mktMsg(tp,buf){if(!mktOn()||!await opsInit())return;const lid=tp.startsWith(MKT_T+'l/')?tp.slice(MKT_T.length+2):'';
+  if(!buf||!buf.length){if(lid&&MKS.L.delete(lid))mktRefresh();return}
+  let d;try{d=JSON.parse(new TextDecoder().decode(buf))}catch(e){return}if(!d||d.v!==1||typeof d.p!=='string'||typeof d.s!=='string'||d.p.length>400000)return;
+  let ok=false;try{ok=await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},ops.sigK,opsUnB64(d.s),opsTE(d.p))}catch(e){}if(!ok)return;
+  let p;try{p=JSON.parse(d.p)}catch(e){return}if(!p||!Number.isFinite(+p.ts))return;
+  if(p.k==='mki'&&tp===MKT_T+'idx'){if(+p.ts<MKS.idxTs)return;const fresh=+p.ts>MKS.idxTs&&(MKS.idxTs>0||Math.abs(Date.now()-p.ts)<300000);MKS.idxTs=+p.ts;MKS.ids=new Set((Array.isArray(p.ids)?p.ids:[]).map(String));if(fresh&&p.open)MKS.idxAt=performance.now();mktRefresh()}
+  else if(p.k==='mkl'&&lid&&p.l&&p.l.lid===lid){const o=MKS.L.get(lid);if(o&&o.ts>p.ts)return;const c=mktClean(p.l.card);if(!c)return;
+    MKS.L.set(lid,{lid,card:c,price:Math.round(+p.l.price)||0,at:+p.l.at||0,exp:+p.l.exp||0,nm:String(p.l.nm||'').slice(0,20),mg:String(p.l.mg||'').slice(0,16),rid:String(p.l.rid||''),ts:+p.ts});mktRefresh()}
+  else if(p.k==='mko'&&tp===MKT_T+'u/'+MKS.mid&&p.mid===MKS.mid&&Array.isArray(p.recs))mktApply(p.recs)}
+// your results, each applied once
+function mktApply(recs){const m=mktSt();let ch=false;
+  for(const r of recs){if(!r||typeof r.id!=='string'||m.done.includes(r.id))continue;m.done.push(r.id);ch=true;const l=m.list[r.lid],why=String(r.why||'').slice(0,120);
+    switch(r.t){
+      case 'listed':if(l&&l.rq===r.rq){l.st='active';l.exp=+r.exp||0;delete l.rq;mktNote(`${mktName(l.pid)} is on the transfer market for ${l.price.toLocaleString()} coins.`)}break;
+      case 'list-no':if(l&&l.rq===r.rq){delete m.list[r.lid];mktNote(`Couldn’t list ${mktName(l.pid)}: ${why}. He’s back in your club.`)}break;
+      case 'priced':if(l){l.price=Math.round(+r.price)||l.price;if(l.prq===r.rq){delete l.prq;mktNote(`${mktName(l.pid)} is now ${l.price.toLocaleString()} coins.`)}}break;
+      case 'price-no':if(l&&l.prq===r.rq){delete l.prq;mktNote(`Couldn’t change the price: ${why}.`)}break;
+      case 'cancelled':if(l){delete m.list[r.lid];mktNote(`${mktName(l.pid)} is off the market and back in your club.`);mktHist({t:'cancelled',pid:l.pid,price:l.price})}break;
+      case 'cancel-no':if(l&&l.crq===r.rq){delete l.crq;mktNote(`Couldn’t cancel: ${why}.`)}break;
+      case 'sold':if(l&&l.pid===r.pid){delete m.list[r.lid];const price=clamp(Math.round(+r.price)||0,0,MKT_MAX),spare=mktGone(l.pid)==='spare';club.coins+=price;
+        mktHist({t:'sold',pid:l.pid,price,who:String(r.to||'').slice(0,20)});mktNote(`Sold ${mktName(l.pid)} to ${String(r.to||'another manager').slice(0,20)} for ${price.toLocaleString()} coins!${spare?' Your spare copy of him takes his place.':''}`)}break;
+      case 'bought':{const P=m.pend[r.rq];if(P&&P.lid===r.lid){delete m.pend[r.rq];const c=mktClean(r.card);const paid=Math.round(+r.price)||P.price;if(paid!==P.price)club.coins+=P.price-paid;
+        if(c){const how=mktJoin(c);mktHist({t:'bought',pid:c.id,price:paid,who:String(r.from||'').slice(0,20)});mktNote(`Signed ${mktName(c.id)} for ${paid.toLocaleString()} coins!${how==='spare'?' You already had him, so he’s kept as a spare copy.':''}`)}}break}
+      case 'buy-no':{const P=m.pend[r.rq];if(P){delete m.pend[r.rq];club.coins+=P.price;mktNote(`Couldn’t buy ${mktName(P.pid)}: ${why}. Your ${P.price.toLocaleString()} coins are back.`)}break}
+      case 'void':{const P=m.pend[r.rq];if(P){delete m.pend[r.rq];club.coins+=P.price;mktNote(`The market didn’t get your offer for ${mktName(P.pid)}. Your coins are back; try again.`)}
+        for(const k of Object.keys(m.list)){const x=m.list[k];if(x.rq===r.rq){delete m.list[k];mktNote(`The market didn’t get your listing for ${mktName(x.pid)}. He’s back in your club; try again.`)}if(x.prq===r.rq)delete x.prq;if(x.crq===r.rq)delete x.crq}break}
+      case 'expired':if(l){delete m.list[r.lid];mktNote(`${mktName(l.pid)} didn’t sell in three days and is back in your club.`);mktHist({t:'expired',pid:l.pid,price:l.price})}break;
+      case 'removed':if(l){delete m.list[r.lid];mktNote(`${mktName(l.pid)} was taken off the market by a moderator${why?': '+why:''}. He’s back in your club.`)}break}}
+  if(m.done.length>400)m.done.splice(0,m.done.length-400);
+  if(ch){saveClub();if(state==='menu')renderMenu()}}
+// requests not answered after a few seconds: ask the server; any it never got are cleared (coins back, player unlocked)
+function mktWaiting(){const m=club.mkt;if(!m)return[];const t=Date.now(),out=[];
+  for(const [rq,P] of Object.entries(m.pend||{}))if(t-P.at>8000)out.push(rq);
+  for(const l of Object.values(m.list||{}))for(const [k,a] of [['rq','at'],['prq','pat'],['crq','cat']])if(l[k]&&t-(l[a]||0)>8000)out.push(l[k]);return out}
+async function mktSync(){const w=mktWaiting();if(!w.length||!mktOpen())return;await mktSend('sync',{pend:w.slice(0,40)})}
+function mktRefresh(){if(state==='menu'&&tab==='club'&&ctab==='market'&&$('mk-body'))mktDraw()}
+function mktBoot(){if(!mktOn())return;const m=club.mkt;// if you've anything going on the market, listen for the results straight away
+  if(m&&(Object.keys(m.list||{}).length||Object.keys(m.pend||{}).length))mktSub(false);
+  MKS.tick=setInterval(()=>{if(club.mkt&&mktWaiting().length)mktSync();if(state==='menu'&&tab==='club'&&ctab==='market')mktRefresh()},12000)}
+
+// ---- the three actions ----
+async function mktList(id,price){const why=mktWhyNot(id);if(why){mktNote(why);return}price=Math.round(+price);
+  if(!(price>=MKT_MIN&&price<=MKT_MAX)){mktNote(`Pick a price from ${MKT_MIN.toLocaleString()} to ${MKT_MAX.toLocaleString()} coins.`);return}
+  const m=mktSt();if(Object.keys(m.list).length>=MKT_PER){mktNote(`You can have at most ${MKT_PER} players on the market at once.`);return}
+  if(!mktOpen()){mktNote('The market is closed right now. Try again later.');return}
+  const lid=mktRand(6),rq=mktRand(6);m.list[lid]={lid,pid:id,price,st:'pending',at:Date.now(),rq};
+  for(const q of [...club.squads,...club.csquads])q.s=q.s.map(x=>x===id?null:x);saveClub();
+  if(!await mktSend('list',{lid,price,card:mktCard(id)},rq)){delete m.list[lid];saveClub();mktNote('Couldn’t reach the market. Check your connection and try again.');renderMenu();return}
+  mktNote(`Listing ${mktName(id)}…`);renderMenu()}
+async function mktReprice(lid,price){const m=mktSt(),l=m.list[lid];price=Math.round(+price);if(!l||l.st!=='active')return;
+  if(!(price>=MKT_MIN&&price<=MKT_MAX)){mktNote(`Pick a price from ${MKT_MIN.toLocaleString()} to ${MKT_MAX.toLocaleString()} coins.`);return}
+  const rq=mktRand(6);l.prq=rq;l.pat=Date.now();saveClub();if(!await mktSend('price',{lid,price},rq)){delete l.prq;saveClub();mktNote('Couldn’t reach the market. Check your connection and try again.');return}mktNote('Changing the price…');renderMenu()}
+async function mktCancel(lid){const m=mktSt(),l=m.list[lid];if(!l||l.st!=='active')return;
+  const rq=mktRand(6);l.crq=rq;l.cat=Date.now();saveClub();if(!await mktSend('cancel',{lid},rq)){delete l.crq;saveClub();mktNote('Couldn’t reach the market. Check your connection and try again.');return}mktNote('Taking him off the market…');renderMenu()}
+async function mktBuy(lid){const L=MKS.L.get(lid),m=mktSt();if(!L||!mktOpen()){mktNote('That listing isn’t available right now.');return}
+  if(Object.values(m.list).some(x=>x.lid===lid)){mktNote('That’s your own listing.');return}
+  if(Object.values(m.pend).some(P=>P.lid===lid)){mktNote('You’ve already made an offer for him.');return}
+  if(club.coins<L.price){mktNote('You don’t have enough coins.');return}
+  // the coins are held while the server decides; refused or never received, they come back
+  club.coins-=L.price;const rq=mktRand(6);m.pend[rq]={lid,pid:L.card.id,price:L.price,at:Date.now()};saveClub();
+  if(!await mktSend('buy',{lid,price:L.price},rq)){delete m.pend[rq];club.coins+=L.price;saveClub();mktNote('Couldn’t reach the market. Your coins weren’t taken.');renderMenu();return}
+  mktNote(`Buying ${mktName(L.card.id)}…`);renderMenu()}
+function mktInstant(id){const why=mktWhyNot(id);if(why){mktNote(why);return}const v=instantOf(id),nm=mktName(id),spare=mktGone(id)==='spare';club.coins+=v;
+  mktHist({t:'instant',pid:id,price:v});saveClub();mktNote(`Sold ${nm} to the game for ${v.toLocaleString()} coins.${spare?' Your spare copy of him takes his place.':''}`);MKS.sel=null;renderMenu()}
+
+// ---- the screen: Club → Transfer Market (Browse Market, My Listings, Sell Players) ----
+const RARN={bronze:'Bronze',silver:'Silver',gold:'Gold',special:'Special',icon:'Icon'};
+const MKST=[['pace','PAC'],['shot','SHO'],['fin','FIN'],['skill','SKI'],['pass','PAS'],['tackle','TAC'],['str','STR']];
+const mkLeft=ms=>{ms=Math.max(0,ms);const m=Math.floor(ms/60000),h=Math.floor(m/60),d=Math.floor(h/24);return d?`${d}d ${h%24}h`:h?`${h}h ${m%60}m`:`${m}m`};
+// one player row: rating, name, rarity, position, level and his seven stats as they'd be in your club
+function mktRow(c,right){return withCard(c,p=>{const s=playStats(p),o=ovr(s);
+  return `<div class="mkrow t-${c.rar}"><div class="mkp"><b class="mko">${o}</b><span><b>${esc(p.name)}</b><small>${RARN[c.rar]} · ${natPos(p)} · Level ${lvlOf(c.id)}${c.evo?` · Evolution ${c.evo}`:''}</small></span></div>
+    <div class="mkst">${MKST.map(([k,n])=>`<span><i>${n}</i>${Math.round((s[k]||0)*100)}</span>`).join('')}</div><div class="mkr">${right}</div></div>`})}
+function mktHTML(){const m=mktSt(),nL=Object.keys(m.list).length,nP=Object.keys(m.pend).length;
+  return `<div class="mk"><div class="mkhead"><b>Transfer Market</b><span id="mk-state"></span></div>
+    <div class="mktabs" role="tablist">${[['browse','Browse Market'],['mine','My Listings'],['sell','Sell Players']].map(([k,n])=>`<button role="tab" data-mkv="${k}" aria-selected="${MKS.view===k}">${n}${k==='mine'&&nL+nP?` <em>${nL+nP}</em>`:''}</button>`).join('')}</div>
+    <p class="mkmsg" id="mk-msg" role="status"></p><div id="mk-ask"></div><div id="mk-body"></div></div>`}
+function mktStateHTML(){if(!mktOn())return'<span class="mkoff">Not available in this copy of the game</span>';
+  return mktOpen()?'<span class="mkon">● Market open</span>':'<span class="mkoff">○ Market closed right now (its server isn’t running). Instant sales still work.</span>'}
+function mktDraw(){const st=$('mk-state'),msg=$('mk-msg'),body=$('mk-body'),ask=$('mk-ask');if(!body)return;st.innerHTML=mktStateHTML();msg.textContent=MKS.msg||'';
+  ask.innerHTML=MKS.ask?mktAskHTML():'';body.innerHTML=MKS.view==='mine'?mktMineHTML():MKS.view==='sell'?mktSellHTML():mktBrowseHTML()}
+// the confirmation step every action goes through
+function mktAskHTML(){const a=MKS.ask,co=n=>n.toLocaleString();let t='',go='Confirm';
+  if(a.kind==='buy'){const L=MKS.L.get(a.lid);if(!L)return'';t=`Buy <b>${esc(mktName(L.card.id))}</b> for <b>${co(L.price)} coins</b>? The coins are held while the market confirms. If someone beats you to him, they come straight back.`;go='Buy him'}
+  else if(a.kind==='list'){t=`Put <b>${esc(mktName(a.id))}</b> on the market for <b>${co(a.price)} coins</b>? He leaves your line-ups and can’t play until he sells, you cancel, or the listing ends after three days.`;go='List him'}
+  else if(a.kind==='instant'){t=`Sell <b>${esc(mktName(a.id))}</b> to the game for <b>${co(instantOf(a.id))} coins</b> (half his original ${co(origOf(a.id))})? This can’t be undone.`;go='Sell now'}
+  else if(a.kind==='cancel'){const l=mktSt().list[a.lid];if(!l)return'';t=`Take <b>${esc(mktName(l.pid))}</b> off the market? He’ll be back in your club.`;go='Take him off'}
+  else if(a.kind==='price'){const l=mktSt().list[a.lid];if(!l)return'';t=`Change the price of <b>${esc(mktName(l.pid))}</b> from ${co(l.price)} to <b>${co(a.price)} coins</b>?`;go='Change price'}
+  return `<div class="mkask" role="alertdialog" aria-label="Confirm"><p>${t}</p><div><button class="btn gold" data-mkdo="yes">${go}</button><button class="btn" data-mkdo="no">Cancel</button></div></div>`}
+function mktBrowseHTML(){const f=MKS.f,m=mktSt(),now=Date.now(),n=v=>v===''?null:+v;const pmin=n(f.pmin),pmax=n(f.pmax),rmin=n(f.rmin),rmax=n(f.rmax);
+  let rows=[...MKS.L.values()].filter(L=>(!MKS.ids||MKS.ids.has(L.lid))&&L.exp>now);
+  const rated=rows.map(L=>({L,o:withCard(L.card,p=>effOvr(p))}));
+  let list=rated.filter(({L,o})=>(f.rar==='all'||L.card.rar===f.rar)&&(pmin==null||L.price>=pmin)&&(pmax==null||L.price<=pmax)&&(rmin==null||o>=rmin)&&(rmax==null||o<=rmax));
+  list.sort((a,b)=>f.sort==='cheap'?a.L.price-b.L.price:f.sort==='dear'?b.L.price-a.L.price:f.sort==='rating'?b.o-a.o:b.L.at-a.L.at);
+  const mine=new Set(Object.keys(m.list)),offered=new Set(Object.values(m.pend).map(P=>P.lid)),open=mktOpen();
+  const filt=`<div class="mkfilt"><label>Rarity<select data-mkf="rar">${['all','bronze','silver','gold','special','icon'].map(r=>`<option value="${r}"${f.rar===r?' selected':''}>${r==='all'?'Any':RARN[r]}</option>`).join('')}</select></label>
+    <label>Price from<input type="number" min="0" inputmode="numeric" data-mkf="pmin" value="${esc(f.pmin)}" placeholder="any"></label><label>to<input type="number" min="0" inputmode="numeric" data-mkf="pmax" value="${esc(f.pmax)}" placeholder="any"></label>
+    <label>Rating from<input type="number" min="0" max="130" inputmode="numeric" data-mkf="rmin" value="${esc(f.rmin)}" placeholder="any"></label><label>to<input type="number" min="0" max="130" inputmode="numeric" data-mkf="rmax" value="${esc(f.rmax)}" placeholder="any"></label>
+    <label>Sort<select data-mkf="sort">${[['new','Newest'],['cheap','Price: low to high'],['dear','Price: high to low'],['rating','Rating: high to low']].map(([k,t])=>`<option value="${k}"${f.sort===k?' selected':''}>${t}</option>`).join('')}</select></label></div>`;
+  if(!MKS.L.size)return filt+`<p class="hint">${open?'Nobody has listed a player yet. Be the first: Sell Players.':'Waiting for the market…'}</p>`;
+  return filt+`<p class="hint">${list.length} of ${rows.length} players · you have ${club.coins.toLocaleString()} coins</p><div class="mklist">`+list.slice(0,120).map(({L})=>{const own=mine.has(L.lid),off=offered.has(L.lid),have=club.owned.includes(L.card.id);
+      const btn=own?'<span class="mktag">Your listing</span>':off?'<span class="mktag">Buying…</span>':`<button class="btn gold" data-mkbuy="${L.lid}" ${!open||club.coins<L.price?'disabled':''}>${club.coins<L.price?'Not enough coins':'Buy'}</button>`;
+      return mktRow(L.card,`<b class="mkprice">${L.price.toLocaleString()} coins</b><small>${esc(L.nm||'A club')}${L.mg?' · '+esc(L.mg):''} · ${mkLeft(L.exp-now)} left${have&&!own?' · you have him (he’d be a spare copy)':''}</small>${btn}`)}).join('')+`</div>`}
+function mktMineHTML(){const m=mktSt(),now=Date.now(),L=Object.values(m.list).sort((a,b)=>b.at-a.at),P=Object.entries(m.pend);
+  const rows=L.map(l=>{const p=byId(l.pid);if(!p)return'';const c=mktCard(l.pid);
+    const st=l.st!=='active'?'<span class="mktag">Sending to the market…</span>':`<small>On the market · ${mkLeft((l.exp||now)-now)} left</small>`;
+    const ctl=l.st==='active'?`<div class="mkprc"><input type="number" min="${MKT_MIN}" max="${MKT_MAX}" inputmode="numeric" id="mkp-${l.lid}" value="${l.price}" aria-label="New price"><button class="btn" data-mkprice="${l.lid}" ${l.prq?'disabled':''}>${l.prq?'Saving…':'Change price'}</button><button class="btn" data-mkcancel="${l.lid}" ${l.crq?'disabled':''}>${l.crq?'Cancelling…':'Cancel listing'}</button></div>`:'';
+    return mktRow(c,`<b class="mkprice">${l.price.toLocaleString()} coins</b>${st}${ctl}`)}).join('');
+  const pend=P.map(([rq,x])=>`<p class="hint">Buying ${esc(mktName(x.pid))} for ${x.price.toLocaleString()} coins: waiting for the market (your coins are held).</p>`).join('');
+  const H=m.hist.slice(0,12).map(h=>`<li>${new Date(h.at).toLocaleDateString()} · ${{sold:'Sold',bought:'Bought',instant:'Sold to the game',expired:'Listing ended',cancelled:'Took off the market'}[h.t]||h.t} ${esc(mktName(h.pid))}${h.t==='expired'||h.t==='cancelled'?'':` for ${h.price.toLocaleString()} coins`}${h.who?` (${h.t==='sold'?'to':'from'} ${esc(h.who)})`:''}</li>`).join('');
+  return `<p class="hint">${L.length} of ${MKT_PER} listing places used. Listed players can’t play until they’re sold or taken off the market. Listings end after three days.</p>`+
+    (rows?`<div class="mklist">${rows}</div>`:'<p class="hint">You have no players on the market. Use Sell Players to list one.</p>')+pend+(H?`<h4 class="mkh">Recent activity</h4><ul class="mkhist">${H}</ul>`:'')}
+function mktSellHTML(){const open=mktOpen(),mine=ownedPlayers().filter(p=>!p.isCustom&&p.id!=='wes');
+  if(MKS.sel&&!mktWhyNot(MKS.sel)){const id=MKS.sel,c=mktCard(id),o=origOf(id),v=instantOf(id),pr=MKS.price&&MKS.price[id]||Math.max(MKT_MIN,o);
+    return `<button class="btn" data-mksel="">← All your players</button>`+mktRow(c,`<small>Original price ${o.toLocaleString()} coins</small>`)+
+      `<div class="mkopts"><div class="mkopt"><h4>List on the transfer market</h4><p class="hint">Choose your price (${MKT_MIN.toLocaleString()} to ${MKT_MAX.toLocaleString()} coins). Another manager can buy him at that price for three days; you can change the price or cancel any time before he sells.</p>
+        <div class="mkprc"><input type="number" min="${MKT_MIN}" max="${MKT_MAX}" inputmode="numeric" id="mk-lp" data-mkpid="${id}" value="${pr}" aria-label="Asking price"><button class="btn gold" data-mkask="list" ${open?'':'disabled'}>List him</button></div>${open?'':'<p class="hint">The market is closed right now.</p>'}</div>
+       <div class="mkopt"><h4>Instant sale</h4><p class="hint">Sell him to the game straight away for half his original price.</p><p class="mkbig">${v.toLocaleString()} coins</p><button class="btn" data-mkask="instant">Sell now</button></div></div>`}
+  MKS.sel=null;
+  return `<p class="hint">Pick a player to list on the market or sell to the game. A player’s original price is the price of the pack he was signed from; selling to the game pays half of it.</p><div class="mklist">`+
+    mine.map(p=>{const why=mktWhyNot(p.id);return mktRow(mktCard(p.id),`<small>Original price ${origOf(p.id).toLocaleString()} · instant sale ${instantOf(p.id).toLocaleString()}</small>${why?`<small class="mkno">${esc(why)}</small>`:`<button class="btn" data-mksel="${p.id}">Sell…</button>`}`)}).join('')+`</div>`}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mkv],[data-mkbuy],[data-mksel],[data-mkdo],[data-mkask],[data-mkcancel],[data-mkprice]');if(!b)return;const d=b.dataset;
+  if(d.mkv){MKS.view=d.mkv;MKS.ask=null;MKS.msg='';mktDraw();for(const x of document.querySelectorAll('[data-mkv]'))x.setAttribute('aria-selected',x.dataset.mkv===MKS.view);return}
+  if(d.mksel!==undefined){MKS.sel=d.mksel||null;MKS.ask=null;mktDraw();return}
+  if(d.mkbuy){MKS.ask={kind:'buy',lid:d.mkbuy};mktDraw();return}
+  if(d.mkcancel){MKS.ask={kind:'cancel',lid:d.mkcancel};mktDraw();return}
+  if(d.mkprice){const v=Math.round(+($('mkp-'+d.mkprice)||{}).value);if(!(v>=MKT_MIN&&v<=MKT_MAX)){mktNote(`Pick a price from ${MKT_MIN.toLocaleString()} to ${MKT_MAX.toLocaleString()} coins.`);mktDraw();return}MKS.ask={kind:'price',lid:d.mkprice,price:v};mktDraw();return}
+  if(d.mkask==='list'){const v=Math.round(+$('mk-lp').value);if(!(v>=MKT_MIN&&v<=MKT_MAX)){mktNote(`Pick a price from ${MKT_MIN.toLocaleString()} to ${MKT_MAX.toLocaleString()} coins.`);mktDraw();return}MKS.ask={kind:'list',id:MKS.sel,price:v};mktDraw();return}
+  if(d.mkask==='instant'){MKS.ask={kind:'instant',id:MKS.sel};mktDraw();return}
+  if(d.mkdo==='no'){MKS.ask=null;mktDraw();return}
+  if(d.mkdo==='yes'){const a=MKS.ask;MKS.ask=null;if(!a)return;
+    if(a.kind==='buy')mktBuy(a.lid);else if(a.kind==='list'){MKS.sel=null;MKS.view='mine';mktList(a.id,a.price)}else if(a.kind==='instant')mktInstant(a.id);
+    else if(a.kind==='cancel')mktCancel(a.lid);else if(a.kind==='price')mktReprice(a.lid,a.price);mktDraw()}});
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.mkf){MKS.f[t.dataset.mkf]=t.value;const body=$('mk-body');if(body&&MKS.view==='browse'){const a=document.activeElement,k=a&&a.dataset&&a.dataset.mkf,pos=a&&a.selectionStart;body.innerHTML=mktBrowseHTML();if(k){const n=body.querySelector(`[data-mkf="${k}"]`);if(n){n.focus();try{if(pos!=null)n.setSelectionRange(pos,pos)}catch(x){}}}}}
+  else if(t.id==='mk-lp'&&t.dataset.mkpid){MKS.price=MKS.price||{};MKS.price[t.dataset.mkpid]=t.value}});
 
 /* ---------- draw ---------- */
 function txt(s,x,y,size,col,align='center',stroke=true){
@@ -7013,7 +7249,7 @@ $('bulk-save').onclick=()=>{let n=0;
   applyNames();try{localStorage.setItem('kickabout-names',JSON.stringify(NAMES))}catch(e){}cloudPush();$('bulk-paste').value='';
   renderMenu();bulkRender();toast(n?`Saved ${n} name${n>1?'s':''}.`:'No names changed.')};
 $('bulk-clear').onclick=()=>{if(!Object.keys(NAMES).length){toast('Everyone already has their card name.');return}NAMES={};applyNames();try{localStorage.setItem('kickabout-names','{}')}catch(e){}cloudPush();renderMenu();bulkRender();toast('All names reset.')};
-renderMenu();cloudInit();profBoot();tutBoot();regBoot();opsBoot();
+renderMenu();cloudInit();profBoot();tutBoot();regBoot();opsBoot();mktBoot();
 let last=performance.now();
 function hitStop(f){if(!RM&&!NET.on)hitT=Math.max(hitT,f)}
 // Every frame starts from a clean drawing state, and one bad frame can never stop the game: errors are caught and the
@@ -7057,7 +7293,7 @@ $('fullscr').onclick=toggleFull;$('fullscr2').onclick=toggleFull;
 new MutationObserver(()=>document.body.classList.toggle('playing',menuEl.hidden)).observe(menuEl,{attributes:true,attributeFilter:['hidden']});
 const fsLabel=()=>{const on=!!(document.fullscreenElement||document.webkitFullscreenElement);$('fullscr').textContent=on?'Exit full screen (V)':'Full screen (V)';$('fullscr2').textContent=on?'Exit full screen':'Full screen'};
 document.addEventListener('fullscreenchange',fsLabel);document.addEventListener('webkitfullscreenchange',fsLabel);
-window.__kick={errs:()=>loopErrs,bsrc:()=>gBallSrc,acct:{v1:async(e,pw)=>{const d=await acctDerive(e,pw,1),keep=acct;acct={k:d.k};const s=await acctSeal(snapshotSave());acct=keep;for(const c of await regConnect()){const go=()=>c.publish(ACCT_T+d.id,s,{qos:1,retain:true});if(c.connected)go();else c.once('connect',go)}return d.id},st:()=>acct&&{...acct,k:'-'},fetch:()=>acct?acctFetch(acct.id,acct.k).then(r=>({ok:r.ok,at:r.sv&&r.sv.at,coins:r.sv&&r.sv.club.coins})):null},oj:()=>({on:!!(OJ.slam||OJ.z>.002||OJ.vig>0||OJ.lines.length||OJ.strobe>0),slam:OJ.slam&&OJ.slam.text,style:Math.round(style),hype:Math.round(hype),fire:Math.round(fire),chain}),dbg:{scout:{band:t=>{const s=scoutBand(t);return s&&{n:s.n,cut:s.cut,pHigh:s.pHigh}},odds:(t,b)=>{const L=scoutLevelOdds(t,b);return L&&{pHigh:L.pHigh,sum:L.w.reduce((a,x)=>a+x,0)}},anchor:(t,b)=>scoutAnchor(t,b),deal:t=>dealHardPick(t).map(p=>({id:p.id,ovr:ovr(p),tier:tier(p)})),roll:o=>rollTier(o),depFx:k=>depFx(k)},gdTokens:(a,b)=>gdTokens(a,b),ttCalc:()=>ttCalc,tPick:p=>throughPick(p),isOff:(m,p)=>isOffside(m,p),doThrough:p=>doThrough(p),aiStat:()=>aiStat,shotLog:()=>aiShotLog.slice(),earnNote:()=>earnNote,cv:()=>({rollTier,ABTIER,sweepPlan,kSkill,byId,upOf,UPCAP,EVO,XPL,STATMAX,tier,depBuy,depLv,depFx,ctk,ctkSync,maxPlan,statMax,upPreview,playStatsX,scoutLevelOdds,matchPay,gdTokens,legacyXP,upBuy,ablBuy,coachCost,upCost,effOvr,cdSecs,spCdOf,PACKS,legNeed,trainDo,evoDo,evoNeed,ovr}),snapSize:()=>JSON.stringify(netSnapOf()).length,prep:()=>!!netPrep,allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p),look:p.look,skin:p.skin})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,netEpoch:()=>{netEpoch++},forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,FY0,FY1,MY,MIDX,GY0,GY1,BOX,BOXH,PITCH}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},career:{newSeason:div=>newSeason(GM,div,1),lgRecord:(a,b)=>lgRecord(lgOf(),a,b),lgNext:()=>lgNext(),lgOf:()=>lgOf(),newWcc:()=>{club.wcc=club.wcc||{};return club.wcc[GM]=newWcc(GM,1)},icup:()=>icupOf(),iconUnlocked:m=>iconUnlocked(m)},net:()=>({stat:netStat,log:netLogBuf.slice(-40),c2:{seq:c2seq,rme:RME&&{idx:RME.idx,on:RME.on,age:Math.round(performance.now()-RME.at)}},gcs:gCs,wait:netWaiting,gwait:netGuestWait,routes:{...netRoutes},prefer:nroom&&nroom.prefer?nroom.prefer.kind:null,gm:{on:gPr.on,seq:gIn.seq,ack:gIn.ack,pending:gIn.list.filter(e=>e[0]>gIn.ack).length,wait:netGuestWait,rtt:netRtt},RSp:RS&&RS.pend?RS.pend.k:null,RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
+window.__kick={errs:()=>loopErrs,bsrc:()=>gBallSrc,acct:{v1:async(e,pw)=>{const d=await acctDerive(e,pw,1),keep=acct;acct={k:d.k};const s=await acctSeal(snapshotSave());acct=keep;for(const c of await regConnect()){const go=()=>c.publish(ACCT_T+d.id,s,{qos:1,retain:true});if(c.connected)go();else c.once('connect',go)}return d.id},st:()=>acct&&{...acct,k:'-'},fetch:()=>acct?acctFetch(acct.id,acct.k).then(r=>({ok:r.ok,at:r.sv&&r.sv.at,coins:r.sv&&r.sv.club.coins})):null},oj:()=>({on:!!(OJ.slam||OJ.z>.002||OJ.vig>0||OJ.lines.length||OJ.strobe>0),slam:OJ.slam&&OJ.slam.text,style:Math.round(style),hype:Math.round(hype),fire:Math.round(fire),chain}),dbg:{scout:{band:t=>{const s=scoutBand(t);return s&&{n:s.n,cut:s.cut,pHigh:s.pHigh}},odds:(t,b)=>{const L=scoutLevelOdds(t,b);return L&&{pHigh:L.pHigh,sum:L.w.reduce((a,x)=>a+x,0)}},anchor:(t,b)=>scoutAnchor(t,b),deal:t=>dealHardPick(t).map(p=>({id:p.id,ovr:ovr(p),tier:tier(p)})),roll:o=>rollTier(o),depFx:k=>depFx(k)},gdTokens:(a,b)=>gdTokens(a,b),ttCalc:()=>ttCalc,tPick:p=>throughPick(p),isOff:(m,p)=>isOffside(m,p),doThrough:p=>doThrough(p),aiStat:()=>aiStat,shotLog:()=>aiShotLog.slice(),earnNote:()=>earnNote,cv:()=>({rollTier,ABTIER,sweepPlan,kSkill,byId,upOf,UPCAP,EVO,XPL,STATMAX,tier,depBuy,depLv,depFx,ctk,ctkSync,maxPlan,statMax,upPreview,playStatsX,scoutLevelOdds,matchPay,gdTokens,legacyXP,upBuy,ablBuy,coachCost,upCost,effOvr,cdSecs,spCdOf,PACKS,legNeed,trainDo,evoDo,evoNeed,ovr}),snapSize:()=>JSON.stringify(netSnapOf()).length,prep:()=>!!netPrep,allPlayers:()=>PLAYERS.map(p=>({id:p.id,real:inspOf(p.id)[0],country:inspOf(p.id)[1],card:p.name0,pos:natPos(p),rar:TIERS[tier(p)].name,ovr:ovr(p),look:p.look,skin:p.skin})),draw:()=>draw(),proj:(x,y,z)=>P(x,y,z),cam:()=>cam,hit:()=>({hitT,slowT,timeScale}),shoot,give,keeperOf,startAim,openCorner,netEpoch:()=>{netEpoch++},forcePlay:()=>{state="play";stT=99;kickT=0;koT=-999;introT=0},setWeather:w=>{weather=w},setDF:k=>{DF=levelDF(k)},DF:()=>DF},sim:()=>({air:airN,ctrl,clock,lastPoss,passChain,FX0,FX1,FY0,FY1,MY,MIDX,GY0,GY1,BOX,BOXH,PITCH}),penApi:()=>({pen,penSetup,penRelease,updatePens,keeperStep,setCharge:v=>{charge=v},myDive,setDF:k=>{DF=levelDF(k)}}),setFire:v=>{fire=v},mkt:{st:()=>mktSt(),mid:()=>mktMid(),open:()=>mktOpen(),L:()=>[...MKS.L.values()],orig:id=>origOf(id),instant:id=>instantOf(id),locked:id=>mktLocked(id),ui:MKS},career:{newSeason:div=>newSeason(GM,div,1),lgRecord:(a,b)=>lgRecord(lgOf(),a,b),lgNext:()=>lgNext(),lgOf:()=>lgOf(),newWcc:()=>{club.wcc=club.wcc||{};return club.wcc[GM]=newWcc(GM,1)},icup:()=>icupOf(),iconUnlocked:m=>iconUnlocked(m)},net:()=>({stat:netStat,log:netLogBuf.slice(-40),c2:{seq:c2seq,rme:RME&&{idx:RME.idx,on:RME.on,age:Math.round(performance.now()-RME.at)}},gcs:gCs,wait:netWaiting,gwait:netGuestWait,routes:{...netRoutes},prefer:nroom&&nroom.prefer?nroom.prefer.kind:null,gm:{on:gPr.on,seq:gIn.seq,ack:gIn.ack,pending:gIn.list.filter(e=>e[0]>gIn.ack).length,wait:netGuestWait,rtt:netRtt},RSp:RS&&RS.pend?RS.pend.k:null,RS:RS&&{...RS},NET,ctrl2:ctrl2&&players.indexOf(ctrl2),ctrl:ctrl&&players.indexOf(ctrl),state,stT,score:score.slice()}),tackle,setScore:(a,b)=>{score[0]=a;score[1]=b},goalFor,setCtrl:p=>{ctrl=p},startPens,pen:()=>pen,setClock:v=>{clock=v},setMode:m=>{mode=m},setGM:g=>{GM=g},gm:()=>({GM,PITCH,FX1,FY1,MIDX,MY}),club:()=>club,players:()=>players,B,state:()=>state,startMatch,update,keys,score:()=>score,stats:()=>stats,setSel:s=>{club.owned=[...new Set([...club.owned,...s])];sq().s=s.slice(0,4)}};
 // Getting ready: a panel over the pitch while both laptops load, then the countdown
 // before kick-off online: the two clubs and their managers face off, then the countdown (or what's still being checked)
 let vsT0=0,vsLast=0;
