@@ -996,7 +996,7 @@ function humanUpdate(p,dt){
       if(feint||spin){p.lunge=0;whiff(p,40,null,false);p.locked=40;pop('dodged',car.x,car.y-30,C.muted,15)}
       else{const far=dist(p,B)>=23;give(p);if(far){B.x=p.x+Math.cos(p.dir)*12;B.y=p.y+Math.sin(p.dir)*12;B.vx=B.vy=0}// won on what the joining player saw: the ball comes to his feet
         p.mT=(p.mT||0)+1;car.stun=60;car.vx*=.2;car.vy*=.2;p.lunge=0;p.tackleCd=LUNGE_CD;S.tackle();shake=Math.max(shake,RM?0:4);if(p.team===0){stats.tackles++;addHype(10);addStyle(15,p.x,p.y)}pop('STOLEN!  +15',p.x,p.y-48,C.mint,28,70);hitStop(4);S.ooh();slowmo(12,.35);flash=RM?0:.25}}
-    else if(car&&(reach(p.slide?28:p.inter?24:23)||(p.slide&&(dist(p,car)<30||(!!sb&&Math.hypot(p.x-sb.cx,p.y-sb.cy)<30&&dist(p,car)<sb.lim))))){tackle(p,car,sb&&dist(p,B)>=(p.slide?28:23)&&!(p.slide&&dist(p,car)<30)?sb:null)}
+    else if(car&&(reach(p.slide?28:p.inter?24:23)||(p.slide&&(dist(p,car)<30||(!!sb&&Math.hypot(p.x-sb.cx,p.y-sb.cy)<30&&dist(p,car)<sb.lim))))){tackle(p,car,sb||null)}
     else if(!B.owner&&dist(p,B)<(p.slide?28:22)&&!(B.lobThrough&&B.lobTo&&B.lobTo.team!==p.team&&B.z>=thruReach(p))){if(p.slide){give(p);ctrl=p;B.vx=B.vy=0}p.lunge=0;p.slide=false;p.inter=false}
     if(p.lunge<=0&&p.slide){p.slide=false;p.stun=48;pop('up you get',p.x,p.y-28,C.muted,13)}
     if(p.lunge<=0&&!p.slide&&!p.inter&&B.owner!==p){whiff(p,30,null,false);p.locked=30;pop('whiff',p.x,p.y-28,C.muted,13)}// whiff: stuck in the lunge for a second
