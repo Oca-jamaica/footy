@@ -43,8 +43,26 @@ rematch. Press N during an online match for connection details.
 
 Each mode has its own six-division league (Amateur, Division 3, 2, 1, Legendary, Icon: 10 clubs, 9 rounds (everyone plays everyone once), top 3 up, bottom 3 down)
 and its own World Club Championship (64-club knockout, earned with a top-3 finish). Coins, players, upgrades and cosmetics are shared.
-In the **Icon Division** (reached with a top-3 finish in the Legendary Division) winning the World Club Championship pays
-200,000 coins and winning the Sunday Cup 30,000.
+The **Icon Division** is reached with a top-3 finish in the Legendary Division.
+
+**Prizes by division** (fixed coins, each paid once when reached, the same on every pitch: no pitch or difficulty
+multiplier). The World Club Championship pays for reaching each round and for winning it, using the same proportions of
+the winning prize in every division (4% / 10% / 16% / 24% / 45%); the Sunday Cup pays its winning prize on top of its
+small round bonuses. The division is your league division in that mode while the competition is played.
+
+| Division | WCC: Round of 32 | Round of 16 | Quarter-finals | Semi-finals | Final | **Winning** | Sunday Cup winning |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Amateur | 1,000 | 2,500 | 4,000 | 6,000 | 11,250 | **25,000** | 1,500 |
+| Division 3 | 1,000 | 2,500 | 4,000 | 6,000 | 11,250 | **25,000** | 3,000 |
+| Division 2 | 2,000 | 5,000 | 8,000 | 12,000 | 22,500 | **50,000** | 7,000 |
+| Division 1 | 3,400 | 8,500 | 13,600 | 20,400 | 38,250 | **85,000** | 12,000 |
+| Legendary | 5,000 | 12,500 | 20,000 | 30,000 | 56,250 | **125,000** | 20,000 |
+| Icon | 8,000 | 20,000 | 32,000 | 48,000 | 90,000 | **200,000** | 30,000 |
+
+**League wins** pay 100% more (double) in each division up: the win pay (base plus goals, with the usual pitch and
+difficulty multipliers) is ×1 in the Amateur Division, ×2 in Division 3, ×4, ×8, ×16 in the Legendary Division and ×32
+in the Icon Division. Draws and defeats pay the same everywhere. A **ranked online win**'s base pay is 1,000 coins (friendly
+and private online wins 60).
 
 **Icon Cup**, the endgame tournament: its tab sits next to the Sunday Cup and the World Club Championship from the start,
 locked (a quiet tab with a padlock; clicking it shows "Icon Cup Locked — Unlock after winning Icon Division", the

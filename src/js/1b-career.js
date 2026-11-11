@@ -218,8 +218,9 @@ const MULT={volta:1,classical:1.5,expanded:1.875},MULTN={volta:'Volta',classical
 const matchMul=()=>MULT[PITCH]||1;
 let earnNote='';
 // pay a match: base for the result plus per-goal coins, times the pitch multiplier and the difficulty, to the whole coin
-function matchPay(label,base,goalCoins,diffMul,extra=0){const m=matchMul(),cb=(1+depFx('fan')/100)*(1+depFx('stad')/100),raw=(base+goalCoins)*m*diffMul*cb,coins=Math.round(raw)+extra;
-  earnNote=`${label} ${base}${goalCoins?` + goals ${goalCoins}`:''}${m!==1?` × ${MULTN[PITCH]} ${m}`:''}${diffMul!==1?` × difficulty ${+diffMul.toFixed(2)}`:''}${cb!==1?` × club ${+cb.toFixed(3)}`:''}${extra?` + prize ${extra.toLocaleString()}`:''} = ${coins.toLocaleString()} coins`;return coins}
+// dv: an extra multiplier with its name (a league win's division bonus)
+function matchPay(label,base,goalCoins,diffMul,extra=0,dv=null){const m=matchMul(),cb=(1+depFx('fan')/100)*(1+depFx('stad')/100),dm=dv&&dv.m>1?dv.m:1,raw=(base+goalCoins)*m*diffMul*cb*dm,coins=Math.round(raw)+extra;
+  earnNote=`${label} ${base}${goalCoins?` + goals ${goalCoins}`:''}${m!==1?` × ${MULTN[PITCH]} ${m}`:''}${diffMul!==1?` × difficulty ${+diffMul.toFixed(2)}`:''}${dm!==1?` × ${dv.n} ${dm}`:''}${cb!==1?` × club ${+cb.toFixed(3)}`:''}${extra?` + prize ${extra.toLocaleString()}`:''} = ${coins.toLocaleString()} coins`;return coins}
 const res=()=>{club.tt=club.tt||0;club.cp=club.cp||0;return club};
 function grant(r,why){if(!r)return'';const c=res(),bits=[];
   if(r.coins){c.coins+=r.coins;bits.push(`+${r.coins.toLocaleString()} coins`);if(r.coins>0)chProg('coins',r.coins)}
@@ -236,6 +237,8 @@ function grant(r,why){if(!r)return'';const c=res(),bits=[];
 const DIVS=[{n:'Amateur Division',s:[.5,.6],df:'beginner',mul:1},{n:'Division 3',s:[.58,.68],df:'easy',mul:1.5},{n:'Division 2',s:[.66,.76],df:'normal',mul:2.2},
   {n:'Division 1',s:[.74,.84],df:'hard',mul:3.2},{n:'Legendary Division',s:[.82,.93],df:'legend',mul:4.5},{n:'Icon Division',s:[.9,.98],df:'legend',mul:6.5}];
 const ICON_DIV=5;
+// a league win pays 100% more (double) in each division up: ×1 Amateur, ×2, ×4, ×8, ×16 Legendary, ×32 Icon (draws and defeats don't change)
+const divWin=d=>Math.pow(2,clamp(d|0,0,DIVS.length-1));
 const FINISH=[1500,1100,850,650,520,420,340,260,180,120];// coins for where you finish, times the division multiplier
 const TOWNS=['Brackwater','Fenmoor','Kestrel Bay','Oakhollow','Redcliffe','Stonebridge','Marlow Vale','Ashgrove','Cinder Hill','Dunmore','Eastwick','Foxley','Granton','Hawkshead','Ironvale',
   'Juniper','Kingsmere','Larkspur','Millbrook','Northgate','Orchard Park','Pembury','Quarrytown','Rookwood','Saltmarsh','Thornbury','Upton Cross','Valemouth','Westholm','Yarrow','Bramblewick','Coldharbour'];
@@ -288,7 +291,16 @@ function lgNext(m=GM){const L=lgOf(m);if(!L||!L.done)return;const s=L.summary||{
 
 /* ===== World Club Championship: 64 clubs, straight knockout ===== */
 const WROUNDS=['Round of 64','Round of 32','Round of 16','Quarter-finals','Semi-finals','Final'];
-const WPRIZE=[0,500,1000,2000,4000,7500,15000];// for reaching each round (R32 .. final) and for winning it; Classical pays 1.5x
+/* World Club Championship prizes, by the league division you're in while it's played: fixed coins for reaching each
+   round (Round of 32 .. Final) and for winning it, each paid once (W.paid), the same on every pitch. Amateur Division:
+   1,000 / 2,500 / 4,000 / 6,000 / 11,250, and 25,000 for winning. Every division uses the same proportions of its own
+   winning prize (4%, 10%, 16%, 24%, 45%, 100%). */
+const WCC_WIN=[25000,25000,50000,85000,125000,200000],WSHARE=[0,.04,.1,.16,.24,.45,1];
+const lgDiv=(m=GM)=>{const L=(club.lg||{})[m];return L?clamp(L.div|0,0,DIVS.length-1):0};
+const wccPrize=(key,m=GM)=>Math.round(WCC_WIN[lgDiv(m)]*WSHARE[key]);
+// the Sunday Cup's prize for winning the final, by division (its earlier rounds keep their small round bonuses)
+const SUNDAY_WIN=[1500,3000,7000,12000,20000,30000];
+const sundayWin=(m=GM)=>SUNDAY_WIN[lgDiv(m)];
 const WCLUBS=[['Porto Azul','#3f8fd8'],['Real Sierra','#f4f1ea'],['Atlético Cordillera','#e8475f'],['FC Nordlicht','#2f2f3a'],['Sporting Lusitano','#1f8a70'],['Inter Lagunare','#4fb3ff'],
   ['Dynamo Volga','#3f8fd8'],['Sakura Shimizu','#ff9ecb'],['Seoul Phoenix','#e8475f'],['Lagos Lions','#5fc79a'],['Accra Stars','#ffd166'],['Cairo Pharaohs','#b94a2c'],['Casablanca Atlas','#1f8a70'],
   ['Buenos Aires Juniors','#ffd166'],['Montevideo Celeste','#4fb3ff'],['São Paulo Paulistas','#f4f1ea'],['Rio Atlântico','#ff6f59'],['Bogotá Cóndores','#b06cf0'],['Lima Incas','#e8475f'],
@@ -321,14 +333,10 @@ function wccRecord(W,gf,ga,pw){const x=wMy(W);if(!x)return null;const meA=x.a===
   if(!won){W.alive=false;W.exit=W.round;wSimRound(W);if(W.round>=5){W.champ=W.rounds[5][0].w;W.done=true}else{W.round++;while(!W.done){wSimRound(W);if(W.round>=5){W.champ=W.rounds[5][0].w;W.done=true}else W.round++}}return{won:false}}
   wSimRound(W);const reached=W.round+1;// 1 = R32 ... 5 = final, 6 = champions
   let prize=0;if(W.round>=5){W.done=true;W.champ='me'}
-  const key=W.round>=5?6:reached;if(!W.paid[key]){W.paid[key]=true;prize=key===6?wccWinPrize():Math.round(WPRIZE[key]*MM())}
+  const key=W.round>=5?6:reached;if(!W.paid[key]){W.paid[key]=true;prize=wccPrize(key)}
   if(!W.done)W.round++;
   return{won:true,prize,champ:W.done,reached:key}}
 
-// winning the World Club Championship and the Sunday Cup is worth far more to an Icon Division club
-const ICON_WCC=200000,ICON_SUNDAY=30000;
-const inIconDiv=(m=GM)=>{const L=(club.lg||{})[m];return!!L&&L.div===ICON_DIV};
-const wccWinPrize=()=>inIconDiv()?ICON_WCC:Math.round(WPRIZE[6]*MM());
 
 /* ===== the Icon Cup: the endgame tournament =====
    Always on show next to the other cups, but locked until you win the Icon Division title (finish first) in that mode.
@@ -533,14 +541,14 @@ function renderLeague(){let L=lgOf();if(!L)L=newSeason(GM,0,1);const D=DIVS[L.di
 function renderWcc(){const W=wccOf();
   if(!W){$('diff-note').textContent='Finish in the top three of your league to qualify. The championship is played during the following season.';
     $('cup').innerHTML=`<div class="cup-head"><b>World Club Championship</b><span>Not qualified yet</span></div><div class="panel"><p>64 of the world’s best clubs, straight knockout, played during the season after you qualify. Opponents are much stronger than league sides, and the final is against one of the top seeds.</p>
-    <div class="prize">${WROUNDS.slice(1).map((r,i)=>`<span>Reach ${r}: ${Math.round(WPRIZE[i+1]*MM()).toLocaleString()}</span>`).join('')}<span>Win it: ${wccWinPrize().toLocaleString()} + Elite Pack + trophy + exclusive cosmetic${inIconDiv()?' (Icon Division prize)':''}</span></div></div>`;return}
+    <p class="hint">Prizes in the ${DIVS[lgDiv()].n}:</p><div class="prize">${WROUNDS.slice(1).map((r,i)=>`<span>Reach ${r}: ${wccPrize(i+1).toLocaleString()}</span>`).join('')}<span>Win it: ${wccPrize(6).toLocaleString()} + Elite Pack + trophy + exclusive cosmetic</span></div></div>`;return}
   const st=W.done?(W.champ==='me'?'You are world champions!':`Won by ${esc(wTeam(W,W.champ).name)}`):W.alive?`Next: ${WROUNDS[W.round]}`:'Knocked out';
-  $('diff-note').textContent=`World Club Championship for season ${W.season}. Knockout: level games go to penalties. ${GM==='classical'?'Classical prizes are 1.5×.':''}`;
+  $('diff-note').textContent=`World Club Championship for season ${W.season}. Knockout: level games go to penalties. Prizes for the ${DIVS[lgDiv()].n}${W.alive&&!W.done?`: win this ${WROUNDS[W.round].replace(/s$/,'').toLowerCase()} for ${wccPrize(W.round>=5?6:W.round+1).toLocaleString()} coins`:''}.`;
   const cols=W.rounds.map((R,ri)=>{const list=ri<2?R.filter(x=>x.a==='me'||x.b==='me'||x.w==='me'||ri>=W.round-0&&false):R;const mine=R.filter(x=>x.a==='me'||x.b==='me');
     const shown=ri<=1?[...mine,...R.filter(x=>!mine.includes(x)).slice(0,ri===0?5:7)]:R;
     return `<div class="bcol"><b>${WROUNDS[ri]}</b>${shown.map(x=>{const nm=id=>esc(wTeam(W,id).name),cl=id=>x.w?(x.w===id?'w':'l'):'';
       return `<div class="bm ${x.a==='me'||x.b==='me'?'me':''}"><span class="${cl(x.a)}">${nm(x.a)}<em>${x.w?x.sa:''}</em></span><span class="${cl(x.b)}">${nm(x.b)}<em>${x.w?x.sb:''}${x.pen?' p':''}</em></span></div>`}).join('')}${ri<=1&&R.length>shown.length?`<span class="hint" style="font-size:11px">+ ${R.length-shown.length} more ties</span>`:''}</div>`}).join('');
-  $('cup').innerHTML=`<div class="cup-head"><b>World Club Championship</b><span>${st}</span></div><div class="prize">${WROUNDS.slice(1).map((r,i)=>`<span class="${W.paid[i+1]?'got':''}">${r}: ${Math.round(WPRIZE[i+1]*MM()).toLocaleString()}</span>`).join('')}<span class="${W.paid[6]?'got':''}">Champions: ${wccWinPrize().toLocaleString()}${inIconDiv()?' (Icon Division prize)':''}</span></div><div class="bracket">${cols}</div>`}
+  $('cup').innerHTML=`<div class="cup-head"><b>World Club Championship</b><span>${st}</span></div><div class="prize">${WROUNDS.slice(1).map((r,i)=>`<span class="${W.paid[i+1]?'got':''}">${r}: ${wccPrize(i+1).toLocaleString()}</span>`).join('')}<span class="${W.paid[6]?'got':''}">Champions: ${wccPrize(6).toLocaleString()}</span></div><div class="bracket">${cols}</div>`}
 // the Icon Cup tab: always shown next to the other cups. Locked, it previews the competition and shows the way to
 // unlock it; unlocked, it's platinum and gold with the draw, the prize and your side.
 const LOCK_SVG='<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 10.5V7.5a4.5 4.5 0 0 1 9 0v3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><rect x="4.5" y="10" width="15" height="11" rx="2.6" fill="currentColor"/></svg>';

@@ -1838,8 +1838,10 @@ function awardCoins(){awardCoins0();
   if(SG||NET.on){matchRatings=null;return}
   matchRatings=calcRatings();const m=matchRatings.motm;if(m.p.team===0){const b=Math.round(25*matchMul()*LV().coin);earned+=b;club.coins+=b;earnNote+=` · man of the match +${b}`;saveClub()}
   careerAfterMatch()}
+// an online match's base coins: a ranked win is 1,000; other online wins 60, draws 30, defeats 15
+const onlineBase=(kind,a,b)=>a>b?(kind==='ranked'?1000:60):a<b?15:30;
 function awardCoins0(){earned=0;shownEarned=0;earnNote='';
-  if(NET.on){const r=score[0]>score[1]?60:score[0]<score[1]?15:30;earned=matchPay(score[0]>score[1]?'Online win':score[0]<score[1]?'Online defeat':'Online draw',r,score[0]*10,1);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;gdTokens(score[0],score[1]);onlineResult();opsResult();saveClub();return}
+  if(NET.on){const r=onlineBase(netKind,score[0],score[1]);earned=matchPay(score[0]>score[1]?'Online win':score[0]<score[1]?'Online defeat':'Online draw',r,score[0]*10,1);club.coins+=earned;club.played=(club.played||0)+1;cupEvent=null;eventText='ONLINE MATCH vs '+OPP.name;gdTokens(score[0],score[1]);onlineResult();opsResult();saveClub();return}
   const pw=pen&&pen.winner!=null?pen.winner:null;
   const r=score[0]>score[1]?100:score[0]<score[1]?20:pw===0?80:pw===1?30:45;
   let bonus=0;const won=score[0]>score[1]||pw===0;
@@ -1853,7 +1855,7 @@ function awardCoins0(){earned=0;shownEarned=0;earnNote='';
     if(ok){if(!ch.done[chalCur.id]){ch.done[chalCur.id]=true;bonus+=90}if(chalCur.id===dailyChal().id&&ch.daily!==today()){ch.daily=today();bonus+=150}}
     earned=bonus+(ok?20:0);club.coins+=earned;club.played=(club.played||0)+1;eventText=ok?`CHALLENGE COMPLETE · ${chalCur.name}`:`Challenge failed · ${chalCur.name}. Have another go!`;cupEvent=ok?'champion':'out';saveClub();return}
   if(comp==='league'){const L=lgOf(),D=DIVS[L.div],base=won?100:score[0]===score[1]?40:20;lgRecord(L,score[0],score[1]);
-    earned=matchPay(won?'Win':score[0]===score[1]?'Draw':'Defeat',base,score[0]*10,LV().coin);club.coins+=earned;club.played=(club.played||0)+1;
+    earned=matchPay(won?'Win':score[0]===score[1]?'Draw':'Defeat',base,score[0]*10,LV().coin,0,won?{m:divWin(L.div),n:D.n}:null);club.coins+=earned;club.played=(club.played||0)+1;
     const sm=L.done?L.summary:null;cupEvent=sm&&sm.pos===1?'champion':won?'advance':null;
     eventText=sm?`SEASON OVER: ${ordinal(sm.pos)} in the ${D.n}. ${sm.lines.join(' · ')}`:`${D.n} · round ${L.round} of ${L.fx.length} · ${ordinal(lgTable(L).findIndex(r=>r.id==='me')+1)} in the table`;saveClub();return}
   if(comp==='wcc'){const W=wccOf(),out=wccRecord(W,score[0],score[1],pw);const base=won?150:30;earned=matchPay(won?'Win':'Defeat',base,score[0]*10,LV().coin,out&&out.prize||0);club.coins+=earned;club.played=(club.played||0)+1;
@@ -1876,9 +1878,10 @@ function awardCoins0(){earned=0;shownEarned=0;earnNote='';
   if(club.cup&&!cupOver()){const c=club.cup;c.res.push(won);
     if(won){bonus=RBONUS[c.round];c.round++;if(c.round>=3){club.trophies=club.trophies||{};club.trophies[c.tier]=(club.trophies[c.tier]||0)+1;cupEvent='champion'}else cupEvent='advance'}
     else{c.alive=false;cupEvent='out'}}
-  const iconSun=cupEvent==='champion'&&club.cup&&club.cup.tier==='easy'&&inIconDiv();
-  earned=matchPay(won?'Win':score[0]===score[1]?'Draw':'Defeat',Math.round(r+style/25),score[0]*15,DIFFS[diffKey].coin*LV().coin,iconSun?ICON_SUNDAY:Math.round(bonus*DIFFS[diffKey].coin*LV().coin*MM()));
-  if(iconSun)earnNote=`Icon Division Sunday Cup prize: ${ICON_SUNDAY.toLocaleString()} coins`;club.coins+=earned;club.played=(club.played||0)+1;saveClub()}
+  // winning the Sunday Cup pays its fixed prize for your division (earlier rounds keep their small round bonus)
+  const sunWin=cupEvent==='champion'&&club.cup&&club.cup.tier==='easy'?sundayWin():0;
+  earned=matchPay(won?'Win':score[0]===score[1]?'Draw':'Defeat',Math.round(r+style/25),score[0]*15,DIFFS[diffKey].coin*LV().coin,sunWin||Math.round(bonus*DIFFS[diffKey].coin*LV().coin*MM()));
+  if(sunWin)earnNote+=` · Sunday Cup winners' prize (${DIVS[lgDiv()].n}): ${sunWin.toLocaleString()} coins`;club.coins+=earned;club.played=(club.played||0)+1;saveClub()}
 /* ---------- main update ---------- */
 // timers, animations and trails for one player, every frame
 function tickPlayer(p,dt){if(p.locked>0)p.locked-=dt;if(p.caughtT>0)p.caughtT-=dt;if(p.fall>0){p.fall-=dt;p.vx*=.9;p.vy*=.9}if(p.tackleCd>0)p.tackleCd-=dt;if(p.skillCd>0)p.skillCd-=dt;if(p.spCd>0)p.spCd-=dt;if(p.slideCd>0)p.slideCd-=dt;if(p.blungeCd>0)p.blungeCd-=dt;if(p.turbo>0)p.turbo-=dt;if(p.whiff>0)p.whiff-=dt;
