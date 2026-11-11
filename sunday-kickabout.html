@@ -1381,9 +1381,12 @@ const DEPTS=[
   {k:'coach',n:'Coaching Staff',fx:[0,5,10,15,20],u:'% off training costs',d:'Cheaper coin costs for stat upgrades, evolutions, keeper training, created-player training and special ability upgrades. Training Token costs never change.'},
   {k:'train',n:'Training Facilities',fx:[0,5,10,15,25],u:'% more player XP',d:'Players level up faster from matches and training sessions (levels still stop at the maximum, and stats at each player’s potential).'},
   {k:'stad',n:'Stadium Development',fx:[0,1,2,3,4],u:'% more match coins',d:'Bigger stands, brighter floodlights, a fuller and livelier crowd, and a small attendance bonus on match coins.'},
-  {k:'scout',n:'Scouting Department',fx:[0,2.5,5,7.5,10],u:'% better chance of a top-rated player',d:'Packs never change rarity: whatever rarity a pack gives, this raises the chance that its players come from the top quarter of that rarity’s ratings, by this much of itself (e.g. 25% becomes 27.5% at +10%). Players keep their real ratings.'},
+  // Scouting has nine levels and its own prices (the other departments: five levels at DEPCOST)
+  {k:'scout',n:'Scouting Department',fx:[0,10,20,30,40,50,65,75,90],cost:[5000,10000,15000,20000,25000,30000,35000,40000],u:'% better chance of a top-rated player',d:'Packs never change rarity: whatever rarity a pack gives, this raises the chance that its players come from the top quarter of that rarity’s ratings, by this much of itself (e.g. 10% becomes 19% at +90%), never by extra percentage points. Players keep their real ratings.'},
   {k:'comm',n:'Commercial Department',fx:[0,5,10,15,20],u:'% more objective coins',d:'More coins from daily and weekly challenges and achievements, a sponsor payment at the end of every league season (500 per level), and your club on the stadium boards at level 3.'}];
-const depLv=k=>clamp(((club.dept||{})[k])|0||1,1,DEPMAX);
+const depMax=k=>{const D=DEPTS.find(d=>d.k===k);return D?D.fx.length:DEPMAX};
+const depCost=(k,L)=>{const D=DEPTS.find(d=>d.k===k);return(D&&D.cost||DEPCOST)[L-1]};
+const depLv=k=>clamp(((club.dept||{})[k])|0||1,1,depMax(k));
 const depFx=k=>DEPTS.find(d=>d.k===k).fx[depLv(k)-1];
 const coachCost=c=>Math.round(c*(1-depFx('coach')/100));
 // every coin price for training shows the original, the Coaching Staff discount and what you actually pay
@@ -1393,8 +1396,8 @@ const coachLine=()=>depFx('coach')?`<p class="hint coachln">Coaching Staff level
 const ctk=()=>{club.ctk=club.ctk||0;return club.ctk};
 // existing clubs get one token for every Club Legacy level they already had (counted once, never twice)
 function ctkSync(){const L=(club.leg||{}).lvl||0;club.ctkEarned=club.ctkEarned||0;if(L>club.ctkEarned){club.ctk=ctk()+(L-club.ctkEarned);club.ctkEarned=L}}
-function depBuy(k){const D=DEPTS.find(d=>d.k===k);if(!D)return;const L=depLv(k);if(L>=DEPMAX){toast(`${D.n} is at the top level.`);return}
-  const c=DEPCOST[L-1];if(club.coins<c||ctk()<1){toast(`Needs ${c.toLocaleString()} coins and 1 Club Token.`);return}
+function depBuy(k){const D=DEPTS.find(d=>d.k===k);if(!D)return;const L=depLv(k);if(L>=depMax(k)){toast(`${D.n} is at the top level.`);return}
+  const c=depCost(k,L);if(club.coins<c||ctk()<1){toast(`Needs ${c.toLocaleString()} coins and 1 Club Token.`);return}
   club.coins-=c;club.ctk-=1;club.dept=club.dept||{};club.dept[k]=L+1;
   if(k==='stad'&&typeof buildCrowd==='function'){buildCrowd();pitchCv=null;skyCv=null}if(k==='comm'&&L+1>=3){club.cosOwned=[...new Set([...(club.cosOwned||[]),'boards_club'])]}
   toast(`${D.n} level ${L+1}: ${D.fx[L]}${D.u}`);S.goal();saveClub();renderMenu()}
@@ -1402,8 +1405,8 @@ function depBuy(k){const D=DEPTS.find(d=>d.k===k);if(!D)return;const L=depLv(k);
    Within that rarity the pack then picks a rating level (leaning towards the common, lower end) and deals real players
    close to it. The "top-rated band" of a rarity is its top quarter of ratings in the player database (every card rated at
    or above that rarity's 75th-percentile rating). Scouting multiplies the chance that the rating level falls in that band
-   by 1 + bonus (0 / 2.5 / 5 / 7.5 / 10% for levels 1-5), and scales every other rating level down to match, so the odds
-   always add up to 100%. Cards are never altered: they're real players at their real base ratings. A rarity whose ratings
+   by 1 + bonus (0 / 10 / 20 / 30 / 40 / 50 / 65 / 75 / 90% for levels 1-9: a relative increase, so 10% becomes 19% at level
+   9), and scales every other rating level down to match, so the odds always add up to 100%. Cards are never altered: they're real players at their real base ratings. A rarity whose ratings
    don't spread (no top band distinct from the rest) is left unchanged. */
 const PACK_LEAN=2.2;
 function scoutBand(t){const sorted=PLAYERS.filter(p=>tier(p)===t).sort((a,b)=>ovr(a)-ovr(b)),n=sorted.length;if(!n)return null;
@@ -1411,23 +1414,24 @@ function scoutBand(t){const sorted=PLAYERS.filter(p=>tier(p)===t).sort((a,b)=>ov
   // the chance of each sorted position being the pack's rating level, with no scouting: P(index=i) for floor(u^2.2*n)
   const base=sorted.map((p,i)=>Math.pow((i+1)/n,1/PACK_LEAN)-Math.pow(i/n,1/PACK_LEAN));let pHigh=0;sorted.forEach((p,i)=>{if(ovr(p)>=r75)pHigh+=base[i]});
   return{sorted,n,cut:r75,base,pHigh}}
-// the rating-level odds for a rarity at a scouting bonus b (0..0.1): top band x(1+b), the rest scaled to keep the total at 1
+// the rating-level odds for a rarity at a scouting bonus b (0..0.9): top band x(1+b), the rest scaled to keep the total at 1
+// (never past 100%: the top band can't be pushed beyond certain)
 function scoutLevelOdds(t,b){const S=scoutBand(t);if(!S)return null;if(!b||!S.pHigh||S.pHigh>=1)return{S,w:S.base,pHigh:S.pHigh};
-  const up=1+b,dn=(1-S.pHigh*up)/(1-S.pHigh);return{S,w:S.sorted.map((p,i)=>S.base[i]*(ovr(p)>=S.cut?up:dn)),pHigh:S.pHigh*up}}
+  const up=Math.min(1+b,1/S.pHigh),dn=(1-S.pHigh*up)/(1-S.pHigh);return{S,w:S.sorted.map((p,i)=>S.base[i]*(ovr(p)>=S.cut?up:dn)),pHigh:S.pHigh*up}}
 // the rating level for a pack of rarity t
 function scoutAnchor(t,b=depFx('scout')/100){const L=scoutLevelOdds(t,b);if(!L)return 60;let r=Math.random(),i=0;for(;i<L.w.length-1;i++){r-=L.w[i];if(r<0)break}return ovr(L.S.sorted[i])}
 
 function deptHTML(){ctkSync();const tk=ctk(),spent=DEPTS.reduce((a,D)=>a+depLv(D.k)-1,0);
   const fmt=(D,v)=>D.k==='stad'?`${[60,70,80,90,100][DEPTS.find(x=>x.k==='stad').fx.indexOf(v)]}% crowd · +${v}% match coins`:`${D.k==='coach'?'−':'+'}${v}${D.u}`;
-  const rows=DEPTS.map(D=>{const L=depLv(D.k),max=L>=DEPMAX,c=max?0:DEPCOST[L-1],can=!max&&club.coins>=c&&tk>=1;
-    return `<div class="panel dept"><div class="dhead"><h4>${D.n}</h4><span class="ablv">${[1,2,3,4,5].map(i=>`<i class="${i<=L?'on':''}"></i>`).join('')}</span><b class="dlv">Level ${L}/${DEPMAX}</b></div>
+  const rows=DEPTS.map(D=>{const L=depLv(D.k),M=depMax(D.k),max=L>=M,c=max?0:depCost(D.k,L),can=!max&&club.coins>=c&&tk>=1;
+    return `<div class="panel dept"><div class="dhead"><h4>${D.n}</h4><span class="ablv">${Array.from({length:M},(_,i)=>`<i class="${i+1<=L?'on':''}"></i>`).join('')}</span><b class="dlv">Level ${L}/${M}</b></div>
      <p class="hint" style="margin:2px 0 6px">${D.d}</p>
      <p>Now: <b>${L===1&&!D.fx[0]&&D.k!=='stad'?'no bonus yet':fmt(D,D.fx[L-1])}</b>${max?'':` · next level: <b class="dnext">${fmt(D,D.fx[L])}</b>`}</p>
      ${D.k==='scout'?`<p class="hint" style="margin:2px 0">Chance a pack's players come from the top-rated quarter of their rarity, now${max?'':' → next level'}: ${['bronze','silver','gold','special','icon'].map(t=>{const a=scoutLevelOdds(t,D.fx[L-1]/100),b=max?null:scoutLevelOdds(t,D.fx[L]/100);return a?`${TIERS[t].name} ${(a.pHigh*100).toFixed(1)}%${b?` → ${(b.pHigh*100).toFixed(1)}%`:''}`:''}).filter(Boolean).join(' · ')}. Rarity odds are never changed.</p>`:''}
      ${D.k==='comm'?`<p class="hint" style="margin:2px 0">Sponsor payment each league season: ${(500*(L-1)).toLocaleString()} coins${L<3?' · club advertising boards at level 3':' · club advertising boards unlocked'}</p>`:''}
      ${max?'<b class="maxl">MAX LEVEL</b>':`<button class="btn ${can?'gold':''}" data-dep="${D.k}" ${can?'':'disabled'}>Upgrade · ${c.toLocaleString()} coins + 1 Club Token</button>`}</div>`}).join('');
-  return `<div class="panel"><h4>Club Development</h4><p><span class="ctk">${tk}</span> Club Token${tk===1?'':'s'} · ${(club.coins||0).toLocaleString()} coins · ${spent} of ${DEPTS.length*(DEPMAX-1)} department levels built</p>
-   <p class="hint">You earn exactly 1 Club Token every time your Club Legacy level goes up (${club.ctkEarned||0} earned so far). Club Tokens are separate from Training Tokens. Each department level costs ${DEPCOST.map(c=>c.toLocaleString()).join(' / ')} coins plus 1 Club Token.  Fanbase and Stadium bonuses apply to every match, online included, on top of the mode multiplier.</p>
+  return `<div class="panel"><h4>Club Development</h4><p><span class="ctk">${tk}</span> Club Token${tk===1?'':'s'} · ${(club.coins||0).toLocaleString()} coins · ${spent} of ${DEPTS.reduce((a,D)=>a+depMax(D.k)-1,0)} department levels built</p>
+   <p class="hint">You earn exactly 1 Club Token every time your Club Legacy level goes up (${club.ctkEarned||0} earned so far). Club Tokens are separate from Training Tokens. Each department level costs ${DEPCOST.map(c=>c.toLocaleString()).join(' / ')} coins plus 1 Club Token; the Scouting Department has nine levels at ${DEPTS.find(D=>D.k==='scout').cost.map(c=>c.toLocaleString()).join(' / ')} coins plus 1 Club Token each.  Fanbase and Stadium bonuses apply to every match, online included, on top of the mode multiplier.</p>
    <button class="btn" data-depcos="1">Cosmetic customisation →</button></div><div class="deptg">${rows}</div>`}
 
 /* ===== special ability development ===== */
@@ -4583,6 +4587,15 @@ const noKeep=()=>hr('nokeep')||(comp==='skill'&&SG&&SG.k==='slalom');
    hold. Measured with placed shots from set spots: still clearly tougher than Hard from the edge of the box and range.
    Chill, Medium and Hard keepers, your own keeper and online keepers are unchanged. */
 const kXN=k=>k.team===1&&!pvp()&&!!LV().extreme;
+/* Hard and Extreme opposition keepers, a little more human: a slightly later reaction, a slightly worse read of where the
+   shot is going, a slower dive with a little less stretch at full extension. Tuned with tools/keepers.cjs (placed shots
+   from set spots) so that Hard saves about 15-20% fewer shots than before and Extreme about 20-25% fewer, with Extreme
+   still the tougher of the two on every pitch. Chill and Medium keepers, your own keeper, online keepers and the Icon
+   Cup's keepers are unchanged. */
+// how much more human, by difficulty and pitch (one strength scales all four; the keepers start at different levels)
+const KHUMS={hard:{volta:.68,classical:.91,expanded:.85},extreme:{volta:1.93,classical:1.35,expanded:1.25}};
+const khumOf=s=>({err:1+.3*s,react:1+.15*s,dive:1-.07*s,reach:1-.1*s});
+const kHum=k=>{if(k.team!==1||pvp()||comp==='icon')return null;const L=KHUMS[club.level];return L&&L[PITCH]?khumOf(L[PITCH]):null};
 const kgk=k=>pvp()?1.02:k.team===0?(k.st.gkv||1.02):DF.gk*(kXN(k)?.96:1)*ez('gk');
 function keeperRead(k,react,type='normal'){
   const gk=kgk(k),spd=Math.hypot(B.vx,B.vy),a=Math.atan2(B.vy,B.vx);
@@ -4593,6 +4606,7 @@ function keeperRead(k,react,type='normal'){
   if(kXN(k)&&B.shot&&B.shot.by){const sh=B.shot.by,gx=goalX(sh.team),one=Math.hypot(sh.x-gx,sh.y-MY)<BOX*1.2&&!outfield(k.team).some(q=>dist(q,sh)<70)&&!laneBlocked(sh,{x:gx,y:MY},20,sh.team);
     sg*=1.1*(1+.8*((sh.st.fin??.6)-.6))*(one?1.25:1);rc=rc*1.06+(one?1:0)}
   if(k.team===1&&EZ()){sg*=ez('gkErr');rc*=ez('gkReact')}
+  {const h=kHum(k);if(h){sg*=h.err;rc*=h.react}}
   k.planErr=gaussN()*sg;k.planD0=Math.max(40,far);k.planY=py+k.planErr;k.react=rc;k.track=true;k.dv=0;k.diving=false}
 const KREACT=1.1;// keepers take 10% longer to react to a shot (and to decide to come off their line) than they used to
 /* ---------- sweeper keeper ----------
@@ -4682,8 +4696,8 @@ function keeperUpdate(k,dt){
     else{// he keeps reading it as it comes: his early misjudgement shrinks the closer the ball gets
       {const spd=Math.hypot(B.vx,B.vy),py=curlCross(B.x,B.y,Math.atan2(B.vy,B.vx),spd,B.curl||0,B.vz||0,k.x);
        if(py!=null)k.planY=py+(k.planErr||0)*Math.pow(clamp(Math.abs(k.x-B.x)/(k.planD0||200),0,1),.6)}
-      const ty=clamp(k.planY??B.y,GY0-24,GY1+24),dy=ty-k.y,max=(mine?3.5:DF.dive*1.15)*gk;
-      k.dv=Math.min(max,(k.dv||0)+.45*gk*dt);k.vy=clamp(dy,-k.dv,k.dv);k.vx=0;if(Math.abs(dy)>7)k.diving=true;if(Math.abs(k.vy)>.3)k.lastDy=Math.sign(k.vy)}
+      const kh=kHum(k),ty=clamp(k.planY??B.y,GY0-24,GY1+24),dy=ty-k.y,max=(mine?3.5:DF.dive*1.15)*gk*(kh?kh.dive:1);
+      k.dv=Math.min(max,(k.dv||0)+.45*gk*(kh?kh.dive:1)*dt);k.vy=clamp(dy,-k.dv,k.dv);k.vx=0;if(Math.abs(dy)>7)k.diving=true;if(Math.abs(k.vy)>.3)k.lastDy=Math.sign(k.vy)}
   }else{
     k.diving=false;
     if(B.claimBy===k&&B.lobTo){steer(k,B.lobX,B.lobY,3.3*gk,dt);return}
@@ -4755,7 +4769,7 @@ function ballUpdate(dt,live){
     const crossed=(B.px-k.x)*(B.x-k.x)<=0||Math.abs(B.x-k.x)<11;
     if(!crossed||B.z>27)continue;
     const f=B.x===B.px?1:clamp((k.x-B.px)/(B.x-B.px),0,1),yc=B.y-B.vy*dt*(1-f);
-    const reach=12.5*kgk(k)+(k.diving?11:0);
+    const reach=12.5*kgk(k)+(k.diving?11*((kHum(k)||{}).reach||1):0);
     if(Math.abs(yc-k.y)<reach&&Math.abs(B.x-(k.team===0?FX0:FX1))<BOX){
       const s=k.team===0?1:-1;
       if(B.rocket&&Math.random()<.5){B.rocket=false;B.vx*=.8;B.vy+=rnd(-1,1);B.lockBy=k;B.lockT=30;pop('THROUGH HIS HANDS!',k.x-s*60,k.y-30,C.coral,20);S.boom();continue}
@@ -5641,7 +5655,7 @@ const HELP=[
  ['Special abilities','<p>Every footballer has a special on <kbd>X</kbd>: Through Ball, Curler, Knuckleball, Rocket, Bicycle Kick, Interceptor, Turbo, Chip Pass or Chip. After using it, it recharges (the ring on the HUD).</p><p>Each footballer\'s special has 10 levels (Club → Special Abilities). Every level costs coins plus 2 Training Tokens and shortens the cooldown: Through Ball 25 s → 7 s, the shots and Interceptor 20 s → 5 s, Turbo and the chips 10 s → 3.5 s.</p><p><b>Through Ball</b> floats the ball over everyone to just outside their penalty area, where it lands after one second, for the team-mate nearest that spot. He chases it at his own normal pace (no speed boost), so it works best when your striker is already near the box. Nobody can touch it while it’s high and a slide only works once it’s down, but a defender who gets to the spot first can win it.</p><p><b>Offside</b> is only given for clear goal-hanging: a Through Ball, or a long ball crossed from far away, to a team-mate standing well beyond their last defender with no defender anywhere near him. The flag goes up and they get the ball. Normal runs and crosses into the box are never offside.</p>'],
  ['Player collection','<p>Open packs in Club → Packs. Each pack shows three footballers of one rarity and you sign one. Rarities: Bronze, Silver, Gold, Special and Icon (the very best). Odds are printed on every pack. Duplicates can be exchanged.</p>'],
  ['Player development','<p>Club → Development. Footballers gain XP from matches (or training with Training Tokens: the cost per 100 XP rises from 2 to 20 tokens as they level up). Levels unlock upgrade points (+1 to a stat for coins) and every two levels add +1 to their five best stats. Evolutions add more. The screen shows the current and maximum achievable OVR and exactly what each upgrade does.</p><p>There’s no 99 cap: the very best footballers can be developed past 99, up to their own maximum potential (Messi, for example, can reach 106). When a footballer has nothing left to gain, his card says <b>MAX POTENTIAL REACHED</b>.</p><p>Your Player (the footballer you create) trains +8 points at a time; prices climb to 75,000 coins for the last session.</p>'],
- ['Club development','<p>Club → Club Development: six departments, levels 1 to 5, paid with coins plus Club Tokens (one per Club Legacy level).</p><p>Fanbase: more match coins. Coaching Staff: up to 20% off every coin cost for training and abilities. Training Facilities: more XP. Stadium: bigger crowd and a small coin bonus. Scouting: a better chance of a top-rated footballer within each pack’s rarity (+2.5% per level after the first, up to +10%); it never changes the chance of a rarer card. Commercial: more objective coins and sponsor money.</p>'],
+ ['Club development','<p>Club → Club Development: six departments, levels 1 to 5 (Scouting 1 to 9), paid with coins plus Club Tokens (one per Club Legacy level).</p><p>Fanbase: more match coins. Coaching Staff: up to 20% off every coin cost for training and abilities. Training Facilities: more XP. Stadium: bigger crowd and a small coin bonus. Scouting: a better chance of a top-rated footballer within each pack’s rarity: +10 / 20 / 30 / 40 / 50 / 65 / 75 / 90% of itself at levels 2 to 9 (so a 10% chance becomes 19% at level 9); it never changes the chance of a rarer card. Scouting levels cost 5,000 to 40,000 coins (5,000 more each level) plus 1 Club Token. Commercial: more objective coins and sponsor money.</p>'],
  ['Game modes','<p><b>Volta 5v5</b>: fast football in a cage, 2 minutes, 1× coins.</p><p><b>Classical Standard 9v9</b>: full pitch, 3 minutes, 1.5× coins. <b>Classical Expanded</b>: a bigger pitch, 3½ minutes, 1.875× coins. The green bubble shows the coin multiplier for your mode, pitch and difficulty.</p><p><b>Difficulty</b>: <b>Chill</b> is relaxed (opponents press less, tackle rarely and miss more), <b>Medium</b> is a fair game that’s still on your side, <b>Hard</b> is a genuine challenge and <b>Extreme</b> is for experts. Harder levels pay more coins.</p>'],
  ['Leagues and tournaments','<p>Volta and Classical each have six divisions (Amateur → Legendary → Icon). Ten clubs, nine rounds, top three promoted, bottom three relegated. A top-three finish earns a World Club Championship place (64-club knockout). There are also the Sunday Cup, the Grand Tournament, friendlies, challenges and skill games. A league win pays 100% more (double) in each division up: ×2, ×4, ×8, ×16 in the Legendary Division and ×32 in the Icon Division. World Club Championship prizes depend on your division (winning it: Amateur and Division 3 25,000, Division 2 50,000, Division 1 85,000, Legendary 125,000, Icon 200,000; reaching each round pays its share, e.g. 6,000 for the semi-finals and 11,250 for the final in the Amateur Division), each paid once and the same on every pitch. Winning the Sunday Cup pays 1,500 / 3,000 / 7,000 / 12,000 / 20,000 / 30,000 from Amateur up to Icon. A ranked online win’s base pay is 1,000 coins.</p><p><b>Icon Cup</b>: the endgame. It’s always on show next to the other cups, but stays locked until you win the Icon Division title (finish first; second or third isn’t enough). Once won it stays unlocked for good in that mode, even after relegation; Volta and Classical unlock separately. You play short-handed against 99-rated Icon sides at the hardest level: Volta 3 v 5, Classical 4 v 9 (your keeper plus your two or three highest-rated players). Sixteen clubs, knockout (Round of 16, quarter-finals, semi-finals, final). Win the final for 500,000 coins, every time you win it.</p>'],
  ['Transfer market','<p>Club → <b>Transfer Market</b>. <b>Browse Market</b>: players other managers are selling, with rarity, rating, stats and price; filter by price, rarity and rating, and buy for coins. <b>My Listings</b>: change the price or cancel. <b>Sell Players</b>: list a player at your own price (100 to 10,000,000 coins, for three days), or sell him straight to the game for half his original price (the price of the pack he came from: an Icon from a 50,000-coin Icon Pack sells for 25,000).</p><p>The market is run by the developer’s server: it handles every sale one at a time, so a player can only be sold once, and the game only accepts its signed results. A listed player can’t play until he’s sold or back. When you buy, the coins are held until the sale is confirmed, and come back if it isn’t. If you’re offline when your player sells, the coins arrive next time. A bought player keeps his development and his original price. The market is only open while the developer’s server is running.</p>'],

@@ -1,5 +1,5 @@
 {
- "_about": "Measured with tools/difficulty.cjs (a simple casual-player bot, 8 matches per mode and level). Chill and Medium are judged against the old numbers (before the Chill/Medium rebalance): their goals 3.0-4.4 on Chill and 3.3-4.6 on Medium, the bot tackled every 2.3-3.5 s on the ball, 2-8 slides a match. Hard and Extreme must stay strong. Since the 'weak teams slightly harder' change, Medium's keeper is a little sharper (keeperBeaten floor 70 -> 65). Extreme must be very hard on every pitch, Volta included (same goal target as Classical).",
+ "_about": "Measured with tools/difficulty.cjs (a simple casual-player bot, 8 matches per mode and level). Chill and Medium are judged against the old numbers (before the Chill/Medium rebalance): their goals 3.0-4.4 on Chill and 3.3-4.6 on Medium, the bot tackled every 2.3-3.5 s on the ball, 2-8 slides a match. Hard and Extreme must stay strong. Since the 'weak teams slightly harder' change, Medium's keeper is a little sharper (keeperBeaten floor 70 -> 65). Extreme must be very hard on every pitch, Volta included (same goal target as Classical). Hard and Extreme opposition keepers were made more human (Hard about 15-20% fewer saves, Extreme about 20-25%; see tools/keepers.cjs for the exact measurement), so the Extreme keeperBeaten ceilings moved up: Volta 45 -> 52, Classical 60 -> 65, Expanded 60 -> 72 (still well below Medium).",
  "cells": {
   "*/chill": {
    "aiGoals": [
@@ -58,7 +58,7 @@
    ],
    "keeperBeaten": [
     "<=",
-    60
+    65
    ]
   },
   "expanded/extreme": {
@@ -68,7 +68,7 @@
    ],
    "keeperBeaten": [
     "<=",
-    60
+    72
    ]
   },
   "volta/extreme": {
@@ -78,7 +78,7 @@
    ],
    "keeperBeaten": [
     "<=",
-    45
+    52
    ]
   }
  },

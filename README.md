@@ -122,7 +122,9 @@ line to sweep up through balls and loose balls behind the defence (better keeper
 (`floor(max(0, goals scored − goals conceded) ÷ 2)`: 2–0 or 3–1 pays 1, 4–0 pays 2, 1–0 or a draw pays nothing), once per
 match, online too, with no multipliers; the full-time screen shows the sum. Other token rewards are unchanged. Every Club Legacy level pays exactly 1 Club Token. Club Tokens build the six Club Development
 departments (Fanbase, Coaching Staff, Training Facilities, Stadium, Scouting, Commercial), levels 1–5, for
-5,000 / 10,000 / 20,000 / 35,000 coins plus 1 Club Token per level.
+5,000 / 10,000 / 20,000 / 35,000 coins plus 1 Club Token per level. Scouting has nine levels: 5,000 / 10,000 / 15,000 /
+20,000 / 25,000 / 30,000 / 35,000 / 40,000 coins plus 1 Club Token each (180,000 coins and 8 tokens in all); a club
+already at Scouting level 5 keeps it and carries on to 9.
 
 
 **Through Ball (special):** the very first version's Through Ball (commit `7d282e9`) with two changes. It's lofted over
@@ -175,10 +177,18 @@ REACHED** once there's nothing left to gain. Costs are unchanged, ratings over 9
 the other laptop gets your developed stats, checked against what's achievable), and existing saves carry on as they were.
 
 **Scouting** (Club Development) now raises the chance of a top-rated footballer *within* the rarity a pack gives, never
-the rarity itself: the chance of a card from the top quarter of that rarity's ratings goes up by 0 / 2.5 / 5 / 7.5 / 10%
-of itself at levels 1–5 (the rest of the rarity shares the remainder, so every pack's odds still add up to 100%). Pack
+the rarity itself: the chance of a card from the top quarter of that rarity's ratings goes up by 0 / 10 / 20 / 30 / 40 /
+50 / 65 / 75 / 90% of itself at levels 1–9, a relative increase (a 10% chance becomes 19% at level 9, not 100%) (the rest of the rarity shares the remainder, so every pack's odds still add up to 100%). Pack
 rarity odds, guaranteed rarities and Icon chances are exactly as printed, and every card is a real database player at
 its real rating. `tools/scouting.cjs` checks all of this by simulation.
+
+**Hard and Extreme goalkeepers** (the opposition's, offline) are a little more human: a slightly later reaction, a
+slightly worse read of where a shot is going, a slower dive with a little less stretch at full extension. Measured with
+`tools/keepers.cjs` (placed shots from three set spots, 1,800-3,000 shots per setting), Hard keepers save about 15-20%
+fewer shots than before (Volta 55.7% -> 45.8% of placed shots, Classical 40.2% -> 33.4%, Expanded 30.8% -> 25.4%) and
+Extreme keepers about 20-25% fewer (Volta 73.1% -> 56.2%, Classical 58.5% -> 45.0%, Expanded 47.6% -> 37.2%), and
+Extreme keepers are still the tougher on every pitch. Chill and Medium keepers, your own keeper, online keepers, the
+sweeper-keeper behaviour and the Icon Cup's keepers are unchanged.
 
 **Online modes:** Ranked, Friendly and Host / Join. Ranked and Friendly find a real opponent automatically (same match type
 and pitch; Ranked by similar rating, widening the longer you wait; never an AI). Ten placement matches set your first rank
@@ -266,4 +276,4 @@ node build.mjs
 ```
 
 Checks (need Playwright): `node tools/smoke.cjs <screenshot-folder>` (quick headless run), `node tools/difficulty.cjs`
-(difficulty targets), `node tools/scouting.cjs` (scouting odds).
+(difficulty targets), `node tools/scouting.cjs` (scouting odds), `node tools/keepers.cjs` (goalkeeper save rates).

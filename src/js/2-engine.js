@@ -1510,6 +1510,15 @@ const noKeep=()=>hr('nokeep')||(comp==='skill'&&SG&&SG.k==='slalom');
    hold. Measured with placed shots from set spots: still clearly tougher than Hard from the edge of the box and range.
    Chill, Medium and Hard keepers, your own keeper and online keepers are unchanged. */
 const kXN=k=>k.team===1&&!pvp()&&!!LV().extreme;
+/* Hard and Extreme opposition keepers, a little more human: a slightly later reaction, a slightly worse read of where the
+   shot is going, a slower dive with a little less stretch at full extension. Tuned with tools/keepers.cjs (placed shots
+   from set spots) so that Hard saves about 15-20% fewer shots than before and Extreme about 20-25% fewer, with Extreme
+   still the tougher of the two on every pitch. Chill and Medium keepers, your own keeper, online keepers and the Icon
+   Cup's keepers are unchanged. */
+// how much more human, by difficulty and pitch (one strength scales all four; the keepers start at different levels)
+const KHUMS={hard:{volta:.68,classical:.91,expanded:.85},extreme:{volta:1.93,classical:1.35,expanded:1.25}};
+const khumOf=s=>({err:1+.3*s,react:1+.15*s,dive:1-.07*s,reach:1-.1*s});
+const kHum=k=>{if(k.team!==1||pvp()||comp==='icon')return null;const L=KHUMS[club.level];return L&&L[PITCH]?khumOf(L[PITCH]):null};
 const kgk=k=>pvp()?1.02:k.team===0?(k.st.gkv||1.02):DF.gk*(kXN(k)?.96:1)*ez('gk');
 function keeperRead(k,react,type='normal'){
   const gk=kgk(k),spd=Math.hypot(B.vx,B.vy),a=Math.atan2(B.vy,B.vx);
@@ -1520,6 +1529,7 @@ function keeperRead(k,react,type='normal'){
   if(kXN(k)&&B.shot&&B.shot.by){const sh=B.shot.by,gx=goalX(sh.team),one=Math.hypot(sh.x-gx,sh.y-MY)<BOX*1.2&&!outfield(k.team).some(q=>dist(q,sh)<70)&&!laneBlocked(sh,{x:gx,y:MY},20,sh.team);
     sg*=1.1*(1+.8*((sh.st.fin??.6)-.6))*(one?1.25:1);rc=rc*1.06+(one?1:0)}
   if(k.team===1&&EZ()){sg*=ez('gkErr');rc*=ez('gkReact')}
+  {const h=kHum(k);if(h){sg*=h.err;rc*=h.react}}
   k.planErr=gaussN()*sg;k.planD0=Math.max(40,far);k.planY=py+k.planErr;k.react=rc;k.track=true;k.dv=0;k.diving=false}
 const KREACT=1.1;// keepers take 10% longer to react to a shot (and to decide to come off their line) than they used to
 /* ---------- sweeper keeper ----------
@@ -1609,8 +1619,8 @@ function keeperUpdate(k,dt){
     else{// he keeps reading it as it comes: his early misjudgement shrinks the closer the ball gets
       {const spd=Math.hypot(B.vx,B.vy),py=curlCross(B.x,B.y,Math.atan2(B.vy,B.vx),spd,B.curl||0,B.vz||0,k.x);
        if(py!=null)k.planY=py+(k.planErr||0)*Math.pow(clamp(Math.abs(k.x-B.x)/(k.planD0||200),0,1),.6)}
-      const ty=clamp(k.planY??B.y,GY0-24,GY1+24),dy=ty-k.y,max=(mine?3.5:DF.dive*1.15)*gk;
-      k.dv=Math.min(max,(k.dv||0)+.45*gk*dt);k.vy=clamp(dy,-k.dv,k.dv);k.vx=0;if(Math.abs(dy)>7)k.diving=true;if(Math.abs(k.vy)>.3)k.lastDy=Math.sign(k.vy)}
+      const kh=kHum(k),ty=clamp(k.planY??B.y,GY0-24,GY1+24),dy=ty-k.y,max=(mine?3.5:DF.dive*1.15)*gk*(kh?kh.dive:1);
+      k.dv=Math.min(max,(k.dv||0)+.45*gk*(kh?kh.dive:1)*dt);k.vy=clamp(dy,-k.dv,k.dv);k.vx=0;if(Math.abs(dy)>7)k.diving=true;if(Math.abs(k.vy)>.3)k.lastDy=Math.sign(k.vy)}
   }else{
     k.diving=false;
     if(B.claimBy===k&&B.lobTo){steer(k,B.lobX,B.lobY,3.3*gk,dt);return}
@@ -1682,7 +1692,7 @@ function ballUpdate(dt,live){
     const crossed=(B.px-k.x)*(B.x-k.x)<=0||Math.abs(B.x-k.x)<11;
     if(!crossed||B.z>27)continue;
     const f=B.x===B.px?1:clamp((k.x-B.px)/(B.x-B.px),0,1),yc=B.y-B.vy*dt*(1-f);
-    const reach=12.5*kgk(k)+(k.diving?11:0);
+    const reach=12.5*kgk(k)+(k.diving?11*((kHum(k)||{}).reach||1):0);
     if(Math.abs(yc-k.y)<reach&&Math.abs(B.x-(k.team===0?FX0:FX1))<BOX){
       const s=k.team===0?1:-1;
       if(B.rocket&&Math.random()<.5){B.rocket=false;B.vx*=.8;B.vy+=rnd(-1,1);B.lockBy=k;B.lockT=30;pop('THROUGH HIS HANDS!',k.x-s*60,k.y-30,C.coral,20);S.boom();continue}

@@ -87,9 +87,12 @@ const DEPTS=[
   {k:'coach',n:'Coaching Staff',fx:[0,5,10,15,20],u:'% off training costs',d:'Cheaper coin costs for stat upgrades, evolutions, keeper training, created-player training and special ability upgrades. Training Token costs never change.'},
   {k:'train',n:'Training Facilities',fx:[0,5,10,15,25],u:'% more player XP',d:'Players level up faster from matches and training sessions (levels still stop at the maximum, and stats at each player’s potential).'},
   {k:'stad',n:'Stadium Development',fx:[0,1,2,3,4],u:'% more match coins',d:'Bigger stands, brighter floodlights, a fuller and livelier crowd, and a small attendance bonus on match coins.'},
-  {k:'scout',n:'Scouting Department',fx:[0,2.5,5,7.5,10],u:'% better chance of a top-rated player',d:'Packs never change rarity: whatever rarity a pack gives, this raises the chance that its players come from the top quarter of that rarity’s ratings, by this much of itself (e.g. 25% becomes 27.5% at +10%). Players keep their real ratings.'},
+  // Scouting has nine levels and its own prices (the other departments: five levels at DEPCOST)
+  {k:'scout',n:'Scouting Department',fx:[0,10,20,30,40,50,65,75,90],cost:[5000,10000,15000,20000,25000,30000,35000,40000],u:'% better chance of a top-rated player',d:'Packs never change rarity: whatever rarity a pack gives, this raises the chance that its players come from the top quarter of that rarity’s ratings, by this much of itself (e.g. 10% becomes 19% at +90%), never by extra percentage points. Players keep their real ratings.'},
   {k:'comm',n:'Commercial Department',fx:[0,5,10,15,20],u:'% more objective coins',d:'More coins from daily and weekly challenges and achievements, a sponsor payment at the end of every league season (500 per level), and your club on the stadium boards at level 3.'}];
-const depLv=k=>clamp(((club.dept||{})[k])|0||1,1,DEPMAX);
+const depMax=k=>{const D=DEPTS.find(d=>d.k===k);return D?D.fx.length:DEPMAX};
+const depCost=(k,L)=>{const D=DEPTS.find(d=>d.k===k);return(D&&D.cost||DEPCOST)[L-1]};
+const depLv=k=>clamp(((club.dept||{})[k])|0||1,1,depMax(k));
 const depFx=k=>DEPTS.find(d=>d.k===k).fx[depLv(k)-1];
 const coachCost=c=>Math.round(c*(1-depFx('coach')/100));
 // every coin price for training shows the original, the Coaching Staff discount and what you actually pay
@@ -99,8 +102,8 @@ const coachLine=()=>depFx('coach')?`<p class="hint coachln">Coaching Staff level
 const ctk=()=>{club.ctk=club.ctk||0;return club.ctk};
 // existing clubs get one token for every Club Legacy level they already had (counted once, never twice)
 function ctkSync(){const L=(club.leg||{}).lvl||0;club.ctkEarned=club.ctkEarned||0;if(L>club.ctkEarned){club.ctk=ctk()+(L-club.ctkEarned);club.ctkEarned=L}}
-function depBuy(k){const D=DEPTS.find(d=>d.k===k);if(!D)return;const L=depLv(k);if(L>=DEPMAX){toast(`${D.n} is at the top level.`);return}
-  const c=DEPCOST[L-1];if(club.coins<c||ctk()<1){toast(`Needs ${c.toLocaleString()} coins and 1 Club Token.`);return}
+function depBuy(k){const D=DEPTS.find(d=>d.k===k);if(!D)return;const L=depLv(k);if(L>=depMax(k)){toast(`${D.n} is at the top level.`);return}
+  const c=depCost(k,L);if(club.coins<c||ctk()<1){toast(`Needs ${c.toLocaleString()} coins and 1 Club Token.`);return}
   club.coins-=c;club.ctk-=1;club.dept=club.dept||{};club.dept[k]=L+1;
   if(k==='stad'&&typeof buildCrowd==='function'){buildCrowd();pitchCv=null;skyCv=null}if(k==='comm'&&L+1>=3){club.cosOwned=[...new Set([...(club.cosOwned||[]),'boards_club'])]}
   toast(`${D.n} level ${L+1}: ${D.fx[L]}${D.u}`);S.goal();saveClub();renderMenu()}
@@ -108,8 +111,8 @@ function depBuy(k){const D=DEPTS.find(d=>d.k===k);if(!D)return;const L=depLv(k);
    Within that rarity the pack then picks a rating level (leaning towards the common, lower end) and deals real players
    close to it. The "top-rated band" of a rarity is its top quarter of ratings in the player database (every card rated at
    or above that rarity's 75th-percentile rating). Scouting multiplies the chance that the rating level falls in that band
-   by 1 + bonus (0 / 2.5 / 5 / 7.5 / 10% for levels 1-5), and scales every other rating level down to match, so the odds
-   always add up to 100%. Cards are never altered: they're real players at their real base ratings. A rarity whose ratings
+   by 1 + bonus (0 / 10 / 20 / 30 / 40 / 50 / 65 / 75 / 90% for levels 1-9: a relative increase, so 10% becomes 19% at level
+   9), and scales every other rating level down to match, so the odds always add up to 100%. Cards are never altered: they're real players at their real base ratings. A rarity whose ratings
    don't spread (no top band distinct from the rest) is left unchanged. */
 const PACK_LEAN=2.2;
 function scoutBand(t){const sorted=PLAYERS.filter(p=>tier(p)===t).sort((a,b)=>ovr(a)-ovr(b)),n=sorted.length;if(!n)return null;
@@ -117,23 +120,24 @@ function scoutBand(t){const sorted=PLAYERS.filter(p=>tier(p)===t).sort((a,b)=>ov
   // the chance of each sorted position being the pack's rating level, with no scouting: P(index=i) for floor(u^2.2*n)
   const base=sorted.map((p,i)=>Math.pow((i+1)/n,1/PACK_LEAN)-Math.pow(i/n,1/PACK_LEAN));let pHigh=0;sorted.forEach((p,i)=>{if(ovr(p)>=r75)pHigh+=base[i]});
   return{sorted,n,cut:r75,base,pHigh}}
-// the rating-level odds for a rarity at a scouting bonus b (0..0.1): top band x(1+b), the rest scaled to keep the total at 1
+// the rating-level odds for a rarity at a scouting bonus b (0..0.9): top band x(1+b), the rest scaled to keep the total at 1
+// (never past 100%: the top band can't be pushed beyond certain)
 function scoutLevelOdds(t,b){const S=scoutBand(t);if(!S)return null;if(!b||!S.pHigh||S.pHigh>=1)return{S,w:S.base,pHigh:S.pHigh};
-  const up=1+b,dn=(1-S.pHigh*up)/(1-S.pHigh);return{S,w:S.sorted.map((p,i)=>S.base[i]*(ovr(p)>=S.cut?up:dn)),pHigh:S.pHigh*up}}
+  const up=Math.min(1+b,1/S.pHigh),dn=(1-S.pHigh*up)/(1-S.pHigh);return{S,w:S.sorted.map((p,i)=>S.base[i]*(ovr(p)>=S.cut?up:dn)),pHigh:S.pHigh*up}}
 // the rating level for a pack of rarity t
 function scoutAnchor(t,b=depFx('scout')/100){const L=scoutLevelOdds(t,b);if(!L)return 60;let r=Math.random(),i=0;for(;i<L.w.length-1;i++){r-=L.w[i];if(r<0)break}return ovr(L.S.sorted[i])}
 
 function deptHTML(){ctkSync();const tk=ctk(),spent=DEPTS.reduce((a,D)=>a+depLv(D.k)-1,0);
   const fmt=(D,v)=>D.k==='stad'?`${[60,70,80,90,100][DEPTS.find(x=>x.k==='stad').fx.indexOf(v)]}% crowd · +${v}% match coins`:`${D.k==='coach'?'−':'+'}${v}${D.u}`;
-  const rows=DEPTS.map(D=>{const L=depLv(D.k),max=L>=DEPMAX,c=max?0:DEPCOST[L-1],can=!max&&club.coins>=c&&tk>=1;
-    return `<div class="panel dept"><div class="dhead"><h4>${D.n}</h4><span class="ablv">${[1,2,3,4,5].map(i=>`<i class="${i<=L?'on':''}"></i>`).join('')}</span><b class="dlv">Level ${L}/${DEPMAX}</b></div>
+  const rows=DEPTS.map(D=>{const L=depLv(D.k),M=depMax(D.k),max=L>=M,c=max?0:depCost(D.k,L),can=!max&&club.coins>=c&&tk>=1;
+    return `<div class="panel dept"><div class="dhead"><h4>${D.n}</h4><span class="ablv">${Array.from({length:M},(_,i)=>`<i class="${i+1<=L?'on':''}"></i>`).join('')}</span><b class="dlv">Level ${L}/${M}</b></div>
      <p class="hint" style="margin:2px 0 6px">${D.d}</p>
      <p>Now: <b>${L===1&&!D.fx[0]&&D.k!=='stad'?'no bonus yet':fmt(D,D.fx[L-1])}</b>${max?'':` · next level: <b class="dnext">${fmt(D,D.fx[L])}</b>`}</p>
      ${D.k==='scout'?`<p class="hint" style="margin:2px 0">Chance a pack's players come from the top-rated quarter of their rarity, now${max?'':' → next level'}: ${['bronze','silver','gold','special','icon'].map(t=>{const a=scoutLevelOdds(t,D.fx[L-1]/100),b=max?null:scoutLevelOdds(t,D.fx[L]/100);return a?`${TIERS[t].name} ${(a.pHigh*100).toFixed(1)}%${b?` → ${(b.pHigh*100).toFixed(1)}%`:''}`:''}).filter(Boolean).join(' · ')}. Rarity odds are never changed.</p>`:''}
      ${D.k==='comm'?`<p class="hint" style="margin:2px 0">Sponsor payment each league season: ${(500*(L-1)).toLocaleString()} coins${L<3?' · club advertising boards at level 3':' · club advertising boards unlocked'}</p>`:''}
      ${max?'<b class="maxl">MAX LEVEL</b>':`<button class="btn ${can?'gold':''}" data-dep="${D.k}" ${can?'':'disabled'}>Upgrade · ${c.toLocaleString()} coins + 1 Club Token</button>`}</div>`}).join('');
-  return `<div class="panel"><h4>Club Development</h4><p><span class="ctk">${tk}</span> Club Token${tk===1?'':'s'} · ${(club.coins||0).toLocaleString()} coins · ${spent} of ${DEPTS.length*(DEPMAX-1)} department levels built</p>
-   <p class="hint">You earn exactly 1 Club Token every time your Club Legacy level goes up (${club.ctkEarned||0} earned so far). Club Tokens are separate from Training Tokens. Each department level costs ${DEPCOST.map(c=>c.toLocaleString()).join(' / ')} coins plus 1 Club Token.  Fanbase and Stadium bonuses apply to every match, online included, on top of the mode multiplier.</p>
+  return `<div class="panel"><h4>Club Development</h4><p><span class="ctk">${tk}</span> Club Token${tk===1?'':'s'} · ${(club.coins||0).toLocaleString()} coins · ${spent} of ${DEPTS.reduce((a,D)=>a+depMax(D.k)-1,0)} department levels built</p>
+   <p class="hint">You earn exactly 1 Club Token every time your Club Legacy level goes up (${club.ctkEarned||0} earned so far). Club Tokens are separate from Training Tokens. Each department level costs ${DEPCOST.map(c=>c.toLocaleString()).join(' / ')} coins plus 1 Club Token; the Scouting Department has nine levels at ${DEPTS.find(D=>D.k==='scout').cost.map(c=>c.toLocaleString()).join(' / ')} coins plus 1 Club Token each.  Fanbase and Stadium bonuses apply to every match, online included, on top of the mode multiplier.</p>
    <button class="btn" data-depcos="1">Cosmetic customisation →</button></div><div class="deptg">${rows}</div>`}
 
 /* ===== special ability development ===== */
