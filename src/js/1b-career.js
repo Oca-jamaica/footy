@@ -209,9 +209,13 @@ function chemParts(q=sq()){const slots=FORMS[q.f],ids=q.s;if(!ids.some(Boolean))
 // tactics, per game mode: mentality, passing and pressing. 0 = low, 1 = balanced, 2 = high
 const TAC=[{k:'ment',l:'Mentality',o:['Defensive','Balanced','Attacking']},{k:'pass',l:'Passing',o:['Patient','Mixed','Direct']},{k:'press',l:'Pressing',o:['Sit back','Normal','High press']}];
 const tacSet=()=>{club.tac=club.tac||{};return club.tac[GM]=club.tac[GM]||{ment:1,pass:1,press:1}};
-function tacOf(team){if(team===1){const o=OPP.tac||{};return{push:o.push||1,pass:o.pass||1,press:o.press||1}}
-  const t=(club.tac||{})[PITCH!=='volta'?'classical':'volta']||{ment:1,pass:1,press:1};
-  return{push:[.75,1,1.25][t.ment],pass:[.7,1,1.4][t.pass],press:[.8,1,1.22][t.press]}}
+function tacOf(team){let b;if(team===1){const o=OPP.tac||{};b={push:o.push||1,pass:o.pass||1,press:o.press||1}}
+  else{const t=(club.tac||{})[PITCH!=='volta'?'classical':'volta']||{ment:1,pass:1,press:1};b={push:[.75,1,1.25][t.ment],pass:[.7,1,1.4][t.pass],press:[.8,1,1.22][t.press]}}
+  // the tactic picked during the match (T) overrides the pre-match settings until the final whistle
+  const lt=typeof liveTac!=='undefined'?liveTac[team]|0:0;
+  if(lt===1)return{push:Math.max(b.push,1.3),pass:b.pass,press:Math.max(b.press,1.3)};
+  if(lt===2)return{push:Math.min(b.push,.7),pass:Math.min(b.pass,.75),press:Math.min(b.press,.75)};
+  return b}
 
 /* ===== economy ===== */
 // Coins buy packs, upgrades, evolutions and keeper training. Training Tokens unlock advanced development (training

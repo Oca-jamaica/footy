@@ -190,6 +190,34 @@ Extreme keepers about 20-25% fewer (Volta 73.1% -> 56.2%, Classical 58.5% -> 45.
 Extreme keepers are still the tougher on every pitch. Chill and Medium keepers, your own keeper, online keepers, the
 sweeper-keeper behaviour and the Icon Cup's keepers are unchanged.
 
+**In-match tactics (T):** press `T` at any time in a match (also paused, at a kick-off or after a goal) to switch your
+AI team-mates between **Normal** (the tactics set on the Squad tab), **High Press** and **Haram Ball**. A banner shows
+the change and the current tactic sits next to the special-ability chips. Every match starts on Normal. Online, each
+player sets their own team's tactic (the joining player's T goes to the host like any other button press); the
+computer's tactics are unchanged.
+
+- **High Press**, for chasing a game: the line pushes up, the nearest player closes down the ball, a second player
+  steps in to cut off the carrier's nearest pass, and the rest mark tightly (closer, less goal-side). It wins the ball
+  back higher up the pitch but leaves space in behind.
+- **Haram Ball**, for holding a lead: the team sits deep and narrow, the nearest player holds a few yards goal-side of
+  the carrier instead of diving in (he only goes for the ball once the carrier gets near your goal), and team-mates
+  stay close to the ball for short passes rather than making runs.
+
+Measured with `tools/tactics.cjs` (whole Medium matches against the computer, a simple bot playing your player, the
+tactic set with T at kick-off; Volta 6 matches per tactic, Classical 12):
+
+| | Line* | Won back in their half | Possession | Nearest team-mate | Goals for / against | Their shots | Their xG |
+|---|---|---|---|---|---|---|---|
+| Volta Normal | .45 | 8.2 | 46% | 150 px | 1.00 / 2.83 | | |
+| Volta High Press | .51 | 9.5 | 48% | 134 px | 2.67 / 2.17 | | |
+| Volta Haram Ball | .35 | 9.3 | 35% | 141 px | 0.67 / 1.50 | | |
+| Classical Normal | .40 | 8.8 | 48% | 138 px | 0.17 / 2.67 | 6.2 | 1.83 |
+| Classical High Press | .46 | 12.6 | 48% | 125 px | 1.08 / 2.75 | 5.8 | 1.81 |
+| Classical Haram Ball | .32 | 3.3 | 37% | 105 px | 0.08 / 2.08 | 4.2 | 1.07 |
+
+\* your team-mates' average position while the computer has the ball (0 = your goal line, 1 = theirs). Per-match
+numbers from a handful of matches are noisy; the direction of each change is what the test is for.
+
 **Online modes:** Ranked, Friendly and Host / Join. Ranked and Friendly find a real opponent automatically (same match type
 and pitch; Ranked by similar rating, widening the longer you wait; never an AI). Ten placement matches set your first rank
 (Bronze → Silver → Gold → Platinum → Diamond → Champion → Legendary); after that wins earn Ranked Points and losses cost

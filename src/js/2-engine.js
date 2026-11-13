@@ -497,6 +497,8 @@ addEventListener('keydown',e=>{
   const c=e.code;
   if(state==='menu')return;
   if(c==='Escape'||c==='KeyP'){e.preventDefault();if(!e.repeat)setPause(!paused);return}
+  // T: change your tactic, any time in a match (paused too, during the kick-off intro, after a goal)
+  if(c==='KeyT'&&!e.repeat&&!['menu','fulltime','pens'].includes(state)&&!pen){const v=(liveTac[0]+1)%3;setLiveTac(0,v);if(NET.guest)gPush('KeyT',{v});return}
   if(c==='KeyV'&&state!=='menu'&&!e.repeat){toggleFull();return}
   if(paused)return;
   if(state==='play'&&introT>0){if(c==='Space'||c==='Enter')introT=Math.min(introT,12);e.preventDefault();return}
@@ -569,7 +571,7 @@ function sgUpdate(dt){if(!SG)return;
 function sgGoal(team){if(SG.k==='target'){const corner=Math.abs(B.y-MY)>36,pts=corner?3:1;SG.pts+=pts;pop(corner?'TOP CORNER  +3':'GOAL  +1',FX1-80,B.y-30,corner?C.sun:C.cream,corner?24:18,60);
     netShake[1]=30;S.goal();if(corner)burst(FX1-10,B.y,60,CONF,8,.12);B.owner=null;B.vx=B.vy=B.vz=0;B.x=FX1+20;SG.parked=true;SG.wait=26;return}
   if(SG.k==='slalom'){SG.done=SG.gi>=SG.gates.length;if(!SG.done){SG.time+=3;pop('MISSED GATES  +3s',FX1-80,MY-30,C.coral,18,60)}netShake[1]=40;S.goal();burst(FX1-10,MY,90,CONF,9,.12);B.x=FX1+20;B.vx=B.vy=B.vz=0;SG.parked=true;clock=0}}
-function startMatch(){matchSerial++;ttCalc=null;
+function startMatch(){matchSerial++;ttCalc=null;liveTac=[0,0];tacFlash=null;
   if(ownedPlayers().length<4)return;
   comp=club.comp||'cup';
   // Classical is played on the big pitch; skill games, challenges and online always use the Volta cage
@@ -1073,7 +1075,19 @@ const CSTY={possession:{n:'Possession',press:.95,line:.5,pass:1.3,long:.5,width:
   wide:{n:'Wide play',press:1,line:.5,pass:1,long:1,width:1.3,tempo:1,shoot:.95},
   neutral:{n:'Balanced',press:1,line:.5,pass:1,long:1,width:1,tempo:1,shoot:1}};
 const CL=()=>PITCH!=='volta';
-function cStyle(team){if(team===0||NET.on)return CSTY.neutral;if(!OPP.style){const k=['possession','counter','press','direct','wide'];let h=7;for(const ch of String(OPP.name||''))h=(h*31+ch.charCodeAt(0))>>>0;OPP.style=k[h%k.length]}return CSTY[OPP.style]||CSTY.neutral}
+/* In-match tactics (T to change, any time during a match; back to Normal for every new match). Online, each player sets
+   his own team's. They drive your AI team-mates:
+   - Normal: your pre-match tactics (Squad tab), unchanged;
+   - High Press: a high line, faster closing down, and a second man who goes at the carrier's next pass (between him
+     and his nearest team-mate), so you win it back high up the pitch, at the risk of space in behind;
+   - Haram Ball: a deep, compact block; the first man only engages near your box (further up he screens, goal-side);
+     with the ball nobody runs in behind and the others come short around the man on the ball for a safe pass, to keep
+     it and see the game out. */
+const LIVETAC=['NORMAL','HIGH PRESS','HARAM BALL'];
+let liveTac=[0,0],tacFlash=null;
+function setLiveTac(team,v,quiet){v=clamp(v|0,0,2);liveTac[team]=v;if(!quiet&&(team===0||NET.guest))tacFlash={v,t0:t}}
+const TSTY={press:{...CSTY.press,n:'High press',press:1.35,line:.85},haram:{n:'Haram ball',press:.75,line:.12,pass:1.15,long:.4,width:.9,tempo:.8,shoot:.85}};
+function cStyle(team){const lt=liveTac[team]|0;if(lt)return lt===1?TSTY.press:TSTY.haram;if(team===0||NET.on)return CSTY.neutral;if(!OPP.style){const k=['possession','counter','press','direct','wide'];let h=7;for(const ch of String(OPP.name||''))h=(h*31+ch.charCodeAt(0))>>>0;OPP.style=k[h%k.length]}return CSTY[OPP.style]||CSTY.neutral}
 // decision quality on the big pitches: Chill .3, Medium .58, Hard .82, Extreme 1 (a little higher in the top divisions)
 function cIQ(team){if(pvp()||team===0)return .6;const b={chill:.3,normal:.58,hard:.82,extreme:1}[lvKey()]??.58;return clamp(b+(DF.read||0)*.3-.03,0,1)}
 const lerp=(a,b,k)=>a+(b-a)*k;
@@ -1140,7 +1154,8 @@ function cPassEval(p,IQ,sty,noise){const gx=goalX(p.team),dir=Math.sign(gx-p.x)|
   return best?{m:best,v:bv}:null}
 function homePos(p,attacking){
   const f=p.slot,bf=(B.x-FX0)/(FX1-FX0),prog=p.team===0?bf:1-bf;
-  let fx=f.x+(prog-.45)*.5+(attacking?.08:-.06)+(tacOf(p.team).push-1)*(attacking?.16:.1);
+  const lt=liveTac[p.team]|0;
+  let fx=f.x+(prog-.45)*.5+(attacking?.08:-.06)+(tacOf(p.team).push-1)*(attacking?.16:.1)+(lt===1?.09:lt===2?(attacking?-.1:-.07):0);
   let lim={DEF:[.07,.55],MID:[.16,.74],ATT:[.28,.86]}[f.r];
   if(p.role==='att'){fx+=attacking?.17:.07;lim=[lim[0]+.08,Math.min(.9,lim[1]+.12)]}// attacking role: lives on the shoulder of the last man
   else if(p.role==='cap'){fx-=attacking?.15:.04;lim=[Math.max(.06,lim[0]-.05),Math.min(lim[1],.46)]}// captain: holds the line, rarely crosses halfway
@@ -1185,7 +1200,7 @@ function teamAI(team,dt){
   if(NET.on&&team===1&&owner&&owner.team===1&&!owner.keeper&&owner!==ctrl2)setCtrl2(owner);
   const chipIn=!owner&&B.lobTo&&B.lobTo.team!==team&&B.pass&&B.pass.chip;// they've chipped it: someone go and attack where it drops
   const thruIn=!owner&&B.lobTo&&B.lobThrough&&B.lobTo.team!==team;// their through ball is in the air: read where it comes down
-  let chaser=null,cover=null;const IQ=aiIQ(team),CLs=CL(),IQc=CLs?cIQ(team):IQ,STY=CLs?cStyle(team):null;for(const p of ai){p.icpt=null;p.cBlock=null}
+  let chaser=null,cover=null,press2=null;const LT=liveTac[team]|0;const IQ=aiIQ(team),CLs=CL(),IQc=CLs?cIQ(team):IQ,STY=CLs?cStyle(team):null;for(const p of ai){p.icpt=null;p.cBlock=null}
   if(!owner||(theyHave&&!owner.keeper)){
     const target=owner||(chipIn||thruIn?{x:B.lobX,y:B.lobY}:{x:B.x+B.vx*8,y:B.y+B.vy*8});
     const cands=ai.filter(p=>p.stun<=0);
@@ -1204,10 +1219,12 @@ function teamAI(team,dt){
     if(CLs&&theyHave&&cands.length){chaser=cEngager(team,cands,owner,STY);
       if(team===0&&ctrl&&dist(ctrl,owner)<dist(chaser,owner)+90)chaser=null;
       const cc=cands.filter(p=>p!==chaser);cover=null;if(cc.length){const dxg=ownGoal-owner.x,dyg=MY-owner.y,dg=Math.hypot(dxg,dyg)||1,cd=Math.min(dg*.55,lerp(125,80,IQc)*Math.sqrt(PSC)),gp={x:owner.x+dxg/dg*cd,y:owner.y+dyg/dg*cd};cover=cc.reduce((a,b)=>dist(a,gp)<dist(b,gp)?a:b)}}
+    // High Press: a second man closes down too (the nearest of the rest, if he's within reach)
+    if(LT===1&&theyHave&&!owner.keeper){const c2=cands.filter(p=>p!==chaser&&p!==cover&&dist(p,owner)<320*PSC).sort((a,b)=>dist(a,owner)-dist(b,owner))[0];if(c2)press2=c2}
   }
   const attackers=outfield(opp).filter(q=>q!==owner);const taken=new Set();
   // marking: the most dangerous free runners (closest to goal) are picked up first, each by the nearest free defender
-  const markOf=new Map();if(!hasBall){const free=ai.filter(p=>p!==chaser&&p!==cover&&p.stun<=0),R=(150+130*IQ)*PSC;
+  const markOf=new Map();if(!hasBall){const free=ai.filter(p=>p!==chaser&&p!==cover&&p!==press2&&p.stun<=0),R=(150+130*IQ)*PSC*(LT===1?1.7:1);
     const homes=new Map(free.map(p=>[p,CLs?cDefSpot(p,team,STY):homePos(p,false)]));
     if(CLs&&theyHave&&!owner.keeper&&free.length&&Math.random()<.35+.65*IQc){const ev=cPassEval(owner,1,cStyle(opp),false);
       if(ev&&ev.m){const bx=owner.x+(ev.m.x-owner.x)*.45,by=owner.y+(ev.m.y-owner.y)*.45;let bd=null,bv=1e9;for(const d of free){const v=Math.hypot(d.x-bx,d.y-by);if(v<bv){bv=v;bd=d}}
@@ -1243,6 +1260,10 @@ function teamAI(team,dt){
     if(p.shadow>0&&owner===p.shadowOf){p.shadow-=dt;const f={x:B.x+Math.cos(owner.dir)*12,y:B.y+Math.sin(owner.dir)*12};
       p.vx=owner.vx*.92+(f.x-p.x)*.12;p.vy=owner.vy*.92+(f.y-p.y)*.12;
       if(dist(p,B)<20&&p.tackleCd<=0&&notBehind(p,owner))tackle(p,owner);continue}
+    // High Press: the second man goes at the carrier's next pass, between him and his nearest team-mate
+    if(p===press2&&owner){const mt=outfield(opp).filter(q=>q!==owner).sort((a,b)=>dist(a,owner)-dist(b,owner))[0],k=.45,tg=mt?{x:owner.x+(mt.x-owner.x)*k,y:owner.y+(mt.y-owner.y)*k}:{x:owner.x,y:owner.y};steer(p,tg.x,tg.y,topSpeed(p),dt);continue}
+    // Haram Ball: the first man only engages near your own box; further up he screens, goal-side, and waits
+    if(LT===2&&p===chaser&&theyHave&&!owner.keeper&&Math.abs(owner.x-ownGoal)>(FX1-FX0)*.42){const dd=Math.hypot(ownGoal-owner.x,MY-owner.y)||1;steer(p,owner.x+(ownGoal-owner.x)/dd*95*PSC,owner.y+(MY-owner.y)/dd*95*PSC,topSpeed(p)*.9,dt);continue}
     if(CLs&&theyHave&&p===chaser){cEngage(p,owner,team,IQc,dt);continue}
     if(CLs&&theyHave&&p===cover){cCoverRun(p,owner,team,IQc,dt);continue}
     if((p===chaser||p===cover)&&react0){steer(p,owner.x+(ownGoal-owner.x)*.25,owner.y+(MY-owner.y)*.25,topSpeed(p)*.5,dt);continue}// you've just won it: they take a moment
@@ -1290,14 +1311,17 @@ function teamAI(team,dt){
         if(p.runPt){tx+=p.runPt.x-p.runB.x;ty+=p.runPt.y-p.runB.y}}
       if(owner&&dist({x:tx,y:ty},owner)<80){ty+=(ty<owner.y?-1:1)*60}
       if(CLs&&owner&&owner!==p&&p.slot.r!=='DEF'){const a=cAttackShape(p,team,owner,tx,ty,IQc);tx=a.x;ty=a.y;if(a.run)p.sprint=false}
+      // Haram Ball: nobody runs in behind; the others come short around the man on the ball for a safe pass
+      if(LT===2&&owner&&owner!==p&&owner.team===team&&!owner.keeper){const mates=ai.filter(q=>q!==owner).sort((a,b)=>a.i-b.i),k=mates.indexOf(p),R=110*PSC,
+        S=[[-.55,1],[-.55,-1],[-1.25,0],[.35,1.25],[.35,-1.25],[-1.6,.9],[-1.6,-.9]][Math.max(0,k)%7];tx=owner.x+att*S[0]*R;ty=owner.y+S[1]*R;p.runPt=null;p.cRun=0;p.sprint=false}
       spd=topSpeed(p)*(p.turbo>0||p.sprint||(CLs&&counter&&p.slot.r!=='DEF')||p.cRun>0?1:.85);
     }else{
       const h=CLs?cDefSpot(p,team,STY):homePos(p,false);let m=markOf.get(p);
       if(!m&&IQ<.3){let md=150*PSC;for(const q of attackers){if(taken.has(q))continue;const d=Math.hypot(q.x-h.x,q.y-h.y);if(d<md){md=d;m=q}}}
       if(m){taken.add(m);
         // goal-side of the runner, reading where he's going, and leaning into the passing lane from the ball
-        const L=8*IQ,mx=m.x+m.vx*L,my=m.y+m.vy*L;let gx2=mx+(ownGoal-mx)*.2,gy2=my+(MY-my)*.2;
-        if(owner&&owner.team===opp){const l=.4*IQ,lx=mx+(owner.x-mx)*.28,ly=my+(owner.y-my)*.28;gx2+=(lx-gx2)*l;gy2+=(ly-gy2)*l}
+        const L=8*IQ,mx=m.x+m.vx*L,my=m.y+m.vy*L,hp=LT===1;let gx2=mx+(ownGoal-mx)*(hp?.06:.2),gy2=my+(MY-my)*(hp?.06:.2);
+        if(owner&&owner.team===opp){const l=hp?Math.max(.6,.4*IQ):.4*IQ,lx=mx+(owner.x-mx)*.28,ly=my+(owner.y-my)*.28;gx2+=(lx-gx2)*l;gy2+=(ly-gy2)*l}
         // their through ball is on: track the run, don't watch the ball
         if(B.pass&&B.pass.through&&B.pass.to===m&&B.pass.from&&B.pass.from.team===opp){gx2=m.x+(ownGoal-m.x)*.1;gy2=m.y;p.sprint=!CLs&&IQ>.3}
         // blocking the carrier's best pass: stand in the lane
@@ -1310,6 +1334,8 @@ function teamAI(team,dt){
     }
     // Chill/Medium: only the man engaging you comes close; everyone else keeps a little room instead of crowding you
     if(team===1&&theyHave&&EZ()&&!owner.keeper){const R=ez('room',0)*Math.sqrt(PSC),dx=tx-owner.x,dy=ty-owner.y,d=Math.hypot(dx,dy);if(d<R){const k=d>.1?R/d:0;tx=owner.x+(k?dx*k:R);ty=owner.y+(k?dy*k:0)}}
+    // Haram Ball: the rest of the block stays compact, a little deeper and narrower
+    if(LT===2&&!hasBall&&p!==chaser&&p!==cover){tx+=(ownGoal-tx)*.1;ty+=(MY-ty)*.18}
     // spacing: don't bunch up on top of a team-mate (the ball-chaser and cover are left alone)
     {const R=(46+30*IQ)*PSC;for(const q of own){if(q===p)continue;const dx=tx-q.x,dy=ty-q.y,d=Math.hypot(dx,dy);if(d<R&&d>.1){const f=(R-d)/R*R*.6;tx+=dx/d*f;ty+=dy/d*f}}}
     steer(p,clamp(tx,FX0+40,FX1-40),clamp(ty,FY0+25,FY1-25),spd,dt);
